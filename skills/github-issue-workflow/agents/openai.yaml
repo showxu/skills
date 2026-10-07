@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub Issue Workflow"
+  short_description: "Issue-to-merge workflow for GitHub repositories"
+  default_prompt: "Use $github-issue-workflow to take this GitHub issue from triage through a test-backed pull request, green CI, and branch cleanup."

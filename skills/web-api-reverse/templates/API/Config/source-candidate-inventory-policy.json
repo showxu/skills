@@ -1,0 +1,17 @@
+{
+  "allowedHosts": [
+    "api.example.invalid"
+  ],
+  "kind": "web-api-reverse.source-candidate-inventory-policy",
+  "market": "cn",
+  "maximumBodyBytes": 2000000,
+  "maximumIdentifierLength": 16,
+  "minimumIdentifierLength": 8,
+  "platformProvider": "replace-with-platform-provider",
+  "productIdentifierKeys": [
+    "itemId",
+    "productId"
+  ],
+  "provider": "replace-with-provider",
+  "schemaVersion": 1
+}

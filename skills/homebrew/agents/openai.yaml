@@ -1,0 +1,4 @@
+interface:
+  display_name: "Homebrew"
+  short_description: "Work with Homebrew formulae and taps"
+  default_prompt: "Use $homebrew to check Homebrew formula/tap behavior, formula naming, install commands, and tap release packaging guidance."

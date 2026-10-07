@@ -1,0 +1,4 @@
+interface:
+  display_name: "ChatGPT & Codex Project Manager"
+  short_description: "Manage chats, threads, projects, and sidebar sections"
+  default_prompt: "Use $chatgpt-project-manager to manage and reorganize my ChatGPT and Codex chats, threads, projects, and sections, then verify each requested change."

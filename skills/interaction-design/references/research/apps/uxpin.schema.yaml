@@ -1,0 +1,223 @@
+schema_version: interaction-schema-facts.v1
+app: uxpin
+source_report: references/research/apps/uxpin.md
+status: research_fact_store
+mapping_policy:
+  status: hypothesis
+  meaning: Draft candidate mapping for future UI Design Schema and Interaction Design Schema synthesis.
+  not_a_fact: true
+  not_current_contract_validation: true
+  review_required: true
+role:
+  classification: secondary_donor
+  orientation:
+    - prototype_time
+    - realistic_forms
+    - code_backed_components
+  summary: Realistic prototype donor for component states, variables, conditions, expressions, forms, validation, data binding, and code-backed component boundaries.
+authority:
+  primary:
+    - official_docs
+  notes:
+    - No local .uxp artifact is available.
+    - Treat docs as concept/schema evidence, not file-format evidence.
+evidence:
+  - id: uxpin_interactions
+    grade: official_docs
+    title: UXPin interactions docs
+    url: https://www.uxpin.com/docs/prototyping/interactions/
+  - id: uxpin_variables
+    grade: official_docs
+    title: UXPin variables docs
+    url: https://www.uxpin.com/docs/prototyping/variables/
+  - id: uxpin_expressions
+    grade: official_docs
+    title: UXPin expressions docs
+    url: https://www.uxpin.com/docs/prototyping/expressions/
+  - id: uxpin_forms
+    grade: official_docs
+    title: UXPin forms docs
+    url: https://www.uxpin.com/docs/prototyping/forms/
+  - id: uxpin_design_systems
+    grade: official_docs
+    title: UXPin design systems docs
+    url: https://www.uxpin.com/docs/design-systems/design-systems/
+  - id: uxpin_merge
+    grade: official_docs
+    title: UXPin Merge overview
+    url: https://www.uxpin.com/docs/merge/what-is-uxpin-merge/
+objects:
+  - name: Page
+    category: surface
+    evidence: [uxpin_interactions]
+    draft_schema_mapping: [interaction_design_schema.behavior.screens, ui_design_schema.pages]
+    decision: absorb
+    fields:
+      - name: elements
+        type: Element[]
+        draft_schema_mapping: [ui_design_schema.children, interaction_design_schema.behavior.actors]
+        decision: absorb
+      - name: interactions
+        type: Interaction[]
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb
+  - name: Element
+    category: actor
+    evidence: [uxpin_interactions]
+    draft_schema_mapping: [interaction_design_schema.behavior.actors, ui_design_schema.elements]
+    decision: absorb
+    fields:
+      - name: element_type
+        draft_schema_mapping: [ui_design_schema.component_type]
+        decision: absorb
+      - name: states
+        type: State[]
+        draft_schema_mapping: [interaction_design_schema.behavior.states]
+        decision: absorb
+      - name: interactions
+        type: Interaction[]
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb
+  - name: Component
+    category: component
+    evidence: [uxpin_design_systems]
+    draft_schema_mapping: [ui_design_schema.components, interaction_design_schema.behavior.components]
+    decision: absorb
+    fields:
+      - name: states
+        type: State[]
+        draft_schema_mapping: [interaction_design_schema.behavior.states]
+        decision: absorb
+      - name: properties
+        draft_schema_mapping: [ui_design_schema.component_properties]
+        decision: absorb
+      - name: design_system_ref
+        draft_schema_mapping: [ui_design_schema.design_system_ref]
+        decision: reference
+  - name: CodeBackedComponent
+    category: runtime_binding
+    evidence: [uxpin_merge]
+    draft_schema_mapping: [prototype_projection_contract.runtime_binding, implementation_boundary.code_component]
+    decision: defer_to_implementation_boundary
+    fields:
+      - name: props
+        draft_schema_mapping: [prototype_projection_contract.runtime_binding.props]
+        decision: reference
+      - name: events
+        draft_schema_mapping: [prototype_projection_contract.runtime_binding.events]
+        decision: reference
+      - name: component_source
+        draft_schema_mapping: [implementation_boundary.component_source]
+        decision: defer
+  - name: Interaction
+    category: action
+    evidence: [uxpin_interactions]
+    draft_schema_mapping: [interaction_design_schema.behavior.actions]
+    decision: absorb
+    fields:
+      - name: trigger
+        draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+        decision: absorb
+      - name: action
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb
+      - name: target
+        draft_schema_mapping: [interaction_design_schema.behavior.action.target]
+        decision: absorb
+      - name: condition
+        type: Condition
+        draft_schema_mapping: [interaction_design_schema.behavior.conditions]
+        decision: absorb
+  - name: State
+    category: state
+    evidence: [uxpin_interactions]
+    draft_schema_mapping: [interaction_design_schema.behavior.states]
+    decision: absorb
+    fields:
+      - name: name
+        draft_schema_mapping: [interaction_design_schema.behavior.state.name]
+        decision: absorb
+      - name: properties
+        draft_schema_mapping: [ui_design_schema.state_properties]
+        decision: absorb
+      - name: visibility
+        draft_schema_mapping: [interaction_design_schema.behavior.state.visible_elements]
+        decision: absorb
+  - name: Variable
+    category: state
+    evidence: [uxpin_variables]
+    draft_schema_mapping: [interaction_design_schema.behavior.variables]
+    decision: absorb
+    fields:
+      - name: name
+        draft_schema_mapping: [interaction_design_schema.behavior.variable.name]
+        decision: absorb
+      - name: type
+        draft_schema_mapping: [interaction_design_schema.behavior.variable.type]
+        decision: absorb
+      - name: value
+        draft_schema_mapping: [interaction_design_schema.behavior.variable.value]
+        decision: absorb
+      - name: scope
+        draft_schema_mapping: [interaction_design_schema.behavior.variable.scope]
+        decision: absorb
+  - name: Expression
+    category: expression
+    evidence: [uxpin_expressions]
+    draft_schema_mapping: [interaction_design_schema.behavior.expressions]
+    decision: absorb_concept_not_syntax
+    fields:
+      - name: expression_body
+        draft_schema_mapping: [interaction_design_schema.behavior.expression.body]
+        decision: absorb_concept_not_syntax
+      - name: referenced_variables
+        draft_schema_mapping: [interaction_design_schema.behavior.expression.references]
+        decision: absorb
+  - name: Condition
+    category: condition
+    evidence: [uxpin_expressions, uxpin_variables]
+    draft_schema_mapping: [interaction_design_schema.behavior.conditions]
+    decision: absorb
+    fields:
+      - name: expression
+        type: Expression
+        draft_schema_mapping: [interaction_design_schema.behavior.condition.expression]
+        decision: absorb
+      - name: action_branch
+        draft_schema_mapping: [interaction_design_schema.behavior.branching]
+        decision: absorb
+  - name: FormField
+    category: validation
+    evidence: [uxpin_forms]
+    draft_schema_mapping: [interaction_design_schema.behavior.validation.fields]
+    decision: absorb
+    fields:
+      - name: field_type
+        draft_schema_mapping: [interaction_design_schema.behavior.validation.field_type]
+        decision: absorb
+      - name: value
+        draft_schema_mapping: [interaction_design_schema.behavior.input.value]
+        decision: absorb
+      - name: validation_rule
+        draft_schema_mapping: [interaction_design_schema.behavior.validation.rules]
+        decision: absorb
+      - name: error_feedback
+        draft_schema_mapping: [interaction_design_schema.behavior.feedback.validation_error]
+        decision: absorb
+  - name: DataBinding
+    category: runtime_binding
+    evidence: [uxpin_merge]
+    draft_schema_mapping: [prototype_projection_contract.runtime_binding.data]
+    decision: reference
+    fields:
+      - name: source
+        draft_schema_mapping: [prototype_projection_contract.runtime_binding.data_source]
+        decision: reference
+      - name: target
+        draft_schema_mapping: [prototype_projection_contract.runtime_binding.data_target]
+        decision: reference
+gaps:
+  - id: uxpin_artifact_schema
+    status: deferred
+    description: No local .uxp export sample is available.
+    impact: UXPin remains docs-backed concept evidence for realistic prototype/form/code-backed boundaries.

@@ -1,0 +1,117 @@
+{
+  "name": "skills",
+  "owner": {
+    "name": "showxu"
+  },
+  "metadata": {
+    "description": "Unified local skills marketplace for product management, design and user experience, Web app build, go-to-market, software engineering, and skill toolkit workflows",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "product-management",
+      "description": "Product Documentation workflow from discovery and requirements through interaction design and product prototype artifacts",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/product-documentation",
+        "./skills/product-discovery",
+        "./skills/product-requirements",
+        "./skills/interaction-design",
+        "./skills/frontend-design",
+        "./skills/web-artifacts-builder"
+      ]
+    },
+    {
+      "name": "design-and-user-experience",
+      "description": "Interaction design, Apple platform experience guidance, official Apple design resources, Sketch design facts, UX writing, design.md templates, SF Symbols assets, framework icon families, app icons, and Web UI expression",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/interaction-design",
+        "./skills/apple-hig",
+        "./skills/apple-design-resource",
+        "./skills/sketch-design",
+        "./skills/ux-writing",
+        "./skills/design-md-template",
+        "./skills/sfsymbols-export",
+        "./skills/apple-framework-icon-design",
+        "./skills/apple-app-icon-design",
+        "./skills/frontend-design",
+        "./skills/github-profile-readme"
+      ]
+    },
+    {
+      "name": "build-webapp",
+      "description": "Design Web UI, create shareable HTML artifacts, implement real Web apps, and verify rendered browser behavior",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/frontend-design",
+        "./skills/web-artifacts-builder",
+        "./skills/webapp-builder",
+        "./skills/webapp-testing"
+      ]
+    },
+    {
+      "name": "go-to-market",
+      "description": "Store readiness, App Store and Google Play assets, launch copy, ASO, market messaging, channel performance, search, and paid acquisition",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/app-store-aso",
+        "./skills/app-store-commerce",
+        "./skills/app-store-connect",
+        "./skills/app-store-metadata",
+        "./skills/app-store-release-dryrun",
+        "./skills/app-store-screenshots",
+        "./skills/app-store-whats-new",
+        "./skills/google-play-store-assets",
+        "./skills/market-messaging",
+        "./skills/market-performance",
+        "./skills/organic-search",
+        "./skills/paid-acquisition"
+      ]
+    },
+    {
+      "name": "software-engineering",
+            "description": "Implementation planning, source-backed research planning, architecture workflows, CLI product creation, developer infrastructure, GitHub product organizations, deeplink formats, and MCP/tool backends",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/coding-plan",
+                "./skills/deep-research-plan",
+        "./skills/code-to-arch",
+        "./skills/cli-creator",
+        "./skills/repository-docs",
+        "./skills/pyproject-docs",
+        "./skills/forking-dog",
+        "./skills/deeplink-formats",
+        "./skills/apple-intelligence-eligibility-research",
+        "./skills/xcode-intelligence-chat-prompts",
+        "./skills/mcp-server-patterns",
+        "./skills/web-api-reverse",
+        "./skills/homebrew",
+        "./skills/codex-thread-recovery",
+        "./skills/github-issue-workflow",
+        "./skills/github-product-org"
+      ]
+    },
+    {
+      "name": "skill-toolkit",
+      "description": "Context alignment, context handoff, skill intake, distillation, creation, evolution, and Codex memory evolution",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/align-with-me",
+        "./skills/context-handoff",
+        "./skills/any-to-skill",
+        "./skills/skill-distiller",
+        "./skills/skill-creator",
+        "./skills/agent-evolver",
+        "./skills/forking-dog",
+        "./skills/chatgpt-project-manager"
+      ]
+    }
+  ]
+}

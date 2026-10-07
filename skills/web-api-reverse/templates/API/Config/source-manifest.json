@@ -1,0 +1,14 @@
+{
+  "brand": "example-provider",
+  "kind": "web-api-reverse.source-manifest",
+  "market": "cn",
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "coveragePolicy": "required",
+      "sourceId": "example-provider-cn-web",
+      "surface": "web",
+      "version": "replace-with-locked-source-revision"
+    }
+  ]
+}

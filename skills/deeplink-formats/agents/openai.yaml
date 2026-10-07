@@ -1,0 +1,4 @@
+interface:
+  display_name: "Deeplink Formats"
+  short_description: "Look up app deeplink formats"
+  default_prompt: "Use $deeplink-formats to look up verified deeplink formats, support levels, Slack or Markdown wrappers, and fallback commands."

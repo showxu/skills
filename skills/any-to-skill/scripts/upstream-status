@@ -1,0 +1,139 @@
+#!/usr/bin/env python3
+"""Print upstream tracking and review coverage status."""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+from typing import Any
+
+
+def _find_repo_root(start: Path) -> Path:
+    for candidate in (start, *start.parents):
+        if (candidate / "upstreams.yaml").exists():
+            return candidate
+    raise FileNotFoundError("could not find repository root with upstreams.yaml")
+
+
+REPO_ROOT = _find_repo_root(Path(__file__).resolve())
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
+
+from upstream_manifest import load_upstreams  # noqa: E402
+
+
+def _short(value: object) -> str:
+    if not isinstance(value, str) or not value:
+        return "-"
+    if len(value) > 12 and all(ch in "0123456789abcdef" for ch in value.lower()):
+        return value[:12]
+    return value
+
+
+def _coverage_text(coverage: dict[str, Any] | None) -> tuple[str, str, str, str]:
+    if not coverage:
+        return ("none", "-", "-", "-")
+    return (
+        str(coverage.get("status", "none")),
+        _short(coverage.get("reviewed_commit")),
+        str(coverage.get("open_items", "-")),
+        str(coverage.get("outcome", "-")),
+    )
+
+
+def _print_table(rows: list[list[str]]) -> None:
+    widths = [0] * len(rows[0])
+    for row in rows:
+        for index, cell in enumerate(row):
+            widths[index] = max(widths[index], len(cell))
+    for row_index, row in enumerate(rows):
+        print("  ".join(cell.ljust(widths[index]) for index, cell in enumerate(row)))
+        if row_index == 0:
+            print("  ".join("-" * width for width in widths))
+
+
+def _source_row(source: dict[str, Any]) -> list[str]:
+    tracking = source.get("tracking")
+    if not isinstance(tracking, dict):
+        tracking = {}
+    status, reviewed, open_items, outcome = _coverage_text(source.get("review_coverage"))
+    return [
+        str(source.get("id", "-")),
+        str(source.get("type", "-")),
+        _short(source.get("last_seen")),
+        _short(tracking.get("last_checked_commit")),
+        status,
+        reviewed,
+        open_items,
+        outcome,
+    ]
+
+
+def _segment_row(source: dict[str, Any], segment: dict[str, Any]) -> list[str]:
+    tracking = segment.get("tracking")
+    if not isinstance(tracking, dict):
+        tracking = {}
+    status, reviewed, open_items, outcome = _coverage_text(segment.get("review_coverage"))
+    return [
+        f"{source.get('id', '-')}/{segment.get('id', '-')}",
+        str(segment.get("source_type", "-")),
+        _short(source.get("last_seen")),
+        _short(tracking.get("last_checked_commit")),
+        status,
+        reviewed,
+        open_items,
+        outcome,
+    ]
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--root",
+        default=REPO_ROOT,
+        type=Path,
+        help="repository root containing upstreams.yaml",
+    )
+    parser.add_argument(
+        "--segments",
+        action="store_true",
+        help="include review_segments as separate rows",
+    )
+    args = parser.parse_args()
+
+    root = args.root.resolve()
+    upstreams_path = root / "upstreams.yaml"
+    try:
+        upstreams = load_upstreams(upstreams_path)
+    except Exception as exc:
+        print(f"invalid upstreams manifest: {exc}", file=sys.stderr)
+        return 1
+
+    rows = [
+        [
+            "scope",
+            "type",
+            "last_seen",
+            "checked",
+            "review",
+            "reviewed",
+            "open",
+            "outcome",
+        ]
+    ]
+
+    for source in upstreams.get("sources", []):
+        if not isinstance(source, dict):
+            continue
+        rows.append(_source_row(source))
+        if args.segments:
+            for segment in source.get("review_segments", []):
+                if isinstance(segment, dict):
+                    rows.append(_segment_row(source, segment))
+
+    _print_table(rows)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

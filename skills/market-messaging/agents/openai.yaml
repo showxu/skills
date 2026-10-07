@@ -1,0 +1,7 @@
+interface:
+  display_name: "Market Messaging"
+  short_description: "Prepare market-facing product messaging"
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#0EA5E9"
+  default_prompt: "Use $market-messaging to turn this product context into channel-ready messaging and flag unsupported claims."

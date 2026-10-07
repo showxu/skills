@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Creator"
+  short_description: "Create and validate production skills"
+  default_prompt: "Use $skill-creator to create, revise, review, evaluate, benchmark, optimize, or package production-ready Codex skills."

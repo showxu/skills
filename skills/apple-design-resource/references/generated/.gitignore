@@ -1,0 +1,5 @@
+*
+!.gitignore
+!latest-catalog.json
+!latest-links.csv
+!latest-README.md

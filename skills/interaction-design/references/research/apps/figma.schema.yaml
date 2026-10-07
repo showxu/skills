@@ -1,0 +1,413 @@
+schema_version: interaction-schema-facts.v1
+app: figma
+source_report: references/research/apps/figma.md
+status: research_fact_store
+mapping_policy:
+  status: hypothesis
+  meaning: Draft candidate mapping for future UI Design Schema and Interaction Design Schema synthesis.
+  not_a_fact: true
+  not_current_contract_validation: true
+  review_required: true
+role:
+  classification: primary_donor
+  orientation:
+    - design_time
+    - prototype_time
+    - api_schema
+  summary: Mainstream programmable UI/prototype schema authority for design tree, components, variables, reactions, actions, and transition presentation.
+authority:
+  primary:
+    - official_api
+    - official_docs
+  secondary:
+    - artifact_probe
+  notes:
+    - REST and Plugin API docs are schema authority.
+    - Local .fig export is package/vocabulary evidence only.
+    - MCP is tooling, not schema authority.
+evidence:
+  - id: figma_developer_docs
+    grade: official_docs
+    title: Figma developer docs
+    url: https://developers.figma.com/docs/
+  - id: figma_rest_file_endpoints
+    grade: official_api
+    title: Figma REST file endpoints
+    url: https://developers.figma.com/docs/rest-api/file-endpoints/
+  - id: figma_rest_file_node_types
+    grade: official_api
+    title: Figma REST file node types
+    url: https://developers.figma.com/docs/rest-api/file-node-types
+  - id: figma_plugin_reaction
+    grade: official_api
+    title: Figma Plugin API Reaction
+    url: https://developers.figma.com/docs/plugins/api/Reaction/
+  - id: figma_plugin_trigger
+    grade: official_api
+    title: Figma Plugin API Trigger
+    url: https://developers.figma.com/docs/plugins/api/Trigger/
+  - id: figma_plugin_action
+    grade: official_api
+    title: Figma Plugin API Action
+    url: https://www.figma.com/plugin-docs/api/Action/
+  - id: figma_plugin_transition
+    grade: official_api
+    title: Figma Plugin API Transition
+    url: https://developers.figma.com/docs/plugins/api/Transition/
+  - id: figma_node_reactions
+    grade: official_api
+    title: Node reactions property
+    url: https://developers.figma.com/docs/plugins/api/properties/nodes-reactions/
+  - id: figma_component_properties
+    grade: official_api
+    title: Figma ComponentProperties API
+    url: https://developers.figma.com/docs/plugins/api/ComponentProperties/
+  - id: local_fig_export
+    grade: artifact_probe
+    title: Local iOS/iPadOS 26 Community .fig export
+    path: references/research/artifacts/figma/local-export/ios-ipados-26-community.fig
+objects:
+  - name: File
+    category: ui_layer
+    evidence: [figma_rest_file_endpoints]
+    draft_schema_mapping: [research_evidence.design_file]
+    decision: reference
+    fields:
+      - name: file_key
+        meaning: Stable Figma file identifier for API access.
+        draft_schema_mapping: [research_evidence.external_id]
+        decision: reference
+      - name: document
+        type: Document
+        meaning: Root document tree.
+        draft_schema_mapping: [ui_design_schema.tree.root]
+        decision: absorb
+      - name: components
+        meaning: File-level component metadata.
+        draft_schema_mapping: [ui_design_schema.components]
+        decision: absorb
+      - name: componentSets
+        meaning: Variant family metadata.
+        draft_schema_mapping: [ui_design_schema.component_sets]
+        decision: absorb
+      - name: styles
+        meaning: Reusable paint, text, effect, or grid styles.
+        draft_schema_mapping: [ui_design_schema.styles]
+        decision: absorb
+      - name: variables
+        meaning: Variable collections, values, modes, aliases, and bindings when exposed by API.
+        draft_schema_mapping: [ui_design_schema.variables, interaction_design_schema.behavior.variables]
+        decision: absorb_as_scoped
+  - name: Node
+    category: ui_layer
+    evidence: [figma_rest_file_node_types, figma_node_reactions]
+    draft_schema_mapping: [ui_design_schema.actor, interaction_design_schema.behavior.actor]
+    decision: absorb
+    fields:
+      - name: id
+        meaning: Node identifier used by links, actions, and API references.
+        draft_schema_mapping: [research_evidence.node_id]
+        decision: absorb
+      - name: name
+        meaning: Human-authored node name.
+        draft_schema_mapping: [ui_design_schema.name]
+        decision: absorb
+      - name: type
+        meaning: Node kind such as DOCUMENT, CANVAS, FRAME, GROUP, INSTANCE, or VECTOR.
+        draft_schema_mapping: [ui_design_schema.node_type]
+        decision: absorb
+      - name: visible
+        meaning: Visibility flag.
+        draft_schema_mapping: [ui_design_schema.visibility_state]
+        decision: absorb
+      - name: children
+        type: Node[]
+        meaning: Nested visual tree.
+        draft_schema_mapping: [ui_design_schema.children]
+        decision: absorb
+      - name: absoluteBoundingBox
+        meaning: Rendered bounds.
+        draft_schema_mapping: [ui_design_schema.bounds]
+        decision: reference
+      - name: constraints
+        meaning: Layout constraints.
+        draft_schema_mapping: [ui_design_schema.constraints]
+        decision: absorb
+      - name: fills
+        meaning: Paint fills.
+        draft_schema_mapping: [ui_design_schema.visual_style]
+        decision: defer_to_ui_layer
+      - name: strokes
+        meaning: Stroke styling.
+        draft_schema_mapping: [ui_design_schema.visual_style]
+        decision: defer_to_ui_layer
+      - name: effects
+        meaning: Effects such as shadows or blur.
+        draft_schema_mapping: [ui_design_schema.visual_style]
+        decision: defer_to_ui_layer
+      - name: reactions
+        type: Reaction[]
+        meaning: Prototype behavior attached to the node.
+        draft_schema_mapping: [interaction_design_schema.behavior.reactions]
+        decision: absorb
+  - name: Frame
+    category: surface
+    evidence: [figma_rest_file_node_types]
+    draft_schema_mapping: [interaction_design_schema.behavior.surfaces, ui_design_schema.frames]
+    decision: absorb
+    fields:
+      - name: layoutMode
+        meaning: Auto-layout orientation or none.
+        draft_schema_mapping: [ui_design_schema.layout.mode]
+        decision: absorb
+      - name: primaryAxisSizingMode
+        meaning: Auto-layout sizing interaction_design_schema.behavior.
+        draft_schema_mapping: [ui_design_schema.layout.sizing]
+        decision: absorb
+      - name: counterAxisSizingMode
+        meaning: Cross-axis sizing interaction_design_schema.behavior.
+        draft_schema_mapping: [ui_design_schema.layout.sizing]
+        decision: absorb
+      - name: itemSpacing
+        meaning: Auto-layout spacing.
+        draft_schema_mapping: [ui_design_schema.layout.spacing]
+        decision: defer_to_ui_layer
+      - name: padding
+        meaning: Auto-layout padding fields.
+        draft_schema_mapping: [ui_design_schema.layout.padding]
+        decision: defer_to_ui_layer
+      - name: clipsContent
+        meaning: Clipping interaction_design_schema.behavior.
+        draft_schema_mapping: [ui_design_schema.clipping]
+        decision: absorb
+      - name: overflowDirection
+        meaning: Scroll behavior direction for prototype/interaction_design_schema.runtime.
+        draft_schema_mapping: [interaction_design_schema.platform.presentation.scroll_behavior]
+        decision: absorb
+      - name: prototypeStartNodeID
+        meaning: Prototype start point in REST-compatible data.
+        draft_schema_mapping: [prototype_projection_contract.start_point]
+        decision: absorb
+  - name: Component
+    category: ui_layer
+    evidence: [figma_rest_file_endpoints, figma_component_properties]
+    draft_schema_mapping: [ui_design_schema.component_source]
+    decision: absorb
+    fields:
+      - name: key
+        meaning: Component key.
+        draft_schema_mapping: [research_evidence.component_key]
+        decision: reference
+      - name: name
+        meaning: Component name.
+        draft_schema_mapping: [ui_design_schema.component_name]
+        decision: absorb
+      - name: componentPropertyDefinitions
+        meaning: Component property schema.
+        draft_schema_mapping: [ui_design_schema.component_properties]
+        decision: absorb
+  - name: Instance
+    category: ui_layer
+    evidence: [figma_rest_file_node_types, figma_component_properties]
+    draft_schema_mapping: [ui_design_schema.component_instance]
+    decision: absorb
+    fields:
+      - name: componentId
+        meaning: Source component reference.
+        draft_schema_mapping: [ui_design_schema.component_ref]
+        decision: absorb
+      - name: componentProperties
+        meaning: Instance property values and overrides.
+        draft_schema_mapping: [ui_design_schema.component_state]
+        decision: absorb
+      - name: overrides
+        meaning: Instance-specific differences from source component.
+        draft_schema_mapping: [ui_design_schema.overrides]
+        decision: absorb
+  - name: Reaction
+    category: interaction
+    evidence: [figma_plugin_reaction, figma_node_reactions]
+    draft_schema_mapping: [interaction_design_schema.behavior.reactions]
+    decision: absorb
+    fields:
+      - name: trigger
+        type: Trigger
+        required: true
+        meaning: Event that starts the reaction.
+        draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+        decision: absorb
+      - name: actions
+        type: Action[]
+        required: true
+        meaning: Ordered actions that run after the trigger.
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb
+      - name: action
+        deprecated: true
+        meaning: Older singular action field.
+        draft_schema_mapping: []
+        decision: do_not_absorb
+  - name: Trigger
+    category: interaction
+    evidence: [figma_plugin_trigger]
+    draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+    decision: absorb
+    fields:
+      - name: type
+        enum_ref: TriggerType
+        meaning: Trigger kind.
+        draft_schema_mapping: [interaction_design_schema.behavior.trigger.type]
+        decision: absorb
+      - name: delay
+        meaning: Delay for timeout-like triggers.
+        draft_schema_mapping: [interaction_design_schema.behavior.trigger.delay]
+        decision: absorb
+      - name: keyCodes
+        meaning: Keyboard/gamepad trigger bindings.
+        draft_schema_mapping: [interaction_design_schema.platform.input_bindings]
+        decision: absorb
+  - name: Action
+    category: interaction
+    evidence: [figma_plugin_action]
+    draft_schema_mapping: [interaction_design_schema.behavior.actions]
+    decision: absorb
+    fields:
+      - name: type
+        enum_ref: ActionType
+        meaning: Action kind.
+        draft_schema_mapping: [interaction_design_schema.behavior.action.type]
+        decision: absorb
+      - name: destinationId
+        meaning: Target node/frame for node actions.
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.target_ref]
+        decision: absorb
+      - name: transition
+        type: Transition
+        meaning: Presentation transition for navigation or state change.
+        draft_schema_mapping: [interaction_design_schema.platform.transition_presentations]
+        decision: absorb_as_presentation
+      - name: overlayRelativePosition
+        meaning: Overlay placement relative to source.
+        draft_schema_mapping: [interaction_design_schema.platform.overlay_presentation.position]
+        decision: absorb_as_presentation
+      - name: preserveScrollPosition
+        meaning: Whether navigation preserves scroll position.
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.scroll_policy]
+        decision: absorb
+      - name: resetScrollPosition
+        meaning: Whether target scroll state resets.
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.scroll_policy]
+        decision: absorb
+      - name: resetInteractiveComponents
+        meaning: Whether interactive component state resets.
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.component_reset_policy]
+        decision: absorb
+  - name: Transition
+    category: presentation
+    evidence: [figma_plugin_transition]
+    draft_schema_mapping: [interaction_design_schema.platform.transition_presentations, prototype_projection_contract.motion]
+    decision: absorb_as_presentation
+    fields:
+      - name: type
+        enum_ref: TransitionType
+        meaning: Transition presentation style.
+        draft_schema_mapping: [interaction_design_schema.platform.transition_presentations.type]
+        decision: absorb
+      - name: direction
+        meaning: Direction for move/push/slide-style transitions.
+        draft_schema_mapping: [interaction_design_schema.platform.transition_presentations.direction]
+        decision: absorb
+      - name: duration
+        meaning: Motion duration.
+        draft_schema_mapping: [prototype_projection_contract.motion.duration]
+        decision: reference
+      - name: easing
+        meaning: Motion easing.
+        draft_schema_mapping: [prototype_projection_contract.motion.easing]
+        decision: reference
+      - name: matchLayers
+        meaning: Smart Animate / matched-layer interaction_design_schema.behavior.
+        draft_schema_mapping: [prototype_projection_contract.motion.matched_layers]
+        decision: absorb
+      - name: spring
+        meaning: Spring transition parameters.
+        draft_schema_mapping: [prototype_projection_contract.motion.spring]
+        decision: reference
+  - name: Variable
+    category: state
+    evidence: [figma_rest_file_endpoints, figma_plugin_action]
+    draft_schema_mapping: [interaction_design_schema.behavior.variables, ui_design_schema.variables]
+    decision: absorb_as_scoped
+    fields:
+      - name: name
+        meaning: Variable name.
+        draft_schema_mapping: [interaction_design_schema.behavior.variable.name]
+        decision: absorb
+      - name: resolvedType
+        meaning: Variable value type.
+        draft_schema_mapping: [interaction_design_schema.behavior.variable.type]
+        decision: absorb
+      - name: valuesByMode
+        meaning: Mode-specific values.
+        draft_schema_mapping: [ui_design_schema.variable_modes]
+        decision: absorb
+      - name: scopes
+        meaning: Valid usage scopes.
+        draft_schema_mapping: [ui_design_schema.variable_scopes]
+        decision: absorb
+enums:
+  - name: TriggerType
+    evidence: [figma_plugin_trigger]
+    values:
+      - ON_CLICK
+      - ON_HOVER
+      - ON_PRESS
+      - ON_DRAG
+      - MOUSE_ENTER
+      - MOUSE_LEAVE
+      - MOUSE_DOWN
+      - MOUSE_UP
+      - AFTER_TIMEOUT
+      - ON_KEY_DOWN
+      - ON_MEDIA_HIT
+      - ON_MEDIA_END
+  - name: ActionType
+    evidence: [figma_plugin_action]
+    values:
+      - BACK
+      - CLOSE
+      - URL
+      - NODE
+      - SET_VARIABLE
+      - SET_VARIABLE_MODE
+      - CONDITIONAL
+      - MEDIA
+  - name: NodeAction.navigation
+    evidence: [figma_plugin_action]
+    values:
+      - NAVIGATE
+      - SWAP
+      - OVERLAY
+      - SCROLL_TO
+      - CHANGE_TO
+  - name: TransitionType
+    evidence: [figma_plugin_transition]
+    values:
+      - INSTANT
+      - DISSOLVE
+      - SMART_ANIMATE
+      - SCROLL_ANIMATE
+      - MOVE_IN
+      - MOVE_OUT
+      - PUSH
+      - SLIDE_IN
+      - SLIDE_OUT
+gaps:
+  - id: figma_same_file_rest_json
+    status: deferred_not_v0_blocking
+    description: Same-file REST JSON for local iOS/iPadOS 26 .fig export is unavailable.
+    impact: Would improve artifact comparison but official API already covers v0 interaction schema.
+  - id: figma_private_canvas_schema
+    status: do_not_depend
+    description: Local canvas.fig private binary format is not parsed as a stable semantic schema.
+    impact: Use REST/Plugin API for semantics.

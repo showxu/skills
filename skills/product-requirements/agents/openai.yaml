@@ -1,0 +1,4 @@
+interface:
+  display_name: "Product Requirements"
+  short_description: "Draft integrated PRDs and specs"
+  default_prompt: "Use $product-requirements to draft, revise, or review an integrated product specification / PRD with scope, non-goals, functional requirements, user stories, acceptance criteria, feature-level success metrics, business rules, constraints, risks, open questions, and traceability, without owning interaction behavior, renderer output, code/build plans, QA automation, UX craft, GTM execution, or schedule mechanics."

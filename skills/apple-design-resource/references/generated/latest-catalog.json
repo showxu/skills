@@ -1,0 +1,2078 @@
+{
+  "counts": {
+    "by_link_kind": {
+      "apple-cdn-download": 40,
+      "apple-developer-page": 10,
+      "external": 3,
+      "figma": 15,
+      "sketch-cloud-share": 15,
+      "sketch-library": 2
+    },
+    "by_reachability": {
+      "False": 10,
+      "None": 2,
+      "True": 73
+    },
+    "by_resource_family": {
+      "app-icon-template": 3,
+      "badge-logo-glyph": 9,
+      "design-template": 4,
+      "font": 8,
+      "icon-composer": 2,
+      "platform-resource": 2,
+      "product-bezel": 19,
+      "resource-link": 7,
+      "sf-symbols": 2,
+      "technology-template": 18,
+      "ui-kit": 11
+    },
+    "direct_download_candidates": 40,
+    "total": 85
+  },
+  "fetched_at": "2026-10-06T01:15:35+00:00",
+  "filters": {
+    "label_contains": [],
+    "link_kind": [],
+    "resource_family": [],
+    "section_contains": []
+  },
+  "resources": [
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Figma",
+      "link_kind": "figma",
+      "probe": {
+        "content_length": "757838",
+        "content_type": "text/html;charset=utf-8",
+        "error": "HTTP Error 404: Not Found",
+        "method": "HEAD",
+        "reachable": false,
+        "status": 404
+      },
+      "resource_family": "ui-kit",
+      "sections": [
+        "Apple Design Resources",
+        "iOS and iPadOS",
+        "iOS 27 and iPadOS 27",
+        "UI Kit"
+      ],
+      "source_line": 1180,
+      "url": "https://www.figma.com/community/file/1651309003795292092/ios-and-ipados-27"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-cloud-share",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "5178",
+        "content_type": "text/html; charset=utf-8",
+        "final_url": "https://www.sketch.com/s/04c24d8b-38fb-4afb-8836-36617e022f02",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "ui-kit",
+      "sections": [
+        "Apple Design Resources",
+        "iOS and iPadOS",
+        "iOS 27 and iPadOS 27",
+        "UI Kit"
+      ],
+      "source_line": 1183,
+      "url": "https://www.sketch.com/s/04c24d8b-38fb-4afb-8836-36617e022f02"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Figma",
+      "link_kind": "figma",
+      "probe": {
+        "content_length": "757798",
+        "content_type": "text/html;charset=utf-8",
+        "error": "HTTP Error 404: Not Found",
+        "method": "HEAD",
+        "reachable": false,
+        "status": 404
+      },
+      "resource_family": "app-icon-template",
+      "sections": [
+        "Apple Design Resources",
+        "iOS and iPadOS",
+        "iOS 27 and iPadOS 27",
+        "App Icon Template"
+      ],
+      "source_line": 1192,
+      "url": "https://www.figma.com/community/file/1645923469870515372/app-icon-template-ios-ipados-and-watchos-27"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-cloud-share",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "5265",
+        "content_type": "text/html; charset=utf-8",
+        "final_url": "https://www.sketch.com/s/a443d962-d989-4c5b-b1db-fb7fb3946995",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "app-icon-template",
+      "sections": [
+        "Apple Design Resources",
+        "iOS and iPadOS",
+        "iOS 27 and iPadOS 27",
+        "App Icon Template"
+      ],
+      "source_line": 1195,
+      "url": "https://sketch.com/s/a443d962-d989-4c5b-b1db-fb7fb3946995"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, Illustrator",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "7566635",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/iOS-27-Icon-Templates-Photoshop-Illustrator.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "app-icon-template",
+      "sections": [
+        "Apple Design Resources",
+        "iOS and iPadOS",
+        "iOS 27 and iPadOS 27",
+        "App Icon Template"
+      ],
+      "source_line": 1198,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/iOS-27-Icon-Templates-Photoshop-Illustrator.dmg"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Figma",
+      "link_kind": "figma",
+      "probe": {
+        "content_length": "757906",
+        "content_type": "text/html;charset=utf-8",
+        "error": "HTTP Error 404: Not Found",
+        "method": "HEAD",
+        "reachable": false,
+        "status": 404
+      },
+      "resource_family": "ui-kit",
+      "sections": [
+        "Apple Design Resources",
+        "macOS",
+        "macOS 27",
+        "UI Kit"
+      ],
+      "source_line": 1218,
+      "url": "https://www.figma.com/community/file/1651309434229735362/macos-27"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-cloud-share",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": null,
+        "content_type": "text/html; charset=utf-8",
+        "final_url": "https://www.sketch.com/s/57153a31-3379-4737-8ac6-dbfd6525f052",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "ui-kit",
+      "sections": [
+        "Apple Design Resources",
+        "macOS",
+        "macOS 27",
+        "UI Kit"
+      ],
+      "source_line": 1221,
+      "url": "https://sketch.com/s/57153a31-3379-4737-8ac6-dbfd6525f052"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-library",
+      "probe": {
+        "note": "non-http link not probed",
+        "reachable": null,
+        "scheme": "sketch"
+      },
+      "resource_family": "ui-kit",
+      "sections": [
+        "Apple Design Resources",
+        "tvOS",
+        "tvOS 18",
+        "UI Kit"
+      ],
+      "source_line": 1241,
+      "url": "sketch://add-library?url=https%3A%2F%2Fdeveloper.apple.com%2Fdesign%2Fdownloads%2Fsketch-tvOS.rss"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Sketch",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "22650797",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/tvOS-18-Design-Templates-Sketch.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "design-template",
+      "sections": [
+        "Apple Design Resources",
+        "tvOS",
+        "tvOS 18",
+        "Templates"
+      ],
+      "source_line": 1251,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/tvOS-18-Design-Templates-Sketch.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Sketch",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "237755",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/tvOS-18-Production-Templates-Sketch.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "design-template",
+      "sections": [
+        "Apple Design Resources",
+        "tvOS",
+        "tvOS 18",
+        "Production Templates"
+      ],
+      "source_line": 1260,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/tvOS-18-Production-Templates-Sketch.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "426867",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/tvOS-18-Production-Templates-Photoshop.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "design-template",
+      "sections": [
+        "Apple Design Resources",
+        "tvOS",
+        "tvOS 18",
+        "Production Templates"
+      ],
+      "source_line": 1264,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/tvOS-18-Production-Templates-Photoshop.dmg"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Figma",
+      "link_kind": "figma",
+      "probe": {
+        "content_length": "757989",
+        "content_type": "text/html;charset=utf-8",
+        "error": "HTTP Error 404: Not Found",
+        "method": "HEAD",
+        "reachable": false,
+        "status": 404
+      },
+      "resource_family": "ui-kit",
+      "sections": [
+        "Apple Design Resources",
+        "watchOS",
+        "watchOS 26",
+        "UI Kit"
+      ],
+      "source_line": 1285,
+      "url": "https://www.figma.com/community/file/1540060090060216489/watchos-26"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-cloud-share",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "5181",
+        "content_type": "text/html; charset=utf-8",
+        "final_url": "https://www.sketch.com/s/2b12618d-596c-41fd-8488-132bff9535e7",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "ui-kit",
+      "sections": [
+        "Apple Design Resources",
+        "watchOS",
+        "watchOS 26",
+        "UI Kit"
+      ],
+      "source_line": 1288,
+      "url": "https://sketch.com/s/2b12618d-596c-41fd-8488-132bff9535e7"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Figma",
+      "link_kind": "figma",
+      "probe": {
+        "content_length": "757934",
+        "content_type": "text/html;charset=utf-8",
+        "error": "HTTP Error 404: Not Found",
+        "method": "HEAD",
+        "reachable": false,
+        "status": 404
+      },
+      "resource_family": "ui-kit",
+      "sections": [
+        "Apple Design Resources",
+        "visionOS",
+        "visionOS 26",
+        "UI Kit"
+      ],
+      "source_line": 1308,
+      "url": "https://www.figma.com/community/file/1540071341298017505/visionos-26"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-cloud-share",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "5184",
+        "content_type": "text/html; charset=utf-8",
+        "final_url": "https://www.sketch.com/s/eb13bfe1-2ddb-4f87-b92c-740a36abed7a",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "ui-kit",
+      "sections": [
+        "Apple Design Resources",
+        "visionOS",
+        "visionOS 26",
+        "UI Kit"
+      ],
+      "source_line": 1311,
+      "url": "https://sketch.com/s/eb13bfe1-2ddb-4f87-b92c-740a36abed7a"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-library",
+      "probe": {
+        "note": "non-http link not probed",
+        "reachable": null,
+        "scheme": "sketch"
+      },
+      "resource_family": "ui-kit",
+      "sections": [
+        "Apple Design Resources",
+        "visionOS",
+        "visionOS 2",
+        "UI Kit"
+      ],
+      "source_line": 1325,
+      "url": "sketch://add-library?url=https%3A%2F%2Fdeveloper.apple.com%2Fdesign%2Fdownloads%2Fsketch-visionOS.rss"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Figma",
+      "link_kind": "figma",
+      "probe": {
+        "content_length": "757881",
+        "content_type": "text/html;charset=utf-8",
+        "error": "HTTP Error 404: Not Found",
+        "method": "HEAD",
+        "reachable": false,
+        "status": 404
+      },
+      "resource_family": "ui-kit",
+      "sections": [
+        "Apple Design Resources",
+        "visionOS",
+        "visionOS 2",
+        "UI Kit"
+      ],
+      "source_line": 1329,
+      "url": "https://www.figma.com/community/file/1253443272911187215/apple-design-resources-visionos"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Sketch",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "38118523",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/visionOS-2-Design-Templates-Sketch.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "design-template",
+      "sections": [
+        "Apple Design Resources",
+        "visionOS",
+        "visionOS 2",
+        "Templates"
+      ],
+      "source_line": 1338,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/visionOS-2-Design-Templates-Sketch.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "PNG, PDF, SVG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "958566",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Glyph-Add-Apple-Watch-Face.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "badge-logo-glyph",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Add Apple Watch Face"
+      ],
+      "source_line": 1356,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Glyph-Add-Apple-Watch-Face.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "PDF",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "224256",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Glyph-AirPlay.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "badge-logo-glyph",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "AirPlay"
+      ],
+      "source_line": 1365,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Glyph-AirPlay.dmg"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Design Guidelines",
+      "link_kind": "apple-developer-page",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "17800",
+        "content_type": "text/html",
+        "final_url": "https://developer.apple.com/design/human-interface-guidelines/airplay/",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "AirPlay"
+      ],
+      "source_line": 1368,
+      "url": "https://developer.apple.com/design/human-interface-guidelines/airplay/"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Figma",
+      "link_kind": "figma",
+      "probe": {
+        "content_length": "757851",
+        "content_type": "text/html;charset=utf-8",
+        "error": "HTTP Error 404: Not Found",
+        "method": "HEAD",
+        "reachable": false,
+        "status": 404
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "App Clips Design Template"
+      ],
+      "source_line": 1377,
+      "url": "https://www.figma.com/community/file/1367914571662801866/app-clips"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-cloud-share",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "5148",
+        "content_type": "text/html; charset=utf-8",
+        "final_url": "https://www.sketch.com/s/e6ed1af0-508c-4fd5-bc6f-05f7ccb91c6e",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "App Clips Design Template"
+      ],
+      "source_line": 1380,
+      "url": "https://sketch.com/s/e6ed1af0-508c-4fd5-bc6f-05f7ccb91c6e"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "182601",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Icon-Apple-Health.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "resource-link",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Apple Health Icon"
+      ],
+      "source_line": 1389,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Icon-Apple-Health.dmg"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Design Guidelines",
+      "link_kind": "apple-developer-page",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "17622",
+        "content_type": "text/html",
+        "final_url": "https://developer.apple.com/design/human-interface-guidelines/healthkit/",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "resource-link",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Apple Health Icon"
+      ],
+      "source_line": 1392,
+      "url": "https://developer.apple.com/design/human-interface-guidelines/healthkit/"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Figma",
+      "link_kind": "figma",
+      "probe": {
+        "content_length": "757926",
+        "content_type": "text/html;charset=utf-8",
+        "error": "HTTP Error 404: Not Found",
+        "method": "HEAD",
+        "reachable": false,
+        "status": 404
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Apple Pay Design Template"
+      ],
+      "source_line": 1401,
+      "url": "https://www.figma.com/community/file/1367915141082663884/apple-pay"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-cloud-share",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "5148",
+        "content_type": "text/html; charset=utf-8",
+        "final_url": "https://www.sketch.com/s/b0fa95e1-e12d-4694-895f-a70f39b8f313",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Apple Pay Design Template"
+      ],
+      "source_line": 1404,
+      "url": "https://sketch.com/s/b0fa95e1-e12d-4694-895f-a70f39b8f313"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "PDF",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "237874",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Glyph-ARKit.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "badge-logo-glyph",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "ARKit Badge and Glyph"
+      ],
+      "source_line": 1413,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Glyph-ARKit.dmg"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Design Guidelines",
+      "link_kind": "apple-developer-page",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "17825",
+        "content_type": "text/html",
+        "final_url": "https://developer.apple.com/design/human-interface-guidelines/augmented-reality/",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "badge-logo-glyph",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "ARKit Badge and Glyph"
+      ],
+      "source_line": 1416,
+      "url": "https://developer.apple.com/design/human-interface-guidelines/augmented-reality/"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-cloud-share",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "5163",
+        "content_type": "text/html; charset=utf-8",
+        "final_url": "https://www.sketch.com/s/85a0f9d2-d76c-42f9-b681-6225882d8024",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "resource-link",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Camera Control"
+      ],
+      "source_line": 1425,
+      "url": "https://sketch.com/s/85a0f9d2-d76c-42f9-b681-6225882d8024"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "PNG, PDF",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "16712148",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Icon-Game-Center.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "resource-link",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Games and Game Center"
+      ],
+      "source_line": 1434,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Icon-Game-Center.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "PNG, PDF",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "273651",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Icon-HomeKit.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "badge-logo-glyph",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "HomeKit Icon and Glyph"
+      ],
+      "source_line": 1443,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Icon-HomeKit.dmg"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Design Guidelines",
+      "link_kind": "apple-developer-page",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "17743",
+        "content_type": "text/html",
+        "final_url": "https://developer.apple.com/design/human-interface-guidelines/homekit/",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "badge-logo-glyph",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "HomeKit Icon and Glyph"
+      ],
+      "source_line": 1446,
+      "url": "https://developer.apple.com/design/human-interface-guidelines/homekit/"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Figma",
+      "link_kind": "figma",
+      "probe": {
+        "content_length": "757851",
+        "content_type": "text/html;charset=utf-8",
+        "error": "HTTP Error 404: Not Found",
+        "method": "HEAD",
+        "reachable": false,
+        "status": 404
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Live Activities Template"
+      ],
+      "source_line": 1455,
+      "url": "https://www.figma.com/community/file/1367915437752334285/live-activities"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-cloud-share",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "5166",
+        "content_type": "text/html; charset=utf-8",
+        "final_url": "https://www.sketch.com/s/d1e8992f-14c2-4eef-b29d-24a32c0c0ef9",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Live Activities Template"
+      ],
+      "source_line": 1458,
+      "url": "https://sketch.com/s/d1e8992f-14c2-4eef-b29d-24a32c0c0ef9"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Figma",
+      "link_kind": "figma",
+      "probe": {
+        "content_length": "757875",
+        "content_type": "text/html;charset=utf-8",
+        "error": "HTTP Error 404: Not Found",
+        "method": "HEAD",
+        "reachable": false,
+        "status": 404
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Messages Template"
+      ],
+      "source_line": 1467,
+      "url": "https://www.figma.com/community/file/1367916269438172112/imessage-apps-and-stickers"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-cloud-share",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "5145",
+        "content_type": "text/html; charset=utf-8",
+        "final_url": "https://www.sketch.com/s/d6cd3d23-7aec-43d5-acb9-52f720ff48b7",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Messages Template"
+      ],
+      "source_line": 1470,
+      "url": "https://sketch.com/s/d6cd3d23-7aec-43d5-acb9-52f720ff48b7"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "PNG, PDF, SVG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "195405",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Logo-Sign-in-with-Apple.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "badge-logo-glyph",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Sign in with Apple Logo"
+      ],
+      "source_line": 1479,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Logo-Sign-in-with-Apple.dmg"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Design Guidelines",
+      "link_kind": "apple-developer-page",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "18069",
+        "content_type": "text/html",
+        "final_url": "https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple/",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "badge-logo-glyph",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Sign in with Apple Logo"
+      ],
+      "source_line": 1482,
+      "url": "https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple/"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Figma",
+      "link_kind": "figma",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "0",
+        "content_type": "text/html; charset=UTF-8",
+        "final_url": "https://www.figma.com/community/file/1367916685468040146/sign-in-with-apple",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 202
+      },
+      "resource_family": "resource-link",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Sign in with Apple Buttons"
+      ],
+      "source_line": 1491,
+      "url": "https://www.figma.com/community/file/1367916685468040146/sign-in-with-apple"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-cloud-share",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "5175",
+        "content_type": "text/html; charset=utf-8",
+        "final_url": "https://www.sketch.com/s/7cd7dbf4-41b2-4e90-bb00-2796ced3cf2b",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "resource-link",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Sign in with Apple Buttons"
+      ],
+      "source_line": 1494,
+      "url": "https://sketch.com/s/7cd7dbf4-41b2-4e90-bb00-2796ced3cf2b"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Figma",
+      "link_kind": "figma",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "0",
+        "content_type": "text/html; charset=UTF-8",
+        "final_url": "https://www.figma.com/community/file/1367916969551216595/siri-app-shortcuts",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 202
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Siri and App Shortcuts Template"
+      ],
+      "source_line": 1503,
+      "url": "https://www.figma.com/community/file/1367916969551216595/siri-app-shortcuts"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-cloud-share",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "5202",
+        "content_type": "text/html; charset=utf-8",
+        "final_url": "https://www.sketch.com/s/84ba051b-c6ad-48c5-8106-28185947754a",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Siri and App Shortcuts Template"
+      ],
+      "source_line": 1506,
+      "url": "https://sketch.com/s/84ba051b-c6ad-48c5-8106-28185947754a"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "4504327",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Icon-Siri.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Siri Icons"
+      ],
+      "source_line": 1515,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Icon-Siri.dmg"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Figma",
+      "link_kind": "figma",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "0",
+        "content_type": "text/html; charset=UTF-8",
+        "final_url": "https://www.figma.com/community/file/1367917199004804052/tap-to-pay-on-iphone",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 202
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Tap to Pay on iPhone Template"
+      ],
+      "source_line": 1524,
+      "url": "https://www.figma.com/community/file/1367917199004804052/tap-to-pay-on-iphone"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-cloud-share",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "5151",
+        "content_type": "text/html; charset=utf-8",
+        "final_url": "https://www.sketch.com/s/fbd2fa90-fadd-403a-b319-0f4d7c04ae5f",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Tap to Pay on iPhone Template"
+      ],
+      "source_line": 1527,
+      "url": "https://sketch.com/s/fbd2fa90-fadd-403a-b319-0f4d7c04ae5f"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Figma",
+      "link_kind": "figma",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "0",
+        "content_type": "text/html; charset=UTF-8",
+        "final_url": "https://www.figma.com/community/file/1367917705471226837/tipkit",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 202
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "TipKit Template"
+      ],
+      "source_line": 1536,
+      "url": "https://www.figma.com/community/file/1367917705471226837/tipkit"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-cloud-share",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "5139",
+        "content_type": "text/html; charset=utf-8",
+        "final_url": "https://www.sketch.com/s/b99f22e1-235e-481b-9ccd-aa7d8f31fedc",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "TipKit Template"
+      ],
+      "source_line": 1539,
+      "url": "https://sketch.com/s/b99f22e1-235e-481b-9ccd-aa7d8f31fedc"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Figma",
+      "link_kind": "figma",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "0",
+        "content_type": "text/html; charset=UTF-8",
+        "final_url": "https://www.figma.com/community/file/1367917956770293718/wallet",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 202
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Wallet Template"
+      ],
+      "source_line": 1548,
+      "url": "https://www.figma.com/community/file/1367917956770293718/wallet"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Sketch",
+      "link_kind": "sketch-cloud-share",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "5139",
+        "content_type": "text/html; charset=utf-8",
+        "final_url": "https://www.sketch.com/s/dd2ce40a-097e-486b-9053-b60088e1d6c3",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "technology-template",
+      "sections": [
+        "Apple Design Resources",
+        "Technologies",
+        "Wallet Template"
+      ],
+      "source_line": 1551,
+      "url": "https://sketch.com/s/dd2ce40a-097e-486b-9053-b60088e1d6c3"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Download SF Pro",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "217902080",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/SF-Pro.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "font",
+      "sections": [
+        "Apple Design Resources",
+        "Fonts",
+        "SF Pro"
+      ],
+      "source_line": 1569,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/SF-Pro.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Download SF Compact",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "177619968",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/SF-Compact.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "font",
+      "sections": [
+        "Apple Design Resources",
+        "Fonts",
+        "SF Compact"
+      ],
+      "source_line": 1579,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/SF-Compact.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Download SF Mono",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "1605572",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/SF-Mono.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "font",
+      "sections": [
+        "Apple Design Resources",
+        "Fonts",
+        "SF Mono"
+      ],
+      "source_line": 1589,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/SF-Mono.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Download New York",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "5501470",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/NY.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "font",
+      "sections": [
+        "Apple Design Resources",
+        "Fonts",
+        "New York"
+      ],
+      "source_line": 1599,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/NY.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Download SF Arabic",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "1495864",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/SF-Arabic.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "font",
+      "sections": [
+        "Apple Design Resources",
+        "Fonts",
+        "SF Arabic"
+      ],
+      "source_line": 1609,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/SF-Arabic.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Download SF Armenian",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "969750",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/SF-Armenian.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "font",
+      "sections": [
+        "Apple Design Resources",
+        "Fonts",
+        "SF Armenian"
+      ],
+      "source_line": 1619,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/SF-Armenian.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Download SF Georgian",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "998590",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/SF-Georgian.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "font",
+      "sections": [
+        "Apple Design Resources",
+        "Fonts",
+        "SF Georgian"
+      ],
+      "source_line": 1629,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/SF-Georgian.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Download SF Hebrew",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "1663934",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/SF-Hebrew.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "font",
+      "sections": [
+        "Apple Design Resources",
+        "Fonts",
+        "SF Hebrew"
+      ],
+      "source_line": 1639,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/SF-Hebrew.dmg"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Learn more",
+      "link_kind": "apple-developer-page",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": null,
+        "content_type": "text/html",
+        "final_url": "https://developer.apple.com/sf-symbols/",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "sf-symbols",
+      "sections": [
+        "Apple Design Resources",
+        "SF Symbols"
+      ],
+      "source_line": 1653,
+      "url": "https://developer.apple.com/sf-symbols/"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Download SF Symbols 27",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "445052983",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/SF-Symbols-27.dmg?2",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "sf-symbols",
+      "sections": [
+        "Apple Design Resources",
+        "SF Symbols"
+      ],
+      "source_line": 1661,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/SF-Symbols-27.dmg?2"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Learn more",
+      "link_kind": "apple-developer-page",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": null,
+        "content_type": "text/html",
+        "final_url": "https://developer.apple.com/icon-composer/",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "icon-composer",
+      "sections": [
+        "Apple Design Resources",
+        "Icon Composer"
+      ],
+      "source_line": 1683,
+      "url": "https://developer.apple.com/icon-composer/"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Download Icon Composer",
+      "link_kind": "apple-developer-page",
+      "probe": {
+        "accept_ranges": null,
+        "content_length": "7541",
+        "content_type": "text/html;charset=UTF-8",
+        "final_url": "https://idmsa.apple.com/IDMSWebAuth/signin.html?path=%2Fdownload%2Fall%2F%3Fq%3DIcon%2520Composer&appIdKey=891bd3417a7776362562d2197f89480a8547b108fd934911bcbea0110d07f757&rv=0",
+        "method": "GET",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "icon-composer",
+      "sections": [
+        "Apple Design Resources",
+        "Icon Composer"
+      ],
+      "source_line": 1691,
+      "url": "https://developer.apple.com/download/all/?q=Icon%20Composer"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Download version 2 for macOS",
+      "link_kind": "external",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "6444470",
+        "content_type": "application/octet-stream",
+        "final_url": "https://tvpartners.apple.com/assets/parallax-previewer.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "platform-resource",
+      "sections": [
+        "Apple Design Resources",
+        "Parallax image tools",
+        "Parallax Previewer App"
+      ],
+      "source_line": 1721,
+      "url": "https://itunespartner.apple.com/assets/downloads/Parallax%20Previewer.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Download version 1 for macOS",
+      "link_kind": "external",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "7380206",
+        "content_type": "application/octet-stream",
+        "final_url": "https://tvpartners.apple.com/assets/parallax-previewer-1-0.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "platform-resource",
+      "sections": [
+        "Apple Design Resources",
+        "Parallax image tools",
+        "Parallax Previewer App"
+      ],
+      "source_line": 1725,
+      "url": "https://itunespartner.apple.com/assets/downloads/Parallax%20Previewer_1_0.dmg"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "User Guide",
+      "link_kind": "external",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "101753",
+        "content_type": "text/html; charset=UTF-8",
+        "final_url": "https://help.apple.com/itc/parallaxpreviewer/",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "resource-link",
+      "sections": [
+        "Apple Design Resources",
+        "Parallax image tools",
+        "Parallax Previewer App"
+      ],
+      "source_line": 1729,
+      "url": "https://help.apple.com/itc/parallaxpreviewer/"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "Marketing Resources and Identity Guidelines",
+      "link_kind": "apple-developer-page",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "155713",
+        "content_type": "text/html",
+        "final_url": "https://developer.apple.com/app-store/marketing/guidelines/#section-products",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels"
+      ],
+      "source_line": 1741,
+      "url": "https://developer.apple.com/app-store/marketing/guidelines/#section-products"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "30886385",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-Apple-TV.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "Apple TV"
+      ],
+      "source_line": 1748,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-Apple-TV.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "329151217",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-Apple-Watch-Ultra-3-2025.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "Apple Watch Ultra 3 (2025)"
+      ],
+      "source_line": 1757,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-Apple-Watch-Ultra-3-2025.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "185665690",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-Apple-Watch-Ultra-2-2024.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "Apple Watch Ultra 2 (2024)"
+      ],
+      "source_line": 1766,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-Apple-Watch-Ultra-2-2024.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "357953080",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-Apple-Watch-Series-11-2025.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "Apple Watch Series 11"
+      ],
+      "source_line": 1775,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-Apple-Watch-Series-11-2025.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "56119732",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-Studio-Displays.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "Studio Displays"
+      ],
+      "source_line": 1784,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-Studio-Displays.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "95428207",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iMac-M4.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "iMac"
+      ],
+      "source_line": 1793,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iMac-M4.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "10679583",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iPad-(A16).dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "iPad (A16)"
+      ],
+      "source_line": 1802,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iPad-(A16).dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "12423692",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iPad-Air-(M4).dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "iPad Air (M4)"
+      ],
+      "source_line": 1811,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iPad-Air-(M4).dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "7569113",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iPad-mini-(A17-Pro).dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "iPad mini (A17 Pro)"
+      ],
+      "source_line": 1820,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iPad-mini-(A17-Pro).dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "6787021",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iPad-Pro-(M5).dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "iPad Pro (M5)"
+      ],
+      "source_line": 1829,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iPad-Pro-(M5).dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "346669714",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iPhone-Duo.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "iPhone Duo"
+      ],
+      "source_line": 1838,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iPhone-Duo.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "144149642",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iPhone-18.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "iPhone 18"
+      ],
+      "source_line": 1847,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iPhone-18.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "265205982",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iPhone-17.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "iPhone 17"
+      ],
+      "source_line": 1856,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iPhone-17.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "272784853",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iPhone-16.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "iPhone 16"
+      ],
+      "source_line": 1865,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-iPhone-16.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "46121412",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-MacBook-Air-M5.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "MacBook Air M5"
+      ],
+      "source_line": 1874,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-MacBook-Air-M5.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "29605850",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-MacBook-Pro-M5.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "MacBook Pro M5"
+      ],
+      "source_line": 1883,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-MacBook-Pro-M5.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Photoshop, PNG",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "24631781",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-MacBook-Neo.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "MacBook Neo"
+      ],
+      "source_line": 1892,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Bezel-MacBook-Neo.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Keynote",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "8784517",
+        "content_type": "application/x-apple-diskimage",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Keynote-Live-Video-Product-Bezel.dmg",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "product-bezel",
+      "sections": [
+        "Apple Design Resources",
+        "Product Bezels",
+        "iPhone and iPad for Keynote Live Video"
+      ],
+      "source_line": 1901,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Keynote-Live-Video-Product-Bezel.dmg"
+    },
+    {
+      "direct_download": false,
+      "download": {},
+      "file_extension": "",
+      "label": "View Apple Badges and Logos",
+      "link_kind": "apple-developer-page",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "112681",
+        "content_type": "text/html",
+        "final_url": "https://developer.apple.com/licensing-trademarks/",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "badge-logo-glyph",
+      "sections": [
+        "Apple Design Resources",
+        "Badges and Logos"
+      ],
+      "source_line": 1916,
+      "url": "https://developer.apple.com/licensing-trademarks/"
+    }
+  ],
+  "snapshot_dir": "Apple-Design-Resources-20261006",
+  "source_sha256": "815bf779b546fb2b44cc89771013d01d16a3266b6e4da8d589e49ec7486b2a89",
+  "source_url": "https://developer.apple.com/design/resources/"
+}

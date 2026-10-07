@@ -1,0 +1,7 @@
+interface:
+  display_name: "Interaction Design"
+  short_description: "Model and review product interaction flows"
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#14B8A6"
+  default_prompt: "Use $interaction-design to draft, revise, or review canonical interaction_model artifacts and interaction quality for product workflows. Keep product facts in interaction_model.behavior and platform expression in interaction_model.platform. Cover flows, screens, states, actions, transitions, feedback, recovery, permission handoffs, device_bezel, platform primitive presentations, product prototype contracts, projection notes, reviewer-only projection controls, and screenshot/prototype review without generating rendered prototypes, writing visual specs, editing design tools, or implementing code. When explicitly requested, use the local Flinto cleanup script for prototype-tool cache/state recovery only. Keep canonical triggers real; platform bindings may reference behavior IDs but must not define new behavior or transition destinations."

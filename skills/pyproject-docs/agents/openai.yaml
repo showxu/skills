@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pyproject Documentation"
+  short_description: "Scaffold and audit Python project documentation structure"
+  default_prompt: "Use $pyproject-docs to scaffold, audit, normalize, or export Python project documentation structure from pyproject.toml while preserving AGENTS/README separation, docs/architecture truth, lowercase docs paths, and generated-output boundaries."

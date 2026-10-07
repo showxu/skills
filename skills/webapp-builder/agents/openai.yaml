@@ -1,0 +1,4 @@
+interface:
+  display_name: "Webapp Builder"
+  short_description: "Build real Web apps in a repository"
+  default_prompt: "Use $webapp-builder to implement a real Web app feature from accepted product, interaction, and design inputs while following the repo's framework, routing, state, data, and validation conventions."

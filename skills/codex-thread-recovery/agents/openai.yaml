@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Thread Recovery"
+  short_description: "Diagnose and repair image-heavy Codex session history"
+  default_prompt: "Use $codex-thread-recovery to diagnose this stuck Codex thread and prepare the smallest evidence-backed recovery."

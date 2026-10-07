@@ -1,0 +1,4 @@
+interface:
+  display_name: "CLI Creator"
+  short_description: "Design and build production CLI products"
+  default_prompt: "Use $cli-creator to design, implement, or review a durable CLI product with command-surface discipline, install validation, structured output, diagnostics, and any needed capability, OpenAPI, browser, probe, MCP, or companion-skill contracts."

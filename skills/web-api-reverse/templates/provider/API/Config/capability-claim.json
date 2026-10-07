@@ -1,0 +1,9 @@
+{
+  "capabilities": [],
+  "claimedAt": "REPLACE_WITH_ISO8601_REVIEW_TIME",
+  "kind": "web-api-reverse.capability-claim",
+  "market": "REPLACE_WITH_MARKET",
+  "provider": "REPLACE_WITH_PROVIDER_ID",
+  "schemaVersion": 1,
+  "zeroUnknown": false
+}

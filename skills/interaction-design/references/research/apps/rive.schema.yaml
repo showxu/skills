@@ -1,0 +1,272 @@
+schema_version: interaction-schema-facts.v1
+app: rive
+source_report: references/research/apps/rive.md
+status: research_fact_store
+mapping_policy:
+  status: hypothesis
+  meaning: Draft candidate mapping for future UI Design Schema and Interaction Design Schema synthesis.
+  not_a_fact: true
+  not_current_contract_validation: true
+  review_required: true
+role:
+  classification: primary_runtime_state_machine_donor
+  orientation:
+    - runtime
+    - interactive_animation
+    - state_machine
+  summary: Runtime-grade state-machine donor for artboards, animations, typed inputs, transitions, listeners, events, and host bindings.
+authority:
+  primary:
+    - official_docs
+    - source_available
+  secondary:
+    - artifact_probe
+  notes:
+    - .riv runtime artifacts and runtime APIs are v0 authority.
+    - .rev editor source would help future editor/importer research but is not needed for v0 runtime facts.
+evidence:
+  - id: rive_docs
+    grade: official_docs
+    title: Rive docs
+    url: https://rive.app/docs/
+  - id: rive_runtime_format
+    grade: official_docs
+    title: Rive runtime format docs
+    url: https://rive.app/docs/runtimes/advanced-topic/format
+  - id: rive_runtime_export
+    grade: official_docs
+    title: Exporting for runtime
+    url: https://rive.app/docs/editor/exporting/exporting-for-runtime
+  - id: rive_backup_export
+    grade: official_docs
+    title: Exporting for backup
+    url: https://rive.app/docs/editor/exporting/exporting-for-backup
+  - id: rive_listeners
+    grade: official_docs
+    title: Rive state machine listeners
+    url: https://rive.app/docs/editor/state-machine/listeners
+  - id: rive_runtime_source
+    grade: source_available
+    title: Rive runtime source
+    url: https://github.com/rive-app/rive-runtime
+  - id: local_rive_runtime_artifacts
+    grade: artifact_probe
+    title: Public Rive .riv runtime artifacts
+    path: references/research/artifacts/rive/local-probe/
+objects:
+  - name: RivFile
+    category: runtime_artifact
+    evidence: [rive_runtime_format, local_rive_runtime_artifacts]
+    draft_schema_mapping: [prototype_projection_contract.runtime_artifact]
+    decision: reference
+    fields:
+      - name: artboards
+        type: Artboard[]
+        meaning: Visual/runtime surfaces available in the file.
+        draft_schema_mapping: [prototype_projection_contract.runtime_surfaces]
+        decision: absorb
+      - name: animations
+        type: Animation[]
+        meaning: Timeline playback units.
+        draft_schema_mapping: [prototype_projection_contract.animations]
+        decision: absorb
+      - name: state_machines
+        type: StateMachine[]
+        meaning: Interactive runtime behavior graphs.
+        draft_schema_mapping: [interaction_design_schema.behavior.state_machines, prototype_projection_contract.runtime_state_machines]
+        decision: absorb
+      - name: magic_header
+        meaning: RIVE file header used to validate downloaded runtime artifacts.
+        draft_schema_mapping: [research_evidence.artifact_validation]
+        decision: reference
+  - name: RevFile
+    category: editor_source
+    evidence: [rive_backup_export]
+    draft_schema_mapping: [research_evidence.editor_source]
+    decision: defer
+    fields:
+      - name: editor_metadata
+        meaning: Editor/source data stripped from runtime export.
+        draft_schema_mapping: [future_adapter_schema.editor_metadata]
+        decision: defer
+  - name: Artboard
+    category: surface
+    evidence: [rive_docs, rive_runtime_source]
+    draft_schema_mapping: [prototype_projection_contract.animation_surface]
+    decision: absorb
+    fields:
+      - name: name
+        draft_schema_mapping: [prototype_projection_contract.surface.name]
+        decision: absorb
+      - name: animations
+        type: Animation[]
+        draft_schema_mapping: [prototype_projection_contract.animations]
+        decision: absorb
+      - name: state_machines
+        type: StateMachine[]
+        draft_schema_mapping: [prototype_projection_contract.runtime_state_machines]
+        decision: absorb
+  - name: Animation
+    category: animation
+    evidence: [rive_docs]
+    draft_schema_mapping: [prototype_projection_contract.animations]
+    decision: absorb
+    fields:
+      - name: name
+        draft_schema_mapping: [prototype_projection_contract.animation.name]
+        decision: absorb
+      - name: timeline
+        draft_schema_mapping: [prototype_projection_contract.motion.timeline]
+        decision: reference
+      - name: playback
+        draft_schema_mapping: [prototype_projection_contract.motion.playback]
+        decision: reference
+  - name: StateMachine
+    category: state_machine
+    evidence: [rive_docs, rive_listeners, rive_runtime_source]
+    draft_schema_mapping: [interaction_design_schema.behavior.state_machines]
+    decision: absorb
+    fields:
+      - name: name
+        draft_schema_mapping: [interaction_design_schema.behavior.state_machine.name]
+        decision: absorb
+      - name: states
+        type: State[]
+        draft_schema_mapping: [interaction_design_schema.behavior.states]
+        decision: absorb
+      - name: transitions
+        type: Transition[]
+        draft_schema_mapping: [interaction_design_schema.behavior.transitions]
+        decision: absorb
+      - name: inputs
+        type: Input[]
+        draft_schema_mapping: [interaction_design_schema.behavior.inputs]
+        decision: absorb
+      - name: listeners
+        type: Listener[]
+        draft_schema_mapping: [interaction_design_schema.behavior.events]
+        decision: absorb
+  - name: State
+    category: state
+    evidence: [rive_docs]
+    draft_schema_mapping: [interaction_design_schema.behavior.states]
+    decision: absorb
+    fields:
+      - name: name
+        draft_schema_mapping: [interaction_design_schema.behavior.state.name]
+        decision: absorb
+      - name: animation
+        meaning: Animation or playback bound to this state.
+        draft_schema_mapping: [prototype_projection_contract.animation_ref]
+        decision: absorb_as_projection
+      - name: entry_behavior
+        meaning: Runtime behavior when state is entered.
+        draft_schema_mapping: [interaction_design_schema.behavior.state.entry_behavior]
+        decision: absorb
+  - name: Transition
+    category: transition
+    evidence: [rive_docs]
+    draft_schema_mapping: [interaction_design_schema.behavior.transitions]
+    decision: absorb
+    fields:
+      - name: from_state
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.from_state]
+        decision: absorb
+      - name: to_state
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.to_state]
+        decision: absorb
+      - name: conditions
+        type: Condition[]
+        draft_schema_mapping: [interaction_design_schema.behavior.conditions]
+        decision: absorb
+      - name: input_refs
+        type: Input[]
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.input_refs]
+        decision: absorb
+  - name: Input
+    category: input
+    evidence: [rive_docs, rive_runtime_source]
+    draft_schema_mapping: [interaction_design_schema.behavior.inputs, interaction_design_schema.platform.input_bindings]
+    decision: absorb
+    fields:
+      - name: name
+        draft_schema_mapping: [interaction_design_schema.behavior.input.name]
+        decision: absorb
+      - name: type
+        enum_ref: InputType
+        draft_schema_mapping: [interaction_design_schema.behavior.input.type]
+        decision: absorb
+      - name: value
+        draft_schema_mapping: [interaction_design_schema.behavior.input.value]
+        decision: absorb
+      - name: scope
+        meaning: State-machine scope.
+        draft_schema_mapping: [interaction_design_schema.behavior.input.scope]
+        decision: absorb
+  - name: Listener
+    category: event
+    evidence: [rive_listeners]
+    draft_schema_mapping: [interaction_design_schema.behavior.events]
+    decision: absorb
+    fields:
+      - name: target
+        meaning: Visual area or runtime target that emits/listens.
+        draft_schema_mapping: [interaction_design_schema.behavior.actor_ref]
+        decision: absorb
+      - name: event
+        type: Event
+        draft_schema_mapping: [interaction_design_schema.behavior.events]
+        decision: absorb
+      - name: input_updates
+        meaning: Runtime input changes triggered by listener events.
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb
+  - name: Event
+    category: external_message
+    evidence: [rive_docs, rive_listeners]
+    draft_schema_mapping: [interaction_design_schema.behavior.external_messages, interaction_design_schema.runtime.events]
+    decision: absorb
+    fields:
+      - name: name
+        draft_schema_mapping: [interaction_design_schema.behavior.event.name]
+        decision: absorb
+      - name: payload
+        draft_schema_mapping: [interaction_design_schema.behavior.event.payload]
+        decision: absorb
+      - name: source
+        draft_schema_mapping: [interaction_design_schema.behavior.event.source]
+        decision: absorb
+  - name: RuntimeBinding
+    category: runtime_binding
+    evidence: [rive_runtime_source, rive_runtime_format]
+    draft_schema_mapping: [prototype_projection_contract.runtime_binding]
+    decision: absorb
+    fields:
+      - name: load_file
+        meaning: Host loads .riv runtime file.
+        draft_schema_mapping: [prototype_projection_contract.runtime_binding.load_artifact]
+        decision: absorb
+      - name: select_artboard
+        draft_schema_mapping: [prototype_projection_contract.runtime_binding.artboard_ref]
+        decision: absorb
+      - name: select_state_machine
+        draft_schema_mapping: [prototype_projection_contract.runtime_binding.state_machine_ref]
+        decision: absorb
+      - name: set_input
+        draft_schema_mapping: [prototype_projection_contract.runtime_binding.input_write]
+        decision: absorb
+      - name: listen_event
+        draft_schema_mapping: [prototype_projection_contract.runtime_binding.event_read]
+        decision: absorb
+enums:
+  - name: InputType
+    evidence: [rive_docs]
+    values:
+      - boolean
+      - number
+      - trigger
+gaps:
+  - id: rive_rev_editor_source
+    status: deferred_not_v0_blocking
+    description: .rev editor-source serialization is unavailable.
+    impact: Does not block v0 runtime state-machine/input/transition facts.

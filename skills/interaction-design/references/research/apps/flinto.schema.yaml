@@ -1,0 +1,357 @@
+schema_version: interaction-schema-facts.v1
+app: flinto
+source_report: references/research/apps/flinto.md
+status: research_fact_store
+mapping_policy:
+  status: hypothesis
+  meaning: Draft candidate mapping for future UI Design Schema and Interaction Design Schema synthesis.
+  not_a_fact: true
+  not_current_contract_validation: true
+  review_required: true
+role:
+  classification: specialized_donor
+  orientation:
+    - prototype_time
+    - artifact_probe
+    - app_like_interaction
+  summary: App-like prototype donor for links, gestures, transitions, behavior states, scroll groups, and motion timing.
+authority:
+  primary:
+    - official_docs
+  secondary:
+    - artifact_probe
+  notes:
+    - Flinto Learn docs are concept authority.
+    - Local .flinto probes provide field taxonomy only.
+    - Private field names are not stable public schema.
+evidence:
+  - id: flinto_learn
+    grade: official_docs
+    title: Flinto Learn
+    url: https://www.flinto.com/learn
+  - id: flinto_links_gestures
+    grade: official_docs
+    title: Links and gestures overview
+    url: https://www.flinto.com/learn/links-and-gestures-overview
+  - id: flinto_transition_designer
+    grade: official_docs
+    title: Transition Designer overview
+    url: https://www.flinto.com/learn/transition-designer-overview
+  - id: flinto_behavior_designer
+    grade: official_docs
+    title: Behavior Designer overview
+    url: https://www.flinto.com/learn/behavior-designer-overview
+  - id: flinto_behavior_states
+    grade: official_docs
+    title: Behavior states
+    url: https://www.flinto.com/learn/behavior-states
+  - id: flinto_scroll_groups
+    grade: official_docs
+    title: Scroll group properties
+    url: https://www.flinto.com/learn/scroll-group-properties
+  - id: local_flinto_blank
+    grade: artifact_probe
+    title: Local blank Flinto artifact
+    path: references/research/artifacts/flinto/local-probe/blank.flinto
+  - id: local_flinto_enriched
+    grade: artifact_probe
+    title: Local enriched Flinto artifact
+    path: references/research/artifacts/flinto/local-probe/enriched-interaction.flinto
+objects:
+  - name: Prototype
+    category: artifact_root
+    evidence: [local_flinto_enriched]
+    draft_schema_mapping: [research_evidence.prototype_artifact]
+    decision: reference
+    fields:
+      - name: sublayers
+        type: Screen[]
+        draft_schema_mapping: [interaction_design_schema.behavior.surfaces]
+        decision: absorb
+      - name: transitions
+        type: Transition[]
+        draft_schema_mapping: [interaction_design_schema.behavior.transitions, interaction_design_schema.platform.transition_presentations]
+        decision: absorb
+      - name: behaviors
+        type: Behavior[]
+        draft_schema_mapping: [interaction_design_schema.behavior.state_machines]
+        decision: absorb
+      - name: homeScreenId
+        draft_schema_mapping: [prototype_projection_contract.start_point]
+        decision: absorb
+      - name: screenSize
+        draft_schema_mapping: [interaction_design_schema.platform.device_context.screen_size]
+        decision: reference
+      - name: screenScale
+        draft_schema_mapping: [interaction_design_schema.platform.device_context.scale]
+        decision: reference
+      - name: platform
+        draft_schema_mapping: [interaction_design_schema.platform.target_surface]
+        decision: reference
+      - name: defaultTimingFunction
+        draft_schema_mapping: [prototype_projection_contract.motion.default_timing]
+        decision: reference
+      - name: defaultStatusbarStyle
+        draft_schema_mapping: [interaction_design_schema.platform.presentation.status_bar]
+        decision: reference
+      - name: showTapHints
+        draft_schema_mapping: [prototype_projection_contract.review_controls]
+        decision: reference
+      - name: importedFromSketch
+        draft_schema_mapping: [research_evidence.import_origin]
+        decision: reference
+  - name: Screen
+    category: surface
+    evidence: [local_flinto_enriched, flinto_learn]
+    draft_schema_mapping: [interaction_design_schema.behavior.screens]
+    decision: absorb
+    fields:
+      - name: name
+        draft_schema_mapping: [interaction_design_schema.behavior.screen.name]
+        decision: absorb
+      - name: links
+        type: Link[]
+        draft_schema_mapping: [interaction_design_schema.behavior.actions, interaction_design_schema.behavior.transitions]
+        decision: absorb
+      - name: sublayers
+        type: Layer[]
+        draft_schema_mapping: [ui_design_schema.children]
+        decision: absorb
+      - name: behaviorIds
+        draft_schema_mapping: [interaction_design_schema.behavior.state_machine_refs]
+        decision: absorb
+      - name: currentBehaviorStateIds
+        draft_schema_mapping: [interaction_design_schema.behavior.current_states]
+        decision: absorb
+      - name: behaviorTagLayerMaps
+        draft_schema_mapping: [prototype_projection_contract.motion.matched_layers]
+        decision: absorb
+      - name: timerLinkEnabled
+        draft_schema_mapping: [interaction_design_schema.behavior.trigger.timer_enabled]
+        decision: absorb
+      - name: statusbarStyle
+        draft_schema_mapping: [interaction_design_schema.platform.presentation.status_bar]
+        decision: reference
+      - name: orientation
+        draft_schema_mapping: [interaction_design_schema.platform.device_context.orientation]
+        decision: reference
+      - name: resetOnLeave
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.reset_policy]
+        decision: absorb
+  - name: Link
+    category: interaction
+    evidence: [local_flinto_enriched, flinto_links_gestures]
+    draft_schema_mapping: [interaction_design_schema.behavior.actions, interaction_design_schema.behavior.transitions]
+    decision: absorb
+    fields:
+      - name: targetScreenId
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.target_screen]
+        decision: absorb
+      - name: transitionId
+        draft_schema_mapping: [interaction_design_schema.platform.transition_presentations.transition_ref]
+        decision: absorb
+      - name: gesture
+        draft_schema_mapping: [interaction_design_schema.behavior.trigger.gesture]
+        decision: absorb
+      - name: timeout
+        draft_schema_mapping: [interaction_design_schema.behavior.trigger.timer]
+        decision: absorb
+      - name: backLink
+        draft_schema_mapping: [interaction_design_schema.behavior.navigation.history_action]
+        decision: absorb
+      - name: ignoreHistory
+        draft_schema_mapping: [interaction_design_schema.behavior.navigation.history_policy]
+        decision: absorb
+      - name: skipAnimation
+        draft_schema_mapping: [interaction_design_schema.platform.transition_presentations.skip_animation]
+        decision: reference
+      - name: isReversed
+        draft_schema_mapping: [interaction_design_schema.platform.transition_presentations.reverse]
+        decision: reference
+      - name: allowsOvershoot
+        draft_schema_mapping: [prototype_projection_contract.motion.overshoot_policy]
+        decision: reference
+      - name: scrollGestureOptions
+        draft_schema_mapping: [interaction_design_schema.behavior.trigger.scroll_gesture]
+        decision: absorb
+      - name: stateChangeDefinition
+        type: StateChangeDefinition
+        draft_schema_mapping: [interaction_design_schema.behavior.state_transitions]
+        decision: absorb
+      - name: fromScreenTagLayerMap
+        draft_schema_mapping: [prototype_projection_contract.motion.matched_layers.from]
+        decision: reference
+      - name: toScreenTagLayerMap
+        draft_schema_mapping: [prototype_projection_contract.motion.matched_layers.to]
+        decision: reference
+      - name: forceGesturePressureRange
+        draft_schema_mapping: [interaction_design_schema.platform.input_bindings.pressure]
+        decision: absorb_as_platform_input
+  - name: Transition
+    category: transition
+    evidence: [local_flinto_enriched, flinto_transition_designer]
+    draft_schema_mapping: [interaction_design_schema.behavior.transitions, interaction_design_schema.platform.transition_presentations]
+    decision: absorb
+    fields:
+      - name: fromScreen
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.from_screen]
+        decision: absorb
+      - name: toScreen
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.to_screen]
+        decision: absorb
+      - name: connectedLayers
+        draft_schema_mapping: [prototype_projection_contract.motion.matched_layers]
+        decision: absorb
+      - name: layerOrder
+        draft_schema_mapping: [prototype_projection_contract.motion.layer_order]
+        decision: reference
+      - name: statusbarAnimation
+        draft_schema_mapping: [interaction_design_schema.platform.transition_presentations.status_bar]
+        decision: reference
+      - name: name
+        draft_schema_mapping: [interaction_design_schema.platform.transition_presentations.name]
+        decision: reference
+  - name: Behavior
+    category: state_machine
+    evidence: [local_flinto_enriched, flinto_behavior_designer]
+    draft_schema_mapping: [interaction_design_schema.behavior.state_machines]
+    decision: absorb
+    fields:
+      - name: states
+        type: BehaviorState[]
+        draft_schema_mapping: [interaction_design_schema.behavior.states]
+        decision: absorb
+      - name: allTags
+        draft_schema_mapping: [prototype_projection_contract.motion.tags]
+        decision: reference
+      - name: tagTimingFunctionMap
+        draft_schema_mapping: [prototype_projection_contract.motion.tag_timing]
+        decision: reference
+      - name: name
+        draft_schema_mapping: [interaction_design_schema.behavior.state_machine.name]
+        decision: absorb
+      - name: UUID
+        draft_schema_mapping: [research_evidence.external_id]
+        decision: reference
+  - name: BehaviorState
+    category: state
+    evidence: [local_flinto_enriched, flinto_behavior_states]
+    draft_schema_mapping: [interaction_design_schema.behavior.states]
+    decision: absorb
+    fields:
+      - name: name
+        draft_schema_mapping: [interaction_design_schema.behavior.state.name]
+        decision: absorb
+      - name: isInitial
+        draft_schema_mapping: [interaction_design_schema.behavior.state.initial]
+        decision: absorb
+      - name: timerLinkEnabled
+        draft_schema_mapping: [interaction_design_schema.behavior.trigger.timer_enabled]
+        decision: absorb
+      - name: timerLink
+        draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+        decision: absorb
+      - name: linkLayers
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb
+      - name: tagLayerStateMap
+        draft_schema_mapping: [ui_design_schema.state_values]
+        decision: absorb
+  - name: LayerState
+    category: state
+    evidence: [local_flinto_enriched]
+    draft_schema_mapping: [ui_design_schema.state_values]
+    decision: absorb
+    fields:
+      - name: links
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb
+      - name: valueMap
+        draft_schema_mapping: [ui_design_schema.state_property_values]
+        decision: absorb
+      - name: UUID
+        draft_schema_mapping: [research_evidence.external_id]
+        decision: reference
+  - name: ScrollLayer
+    category: container
+    evidence: [local_flinto_enriched, flinto_scroll_groups]
+    draft_schema_mapping: [interaction_design_schema.platform.presentation.scroll_container]
+    decision: absorb
+    fields:
+      - name: _contentOffset
+        draft_schema_mapping: [interaction_design_schema.behavior.state.scroll_position]
+        decision: absorb
+      - name: _contentSize
+        draft_schema_mapping: [interaction_design_schema.platform.presentation.scroll_content_size]
+        decision: reference
+      - name: _clippingRect
+        draft_schema_mapping: [interaction_design_schema.platform.presentation.clipping]
+        decision: reference
+      - name: isVerticalScrollEnabled
+        draft_schema_mapping: [interaction_design_schema.platform.presentation.scroll_axis]
+        decision: absorb
+      - name: isHorizontalScrollEnabled
+        draft_schema_mapping: [interaction_design_schema.platform.presentation.scroll_axis]
+        decision: absorb
+      - name: isBounceScrollEnabled
+        draft_schema_mapping: [interaction_design_schema.platform.presentation.bounce]
+        decision: absorb
+      - name: isDirectionalLockEnabled
+        draft_schema_mapping: [interaction_design_schema.platform.presentation.directional_lock]
+        decision: absorb
+      - name: isPagingEnabled
+        draft_schema_mapping: [interaction_design_schema.platform.presentation.paging]
+        decision: absorb
+      - name: pageSize
+        draft_schema_mapping: [interaction_design_schema.platform.presentation.page_size]
+        decision: reference
+      - name: scrollIndicatorStyle
+        draft_schema_mapping: [interaction_design_schema.platform.presentation.scroll_indicator]
+        decision: reference
+  - name: ScrollGestureAnimationDescriptor
+    category: trigger
+    evidence: [local_flinto_enriched]
+    draft_schema_mapping: [interaction_design_schema.behavior.triggers.scroll_gesture]
+    decision: absorb
+    fields:
+      - name: orientation
+        draft_schema_mapping: [interaction_design_schema.platform.input_bindings.scroll_orientation]
+        decision: absorb
+      - name: startInPixel
+        draft_schema_mapping: [interaction_design_schema.behavior.trigger.threshold_start]
+        decision: reference
+      - name: endInPixel
+        draft_schema_mapping: [interaction_design_schema.behavior.trigger.threshold_end]
+        decision: reference
+      - name: autoReverse
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.reverse_policy]
+        decision: absorb
+  - name: SpringTiming
+    category: motion
+    evidence: [local_flinto_enriched]
+    draft_schema_mapping: [prototype_projection_contract.motion.spring]
+    decision: reference
+    fields:
+      - name: duration
+        draft_schema_mapping: [prototype_projection_contract.motion.duration]
+        decision: reference
+      - name: delay
+        draft_schema_mapping: [prototype_projection_contract.motion.delay]
+        decision: reference
+      - name: tension
+        draft_schema_mapping: [prototype_projection_contract.motion.spring.tension]
+        decision: reference
+      - name: friction
+        draft_schema_mapping: [prototype_projection_contract.motion.spring.friction]
+        decision: reference
+      - name: dampingRatio
+        draft_schema_mapping: [prototype_projection_contract.motion.spring.damping_ratio]
+        decision: reference
+      - name: velocity
+        draft_schema_mapping: [prototype_projection_contract.motion.spring.velocity]
+        decision: reference
+gaps:
+  - id: flinto_media_component_import_preview_variants
+    status: deferred
+    description: Media-rich, component-rich, preview/device, and imported Sketch/Figma cases need broader samples.
+    impact: Current artifact is enough for core behavior-state/link/scroll/motion schema facts, not full importer coverage.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "MCP Server Patterns"
+  short_description: "Design and review MCP servers"
+  default_prompt: "Use $mcp-server-patterns to design, implement, or review an MCP server or MCP-backed skill backend."

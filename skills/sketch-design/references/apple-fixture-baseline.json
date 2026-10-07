@@ -1,0 +1,157 @@
+{
+  "schema": "sketch-design.apple-fixture-baseline.v1",
+  "fixture_id": "apple-tvos-ui-library-large",
+  "source_description": "Apple tvOS UI Sketch library extracted from official Apple Design Resources. This fixture covers the Onboarding & Sign In symbol-master screens used for visual export checks.",
+  "fixture_asset": {
+    "path": "references/fixtures/apple-tvos-ui.sketch",
+    "kind": "Apple tvOS UI Sketch library",
+    "file_type": ".sketch zip/json document",
+    "bytes": 8361482,
+    "sha256": "8cfdf1181b37b00ef65fc9ee8e9f9edb9be150103114f96c522e22f7910683d6"
+  },
+  "expected_original_summary": {
+    "pages": 1,
+    "artboards_and_symbol_masters": 1121,
+    "layers_including_pages": 6982,
+    "layers_excluding_pages": 6981,
+    "unfiltered_layers_including_pages": 6982,
+    "embedded_images": 61,
+    "exportable_layers": 6,
+    "raw_class_counts": {
+      "symbolInstance": 2057,
+      "rectangle": 1425,
+      "symbolMaster": 1120,
+      "text": 1056,
+      "shapePath": 610,
+      "group": 462,
+      "shapeGroup": 127,
+      "oval": 117,
+      "bitmap": 6,
+      "page": 1,
+      "artboard": 1
+    },
+    "mapped_type_counts": {
+      "ShapePath": 2152,
+      "SymbolInstance": 2057,
+      "SymbolMaster": 1120,
+      "Text": 1056,
+      "Group": 462,
+      "Shape": 127,
+      "Image": 6,
+      "Page": 1,
+      "Artboard": 1
+    },
+    "mapped_type_counts_excluding_pages": {
+      "Artboard": 1,
+      "Group": 462,
+      "ShapePath": 2152,
+      "Shape": 127,
+      "Text": 1056,
+      "SymbolMaster": 1120,
+      "SymbolInstance": 2057,
+      "Image": 6
+    },
+    "detail_coverage": {
+      "layers_with_style_detail": 6982,
+      "layers_with_export_detail": 6982,
+      "layers_with_prototype_detail": 6982,
+      "layers_with_symbol_detail": 3177,
+      "layers_with_shape_detail": 2279,
+      "symbol_instances": 2057,
+      "layers_with_group_layout_detail": 1711,
+      "layers_with_background_detail": 1121,
+      "symbol_masters": 1120,
+      "layers_with_text_detail": 1056,
+      "text_layers": 1056,
+      "layers_with_override_properties": 971,
+      "layers_with_override_values": 871
+    }
+  },
+  "expected_detached_summary": {
+    "pages": 1,
+    "artboards_and_symbol_masters": 1120,
+    "layers_including_pages": 19040,
+    "layers_excluding_pages": 19039,
+    "unfiltered_layers_including_pages": 19040,
+    "embedded_images": 61,
+    "exportable_layers": 22,
+    "raw_class_counts": {
+      "group": 6277,
+      "text": 4881,
+      "rectangle": 4814,
+      "shapePath": 1286,
+      "symbolMaster": 1120,
+      "oval": 359,
+      "shapeGroup": 288,
+      "bitmap": 14,
+      "page": 1
+    },
+    "mapped_type_counts": {
+      "ShapePath": 6459,
+      "Group": 6277,
+      "Text": 4881,
+      "SymbolMaster": 1120,
+      "Shape": 288,
+      "Image": 14,
+      "Page": 1
+    },
+    "mapped_type_counts_excluding_pages": {
+      "Group": 6277,
+      "ShapePath": 6459,
+      "Shape": 288,
+      "Text": 4881,
+      "SymbolMaster": 1120,
+      "Image": 14
+    },
+    "detail_coverage": {
+      "layers_with_style_detail": 19040,
+      "layers_with_export_detail": 19040,
+      "layers_with_prototype_detail": 19040,
+      "layers_with_background_detail": 7686,
+      "layers_with_group_layout_detail": 7686,
+      "layers_with_shape_detail": 6747,
+      "layers_with_text_detail": 4881,
+      "text_layers": 4881,
+      "layers_with_symbol_detail": 1120,
+      "symbol_masters": 1120,
+      "layers_with_override_properties": 971
+    }
+  },
+  "expected_symbol_export": {
+    "target": "Onboarding & Sign In/Dark/PIN Entry 6 Digits",
+    "requires_include_symbols": true,
+    "file_count": 1,
+    "file_name": "500D55C8-B2F0-425E-BFC7-66940E4A056E.png",
+    "bytes": 76231,
+    "dimensions": {
+      "width": 1920,
+      "height": 1080
+    },
+    "expected_scoped_context_summary": {
+      "pages": 1,
+      "artboards_and_symbol_masters": 1,
+      "layers_including_pages": 8,
+      "layers_excluding_pages": 7,
+      "unfiltered_layers_including_pages": 6982,
+      "raw_class_counts": {
+        "symbolInstance": 5,
+        "page": 1,
+        "symbolMaster": 1,
+        "rectangle": 1
+      },
+      "detail_coverage": {
+        "layers_with_style_detail": 8,
+        "layers_with_export_detail": 8,
+        "layers_with_prototype_detail": 8,
+        "layers_with_symbol_detail": 6,
+        "symbol_instances": 5,
+        "layers_with_group_layout_detail": 2,
+        "layers_with_background_detail": 1,
+        "layers_with_override_properties": 1,
+        "symbol_masters": 1,
+        "layers_with_shape_detail": 1,
+        "layers_with_override_values": 1
+      }
+    }
+  }
+}

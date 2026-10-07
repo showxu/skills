@@ -1,0 +1,21 @@
+{
+  "brand": "example-provider",
+  "kind": "web-api-reverse.operation-annotations",
+  "market": "cn",
+  "operations": [
+    {
+      "authPolicy": "none",
+      "classification": "public-current-fact",
+      "fingerprint": "replace-with-observed-sha256-fingerprint",
+      "operationId": "product.currentFacts",
+      "productFamily": "product",
+      "routePolicy": {
+        "baseURL": "https://example.invalid",
+        "kind": "fixed"
+      },
+      "safety": "safe-read",
+      "serviceFamily": "product"
+    }
+  ],
+  "schemaVersion": 1
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Align With Me"
+  short_description: "Align context before or after work"
+  default_prompt: "Use $align-with-me to align intent, evidence, decisions, assumptions, risks, and open questions before starting or correcting work."

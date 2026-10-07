@@ -1,0 +1,26 @@
+{
+  "brand": "example-provider",
+  "kind": "web-api-reverse.trust-manifest",
+  "market": "cn",
+  "operations": [
+    {
+      "authPolicy": "none",
+      "clientOperationId": "getProductCurrentFacts",
+      "evidenceIds": [
+        "replace-with-capture-id",
+        "replace-with-verification-id"
+      ],
+      "family": "product",
+      "operationId": "product.currentFacts",
+      "reversibleMutation": false,
+      "routePolicy": {
+        "baseURL": "https://example.invalid",
+        "kind": "fixed"
+      },
+      "safety": "safe-read",
+      "summary": "Current product and SKU facts verified by native replay."
+    }
+  ],
+  "reviewedAt": "replace-with-review-timestamp",
+  "schemaVersion": 1
+}

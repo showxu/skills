@@ -1,0 +1,9 @@
+*
+!.gitignore
+!latest-README.md
+!latest-manifest.json
+!Xcode-*/
+Xcode-*/*
+!Xcode-*/README.md
+!Xcode-*/INDEX.md
+!Xcode-*/manifest.json

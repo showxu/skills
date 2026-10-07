@@ -1,0 +1,8 @@
+{
+  "brand": "REPLACE_WITH_PROVIDER_ID",
+  "kind": "web-api-reverse.trust-manifest",
+  "market": "REPLACE_WITH_MARKET",
+  "operations": [],
+  "reviewedAt": "REPLACE_WITH_ISO8601_REVIEW_TIME",
+  "schemaVersion": 1
+}

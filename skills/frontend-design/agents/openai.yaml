@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Design"
+  short_description: "Design and polish high-quality Web UI"
+  default_prompt: "Use $frontend-design to create or improve a distinctive Web interface, visual system, or UI surface while preserving supplied product behavior. Use $webapp-builder for repo-level app architecture, routing, state, data, and API integration."

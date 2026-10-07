@@ -1,0 +1,316 @@
+schema_version: interaction-schema-facts.v1
+app: sketch
+source_report: references/research/apps/sketch.md
+status: research_fact_store
+mapping_policy:
+  status: hypothesis
+  meaning: Draft candidate mapping for future UI Design Schema and Interaction Design Schema synthesis.
+  not_a_fact: true
+  not_current_contract_validation: true
+  review_required: true
+role:
+  classification: primary_ui_layer_donor
+  orientation:
+    - design_time
+    - prototype_time
+    - file_format
+  summary: Mac-native design file and built-in prototype donor, especially important for Apple Design Resources and Sketch ZIP/JSON extraction.
+authority:
+  primary:
+    - official_spec
+    - official_api
+    - official_docs
+  secondary:
+    - artifact_probe
+    - local_tooling
+  notes:
+    - Official Sketch file format/API/prototyping docs are schema authority.
+    - Apple Design Resources provide platform UI artifact evidence.
+    - sketch-design provides local extraction convention for .sketch ZIP/JSON facts.
+evidence:
+  - id: sketch_file_format
+    grade: official_spec
+    title: Sketch file format
+    url: https://developer.sketch.com/file-format/
+  - id: sketch_file_format_spec
+    grade: official_spec
+    title: Sketch file format spec
+    url: https://developer.sketch.com/file-format/spec
+  - id: sketch_api
+    grade: official_api
+    title: Sketch API reference
+    url: https://developer.sketch.com/reference/api
+  - id: sketch_prototyping
+    grade: official_docs
+    title: Sketch prototyping docs
+    url: https://www.sketch.com/docs/prototyping/
+  - id: sketch_links
+    grade: official_docs
+    title: Sketch links docs
+    url: https://www.sketch.com/docs/prototyping/adding-links/
+  - id: sketch_hotspots
+    grade: official_docs
+    title: Sketch hotspots docs
+    url: https://www.sketch.com/docs/prototyping/adding-hotspots/
+  - id: sketch_overlays
+    grade: official_docs
+    title: Sketch overlays docs
+    url: https://www.sketch.com/docs/prototyping/overlays/
+  - id: apple_design_resources
+    grade: official_docs
+    title: Apple Design Resources
+    url: https://developer.apple.com/design/resources/
+  - id: local_ios_template
+    grade: artifact_probe
+    title: Apple iOS Sketch design template artifact
+    path: references/research/artifacts/sketch/apple-ios18-templates-guides.sketch
+  - id: local_tvos_template
+    grade: artifact_probe
+    title: Apple tvOS Sketch UI library artifact
+    path: references/research/artifacts/sketch/apple-tvos-ui.sketch
+  - id: local_sketch_design_skill
+    grade: local_tooling
+    title: Local sketch-design extraction convention
+    skill: sketch-design
+objects:
+  - name: Document
+    category: ui_layer
+    evidence: [sketch_file_format, sketch_api]
+    draft_schema_mapping: [ui_design_schema.tree.root, research_evidence.design_file]
+    decision: absorb
+    fields:
+      - name: pages
+        type: Page[]
+        meaning: Document page collection.
+        draft_schema_mapping: [ui_design_schema.pages]
+        decision: absorb
+      - name: layerStyles
+        meaning: Shared layer styles.
+        draft_schema_mapping: [ui_design_schema.shared_styles]
+        decision: absorb
+      - name: textStyles
+        meaning: Shared text styles.
+        draft_schema_mapping: [ui_design_schema.text_styles]
+        decision: absorb
+      - name: foreignSymbols
+        meaning: Library symbol references.
+        draft_schema_mapping: [ui_design_schema.library_refs]
+        decision: absorb
+  - name: Page
+    category: ui_layer
+    evidence: [sketch_file_format]
+    draft_schema_mapping: [ui_design_schema.pages]
+    decision: absorb
+    fields:
+      - name: layers
+        type: Layer[]
+        meaning: Page child layer tree.
+        draft_schema_mapping: [ui_design_schema.children]
+        decision: absorb
+      - name: name
+        meaning: Page name.
+        draft_schema_mapping: [ui_design_schema.name]
+        decision: absorb
+  - name: ArtboardOrFrame
+    category: surface
+    evidence: [sketch_file_format, sketch_prototyping]
+    draft_schema_mapping: [interaction_design_schema.behavior.surfaces, ui_design_schema.artboards]
+    decision: absorb
+    fields:
+      - name: frame
+        meaning: Position and size.
+        draft_schema_mapping: [ui_design_schema.bounds]
+        decision: reference
+      - name: layers
+        type: Layer[]
+        meaning: Child layer tree.
+        draft_schema_mapping: [ui_design_schema.children]
+        decision: absorb
+      - name: flowStartPoint
+        meaning: Prototype start point marker.
+        draft_schema_mapping: [prototype_projection_contract.start_point]
+        decision: absorb
+      - name: fixedLayerBehavior
+        meaning: Layer behavior in scrolling prototypes.
+        draft_schema_mapping: [interaction_design_schema.platform.presentation.fixed_elements]
+        decision: absorb
+  - name: Layer
+    category: actor
+    evidence: [sketch_file_format, local_sketch_design_skill]
+    draft_schema_mapping: [ui_design_schema.actor, interaction_design_schema.behavior.actor]
+    decision: absorb
+    fields:
+      - name: _class
+        meaning: Sketch class/type.
+        draft_schema_mapping: [ui_design_schema.node_type]
+        decision: absorb
+      - name: name
+        meaning: Source-authored layer name.
+        draft_schema_mapping: [ui_design_schema.name]
+        decision: absorb
+      - name: frame
+        meaning: Layer bounds.
+        draft_schema_mapping: [ui_design_schema.bounds]
+        decision: reference
+      - name: style
+        meaning: Full Sketch style JSON.
+        draft_schema_mapping: [ui_design_schema.visual_style]
+        decision: defer_to_ui_layer
+      - name: attributedString
+        meaning: Text content and attributes for text layers.
+        draft_schema_mapping: [ui_design_schema.text]
+        decision: absorb
+      - name: exportOptions
+        meaning: Export preset/options.
+        draft_schema_mapping: [ui_design_schema.export]
+        decision: absorb
+      - name: flow
+        type: FlowConnection
+        meaning: Prototype flow connection when present.
+        draft_schema_mapping: [interaction_design_schema.behavior.transitions]
+        decision: absorb
+  - name: SymbolOrComponent
+    category: ui_layer
+    evidence: [sketch_file_format, sketch_api]
+    draft_schema_mapping: [ui_design_schema.component_source]
+    decision: absorb
+    fields:
+      - name: symbolID
+        meaning: Symbol identifier.
+        draft_schema_mapping: [research_evidence.component_id]
+        decision: reference
+      - name: overrideProperties
+        meaning: Overridable properties for instances.
+        draft_schema_mapping: [ui_design_schema.component_properties]
+        decision: absorb
+      - name: overrides
+        meaning: Instance override values.
+        draft_schema_mapping: [ui_design_schema.overrides]
+        decision: absorb
+  - name: FlowConnection
+    category: interaction
+    evidence: [sketch_prototyping, local_ios_template]
+    draft_schema_mapping: [interaction_design_schema.behavior.transitions, prototype_projection_contract.prototype_links]
+    decision: absorb
+    fields:
+      - name: destinationArtboardID
+        meaning: Target frame/artboard.
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.target_surface]
+        decision: absorb
+      - name: interactionTrigger
+        meaning: Link/hotspot trigger.
+        draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+        decision: absorb
+      - name: interactionAction
+        meaning: Navigation/overlay/dismiss/scroll action.
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb
+      - name: animationType
+        meaning: Transition animation type.
+        draft_schema_mapping: [interaction_design_schema.platform.transition_presentations.type]
+        decision: absorb_as_presentation
+      - name: animationTiming
+        meaning: Transition timing/easing.
+        draft_schema_mapping: [prototype_projection_contract.motion.easing]
+        decision: reference
+      - name: duration
+        meaning: Transition duration.
+        draft_schema_mapping: [prototype_projection_contract.motion.duration]
+        decision: reference
+      - name: maintainScrollPosition
+        meaning: Whether target keeps scroll position.
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.scroll_policy]
+        decision: absorb
+      - name: shouldCloseExistingOverlays
+        meaning: Overlay closing policy.
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.overlay_policy]
+        decision: absorb
+  - name: Hotspot
+    category: interaction
+    evidence: [sketch_hotspots]
+    draft_schema_mapping: [interaction_design_schema.behavior.actors, interaction_design_schema.behavior.triggers]
+    decision: absorb
+    fields:
+      - name: source_region
+        meaning: Clickable region independent of visual layer.
+        draft_schema_mapping: [interaction_design_schema.behavior.hotspot.region]
+        decision: absorb
+      - name: link
+        type: FlowConnection
+        meaning: Target interaction behavior.
+        draft_schema_mapping: [interaction_design_schema.behavior.transitions]
+        decision: absorb
+  - name: Overlay
+    category: presentation
+    evidence: [sketch_overlays]
+    draft_schema_mapping: [interaction_design_schema.platform.presentation.overlay]
+    decision: absorb_as_presentation
+    fields:
+      - name: target
+        meaning: Overlay target artboard/frame.
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.target_surface]
+        decision: absorb
+      - name: placement
+        meaning: Overlay placement.
+        draft_schema_mapping: [interaction_design_schema.platform.overlay_presentation.position]
+        decision: absorb
+      - name: outsideInteraction
+        meaning: No action, close overlay, or allow active links behind overlay.
+        draft_schema_mapping: [interaction_design_schema.behavior.overlay_policy]
+        decision: absorb
+      - name: animation
+        meaning: Overlay animation.
+        draft_schema_mapping: [interaction_design_schema.platform.transition_presentations]
+        decision: absorb_as_presentation
+  - name: SketchDesignContext
+    category: local_tooling
+    evidence: [local_sketch_design_skill]
+    draft_schema_mapping: [research_evidence.extracted_design_context]
+    decision: reference
+    fields:
+      - name: layout
+        meaning: Frame, rotation, flip state, clipping/mask flags, resizing fields, group layout, rulers, viewport, and related layer flags.
+        draft_schema_mapping: [ui_design_schema.layout]
+        decision: absorb
+      - name: style
+        meaning: Full Sketch style JSON with color objects augmented by hex values.
+        draft_schema_mapping: [ui_design_schema.visual_style]
+        decision: defer_to_ui_layer
+      - name: text
+        meaning: Full attributed string, text style, glyph bounds, line spacing, and text behavior fields.
+        draft_schema_mapping: [ui_design_schema.text]
+        decision: absorb
+      - name: symbol
+        meaning: Symbol ids, scale, override values, override properties, and override type hints.
+        draft_schema_mapping: [ui_design_schema.component_state]
+        decision: absorb
+      - name: export
+        meaning: Full Sketch export options.
+        draft_schema_mapping: [ui_design_schema.export]
+        decision: absorb
+      - name: prototype
+        meaning: Remaining source prototype facts from the Sketch JSON.
+        draft_schema_mapping: [interaction_design_schema.behavior.transitions, prototype_projection_contract.prototype_links]
+        decision: absorb
+enums:
+  - name: PrototypeAction
+    evidence: [sketch_prototyping]
+    values:
+      - navigate
+      - show_overlay
+      - dismiss_overlay
+      - scroll
+  - name: PrototypeState
+    evidence: [sketch_prototyping]
+    values:
+      - overlay_visibility
+      - layer_visibility
+      - scroll_position
+      - fixed_layer_status
+      - symbol_override_state
+      - smart_animate_matched_layer_state
+gaps:
+  - id: sketch_modern_prototype_heavy_file
+    status: deferred_not_v0_blocking
+    description: A modern custom Sketch file covering every current prototyping feature has not been captured.
+    impact: Official docs and Apple artifacts are enough for v0 model mapping; exhaustive artifact verification remains future work.

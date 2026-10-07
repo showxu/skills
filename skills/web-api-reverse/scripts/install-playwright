@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+
+default_root="${HOME}/Library/Application Support/web-api-reverse/playwright"
+install_root="${WEB_API_REVERSE_PLAYWRIGHT_ROOT:-$default_root}"
+
+mkdir -p "$install_root"
+npm install --prefix "$install_root" --save-exact playwright@1.60.0
+"$install_root/node_modules/.bin/playwright" install chromium
+
+printf "export WEB_API_REVERSE_PLAYWRIGHT_ROOT='%s'\n" "$install_root"

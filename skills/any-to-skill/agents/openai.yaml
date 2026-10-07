@@ -1,0 +1,4 @@
+interface:
+  display_name: "Any-to-Skill"
+  short_description: "Route inputs into skill-update workflows"
+  default_prompt: "Use $any-to-skill to review upstream, code, design, documentation, package, or skill-source inputs; route candidate owners; coordinate distiller handoff queues; and produce digest, intake-plan, or target-skill update-packet recommendations."

@@ -1,0 +1,207 @@
+schema_version: interaction-schema-facts.v1
+app: principle
+source_report: references/research/apps/principle.md
+status: research_fact_store
+mapping_policy:
+  status: hypothesis
+  meaning: Draft candidate mapping for future UI Design Schema and Interaction Design Schema synthesis.
+  not_a_fact: true
+  not_current_contract_validation: true
+  review_required: true
+role:
+  classification: specialized_motion_timeline_donor
+  orientation:
+    - prototype_time
+    - motion
+    - timeline
+  summary: Motion/timeline/driver donor for artboards, layers, events, transitions, timelines, property animations, drag/scroll interactions, and preview/export interaction_design_schema.behavior.
+authority:
+  primary:
+    - official_docs
+  secondary:
+    - artifact_probe
+  notes:
+    - Official docs and app-bundle resources support concept taxonomy.
+    - No .prd authoring sample was found.
+evidence:
+  - id: principle_docs
+    grade: official_docs
+    title: Principle docs
+    url: https://principle.app/docs.html
+  - id: principle_product
+    grade: official_docs
+    title: Principle product page
+    url: https://principle.app/
+  - id: principle_gallery
+    grade: official_docs
+    title: Principle gallery
+    url: https://principleformac.com/gallery.html
+  - id: principle_download
+    grade: official_docs
+    title: Principle download
+    url: https://www.principle.app/download/Principle.zip
+  - id: local_principle_app_bundle
+    grade: artifact_probe
+    title: Principle app-bundle resources
+    path: references/research/artifacts/principle/app-bundle/
+objects:
+  - name: Document
+    category: artifact_root
+    evidence: [principle_docs]
+    draft_schema_mapping: [research_evidence.prototype_artifact]
+    decision: reference
+    fields:
+      - name: artboards
+        type: Artboard[]
+        draft_schema_mapping: [interaction_design_schema.behavior.surfaces]
+        decision: absorb
+      - name: components
+        type: Component[]
+        draft_schema_mapping: [ui_design_schema.components]
+        decision: absorb
+      - name: preview_settings
+        draft_schema_mapping: [prototype_projection_contract.preview]
+        decision: reference
+  - name: Artboard
+    category: surface
+    evidence: [principle_docs]
+    draft_schema_mapping: [interaction_design_schema.behavior.screens, ui_design_schema.artboards]
+    decision: absorb
+    fields:
+      - name: layers
+        type: Layer[]
+        draft_schema_mapping: [ui_design_schema.children, interaction_design_schema.behavior.actors]
+        decision: absorb
+      - name: events
+        type: Event[]
+        draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+        decision: absorb
+      - name: transitions
+        type: Transition[]
+        draft_schema_mapping: [interaction_design_schema.behavior.transitions]
+        decision: absorb
+  - name: Layer
+    category: actor
+    evidence: [principle_docs]
+    draft_schema_mapping: [interaction_design_schema.behavior.actors, ui_design_schema.layers]
+    decision: absorb
+    fields:
+      - name: properties
+        draft_schema_mapping: [ui_design_schema.properties]
+        decision: reference
+      - name: animations
+        type: PropertyAnimation[]
+        draft_schema_mapping: [prototype_projection_contract.motion.property_animations]
+        decision: reference
+      - name: draggable
+        draft_schema_mapping: [interaction_design_schema.platform.input_bindings.drag]
+        decision: absorb
+      - name: scrollable
+        draft_schema_mapping: [interaction_design_schema.platform.presentation.scroll_container]
+        decision: absorb
+  - name: Event
+    category: trigger
+    evidence: [principle_docs]
+    draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+    decision: absorb
+    fields:
+      - name: event_type
+        draft_schema_mapping: [interaction_design_schema.behavior.trigger.type]
+        decision: absorb
+      - name: source_layer
+        draft_schema_mapping: [interaction_design_schema.behavior.actor_ref]
+        decision: absorb
+      - name: target_transition
+        draft_schema_mapping: [interaction_design_schema.behavior.transition_ref]
+        decision: absorb
+  - name: Transition
+    category: transition
+    evidence: [principle_docs]
+    draft_schema_mapping: [interaction_design_schema.behavior.transitions, interaction_design_schema.platform.transition_presentations]
+    decision: absorb
+    fields:
+      - name: source_artboard
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.from_screen]
+        decision: absorb
+      - name: target_artboard
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.to_screen]
+        decision: absorb
+      - name: animations
+        type: PropertyAnimation[]
+        draft_schema_mapping: [prototype_projection_contract.motion.property_animations]
+        decision: reference
+      - name: duration
+        draft_schema_mapping: [prototype_projection_contract.motion.duration]
+        decision: reference
+      - name: easing
+        draft_schema_mapping: [prototype_projection_contract.motion.easing]
+        decision: reference
+  - name: Driver
+    category: runtime_binding
+    evidence: [principle_docs]
+    draft_schema_mapping: [prototype_projection_contract.motion.driver]
+    decision: reference
+    fields:
+      - name: input
+        draft_schema_mapping: [interaction_design_schema.platform.input_bindings]
+        decision: absorb
+      - name: output_property
+        draft_schema_mapping: [prototype_projection_contract.motion.output_property]
+        decision: reference
+      - name: mapping
+        draft_schema_mapping: [prototype_projection_contract.motion.driver_mapping]
+        decision: reference
+  - name: Timeline
+    category: motion
+    evidence: [principle_docs]
+    draft_schema_mapping: [prototype_projection_contract.motion.timeline]
+    decision: reference
+    fields:
+      - name: property_animations
+        type: PropertyAnimation[]
+        draft_schema_mapping: [prototype_projection_contract.motion.property_animations]
+        decision: reference
+      - name: duration
+        draft_schema_mapping: [prototype_projection_contract.motion.duration]
+        decision: reference
+  - name: PropertyAnimation
+    category: motion
+    evidence: [principle_docs]
+    draft_schema_mapping: [prototype_projection_contract.motion.property_animation]
+    decision: reference
+    fields:
+      - name: target_layer
+        draft_schema_mapping: [prototype_projection_contract.motion.target_actor]
+        decision: reference
+      - name: property
+        draft_schema_mapping: [prototype_projection_contract.motion.property]
+        decision: reference
+      - name: from_value
+        draft_schema_mapping: [prototype_projection_contract.motion.from_value]
+        decision: reference
+      - name: to_value
+        draft_schema_mapping: [prototype_projection_contract.motion.to_value]
+        decision: reference
+      - name: easing
+        draft_schema_mapping: [prototype_projection_contract.motion.easing]
+        decision: reference
+  - name: PreviewExport
+    category: projection
+    evidence: [local_principle_app_bundle]
+    draft_schema_mapping: [prototype_projection_contract.preview_artifact]
+    decision: reference
+    fields:
+      - name: web_principle_html
+        draft_schema_mapping: [prototype_projection_contract.web_runtime]
+        decision: reference
+      - name: compatibility_json
+        draft_schema_mapping: [research_evidence.compatibility]
+        decision: reference
+      - name: sketch_import_script
+        draft_schema_mapping: [research_evidence.import_compatibility]
+        decision: reference
+gaps:
+  - id: principle_prd_authoring_sample
+    status: deferred_not_v0_blocking
+    description: No .prd authoring sample was found in the official app bundle.
+    impact: Principle remains motion/timeline/driver donor, not file-format authority.

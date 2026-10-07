@@ -1,0 +1,7 @@
+interface:
+  display_name: "Market Performance"
+  short_description: "Interpret market performance evidence"
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#0EA5E9"
+  default_prompt: "Use $market-performance to review this market performance data, separate evidence from hypotheses, and propose the next measurement action."

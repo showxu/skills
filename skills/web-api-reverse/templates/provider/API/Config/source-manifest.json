@@ -1,0 +1,14 @@
+{
+  "brand": "REPLACE_WITH_PROVIDER_ID",
+  "kind": "web-api-reverse.source-manifest",
+  "market": "REPLACE_WITH_MARKET",
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "coveragePolicy": "required",
+      "sourceId": "REPLACE_WITH_SOURCE_ID",
+      "surface": "web",
+      "version": "REPLACE_WITH_LOCKED_SOURCE_REVISION"
+    }
+  ]
+}

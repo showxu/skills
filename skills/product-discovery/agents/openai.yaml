@@ -1,0 +1,4 @@
+interface:
+  display_name: "Product Discovery"
+  short_description: "Shape product direction before PRDs"
+  default_prompt: "Use $product-discovery to shape product direction before requirements / PRD work, covering problem framing, users and scenarios, opportunity framing, solution brainstorming, lightweight strategy, tradeoffs, direction selection, risks, assumptions, evidence strength, and PRD-ready decision inputs without writing the full PRD or interaction design."

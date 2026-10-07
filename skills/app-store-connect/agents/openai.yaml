@@ -1,0 +1,7 @@
+interface:
+  display_name: "App Store Connect"
+  short_description: "Inspect App Store Connect state and IDs"
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#0EA5E9"
+  default_prompt: "Use $app-store-connect to inspect App Store Connect app, build, TestFlight, or review-submission state safely."

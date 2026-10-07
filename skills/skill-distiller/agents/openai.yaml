@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Distiller"
+  short_description: "Distill upstream skill material into local skill ledgers"
+  default_prompt: "Use $skill-distiller to turn upstream or copied skill material into a capability ledger, handover ledger, local skill mapping, and information-conservation audit."

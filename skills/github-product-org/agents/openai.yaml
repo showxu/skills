@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub Product Org"
+  short_description: "Set up and maintain a product's GitHub organization"
+  default_prompt: "Use $github-product-org to set up, take over, change, or audit this product's GitHub organization: repository placement, the .github conventions, rulesets and settings, GitHub Apps, brand delivery, website and releases, and the acceptance scan."

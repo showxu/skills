@@ -1,0 +1,210 @@
+schema_version: interaction-schema-facts.v1
+app: dotlottie
+source_report: references/research/apps/dotlottie.md
+status: research_fact_store
+mapping_policy:
+  status: hypothesis
+  meaning: Draft candidate mapping for future UI Design Schema and Interaction Design Schema synthesis.
+  not_a_fact: true
+  not_current_contract_validation: true
+  review_required: true
+role:
+  classification: primary_open_state_machine_spec_donor
+  orientation:
+    - official_spec
+    - runtime
+    - state_machine
+  summary: Formal open package and state-machine spec donor for states, transitions, guards, inputs, events, actions, assets, and playback.
+authority:
+  primary:
+    - official_spec
+    - official_docs
+evidence:
+  - id: dotlottie_v2_spec
+    grade: official_spec
+    title: dotLottie v2 spec
+    url: https://dotlottie.io/spec/2.0/
+  - id: dotlottie_docs
+    grade: official_docs
+    title: dotLottie docs
+    url: https://dotlottie.io/
+  - id: lottiefiles_ecosystem
+    grade: official_docs
+    title: LottieFiles / dotLottie player ecosystem
+    url: https://lottiefiles.com/
+objects:
+  - name: DotLottiePackage
+    category: runtime_artifact
+    evidence: [dotlottie_v2_spec]
+    draft_schema_mapping: [prototype_projection_contract.runtime_artifact]
+    decision: absorb
+    fields:
+      - name: manifest
+        type: Manifest
+        draft_schema_mapping: [research_evidence.manifest]
+        decision: absorb
+      - name: animations
+        type: Animation[]
+        draft_schema_mapping: [prototype_projection_contract.animations]
+        decision: absorb
+      - name: state_machines
+        type: StateMachine[]
+        draft_schema_mapping: [interaction_design_schema.behavior.state_machines]
+        decision: absorb
+      - name: themes
+        draft_schema_mapping: [ui_design_schema.themes]
+        decision: defer_to_ui_layer
+      - name: assets
+        draft_schema_mapping: [ui_design_schema.assets]
+        decision: absorb
+  - name: Manifest
+    category: metadata
+    evidence: [dotlottie_v2_spec]
+    draft_schema_mapping: [research_evidence.manifest]
+    decision: absorb
+    fields:
+      - name: animations
+        type: Animation[]
+        draft_schema_mapping: [prototype_projection_contract.animations]
+        decision: absorb
+      - name: state_machines
+        type: StateMachine[]
+        draft_schema_mapping: [interaction_design_schema.behavior.state_machines]
+        decision: absorb
+      - name: active_animation
+        draft_schema_mapping: [prototype_projection_contract.default_animation_ref]
+        decision: absorb
+      - name: metadata
+        draft_schema_mapping: [research_evidence.metadata]
+        decision: reference
+  - name: Animation
+    category: animation
+    evidence: [dotlottie_v2_spec]
+    draft_schema_mapping: [prototype_projection_contract.animations]
+    decision: absorb
+    fields:
+      - name: id
+        draft_schema_mapping: [prototype_projection_contract.animation.id]
+        decision: absorb
+      - name: path
+        draft_schema_mapping: [prototype_projection_contract.animation.asset_ref]
+        decision: reference
+      - name: loop
+        draft_schema_mapping: [prototype_projection_contract.motion.loop]
+        decision: reference
+      - name: autoplay
+        draft_schema_mapping: [prototype_projection_contract.motion.autoplay]
+        decision: reference
+  - name: StateMachine
+    category: state_machine
+    evidence: [dotlottie_v2_spec]
+    draft_schema_mapping: [interaction_design_schema.behavior.state_machines]
+    decision: absorb
+    fields:
+      - name: id
+        draft_schema_mapping: [interaction_design_schema.behavior.state_machine.id]
+        decision: absorb
+      - name: states
+        type: State[]
+        draft_schema_mapping: [interaction_design_schema.behavior.states]
+        decision: absorb
+      - name: transitions
+        type: Transition[]
+        draft_schema_mapping: [interaction_design_schema.behavior.transitions]
+        decision: absorb
+      - name: inputs
+        type: Input[]
+        draft_schema_mapping: [interaction_design_schema.behavior.inputs]
+        decision: absorb
+      - name: initial_state
+        draft_schema_mapping: [interaction_design_schema.behavior.state_machine.initial_state]
+        decision: absorb
+  - name: State
+    category: state
+    evidence: [dotlottie_v2_spec]
+    draft_schema_mapping: [interaction_design_schema.behavior.states]
+    decision: absorb
+    fields:
+      - name: id
+        draft_schema_mapping: [interaction_design_schema.behavior.state.id]
+        decision: absorb
+      - name: type
+        draft_schema_mapping: [interaction_design_schema.behavior.state.type]
+        decision: absorb
+      - name: animation_ref
+        draft_schema_mapping: [prototype_projection_contract.animation_ref]
+        decision: absorb_as_projection
+      - name: actions
+        type: Action[]
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb
+  - name: Transition
+    category: transition
+    evidence: [dotlottie_v2_spec]
+    draft_schema_mapping: [interaction_design_schema.behavior.transitions]
+    decision: absorb
+    fields:
+      - name: from
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.from_state]
+        decision: absorb
+      - name: to
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.to_state]
+        decision: absorb
+      - name: guards
+        type: Guard[]
+        draft_schema_mapping: [interaction_design_schema.behavior.conditions]
+        decision: absorb
+      - name: actions
+        type: Action[]
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb
+  - name: Guard
+    category: condition
+    evidence: [dotlottie_v2_spec]
+    draft_schema_mapping: [interaction_design_schema.behavior.conditions]
+    decision: absorb
+    fields:
+      - name: input
+        draft_schema_mapping: [interaction_design_schema.behavior.condition.input_ref]
+        decision: absorb
+      - name: operator
+        draft_schema_mapping: [interaction_design_schema.behavior.condition.operator]
+        decision: absorb
+      - name: value
+        draft_schema_mapping: [interaction_design_schema.behavior.condition.value]
+        decision: absorb
+  - name: Input
+    category: input
+    evidence: [dotlottie_v2_spec]
+    draft_schema_mapping: [interaction_design_schema.behavior.inputs]
+    decision: absorb
+    fields:
+      - name: id
+        draft_schema_mapping: [interaction_design_schema.behavior.input.id]
+        decision: absorb
+      - name: type
+        draft_schema_mapping: [interaction_design_schema.behavior.input.type]
+        decision: absorb
+      - name: initial_value
+        draft_schema_mapping: [interaction_design_schema.behavior.input.initial_value]
+        decision: absorb
+  - name: Action
+    category: action
+    evidence: [dotlottie_v2_spec]
+    draft_schema_mapping: [interaction_design_schema.behavior.actions, prototype_projection_contract.playback_actions]
+    decision: absorb
+    fields:
+      - name: type
+        draft_schema_mapping: [interaction_design_schema.behavior.action.type]
+        decision: absorb
+      - name: target
+        draft_schema_mapping: [interaction_design_schema.behavior.action.target]
+        decision: absorb
+      - name: value
+        draft_schema_mapping: [interaction_design_schema.behavior.action.value]
+        decision: absorb
+gaps:
+  - id: app_flow_semantics
+    status: non_goal
+    description: dotLottie state machines model animation runtime behavior, not full product IA or business rules.
+    impact: Use as state-machine/formal spec donor, not product workflow authority.

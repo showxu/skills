@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sketch Design"
+  short_description: "Resolve Sketch Cloud shares, extract Sketch design facts, and produce handoff artifacts"
+  default_prompt: "Use $sketch-design to resolve Sketch Cloud shares or local .sketch files, then extract, review, export, summarize, or hand off design context with sketchtool, stable JSON/Markdown artifacts, and optional Sketch MCP parity checks."

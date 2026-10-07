@@ -1,0 +1,4 @@
+interface:
+  display_name: "Xcode Intelligence Chat Prompts"
+  short_description: "Extract and index Xcode chat prompts"
+  default_prompt: "Use $xcode-intelligence-chat-prompts to extract, refresh, index, or compare local Xcode IDEIntelligenceChat prompt templates, AdditionalDocumentation, and support files as generated reference artifacts."

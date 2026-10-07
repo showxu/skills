@@ -1,0 +1,618 @@
+{
+  "counts": {
+    "additional-documentation": 20,
+    "prompt-template": 46,
+    "support-file": 8
+  },
+  "files": [
+    {
+      "bytes": 248,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/AdditionalFiles.idechatprompttemplate",
+      "name": "AdditionalFiles.idechatprompttemplate",
+      "sha256": "cf8f9f44ee0e689f053d084f2bae164b4d4eddc16049971502f2b933b99e288c",
+      "source_relative_path": "AdditionalFiles.idechatprompttemplate"
+    },
+    {
+      "bytes": 481,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/AgentAdditionalContext.idechatprompttemplate",
+      "name": "AgentAdditionalContext.idechatprompttemplate",
+      "sha256": "37c2251a253f1adcdac5b48967868c7a2cf042c9820e99ac0a58e17bbdea113d",
+      "source_relative_path": "AgentAdditionalContext.idechatprompttemplate"
+    },
+    {
+      "bytes": 4324,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/AgentSystemPromptAddition.idechatprompttemplate",
+      "name": "AgentSystemPromptAddition.idechatprompttemplate",
+      "sha256": "65932d67ab13e88d62f2b2a144650235e785aabfe36dd8a233fc5baccbc025f9",
+      "source_relative_path": "AgentSystemPromptAddition.idechatprompttemplate"
+    },
+    {
+      "bytes": 3448,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/BasicSystemPrompt.idechatprompttemplate",
+      "name": "BasicSystemPrompt.idechatprompttemplate",
+      "sha256": "38e4a18f8bcf3768ea63f18c044bdebc1e4ffc4573eebee2738c9a1e10c893f9",
+      "source_relative_path": "BasicSystemPrompt.idechatprompttemplate"
+    },
+    {
+      "bytes": 1735,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/ChatTitleResolver.idechatprompttemplate",
+      "name": "ChatTitleResolver.idechatprompttemplate",
+      "sha256": "4998a79611cfa8399189efc7a0caaf6cbe5d9968b49cf0e858e765e8614c9cb9",
+      "source_relative_path": "ChatTitleResolver.idechatprompttemplate"
+    },
+    {
+      "bytes": 764,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/CodingToolTemplateDocument.idechatprompttemplate",
+      "name": "CodingToolTemplateDocument.idechatprompttemplate",
+      "sha256": "24cb896548eaae5222857152c261a8c4f92b5a33b42e68b0ba36e45e7cc8a00a",
+      "source_relative_path": "CodingToolTemplateDocument.idechatprompttemplate"
+    },
+    {
+      "bytes": 393,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/CodingToolTemplateExplain.idechatprompttemplate",
+      "name": "CodingToolTemplateExplain.idechatprompttemplate",
+      "sha256": "1de12b11f3dcfc352ce0d4da72a07a8f3db1d77a804df3730905594ba6ea51b4",
+      "source_relative_path": "CodingToolTemplateExplain.idechatprompttemplate"
+    },
+    {
+      "bytes": 990,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/CodingToolTemplateGeneratePlayground.idechatprompttemplate",
+      "name": "CodingToolTemplateGeneratePlayground.idechatprompttemplate",
+      "sha256": "598310e1d729acf732d50e1266a2c0aac875c4a7fe4810aaa43bbdb6e83d8f92",
+      "source_relative_path": "CodingToolTemplateGeneratePlayground.idechatprompttemplate"
+    },
+    {
+      "bytes": 1032,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/CodingToolTemplateGeneratePreview.idechatprompttemplate",
+      "name": "CodingToolTemplateGeneratePreview.idechatprompttemplate",
+      "sha256": "a7d8dfc580372aa41eb282f275b6be8a5a83e92d432b275437da222529f9b863",
+      "source_relative_path": "CodingToolTemplateGeneratePreview.idechatprompttemplate"
+    },
+    {
+      "bytes": 185,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/ContextItems.idechatprompttemplate",
+      "name": "ContextItems.idechatprompttemplate",
+      "sha256": "cdb04d6bed70c2ac4bfe8d62d4694a8ed9c25cac9d1b49e5bdfb5aa092067e66",
+      "source_relative_path": "ContextItems.idechatprompttemplate"
+    },
+    {
+      "bytes": 175,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/CurrentFile.idechatprompttemplate",
+      "name": "CurrentFile.idechatprompttemplate",
+      "sha256": "6efe3a3e43520eea18e30ea7f0672124db69644e4ac1b12e2a97580fd1434e55",
+      "source_relative_path": "CurrentFile.idechatprompttemplate"
+    },
+    {
+      "bytes": 402,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/CurrentFileAbbreviated.idechatprompttemplate",
+      "name": "CurrentFileAbbreviated.idechatprompttemplate",
+      "sha256": "44d94ee05633438c7d2f5cc7518e108f94c448fea170055ff78afb64bd92a5f1",
+      "source_relative_path": "CurrentFileAbbreviated.idechatprompttemplate"
+    },
+    {
+      "bytes": 62,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/CurrentFileName.idechatprompttemplate",
+      "name": "CurrentFileName.idechatprompttemplate",
+      "sha256": "47a8023194b54d29246b39b4440552724b9fa6e1db26f2ca8805d302416c0754",
+      "source_relative_path": "CurrentFileName.idechatprompttemplate"
+    },
+    {
+      "bytes": 110,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/CurrentSelection.idechatprompttemplate",
+      "name": "CurrentSelection.idechatprompttemplate",
+      "sha256": "9d4a2db04e2d9a6bf20a3ab7906c3672dc641b8d34954040ced38dcd09c8b8fd",
+      "source_relative_path": "CurrentSelection.idechatprompttemplate"
+    },
+    {
+      "bytes": 107,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/FastApplyIntegratorSystemPrompt.idechatprompttemplate",
+      "name": "FastApplyIntegratorSystemPrompt.idechatprompttemplate",
+      "sha256": "ec07524c36e05dd3e8279f4a1731cc2dea1c492bac7388e1556be32b7eac6044",
+      "source_relative_path": "FastApplyIntegratorSystemPrompt.idechatprompttemplate"
+    },
+    {
+      "bytes": 419,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/FastApplyIntegratorUserPrompt.idechatprompttemplate",
+      "name": "FastApplyIntegratorUserPrompt.idechatprompttemplate",
+      "sha256": "33262f52b1cf104967dd7f98f3105bafb551a15f5f8f07f19440abfdc5bd71b8",
+      "source_relative_path": "FastApplyIntegratorUserPrompt.idechatprompttemplate"
+    },
+    {
+      "bytes": 152,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/GenerateDocumentation.idechatprompttemplate",
+      "name": "GenerateDocumentation.idechatprompttemplate",
+      "sha256": "c0435f5eba5cc751a5bd04ce79b56e3e05c4316ae890e4c8f8e1aa100e6b8170",
+      "source_relative_path": "GenerateDocumentation.idechatprompttemplate"
+    },
+    {
+      "bytes": 209,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/GeneratePlayground.idechatprompttemplate",
+      "name": "GeneratePlayground.idechatprompttemplate",
+      "sha256": "ae39f42972a5b893caa405ec2135c3dd1d46cb1da788719835750f32b0d9364f",
+      "source_relative_path": "GeneratePlayground.idechatprompttemplate"
+    },
+    {
+      "bytes": 1715,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/GeneratePreview.idechatprompttemplate",
+      "name": "GeneratePreview.idechatprompttemplate",
+      "sha256": "2bab2bb1a99d85896728c66abfd646edc079d402ae3925ea8128fdeb9ae4ada3",
+      "source_relative_path": "GeneratePreview.idechatprompttemplate"
+    },
+    {
+      "bytes": 984,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/InQueryDetailedGuidelines.idechatprompttemplate",
+      "name": "InQueryDetailedGuidelines.idechatprompttemplate",
+      "sha256": "9f98ad888d608c0af2bce3511415e97635d0399e6b1dcc062da04c79fe0d8e4d",
+      "source_relative_path": "InQueryDetailedGuidelines.idechatprompttemplate"
+    },
+    {
+      "bytes": 137,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/InQueryShortGuidelines.idechatprompttemplate",
+      "name": "InQueryShortGuidelines.idechatprompttemplate",
+      "sha256": "f86352b63e911de0cb375b0757f0ba800e4aa3fbbf7574e8d1409f6acc2053e4",
+      "source_relative_path": "InQueryShortGuidelines.idechatprompttemplate"
+    },
+    {
+      "bytes": 1475,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/InstructionEmbeddingsQueryExpansion.idechatprompttemplate",
+      "name": "InstructionEmbeddingsQueryExpansion.idechatprompttemplate",
+      "sha256": "9f3c1a8e3c31f8081cb773d0caadc9d10b221bc537b12929454b8f53d150cb33",
+      "source_relative_path": "InstructionEmbeddingsQueryExpansion.idechatprompttemplate"
+    },
+    {
+      "bytes": 1056,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/IntegratorSystemPrompt.idechatprompttemplate",
+      "name": "IntegratorSystemPrompt.idechatprompttemplate",
+      "sha256": "307a3dc4a09b45bb313de5c72aee9e7cd57b362685c1411e1a0ddbfc7ce7c6b4",
+      "source_relative_path": "IntegratorSystemPrompt.idechatprompttemplate"
+    },
+    {
+      "bytes": 64,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/IntegratorUserPrompt.idechatprompttemplate",
+      "name": "IntegratorUserPrompt.idechatprompttemplate",
+      "sha256": "29d1954bfd2906e944955a81449af26e4edf27f945a249cc83795c1a596854fb",
+      "source_relative_path": "IntegratorUserPrompt.idechatprompttemplate"
+    },
+    {
+      "bytes": 203,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/Interfaces.idechatprompttemplate",
+      "name": "Interfaces.idechatprompttemplate",
+      "sha256": "2e57593e407e3735cf77a4d3614c7449fda875384f1ba5f24f2a7471b94b26d2",
+      "source_relative_path": "Interfaces.idechatprompttemplate"
+    },
+    {
+      "bytes": 134,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/Issues.idechatprompttemplate",
+      "name": "Issues.idechatprompttemplate",
+      "sha256": "b8bd9ab9e65d5879c3462d5125b55f31120c6daca13267cc4abeecbc78b71f23",
+      "source_relative_path": "Issues.idechatprompttemplate"
+    },
+    {
+      "bytes": 1439,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/LocalInfillEmbeddingsQueryExpansion.idechatprompttemplate",
+      "name": "LocalInfillEmbeddingsQueryExpansion.idechatprompttemplate",
+      "sha256": "e35bb7dffa356f3c1662ac12edd4d92f3b195d6e2657e64b4cdce71d8c904b15",
+      "source_relative_path": "LocalInfillEmbeddingsQueryExpansion.idechatprompttemplate"
+    },
+    {
+      "bytes": 956,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/NewCodeIntegratorSystemPrompt.idechatprompttemplate",
+      "name": "NewCodeIntegratorSystemPrompt.idechatprompttemplate",
+      "sha256": "870492827726310e3971cb78ac6e2ca7250720a0a3860cc7c2363792e701e933",
+      "source_relative_path": "NewCodeIntegratorSystemPrompt.idechatprompttemplate"
+    },
+    {
+      "bytes": 79,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/NewCodeIntegratorUserPrompt.idechatprompttemplate",
+      "name": "NewCodeIntegratorUserPrompt.idechatprompttemplate",
+      "sha256": "a53e95ec183c764fab256b5164540abc153af14dc307c326370c6fc6fdeb3588",
+      "source_relative_path": "NewCodeIntegratorUserPrompt.idechatprompttemplate"
+    },
+    {
+      "bytes": 144,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/NewKnowledge.idechatprompttemplate",
+      "name": "NewKnowledge.idechatprompttemplate",
+      "sha256": "a2432133b42dfb75f03edefcf8ea53a49309101beb0429e24b0d8e9a39e0266e",
+      "source_relative_path": "NewKnowledge.idechatprompttemplate"
+    },
+    {
+      "bytes": 31,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/NoSelection.idechatprompttemplate",
+      "name": "NoSelection.idechatprompttemplate",
+      "sha256": "f41f1ed281d928a0a134689715e49da5dfda8620a5dd1d97c8f77200b460083b",
+      "source_relative_path": "NoSelection.idechatprompttemplate"
+    },
+    {
+      "bytes": 72,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/OriginalFile.idechatprompttemplate",
+      "name": "OriginalFile.idechatprompttemplate",
+      "sha256": "28ab02960be05db32676d8e00604f6cf27bd6b9adf4028e3c5a73391526ce598",
+      "source_relative_path": "OriginalFile.idechatprompttemplate"
+    },
+    {
+      "bytes": 5568,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/PlannerExecutorStyleNoClassify.idechatprompttemplate",
+      "name": "PlannerExecutorStyleNoClassify.idechatprompttemplate",
+      "sha256": "53c8a5dcb3ea3e78390829b0e40a3237bdc0f710a4f5b97ce802f259fd4a3743",
+      "source_relative_path": "PlannerExecutorStyleNoClassify.idechatprompttemplate"
+    },
+    {
+      "bytes": 12436,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/PlannerExecutorStylePlannerSystemPrompt-gpt_5.idechatprompttemplate",
+      "name": "PlannerExecutorStylePlannerSystemPrompt-gpt_5.idechatprompttemplate",
+      "sha256": "ede26b62ec4ce87da596494b665625401c5892ca293ffdc231bfbc9d094b3634",
+      "source_relative_path": "PlannerExecutorStylePlannerSystemPrompt-gpt_5.idechatprompttemplate"
+    },
+    {
+      "bytes": 10368,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/PlannerExecutorStylePlannerSystemPrompt.idechatprompttemplate",
+      "name": "PlannerExecutorStylePlannerSystemPrompt.idechatprompttemplate",
+      "sha256": "c4081552f740768c2271414f8057556e7b3693b29b8145d5da3f0c0552459963",
+      "source_relative_path": "PlannerExecutorStylePlannerSystemPrompt.idechatprompttemplate"
+    },
+    {
+      "bytes": 33,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/Query.idechatprompttemplate",
+      "name": "Query.idechatprompttemplate",
+      "sha256": "7bf61cb6d428f298da0b583e839110fb42edb3bac4e683936a28a894dd64f252",
+      "source_relative_path": "Query.idechatprompttemplate"
+    },
+    {
+      "bytes": 2795,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/ReasoningSystemPrompt.idechatprompttemplate",
+      "name": "ReasoningSystemPrompt.idechatprompttemplate",
+      "sha256": "afdb316f3a34cba755920639c585e44bdb647261f5be995f41594bebffb39d30",
+      "source_relative_path": "ReasoningSystemPrompt.idechatprompttemplate"
+    },
+    {
+      "bytes": 185,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/SearchResults.idechatprompttemplate",
+      "name": "SearchResults.idechatprompttemplate",
+      "sha256": "0ad610a45ab6a5cfdcb8c395120b08de907d9c3b74edb788bbc980b7fcfab3bc",
+      "source_relative_path": "SearchResults.idechatprompttemplate"
+    },
+    {
+      "bytes": 158,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/Snippets.idechatprompttemplate",
+      "name": "Snippets.idechatprompttemplate",
+      "sha256": "76135c5e5f11e93616a9f3d8b7365a7bcf1d9ccffc0020bb3327677518851d7b",
+      "source_relative_path": "Snippets.idechatprompttemplate"
+    },
+    {
+      "bytes": 3802,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/TextEditorToolSystemPrompt.idechatprompttemplate",
+      "name": "TextEditorToolSystemPrompt.idechatprompttemplate",
+      "sha256": "5997f1d930c829d1a439e97a9abb23cd8b76a4000a553af29e550269fe40e807",
+      "source_relative_path": "TextEditorToolSystemPrompt.idechatprompttemplate"
+    },
+    {
+      "bytes": 3994,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/ToolAssistedBasicSystemPrompt.idechatprompttemplate",
+      "name": "ToolAssistedBasicSystemPrompt.idechatprompttemplate",
+      "sha256": "cf73ca6e68775f9aae0f7e62057f83498b409d38f500fff762310fa601e6cc78",
+      "source_relative_path": "ToolAssistedBasicSystemPrompt.idechatprompttemplate"
+    },
+    {
+      "bytes": 1560,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/ToolAssistedInQueryDetailedGuidelines.idechatprompttemplate",
+      "name": "ToolAssistedInQueryDetailedGuidelines.idechatprompttemplate",
+      "sha256": "463b461d5eba69cf554ce5604ceb6420d4929d782c627f862ab4ad4640b7d1d1",
+      "source_relative_path": "ToolAssistedInQueryDetailedGuidelines.idechatprompttemplate"
+    },
+    {
+      "bytes": 137,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/ToolAssistedInQueryShortGuidelines.idechatprompttemplate",
+      "name": "ToolAssistedInQueryShortGuidelines.idechatprompttemplate",
+      "sha256": "f86352b63e911de0cb375b0757f0ba800e4aa3fbbf7574e8d1409f6acc2053e4",
+      "source_relative_path": "ToolAssistedInQueryShortGuidelines.idechatprompttemplate"
+    },
+    {
+      "bytes": 3374,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/ToolAssistedReasoningSystemPrompt.idechatprompttemplate",
+      "name": "ToolAssistedReasoningSystemPrompt.idechatprompttemplate",
+      "sha256": "1c36d7193dfb59a487355c17a34826da6ba7353056289a77150c2f6a56fd3b03",
+      "source_relative_path": "ToolAssistedReasoningSystemPrompt.idechatprompttemplate"
+    },
+    {
+      "bytes": 4144,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/VariantASystemPrompt.idechatprompttemplate",
+      "name": "VariantASystemPrompt.idechatprompttemplate",
+      "sha256": "445db733ee7c05c84e151fb96dcdd13972c8e08ca346895817a09a0dde28365d",
+      "source_relative_path": "VariantASystemPrompt.idechatprompttemplate"
+    },
+    {
+      "bytes": 3015,
+      "category": "prompt-template",
+      "generated_relative_path": "prompts/VariantBSystemPrompt.idechatprompttemplate",
+      "name": "VariantBSystemPrompt.idechatprompttemplate",
+      "sha256": "5bfa620c91bced62447ab87562882a4714d1f2396f9ab9ad0faa348dfbe13120",
+      "source_relative_path": "VariantBSystemPrompt.idechatprompttemplate"
+    },
+    {
+      "bytes": 12226,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/AppIntents-Updates.md",
+      "name": "AppIntents-Updates.md",
+      "sha256": "d161014cfbf0a0d4b8eb4a50a73af4e87e571ee19b2b65f9ae12f443e1f342dd",
+      "source_relative_path": "AdditionalDocumentation/AppIntents-Updates.md"
+    },
+    {
+      "bytes": 13382,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/AppKit-Implementing-Liquid-Glass-Design.md",
+      "name": "AppKit-Implementing-Liquid-Glass-Design.md",
+      "sha256": "ed10b4cf4697bab2beeae670a2db8ea62ad775698e85f395ac2df15dd6433022",
+      "source_relative_path": "AdditionalDocumentation/AppKit-Implementing-Liquid-Glass-Design.md"
+    },
+    {
+      "bytes": 6795,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/Foundation-AttributedString-Updates.md",
+      "name": "Foundation-AttributedString-Updates.md",
+      "sha256": "d439da765b3946bfe384f12344c76ed16b6dcc684a9f2be32673a125438d5af8",
+      "source_relative_path": "AdditionalDocumentation/Foundation-AttributedString-Updates.md"
+    },
+    {
+      "bytes": 12268,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/FoundationModels-Using-on-device-LLM-in-your-app.md",
+      "name": "FoundationModels-Using-on-device-LLM-in-your-app.md",
+      "sha256": "0a59e7ea806144eb206ae0ea568c325e197053d4fd53f212d38b49988fd22b9b",
+      "source_relative_path": "AdditionalDocumentation/FoundationModels-Using-on-device-LLM-in-your-app.md"
+    },
+    {
+      "bytes": 6421,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/Implementing-Assistive-Access-in-iOS.md",
+      "name": "Implementing-Assistive-Access-in-iOS.md",
+      "sha256": "24d9cba09d52cecf76fdc08ae3225388622cddb00d7ee0c7a17074cb509997a9",
+      "source_relative_path": "AdditionalDocumentation/Implementing-Assistive-Access-in-iOS.md"
+    },
+    {
+      "bytes": 10845,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/Implementing-Visual-Intelligence-in-iOS.md",
+      "name": "Implementing-Visual-Intelligence-in-iOS.md",
+      "sha256": "d7d5c86058198e39894726500634e121439c8b9d3f8d00e3de1b6e4db5f40171",
+      "source_relative_path": "AdditionalDocumentation/Implementing-Visual-Intelligence-in-iOS.md"
+    },
+    {
+      "bytes": 9711,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/MapKit-GeoToolbox-PlaceDescriptors.md",
+      "name": "MapKit-GeoToolbox-PlaceDescriptors.md",
+      "sha256": "80f14c9d7480142ce9994c85bb955518c5dcfd44f1fbea42683065e5b94992c8",
+      "source_relative_path": "AdditionalDocumentation/MapKit-GeoToolbox-PlaceDescriptors.md"
+    },
+    {
+      "bytes": 9496,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/StoreKit-Updates.md",
+      "name": "StoreKit-Updates.md",
+      "sha256": "79a980f784735439d52f7aea95547842313a8cd738b77ef0068ad9bd7e30befb",
+      "source_relative_path": "AdditionalDocumentation/StoreKit-Updates.md"
+    },
+    {
+      "bytes": 9245,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/Swift-Charts-3D-Visualization.md",
+      "name": "Swift-Charts-3D-Visualization.md",
+      "sha256": "8d81804565bf7bd96c542068b6c613d3715476c9ace82494fdada243f1466471",
+      "source_relative_path": "AdditionalDocumentation/Swift-Charts-3D-Visualization.md"
+    },
+    {
+      "bytes": 10675,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/Swift-Concurrency-Updates.md",
+      "name": "Swift-Concurrency-Updates.md",
+      "sha256": "0fbd5c2b5dd87710efd68e73c34476749275363bd2b7ad569039e590c3f3c7ce",
+      "source_relative_path": "AdditionalDocumentation/Swift-Concurrency-Updates.md"
+    },
+    {
+      "bytes": 8945,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/Swift-InlineArray-Span.md",
+      "name": "Swift-InlineArray-Span.md",
+      "sha256": "01e2630bccaecadabea6222831562de117904ac88d883d27c14706d42cdcf0fd",
+      "source_relative_path": "AdditionalDocumentation/Swift-InlineArray-Span.md"
+    },
+    {
+      "bytes": 9863,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/SwiftData-Class-Inheritance.md",
+      "name": "SwiftData-Class-Inheritance.md",
+      "sha256": "d112124927d4f06a6f86659b3a87a492c0bd6ce8a64b364a2069a9b6d13f8060",
+      "source_relative_path": "AdditionalDocumentation/SwiftData-Class-Inheritance.md"
+    },
+    {
+      "bytes": 23618,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/SwiftUI-AlarmKit-Integration.md",
+      "name": "SwiftUI-AlarmKit-Integration.md",
+      "sha256": "34d7571b9f923a76cba668e8a6e3a61a7803eb7596b4648412435c87ea1ba6e8",
+      "source_relative_path": "AdditionalDocumentation/SwiftUI-AlarmKit-Integration.md"
+    },
+    {
+      "bytes": 8175,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/SwiftUI-Implementing-Liquid-Glass-Design.md",
+      "name": "SwiftUI-Implementing-Liquid-Glass-Design.md",
+      "sha256": "6365b71a65a1522439e082a92aab63a5af6bf1cacb483f62c89783fdaaccda66",
+      "source_relative_path": "AdditionalDocumentation/SwiftUI-Implementing-Liquid-Glass-Design.md"
+    },
+    {
+      "bytes": 6633,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/SwiftUI-New-Toolbar-Features.md",
+      "name": "SwiftUI-New-Toolbar-Features.md",
+      "sha256": "3636e0b20a2c3a323214272dd2e439b09aa884bfb5dd2e268ccf28afa3e2328d",
+      "source_relative_path": "AdditionalDocumentation/SwiftUI-New-Toolbar-Features.md"
+    },
+    {
+      "bytes": 10905,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/SwiftUI-Styled-Text-Editing.md",
+      "name": "SwiftUI-Styled-Text-Editing.md",
+      "sha256": "b7c09273cee7ff17599b724164660380fc74ed2eb9d3f6bc1fc014692efef212",
+      "source_relative_path": "AdditionalDocumentation/SwiftUI-Styled-Text-Editing.md"
+    },
+    {
+      "bytes": 12414,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/SwiftUI-WebKit-Integration.md",
+      "name": "SwiftUI-WebKit-Integration.md",
+      "sha256": "2320fe764030be4a1f31b3e7395c8d1e505979ac60f2374e2de0f93d060d9351",
+      "source_relative_path": "AdditionalDocumentation/SwiftUI-WebKit-Integration.md"
+    },
+    {
+      "bytes": 10008,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/UIKit-Implementing-Liquid-Glass-Design.md",
+      "name": "UIKit-Implementing-Liquid-Glass-Design.md",
+      "sha256": "f57afa408d4fd245d399b5c3c1f9eef4e28022a1608b17a5e5faea6bf8115995",
+      "source_relative_path": "AdditionalDocumentation/UIKit-Implementing-Liquid-Glass-Design.md"
+    },
+    {
+      "bytes": 7704,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/WidgetKit-Implementing-Liquid-Glass-Design.md",
+      "name": "WidgetKit-Implementing-Liquid-Glass-Design.md",
+      "sha256": "a2c7e5e849002a34023ed536c690dc42759aef545e625fd393482848435d0444",
+      "source_relative_path": "AdditionalDocumentation/WidgetKit-Implementing-Liquid-Glass-Design.md"
+    },
+    {
+      "bytes": 8743,
+      "category": "additional-documentation",
+      "generated_relative_path": "additional-documentation/Widgets-for-visionOS.md",
+      "name": "Widgets-for-visionOS.md",
+      "sha256": "a1710b92f027d27c31c1b7d1db2fce64f26b7a4261b69555f6c1eb4991600203",
+      "source_relative_path": "AdditionalDocumentation/Widgets-for-visionOS.md"
+    },
+    {
+      "bytes": 997,
+      "category": "support-file",
+      "generated_relative_path": "support/AgentVersions.plist",
+      "name": "AgentVersions.plist",
+      "sha256": "6b24e61a719cddcb4adbd75cb056ffca28e9e540e5a0e59eef51c698f2598986",
+      "source_relative_path": "AgentVersions.plist"
+    },
+    {
+      "bytes": 35156,
+      "category": "support-file",
+      "generated_relative_path": "support/AppleXCNavigation-Heavy.ttf",
+      "name": "AppleXCNavigation-Heavy.ttf",
+      "sha256": "0935758c2aaba4ea4da17e68ca0a1a72aba6edda14bd561eb80276e030e6a896",
+      "source_relative_path": "AppleXCNavigation-Heavy.ttf"
+    },
+    {
+      "bytes": 1101,
+      "category": "support-file",
+      "generated_relative_path": "support/ApprovedIntegrationModelPairings.plist",
+      "name": "ApprovedIntegrationModelPairings.plist",
+      "sha256": "bfb6546018b00f593a593b258207309023429d261bc247677af07f639395634e",
+      "source_relative_path": "ApprovedIntegrationModelPairings.plist"
+    },
+    {
+      "bytes": 419176,
+      "category": "support-file",
+      "generated_relative_path": "support/Assets.car",
+      "name": "Assets.car",
+      "sha256": "d4a969c7769611aae0c0aa8138c5fb2976deedbe3ed92825ba1881f5cba47097",
+      "source_relative_path": "Assets.car"
+    },
+    {
+      "bytes": 20437,
+      "category": "support-file",
+      "generated_relative_path": "support/IDEIntelligenceChat.xcplugindata",
+      "name": "IDEIntelligenceChat.xcplugindata",
+      "sha256": "338cdb7b7f9bee0a11cbe8c8dd0eb772a549f0eea8efd222c177e307f4a8d7fb",
+      "source_relative_path": "IDEIntelligenceChat.xcplugindata"
+    },
+    {
+      "bytes": 847,
+      "category": "support-file",
+      "generated_relative_path": "support/Info.plist",
+      "name": "Info.plist",
+      "sha256": "d342e5dc28facde3c1014ce085375e9ede7c9f12a05ce17347ad7b94a24b44e0",
+      "source_relative_path": "Info.plist"
+    },
+    {
+      "bytes": 231508,
+      "category": "support-file",
+      "generated_relative_path": "support/bert-estimate.vocab",
+      "name": "bert-estimate.vocab",
+      "sha256": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3",
+      "source_relative_path": "bert-estimate.vocab"
+    },
+    {
+      "bytes": 473,
+      "category": "support-file",
+      "generated_relative_path": "support/version.plist",
+      "name": "version.plist",
+      "sha256": "cd66ffbed7478518c3a364b77bebbe682f1535f0ce115c1f105afdb0e324e693",
+      "source_relative_path": "version.plist"
+    }
+  ],
+  "generated_at": "2026-05-25T09:48:14.330508+00:00",
+  "provenance": {
+    "primary": "local-xcode-bundle",
+    "signal_repository": "artemnovichkov/xcode-26-system-prompts"
+  },
+  "schema_version": 1,
+  "snapshot": "Xcode-26.4.1-24909.0.3",
+  "source": {
+    "developer_dir": "/Applications/Xcode.app/Contents/Developer",
+    "resources_dir": "/Applications/Xcode.app/Contents/PlugIns/IDEIntelligenceChat.framework/Versions/A/Resources",
+    "xcode_app": "/Applications/Xcode.app"
+  },
+  "xcode": {
+    "build": "24909.0.3",
+    "bundle_identifier": "com.apple.dt.Xcode",
+    "version": "26.4.1"
+  }
+}

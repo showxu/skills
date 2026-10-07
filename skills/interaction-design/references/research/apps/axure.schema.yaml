@@ -1,0 +1,264 @@
+schema_version: interaction-schema-facts.v1
+app: axure
+source_report: references/research/apps/axure.md
+status: research_fact_store
+mapping_policy:
+  status: hypothesis
+  meaning: Draft candidate mapping for future UI Design Schema and Interaction Design Schema synthesis.
+  not_a_fact: true
+  not_current_contract_validation: true
+  review_required: true
+role:
+  classification: specialized_functional_prototype_donor
+  orientation:
+    - prototype_time
+    - functional_logic
+    - enterprise_prototype
+  summary: Functional prototype donor for events, cases, conditions, actions, dynamic panels, panel states, variables, expressions, repeaters, forms, and validation.
+authority:
+  primary:
+    - official_docs
+    - official_api
+  secondary:
+    - artifact_probe
+evidence:
+  - id: axure_events_cases_actions
+    grade: official_docs
+    title: Events, cases, and actions
+    url: https://archive.axure.com/axure-rp/reference/events-cases-actions/
+  - id: axure_dynamic_panels
+    grade: official_docs
+    title: Dynamic panels
+    url: https://archive.axure.com/axure-rp/reference/dynamic-panels/
+  - id: axure_api
+    grade: official_api
+    title: Axure RP API
+    url: https://www.axure.com/axure-rp-api
+  - id: axure_training
+    grade: official_docs
+    title: Axure core training
+    url: https://www.axure.com/support/core-training-4
+  - id: local_axure_app_bundle
+    grade: artifact_probe
+    title: Axure RP 11 app-bundle training projects and libraries
+    path: references/research/artifacts/axure/app-bundle/
+objects:
+  - name: Project
+    category: artifact_root
+    evidence: [axure_training, local_axure_app_bundle]
+    draft_schema_mapping: [research_evidence.prototype_artifact]
+    decision: reference
+    fields:
+      - name: pages
+        type: Page[]
+        draft_schema_mapping: [interaction_design_schema.behavior.surfaces]
+        decision: absorb
+      - name: masters
+        draft_schema_mapping: [ui_design_schema.reusable_components]
+        decision: reference
+      - name: variables
+        type: Variable[]
+        draft_schema_mapping: [interaction_design_schema.behavior.variables]
+        decision: absorb
+      - name: libraries
+        draft_schema_mapping: [research_evidence.libraries]
+        decision: reference
+  - name: Page
+    category: surface
+    evidence: [axure_events_cases_actions]
+    draft_schema_mapping: [interaction_design_schema.behavior.screens]
+    decision: absorb
+    fields:
+      - name: widgets
+        type: Widget[]
+        draft_schema_mapping: [ui_design_schema.actors, interaction_design_schema.behavior.actors]
+        decision: absorb
+      - name: events
+        type: Event[]
+        draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+        decision: absorb
+      - name: page_notes
+        draft_schema_mapping: [research_evidence.notes]
+        decision: reference
+  - name: Widget
+    category: actor
+    evidence: [axure_events_cases_actions]
+    draft_schema_mapping: [interaction_design_schema.behavior.actors, ui_design_schema.widgets]
+    decision: absorb
+    fields:
+      - name: widget_type
+        draft_schema_mapping: [ui_design_schema.component_type]
+        decision: absorb
+      - name: events
+        type: Event[]
+        draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+        decision: absorb
+      - name: interactions
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb
+      - name: style
+        draft_schema_mapping: [ui_design_schema.visual_style]
+        decision: defer_to_ui_layer
+  - name: Event
+    category: trigger
+    evidence: [axure_events_cases_actions]
+    draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+    decision: absorb
+    fields:
+      - name: event_type
+        draft_schema_mapping: [interaction_design_schema.behavior.trigger.type]
+        decision: absorb
+      - name: cases
+        type: Case[]
+        draft_schema_mapping: [interaction_design_schema.behavior.branches]
+        decision: absorb
+  - name: Case
+    category: branch
+    evidence: [axure_events_cases_actions]
+    draft_schema_mapping: [interaction_design_schema.behavior.branches]
+    decision: absorb
+    fields:
+      - name: condition
+        type: Condition
+        draft_schema_mapping: [interaction_design_schema.behavior.conditions]
+        decision: absorb
+      - name: actions
+        type: Action[]
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb
+      - name: name
+        draft_schema_mapping: [interaction_design_schema.behavior.branch.name]
+        decision: absorb
+  - name: Condition
+    category: condition
+    evidence: [axure_events_cases_actions]
+    draft_schema_mapping: [interaction_design_schema.behavior.conditions]
+    decision: absorb
+    fields:
+      - name: left_expression
+        type: Expression
+        draft_schema_mapping: [interaction_design_schema.behavior.condition.left]
+        decision: absorb
+      - name: operator
+        draft_schema_mapping: [interaction_design_schema.behavior.condition.operator]
+        decision: absorb
+      - name: right_expression
+        type: Expression
+        draft_schema_mapping: [interaction_design_schema.behavior.condition.right]
+        decision: absorb
+  - name: Action
+    category: action
+    evidence: [axure_events_cases_actions]
+    draft_schema_mapping: [interaction_design_schema.behavior.actions]
+    decision: absorb
+    fields:
+      - name: action_type
+        draft_schema_mapping: [interaction_design_schema.behavior.action.type]
+        decision: absorb
+      - name: target
+        draft_schema_mapping: [interaction_design_schema.behavior.action.target]
+        decision: absorb
+      - name: value
+        draft_schema_mapping: [interaction_design_schema.behavior.action.value]
+        decision: absorb
+      - name: animation
+        draft_schema_mapping: [interaction_design_schema.platform.transition_presentations]
+        decision: absorb_as_presentation
+  - name: DynamicPanel
+    category: component
+    evidence: [axure_dynamic_panels]
+    draft_schema_mapping: [interaction_design_schema.behavior.components, interaction_design_schema.behavior.state_machines]
+    decision: absorb
+    fields:
+      - name: panel_states
+        type: PanelState[]
+        draft_schema_mapping: [interaction_design_schema.behavior.states]
+        decision: absorb
+      - name: current_state
+        draft_schema_mapping: [interaction_design_schema.behavior.current_state]
+        decision: absorb
+      - name: events
+        type: Event[]
+        draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+        decision: absorb
+  - name: PanelState
+    category: state
+    evidence: [axure_dynamic_panels]
+    draft_schema_mapping: [interaction_design_schema.behavior.states]
+    decision: absorb
+    fields:
+      - name: name
+        draft_schema_mapping: [interaction_design_schema.behavior.state.name]
+        decision: absorb
+      - name: widgets
+        type: Widget[]
+        draft_schema_mapping: [ui_design_schema.children]
+        decision: absorb
+      - name: transition_in
+        draft_schema_mapping: [interaction_design_schema.platform.transition_presentations]
+        decision: absorb_as_presentation
+      - name: transition_out
+        draft_schema_mapping: [interaction_design_schema.platform.transition_presentations]
+        decision: absorb_as_presentation
+  - name: Variable
+    category: state
+    evidence: [axure_events_cases_actions]
+    draft_schema_mapping: [interaction_design_schema.behavior.variables]
+    decision: absorb
+    fields:
+      - name: name
+        draft_schema_mapping: [interaction_design_schema.behavior.variable.name]
+        decision: absorb
+      - name: scope
+        draft_schema_mapping: [interaction_design_schema.behavior.variable.scope]
+        decision: absorb
+      - name: value
+        draft_schema_mapping: [interaction_design_schema.behavior.variable.value]
+        decision: absorb
+  - name: Expression
+    category: expression
+    evidence: [axure_events_cases_actions]
+    draft_schema_mapping: [interaction_design_schema.behavior.expressions]
+    decision: absorb
+    fields:
+      - name: expression_body
+        draft_schema_mapping: [interaction_design_schema.behavior.expression.body]
+        decision: absorb_concept_not_syntax
+      - name: referenced_variables
+        draft_schema_mapping: [interaction_design_schema.behavior.expression.references]
+        decision: absorb
+  - name: Repeater
+    category: data_component
+    evidence: [axure_events_cases_actions]
+    draft_schema_mapping: [ui_design_schema.data_list, interaction_design_schema.behavior.data_state]
+    decision: absorb
+    fields:
+      - name: dataset
+        draft_schema_mapping: [interaction_design_schema.behavior.data_source]
+        decision: reference
+      - name: item_template
+        draft_schema_mapping: [ui_design_schema.repeated_item]
+        decision: absorb
+      - name: filters
+        draft_schema_mapping: [interaction_design_schema.behavior.conditions]
+        decision: absorb
+  - name: FormInput
+    category: validation
+    evidence: [local_axure_app_bundle]
+    draft_schema_mapping: [interaction_design_schema.behavior.validation]
+    decision: absorb
+    fields:
+      - name: input_type
+        draft_schema_mapping: [interaction_design_schema.behavior.validation.input_type]
+        decision: absorb
+      - name: value
+        draft_schema_mapping: [interaction_design_schema.behavior.input.value]
+        decision: absorb
+      - name: validation_rule
+        draft_schema_mapping: [interaction_design_schema.behavior.validation.rules]
+        decision: absorb
+gaps:
+  - id: axure_rp11_readable_schema
+    status: deferred
+    description: Current RP 11 serialized schema is not treated as stable readable field schema.
+    impact: Official docs/API and app-bundle samples are enough for functional prototype object model; importer fields remain future work.

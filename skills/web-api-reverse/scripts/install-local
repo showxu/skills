@@ -1,0 +1,380 @@
+#!/bin/sh
+
+set -eu
+
+command_name="web-api-reverse"
+tool_name="web-api-reverse"
+prefix="${WEB_API_REVERSE_INSTALL_PREFIX:-$HOME/.local/bin}"
+bin_path=""
+force=0
+install_playwright=1
+release_retention="${WEB_API_REVERSE_RELEASE_RETENTION:-3}"
+activation_pending=0
+activation_backup=""
+previous_current_existed=0
+previous_current_target=""
+previous_command_existed=0
+next_current=""
+next_command=""
+
+usage() {
+  cat <<'EOF'
+Usage: scripts/install-local [--prefix DIRECTORY] [--bin-path DIRECTORY] [--retain-releases COUNT] [--skip-playwright-install] [--force]
+
+Build and atomically install web-api-reverse and its SwiftPM resources.
+
+Options:
+  --prefix DIRECTORY   Install directory (default: ~/.local/bin).
+  --bin-path DIRECTORY Install a prebuilt binary; intended for tests.
+  --retain-releases COUNT
+                       Keep the active release plus recent rollback releases
+                       (default: 3; allowed: 2...20).
+  --skip-playwright-install
+                       Do not install the pinned private Playwright runtime.
+  --force              Replace an existing unowned command.
+  -h, --help           Show this help.
+EOF
+}
+
+fail() {
+  printf '%s installer: %s\n' "$tool_name" "$1" >&2
+  exit 1
+}
+
+warn() {
+  printf '%s installer warning: %s\n' "$tool_name" "$1" >&2
+}
+
+rollback_activation() {
+  rollback_status=$?
+  [ "$rollback_status" -ne 0 ] || rollback_status=1
+  trap - EXIT HUP INT TERM
+
+  if [ "$activation_pending" -eq 1 ]; then
+    rollback_failed=0
+    rm -f "$next_current" "$next_command" 2>/dev/null \
+      || rollback_failed=1
+
+    if [ "$previous_current_existed" -eq 1 ]; then
+      restore_current="$prefix/.$tool_name-current.restore.$$"
+      rm -f "$restore_current"
+      if ! ln -s "$previous_current_target" "$restore_current" \
+        || ! mv -f -h "$restore_current" "$current"; then
+        rollback_failed=1
+        rm -f "$restore_current" 2>/dev/null || true
+      fi
+    elif ! rm -f "$current"; then
+      rollback_failed=1
+    fi
+
+    if [ "$previous_command_existed" -eq 1 ]; then
+      if ! rm -rf "$destination" \
+        || ! cp -pPR "$activation_backup/command" "$destination"; then
+        rollback_failed=1
+      fi
+    elif ! rm -rf "$destination"; then
+      rollback_failed=1
+    fi
+
+    if [ "$rollback_failed" -eq 0 ] \
+      && [ -n "${release:-}" ] \
+      && [ -d "$release" ] \
+      && [ ! -L "$release" ]; then
+      rm -rf "$release" 2>/dev/null || rollback_failed=1
+    fi
+    rm -rf "$activation_backup" 2>/dev/null || rollback_failed=1
+    if [ "$rollback_failed" -eq 1 ]; then
+      warn "activation failed and the previous installation could not be fully restored."
+    else
+      warn "activation failed; restored the previous current pointer and command."
+    fi
+  fi
+
+  release_install_lock
+  exit "$rollback_status"
+}
+
+validate_release_retention() {
+  case "$release_retention" in
+    ''|*[!0-9]*)
+      fail "release retention must be an integer from 2 through 20."
+      ;;
+  esac
+  [ "$release_retention" -ge 2 ] && [ "$release_retention" -le 20 ] \
+    || fail "release retention must be an integer from 2 through 20."
+}
+
+reject_symbolic_links() {
+  root=$1
+  [ ! -L "$root" ] \
+    || fail "resource bundle must not be a symbolic link: $root"
+  symbolic_link=$(find "$root" -type l -print -quit)
+  [ -z "$symbolic_link" ] \
+    || fail "resource bundle contains a symbolic link: $symbolic_link"
+}
+
+garbage_collect_releases() {
+  [ "${WEB_API_REVERSE_INSTALLER_TEST_GC_FAILURE:-0}" != "1" ] \
+    || return 1
+  active_target=$(readlink "$current") || return 1
+  case "$active_target" in
+    ".$tool_name-releases/"*)
+      active_release=${active_target#".$tool_name-releases/"}
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+  case "$active_release" in
+    ''|*/*|.|..)
+      return 1
+      ;;
+  esac
+  [ -d "$releases/$active_release" ] && [ ! -L "$releases/$active_release" ] \
+    || return 1
+
+  rollback_limit=$((release_retention - 1))
+  release_names=$(
+    for candidate in "$releases"/*; do
+      [ -e "$candidate" ] || [ -L "$candidate" ] || continue
+      [ ! -L "$candidate" ] || continue
+      [ -d "$candidate" ] || continue
+      [ -f "$candidate/manifest" ] \
+        && [ ! -L "$candidate/manifest" ] \
+        && [ -f "$candidate/$command_name" ] \
+        && [ ! -L "$candidate/$command_name" ] \
+        || continue
+      release_name=$(basename "$candidate")
+      printf '%s\n' "$release_name" \
+        | LC_ALL=C grep -Eq '^[0-9]{8}T[0-9]{6}Z-[0-9]+-[0-9a-f]{12}$' \
+        || continue
+      printf '%s\n' "$release_name"
+    done | LC_ALL=C sort -r
+  ) || return 1
+
+  kept_rollbacks=0
+  printf '%s\n' "$release_names" | while IFS= read -r release_name; do
+    [ -n "$release_name" ] || continue
+    [ "$release_name" != "$active_release" ] || continue
+    if [ "$kept_rollbacks" -lt "$rollback_limit" ]; then
+      kept_rollbacks=$((kept_rollbacks + 1))
+      continue
+    fi
+    rm -rf "$releases/$release_name" \
+      || return 1
+  done || return 1
+}
+
+hash_tree() {
+  root=$1
+  (
+    cd "$root"
+    find . -type f -print \
+      | LC_ALL=C sort \
+      | while IFS= read -r file; do
+          file_hash=$(shasum -a 256 "$file" | awk '{ print $1 }')
+          printf '%s %s\n' "$file_hash" "$file"
+        done \
+      | shasum -a 256 \
+      | awk '{ print $1 }'
+  )
+}
+
+strip_mach_o_debug_symbols() {
+  path=$1
+  if /usr/bin/file -b "$path" | /usr/bin/grep -q 'Mach-O'; then
+    /usr/bin/strip -S "$path" 2>/dev/null \
+      || fail "unable to strip staged executable: $path"
+  fi
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --prefix)
+      [ "$#" -ge 2 ] || fail "--prefix requires a directory."
+      prefix=$2
+      shift 2
+      ;;
+    --bin-path)
+      [ "$#" -ge 2 ] || fail "--bin-path requires a directory."
+      bin_path=$2
+      shift 2
+      ;;
+    --retain-releases)
+      [ "$#" -ge 2 ] || fail "--retain-releases requires a count."
+      release_retention=$2
+      shift 2
+      ;;
+    --skip-playwright-install)
+      install_playwright=0
+      shift
+      ;;
+    --force)
+      force=1
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      fail "unknown argument: $1"
+      ;;
+  esac
+done
+
+validate_release_retention
+
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+repository_root=$(CDPATH= cd -- "$script_dir/.." && pwd)
+
+if [ -z "$bin_path" ]; then
+  (
+    cd "$repository_root"
+    swift build \
+      --configuration release \
+      --explicit-target-dependency-import-check error
+  ) || fail "release build failed."
+  bin_path=$(
+    cd "$repository_root"
+    swift build --configuration release --show-bin-path
+  ) || fail "unable to resolve the release binary directory."
+fi
+
+source_binary="$bin_path/$command_name"
+[ -x "$source_binary" ] || fail "missing executable: $source_binary"
+
+if [ "$install_playwright" -eq 1 ]; then
+  "$script_dir/install-playwright" \
+    || fail "Playwright runtime installation failed."
+fi
+
+mkdir -p "$prefix" || fail "unable to create install directory: $prefix"
+prefix=$(CDPATH= cd -- "$prefix" && pwd)
+install_lock="$prefix/.lifewear-install.lock"
+lock_acquired=0
+
+release_install_lock() {
+  [ "$lock_acquired" -eq 1 ] || return 0
+  if [ -f "$install_lock" ] \
+    && [ "$(cat "$install_lock" 2>/dev/null || true)" = "$$" ]
+  then
+    rm -f "$install_lock"
+  fi
+  lock_acquired=0
+}
+
+[ ! -L "$install_lock" ] \
+  || fail "reserved installation lock must not be a symbolic link: $install_lock"
+[ ! -e "$install_lock" ] || [ -f "$install_lock" ] \
+  || fail "reserved installation lock is not a regular file: $install_lock"
+/usr/bin/shlock -f "$install_lock" -p "$$" \
+  || fail "another LifeWear installation is already in progress for: $prefix"
+lock_acquired=1
+trap 'release_install_lock' 0
+
+releases="$prefix/.$tool_name-releases"
+current="$prefix/.$tool_name-current"
+destination="$prefix/$command_name"
+
+[ ! -L "$releases" ] \
+  || fail "reserved release path must not be a symbolic link: $releases"
+[ ! -e "$releases" ] || [ -d "$releases" ] \
+  || fail "reserved release path is not a directory: $releases"
+[ ! -e "$current" ] || [ -L "$current" ] \
+  || fail "reserved current path is not a symbolic link: $current"
+
+owned_target=".$tool_name-current/$command_name"
+if [ -e "$destination" ] || [ -L "$destination" ]; then
+  if [ "$force" -ne 1 ]; then
+    [ -L "$destination" ] \
+      && [ "$(readlink "$destination")" = "$owned_target" ] \
+      || fail "refusing to replace unowned file: $destination"
+  fi
+fi
+
+mkdir -p "$releases" || fail "unable to create release directory."
+transaction=$(mktemp -d "$prefix/.$tool_name-install.XXXXXX") \
+  || fail "unable to create installation transaction."
+trap 'rm -rf "$transaction"; release_install_lock' 0
+trap 'exit 130' HUP INT TERM
+
+install -m 0755 "$source_binary" "$transaction/$command_name" \
+  || fail "unable to stage $command_name."
+strip_mach_o_debug_symbols "$transaction/$command_name"
+for resource_bundle in "$bin_path"/*.bundle; do
+  [ -e "$resource_bundle" ] || [ -L "$resource_bundle" ] || continue
+  [ -d "$resource_bundle" ] \
+    || fail "resource bundle is not a directory: $resource_bundle"
+  reject_symbolic_links "$resource_bundle"
+  cp -R "$resource_bundle" "$transaction/" \
+    || fail "unable to stage SwiftPM resource bundle: $resource_bundle"
+done
+for resource_bundle in "$transaction"/*.bundle; do
+  [ -e "$resource_bundle" ] || [ -L "$resource_bundle" ] || continue
+  reject_symbolic_links "$resource_bundle"
+done
+
+binary_hash=$(shasum -a 256 "$transaction/$command_name" | awk '{ print $1 }')
+printf '%s %s\n' "$binary_hash" "$command_name" > "$transaction/manifest"
+for resource_bundle in "$transaction"/*.bundle; do
+  [ -d "$resource_bundle" ] || continue
+  resource_name=$(basename "$resource_bundle")
+  resource_hash=$(hash_tree "$resource_bundle")
+  printf '%s %s\n' "$resource_hash" "$resource_name" \
+    >> "$transaction/manifest"
+done
+release_hash=$(
+  shasum -a 256 "$transaction/manifest" | awk '{ print $1 }'
+)
+release_id="$(date -u +%Y%m%dT%H%M%SZ)-$$-$(printf '%s' "$release_hash" | cut -c 1-12)"
+release="$releases/$release_id"
+mv "$transaction" "$release" || fail "unable to publish staged release."
+trap 'release_install_lock' 0
+trap - HUP INT TERM
+
+activation_backup=$(mktemp -d "$prefix/.$tool_name-activation.XXXXXX") \
+  || fail "unable to create activation backup."
+if [ -L "$current" ]; then
+  previous_current_target=$(readlink "$current") \
+    || fail "unable to snapshot current pointer."
+  previous_current_existed=1
+fi
+if [ -e "$destination" ] || [ -L "$destination" ]; then
+  cp -pPR "$destination" "$activation_backup/command" \
+    || fail "unable to snapshot public command."
+  previous_command_existed=1
+fi
+
+next_current="$prefix/.$tool_name-current.next.$$"
+next_command="$prefix/.$tool_name-command.next.$$"
+activation_pending=1
+trap 'rollback_activation' 0
+trap 'exit 130' HUP INT TERM
+rm -f "$next_current"
+ln -s ".$tool_name-releases/$release_id" "$next_current" \
+  || fail "unable to create current pointer."
+mv -f -h "$next_current" "$current" \
+  || fail "unable to switch current pointer."
+[ "${WEB_API_REVERSE_INSTALLER_TEST_FAIL_AT:-}" != "after-current-switch" ] \
+  || fail "injected failure after current pointer activation."
+
+rm -f "$next_command"
+ln -s "$owned_target" "$next_command" \
+  || fail "unable to create command link."
+mv -f -h "$next_command" "$destination" \
+  || fail "unable to publish command link."
+[ "${WEB_API_REVERSE_INSTALLER_TEST_FAIL_AT:-}" != "after-command-switch" ] \
+  || fail "injected failure after public command activation."
+
+activation_pending=0
+trap 'release_install_lock' 0
+trap - HUP INT TERM
+rm -rf "$activation_backup" \
+  || warn "unable to remove activation backup: $activation_backup"
+
+if ! garbage_collect_releases; then
+  warn "unable to prune inactive releases; the active installation remains healthy."
+fi
+
+printf 'Installed %s at %s\n' "$command_name" "$destination"

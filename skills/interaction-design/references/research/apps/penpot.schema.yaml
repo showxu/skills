@@ -1,0 +1,217 @@
+schema_version: interaction-schema-facts.v1
+app: penpot
+source_report: references/research/apps/penpot.md
+status: research_fact_store
+mapping_policy:
+  status: hypothesis
+  meaning: Draft candidate mapping for future UI Design Schema and Interaction Design Schema synthesis.
+  not_a_fact: true
+  not_current_contract_validation: true
+  review_required: true
+role:
+  classification: secondary_open_design_donor
+  orientation:
+    - design_time
+    - prototype_time
+    - source_available
+  summary: Open-source design/prototype donor for file, page, board, shape, component, design token, prototype flow, interaction, plugin, export, and inspect models.
+authority:
+  primary:
+    - official_docs
+    - source_available
+evidence:
+  - id: penpot_help
+    grade: official_docs
+    title: Penpot help center
+    url: https://help.penpot.app/
+  - id: penpot_prototyping
+    grade: official_docs
+    title: Penpot prototyping docs
+    url: https://help.penpot.app/user-guide/prototyping-testing/prototyping/
+  - id: penpot_view_mode
+    grade: official_docs
+    title: Penpot View mode docs
+    url: https://help.penpot.app/user-guide/prototyping-testing/testing-view-mode/
+  - id: penpot_workspace
+    grade: official_docs
+    title: Penpot workspace basics
+    url: https://help.penpot.app/user-guide/workspace-basics/
+  - id: penpot_flexible_layouts
+    grade: official_docs
+    title: Penpot flexible layouts
+    url: https://help.penpot.app/user-guide/flexible-layouts/
+  - id: penpot_tokens
+    grade: official_docs
+    title: Penpot design tokens
+    url: https://help.penpot.app/user-guide/design-systems/design-tokens/
+  - id: penpot_plugins
+    grade: official_docs
+    title: Penpot plugin FAQ
+    url: https://help.penpot.app/plugins/faq/
+  - id: penpot_source
+    grade: source_available
+    title: Penpot public source repository
+    url: https://github.com/penpot/penpot
+objects:
+  - name: File
+    category: artifact_root
+    evidence: [penpot_workspace, penpot_source]
+    draft_schema_mapping: [research_evidence.design_file]
+    decision: reference
+    fields:
+      - name: pages
+        type: Page[]
+        draft_schema_mapping: [ui_design_schema.pages]
+        decision: absorb
+      - name: components
+        type: Component[]
+        draft_schema_mapping: [ui_design_schema.components]
+        decision: absorb
+      - name: tokens
+        type: DesignToken[]
+        draft_schema_mapping: [ui_design_schema.tokens]
+        decision: absorb
+      - name: prototype_flows
+        type: PrototypeFlow[]
+        draft_schema_mapping: [interaction_design_schema.behavior.flows]
+        decision: absorb
+  - name: Page
+    category: ui_layer
+    evidence: [penpot_workspace]
+    draft_schema_mapping: [ui_design_schema.pages]
+    decision: absorb
+    fields:
+      - name: boards
+        type: Board[]
+        draft_schema_mapping: [interaction_design_schema.behavior.surfaces, ui_design_schema.boards]
+        decision: absorb
+      - name: shapes
+        type: Shape[]
+        draft_schema_mapping: [ui_design_schema.shapes]
+        decision: absorb
+  - name: Board
+    category: surface
+    evidence: [penpot_workspace, penpot_prototyping]
+    draft_schema_mapping: [interaction_design_schema.behavior.screens, ui_design_schema.boards]
+    decision: absorb
+    fields:
+      - name: shapes
+        type: Shape[]
+        draft_schema_mapping: [ui_design_schema.children, interaction_design_schema.behavior.actors]
+        decision: absorb
+      - name: interactions
+        type: Interaction[]
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb
+  - name: Shape
+    category: actor
+    evidence: [penpot_workspace, penpot_source]
+    draft_schema_mapping: [ui_design_schema.actors, interaction_design_schema.behavior.actors]
+    decision: absorb
+    fields:
+      - name: shape_type
+        draft_schema_mapping: [ui_design_schema.node_type]
+        decision: absorb
+      - name: layout
+        draft_schema_mapping: [ui_design_schema.layout]
+        decision: absorb
+      - name: style
+        draft_schema_mapping: [ui_design_schema.visual_style]
+        decision: defer_to_ui_layer
+      - name: interactions
+        type: Interaction[]
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb
+  - name: Component
+    category: component
+    evidence: [penpot_workspace, penpot_source]
+    draft_schema_mapping: [ui_design_schema.components]
+    decision: absorb
+    fields:
+      - name: source_shape
+        draft_schema_mapping: [ui_design_schema.component_source]
+        decision: absorb
+      - name: instances
+        draft_schema_mapping: [ui_design_schema.component_instances]
+        decision: absorb
+      - name: overrides
+        draft_schema_mapping: [ui_design_schema.overrides]
+        decision: absorb
+  - name: DesignToken
+    category: ui_layer
+    evidence: [penpot_tokens]
+    draft_schema_mapping: [ui_design_schema.tokens]
+    decision: defer_to_ui_layer
+    fields:
+      - name: token_type
+        draft_schema_mapping: [ui_design_schema.token.type]
+        decision: absorb
+      - name: value
+        draft_schema_mapping: [ui_design_schema.token.value]
+        decision: absorb
+      - name: alias
+        draft_schema_mapping: [ui_design_schema.token.alias]
+        decision: absorb
+  - name: PrototypeFlow
+    category: interaction
+    evidence: [penpot_prototyping, penpot_view_mode]
+    draft_schema_mapping: [interaction_design_schema.behavior.flows]
+    decision: absorb
+    fields:
+      - name: start_board
+        draft_schema_mapping: [interaction_design_schema.behavior.flow.entry_point]
+        decision: absorb
+      - name: interactions
+        type: Interaction[]
+        draft_schema_mapping: [interaction_design_schema.behavior.actions, interaction_design_schema.behavior.transitions]
+        decision: absorb
+      - name: view_mode
+        draft_schema_mapping: [prototype_projection_contract.preview]
+        decision: reference
+  - name: Interaction
+    category: action
+    evidence: [penpot_prototyping]
+    draft_schema_mapping: [interaction_design_schema.behavior.actions, interaction_design_schema.behavior.transitions]
+    decision: absorb
+    fields:
+      - name: trigger
+        draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+        decision: absorb
+      - name: action
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb
+      - name: target
+        draft_schema_mapping: [interaction_design_schema.behavior.transition.target_surface]
+        decision: absorb
+      - name: animation
+        draft_schema_mapping: [interaction_design_schema.platform.transition_presentations]
+        decision: absorb_as_presentation
+  - name: Plugin
+    category: tooling
+    evidence: [penpot_plugins]
+    draft_schema_mapping: [tooling.plugin_extension]
+    decision: reference
+    fields:
+      - name: api_capabilities
+        draft_schema_mapping: [tooling.capabilities]
+        decision: reference
+      - name: flow_interaction_refs
+        draft_schema_mapping: [interaction_design_schema.behavior.flows]
+        decision: reference
+  - name: Export
+    category: projection
+    evidence: [penpot_workspace]
+    draft_schema_mapping: [prototype_projection_contract.export_artifact]
+    decision: reference
+    fields:
+      - name: format
+        draft_schema_mapping: [prototype_projection_contract.export.format]
+        decision: reference
+      - name: assets
+        draft_schema_mapping: [ui_design_schema.assets]
+        decision: absorb
+gaps:
+  - id: penpot_exact_source_schema
+    status: deferred
+    description: Exact current internal source-level schema for interactions and flows has not been fully extracted.
+    impact: Public source can support future adapter-level research.

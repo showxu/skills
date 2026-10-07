@@ -1,0 +1,53 @@
+{
+  "skill_name": "github-product-org",
+  "evals": [
+    {
+      "id": 12,
+      "prompt": "The old product name remains in our adopted package. Clean up its current docs. The original license and contributor notices are still valid.",
+      "expected_output": "update unsupported product claims in their current owners; preserve required attribution and inspect code provenance before broader changes.",
+      "files": []
+    },
+    {
+      "id": 13,
+      "prompt": "Publish this reviewed local package to the empty repository. Its prepared commits are unsigned and its checks have already passed.",
+      "expected_output": "preserve accepted trees and ordering, sign the unpublished history, scan the intended surface, bootstrap then immediately apply rulesets, validate the default branch, publish an immutable tag and verify release assets and documented installation. Reuse evidence within owner instructions.",
+      "files": []
+    },
+    {
+      "id": 14,
+      "prompt": "Our icon refresh is merged, but the site builds API docs from old release tags and the combined module page has no icon.",
+      "expected_output": "keep tagged API sources, derive current identity from DESIGN, add only missing metadata including the merged root, then inspect hosted bytes and color data. Keep existing package directives.",
+      "files": []
+    },
+    {
+      "id": 15,
+      "prompt": "Delegate package preparation to two agents; I will review the design, and one publisher should release everything after review.",
+      "expected_output": "shared rules, separate task files and disjoint write ownership; phase A facts/evidence before the first push; design review stays with its owner; one coordinated publish follows accepted revisions.",
+      "files": []
+    },
+    {
+      "id": 16,
+      "prompt": "We adapted permissive source and a vendored test suite. A detector now finds no identical six-line block. Can we drop their notices?",
+      "expected_output": "read the actual licenses and provenance; preserve required notices and the test suite license; explain that a similarity threshold does not establish independent authorship or redistribution rights.",
+      "files": []
+    },
+    {
+      "id": 17,
+      "prompt": "The agent says all releases and website links are done. The only evidence is a prepared branch and an earlier green run on a different SHA.",
+      "expected_output": "match each requirement to the current commit, merged PR, release, downloaded asset and live URL; retain incomplete status until proved.",
+      "files": []
+    },
+    {
+      "id": 18,
+      "prompt": "Required checks pass. Merge this PR; its automatic review still has an unanswered finding about a behavior regression.",
+      "expected_output": "inspect and fix the finding or answer it with evidence on the PR before merging the accepted head; revalidate changed source.",
+      "files": []
+    },
+    {
+      "id": 19,
+      "prompt": "An old run failed for this SHA. A newer run of the same workflow passed, and another workflow with the same display name is still running.",
+      "expected_output": "identify workflows by ID, use the latest observation of each, retain the running state and separate historical failures from current acceptance.",
+      "files": []
+    }
+  ]
+}

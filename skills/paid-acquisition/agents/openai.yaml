@@ -1,0 +1,7 @@
+interface:
+  display_name: "Paid Acquisition"
+  short_description: "Preflight paid acquisition operations"
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#0EA5E9"
+  default_prompt: "Use $paid-acquisition to preflight this paid campaign for budget safety, tracking, creative consistency, and policy risk."

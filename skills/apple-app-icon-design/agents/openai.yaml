@@ -1,0 +1,7 @@
+interface:
+  display_name: "Apple App Icon Design"
+  short_description: "Generate native app icon documents and web assets"
+  default_prompt: "Use $apple-app-icon-design to build and verify the app icon, native appearances, and web set from this project’s DESIGN.md and original layers."
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#3565CA"

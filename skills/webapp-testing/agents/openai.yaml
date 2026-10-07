@@ -1,0 +1,4 @@
+interface:
+  display_name: "Webapp Testing"
+  short_description: "Test local web apps and HTML artifacts"
+  default_prompt: "Use $webapp-testing to plan browser backend selection, server startup, functional and visual QA, and evidence collection for a local web app or HTML artifact."

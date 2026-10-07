@@ -1,0 +1,10 @@
+.DS_Store
+.agent/
+.vscode/
+__pycache__/
+*.py[cod]
+.build/
+.codex/
+/plans/
+skills/interaction-design/references/research/artifacts/
+skills/sketch-design/references/fixtures/apple-tvos-ui.sketch

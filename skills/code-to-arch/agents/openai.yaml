@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code-to-Arch"
+  short_description: "Orchestrate donor evidence into local architecture truth"
+  default_prompt: "Use $code-to-arch to reconstruct upstream code, donor repositories, official APIs, product references, tests, and UX patterns into local architecture truth; for complex donor sets, collect per-source findings first, then synthesize framework boundaries, docs updates, and follow-up Codex prompts."

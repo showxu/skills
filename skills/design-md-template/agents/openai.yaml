@@ -1,0 +1,4 @@
+interface:
+  display_name: "DESIGN.md Template"
+  short_description: "Apply tracked DESIGN.md templates"
+  default_prompt: "Use $design-md-template to choose a tracked DESIGN.md template and apply it to this project."

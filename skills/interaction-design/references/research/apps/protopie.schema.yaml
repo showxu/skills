@@ -1,0 +1,280 @@
+schema_version: interaction-schema-facts.v1
+app: protopie
+source_report: references/research/apps/protopie.md
+status: research_fact_store
+mapping_policy:
+  status: hypothesis
+  meaning: Draft candidate mapping for future UI Design Schema and Interaction Design Schema synthesis.
+  not_a_fact: true
+  not_current_contract_validation: true
+  review_required: true
+role:
+  classification: primary_logic_donor
+  orientation:
+    - prototype_time
+    - interaction_logic
+  summary: High-fidelity interaction logic donor for triggers, responses, conditions, variables, formulas, components, Send/Receive, and sensors.
+authority:
+  primary:
+    - official_docs
+  secondary:
+    - artifact_probe
+  notes:
+    - Official docs are semantic authority.
+    - .pie/.piec files are opaque in current probes and must not define field schema.
+evidence:
+  - id: protopie_docs_root
+    grade: official_docs
+    title: ProtoPie docs
+    url: https://www.protopie.io/learn/docs
+  - id: protopie_triggers
+    grade: official_docs
+    title: ProtoPie triggers docs
+    url: https://www.protopie.io/learn/docs/interactions/triggers
+  - id: protopie_responses
+    grade: official_docs
+    title: ProtoPie responses docs
+    url: https://www.protopie.io/learn/docs/interactions/responses
+  - id: protopie_variables
+    grade: official_docs
+    title: ProtoPie variables docs
+    url: https://www.protopie.io/learn/docs/variables
+  - id: protopie_variables_tutorial
+    grade: official_docs
+    title: ProtoPie variables tutorial with official Pie samples
+    url: https://www.protopie.io/blog/how-to-use-variables-protopie
+  - id: protopie_send_receive
+    grade: official_docs
+    title: Send/Receive messages docs
+    url: https://www.protopie.io/learn/docs/components/send-receive-messages
+  - id: local_protopie_walkthrough
+    grade: artifact_probe
+    title: ProtoPie Studio app-bundle walkthrough.pie
+    path: references/research/artifacts/protopie/app-bundle/walkthrough.pie
+  - id: local_protopie_piec
+    grade: artifact_probe
+    title: ProtoPie Studio app-bundle sample-1119.piec
+    path: references/research/artifacts/protopie/app-bundle/sample-1119.piec
+  - id: local_protopie_tutorial_samples
+    grade: artifact_probe
+    title: Official tutorial .pie samples
+    path: references/research/artifacts/protopie/local-official-tutorial/
+objects:
+  - name: Pie
+    category: artifact_root
+    evidence: [protopie_docs_root, local_protopie_walkthrough]
+    draft_schema_mapping: [research_evidence.prototype_artifact]
+    decision: reference
+    fields:
+      - name: scenes
+        type: Scene[]
+        meaning: Prototype surface collection.
+        draft_schema_mapping: [interaction_design_schema.behavior.surfaces]
+        decision: absorb
+      - name: components
+        type: Component[]
+        meaning: Reusable interaction units.
+        draft_schema_mapping: [interaction_design_schema.behavior.components]
+        decision: absorb
+      - name: variables
+        type: Variable[]
+        meaning: Prototype state.
+        draft_schema_mapping: [interaction_design_schema.behavior.variables]
+        decision: absorb
+  - name: Scene
+    category: surface
+    evidence: [protopie_docs_root]
+    draft_schema_mapping: [interaction_design_schema.behavior.screens, interaction_design_schema.behavior.surfaces]
+    decision: absorb
+    fields:
+      - name: layers
+        type: Layer[]
+        meaning: Visual or interactive actors on the scene.
+        draft_schema_mapping: [ui_design_schema.children, interaction_design_schema.behavior.actors]
+        decision: absorb
+      - name: triggers
+        type: Trigger[]
+        meaning: Scene-level triggers.
+        draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+        decision: absorb
+      - name: variables
+        type: Variable[]
+        meaning: Scene-scope state.
+        draft_schema_mapping: [interaction_design_schema.behavior.variables]
+        decision: absorb_as_scoped
+  - name: Layer
+    category: actor
+    evidence: [protopie_docs_root]
+    draft_schema_mapping: [interaction_design_schema.behavior.actors, ui_design_schema.actors]
+    decision: absorb
+    fields:
+      - name: properties
+        meaning: Layer properties targeted by responses.
+        draft_schema_mapping: [ui_design_schema.properties]
+        decision: reference
+      - name: triggers
+        type: Trigger[]
+        meaning: Layer-level triggers.
+        draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+        decision: absorb
+  - name: Trigger
+    category: interaction
+    evidence: [protopie_triggers]
+    draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+    decision: absorb
+    fields:
+      - name: trigger_type
+        meaning: Event that starts response execution.
+        draft_schema_mapping: [interaction_design_schema.behavior.trigger.type]
+        decision: absorb
+      - name: target
+        meaning: Layer, scene, variable, sensor, message, or component source.
+        draft_schema_mapping: [interaction_design_schema.behavior.trigger.source]
+        decision: absorb
+      - name: responses
+        type: Response[]
+        meaning: Responses produced by the trigger.
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb
+      - name: conditions
+        type: Condition[]
+        meaning: Guards for response execution.
+        draft_schema_mapping: [interaction_design_schema.behavior.conditions]
+        decision: absorb
+  - name: Response
+    category: action
+    evidence: [protopie_responses]
+    draft_schema_mapping: [interaction_design_schema.behavior.actions]
+    decision: absorb
+    fields:
+      - name: response_type
+        meaning: Operation produced by a trigger.
+        draft_schema_mapping: [interaction_design_schema.behavior.action.type]
+        decision: absorb
+      - name: target
+        meaning: Layer, scene, variable, component, message, or external target.
+        draft_schema_mapping: [interaction_design_schema.behavior.action.target]
+        decision: absorb
+      - name: value
+        meaning: Response value or property change.
+        draft_schema_mapping: [interaction_design_schema.behavior.action.value]
+        decision: absorb
+      - name: duration
+        meaning: Response animation duration when applicable.
+        draft_schema_mapping: [prototype_projection_contract.motion.duration]
+        decision: reference
+      - name: easing
+        meaning: Response animation easing when applicable.
+        draft_schema_mapping: [prototype_projection_contract.motion.easing]
+        decision: reference
+  - name: Condition
+    category: condition
+    evidence: [protopie_triggers, protopie_responses]
+    draft_schema_mapping: [interaction_design_schema.behavior.conditions]
+    decision: absorb
+    fields:
+      - name: expression
+        type: Formula
+        meaning: Predicate controlling response path.
+        draft_schema_mapping: [interaction_design_schema.behavior.conditions.expression]
+        decision: absorb
+      - name: branch
+        meaning: Response branch selected by condition.
+        draft_schema_mapping: [interaction_design_schema.behavior.branching]
+        decision: absorb
+  - name: Variable
+    category: state
+    evidence: [protopie_variables, protopie_variables_tutorial]
+    draft_schema_mapping: [interaction_design_schema.behavior.variables]
+    decision: absorb
+    fields:
+      - name: name
+        draft_schema_mapping: [interaction_design_schema.behavior.variable.name]
+        decision: absorb
+      - name: scope
+        meaning: Pie, scene, or component scope.
+        draft_schema_mapping: [interaction_design_schema.behavior.variable.scope]
+        decision: absorb
+      - name: type
+        meaning: Variable value type.
+        draft_schema_mapping: [interaction_design_schema.behavior.variable.type]
+        decision: absorb
+      - name: value
+        meaning: Current or initial value.
+        draft_schema_mapping: [interaction_design_schema.behavior.variable.initial_value]
+        decision: absorb
+  - name: Formula
+    category: expression
+    evidence: [protopie_variables]
+    draft_schema_mapping: [interaction_design_schema.behavior.expressions]
+    decision: absorb_concept_not_syntax
+    fields:
+      - name: expression_body
+        meaning: Computed expression.
+        draft_schema_mapping: [interaction_design_schema.behavior.expression.body]
+        decision: absorb_concept_not_syntax
+      - name: referenced_variables
+        draft_schema_mapping: [interaction_design_schema.behavior.expression.references]
+        decision: absorb
+  - name: Component
+    category: component
+    evidence: [protopie_send_receive, protopie_variables_tutorial]
+    draft_schema_mapping: [interaction_design_schema.behavior.components]
+    decision: absorb
+    fields:
+      - name: layers
+        type: Layer[]
+        draft_schema_mapping: [ui_design_schema.children]
+        decision: absorb
+      - name: triggers
+        type: Trigger[]
+        draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+        decision: absorb
+      - name: variables
+        type: Variable[]
+        draft_schema_mapping: [interaction_design_schema.behavior.component_variables]
+        decision: absorb
+      - name: send_receive
+        type: Message[]
+        draft_schema_mapping: [interaction_design_schema.behavior.external_messages]
+        decision: absorb
+  - name: Message
+    category: external_message
+    evidence: [protopie_send_receive]
+    draft_schema_mapping: [interaction_design_schema.behavior.external_messages]
+    decision: absorb
+    fields:
+      - name: channel
+        draft_schema_mapping: [interaction_design_schema.behavior.external_message.channel]
+        decision: absorb
+      - name: message
+        draft_schema_mapping: [interaction_design_schema.behavior.external_message.name]
+        decision: absorb
+      - name: payload
+        draft_schema_mapping: [interaction_design_schema.behavior.external_message.payload]
+        decision: absorb
+      - name: source_scope
+        meaning: Component, scene, pie, device, or Connect source.
+        draft_schema_mapping: [interaction_design_schema.behavior.external_message.source_scope]
+        decision: absorb
+      - name: target_scope
+        meaning: Component, scene, pie, device, or Connect target.
+        draft_schema_mapping: [interaction_design_schema.behavior.external_message.target_scope]
+        decision: absorb
+  - name: Sensor
+    category: input
+    evidence: [protopie_docs_root]
+    draft_schema_mapping: [interaction_design_schema.platform.input_bindings.sensors]
+    decision: absorb_as_platform_input
+    fields:
+      - name: sensor_type
+        draft_schema_mapping: [interaction_design_schema.platform.input_bindings.sensor_type]
+        decision: absorb
+      - name: value
+        draft_schema_mapping: [interaction_design_schema.behavior.trigger.input_value]
+        decision: absorb
+gaps:
+  - id: protopie_readable_file_schema
+    status: deferred_not_v0_blocking
+    description: Official .pie/.piec files are opaque in local probes.
+    impact: Use official docs for concept schema; defer file-level importer fields until trusted parser/export exists.

@@ -1,0 +1,15 @@
+{
+  "name": "showxu-skills",
+  "version": "0.1.0",
+  "description": "Skills for product, design, Web development, go-to-market, software engineering, and skill authoring.",
+  "author": {
+    "name": "showxu"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "showxu Skills",
+    "shortDescription": "Product, design, engineering, and skill workflows",
+    "developerName": "showxu",
+    "category": "Developer Tools"
+  }
+}

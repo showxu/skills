@@ -1,0 +1,4 @@
+interface:
+  display_name: "Deep Research Plan"
+  short_description: "Write source-backed research plans"
+  default_prompt: "Use $deep-research-plan to scope a research or article-writing task, inspect sources read-only, and write the right local plan file before drafting."

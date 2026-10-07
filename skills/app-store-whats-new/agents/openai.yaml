@@ -1,0 +1,7 @@
+interface:
+  display_name: "App Store What's New"
+  short_description: "Draft App Store version notes"
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#0EA5E9"
+  default_prompt: "Use $app-store-whats-new to draft App Store What's New text from the current release changes."

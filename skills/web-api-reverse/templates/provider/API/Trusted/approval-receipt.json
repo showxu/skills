@@ -1,0 +1,18 @@
+{
+  "approvedAt": "REPLACE_WITH_ISO8601_REVIEW_TIME",
+  "inputHashes": {
+    "API/Config/source-manifest.json": "REPLACE_WITH_LOWERCASE_SHA256",
+    "API/Config/trust-manifest.json": "REPLACE_WITH_LOWERCASE_SHA256",
+    "API/Observed/catalog.json": "REPLACE_WITH_LOWERCASE_SHA256",
+    "API/Observed/source-lock.json": "REPLACE_WITH_LOWERCASE_SHA256",
+    "API/Trusted/openapi.yaml": "REPLACE_WITH_LOWERCASE_SHA256",
+    "API/Trusted/operation-policies.json": "REPLACE_WITH_LOWERCASE_SHA256"
+  },
+  "kind": "web-api-reverse.approval-receipt",
+  "market": "REPLACE_WITH_MARKET",
+  "operations": [],
+  "provider": "REPLACE_WITH_PROVIDER_ID",
+  "reviewer": "REPLACE_WITH_REVIEWER_ID",
+  "schemaVersion": 1,
+  "sourceRevisions": []
+}

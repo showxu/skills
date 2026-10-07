@@ -1,0 +1,4 @@
+interface:
+  display_name: "Apple HIG"
+  short_description: "Guide, audit, score, and review Apple HIG fit"
+  default_prompt: "Use $apple-hig to guide, review, audit, score, or compare this Apple-platform interface or structured platform context against current Human Interface Guidelines, native visual-system primitives, Apple Design Resources, and platform metrics, returning convention guidance, findings, scorecards, or proposed source-artifact deltas without owning product behavior."

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Organic Search"
+  short_description: "Audit organic search readiness"
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#0EA5E9"
+  default_prompt: "Use $organic-search to audit these pages for organic search readiness, indexing risks, and Search Console evidence."

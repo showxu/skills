@@ -1,0 +1,7 @@
+interface:
+  display_name: "Google Play Store Assets"
+  short_description: "Prepare and validate Google Play listing assets"
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#0EA5E9"
+  default_prompt: "Use $google-play-store-assets to review, validate, or plan Google Play screenshots, tablet assets, feature graphics, app icons, preview videos, and localized store listing visuals."

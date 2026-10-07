@@ -1,0 +1,7 @@
+interface:
+  display_name: "Agent 进化"
+  short_description: "从官方知识与 Codex 实际经验更新 Agent 指令和技能"
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#7C3AED"
+  default_prompt: "Use $agent-evolver to select the relevant official-knowledge or codex-experience topics, assess evidence and complete the authorized agent improvements."

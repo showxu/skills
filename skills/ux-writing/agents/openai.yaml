@@ -1,0 +1,4 @@
+interface:
+  display_name: "UX Writing"
+  short_description: "Product-facing UI copy for design surfaces"
+  default_prompt: "Use $ux-writing to write or review product-facing UI copy, microcopy, button labels, empty states, errors, alerts, onboarding, settings text, tooltips, notifications, and terminology in a design surface."

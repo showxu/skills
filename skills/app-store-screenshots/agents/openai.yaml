@@ -1,0 +1,7 @@
+interface:
+  display_name: "App Store Screenshots"
+  short_description: "Prepare and validate App Store screenshot assets"
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#0EA5E9"
+  default_prompt: "Use $app-store-screenshots to review and validate this App Store screenshot set before submission."

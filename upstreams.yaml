@@ -1,0 +1,5287 @@
+schema_version: 1
+
+sources:
+  - id: snarktank-ralph-prd
+    repo: snarktank/ralph
+    feed: https://github.com/snarktank/ralph/commits/main.atom
+    branch: main
+    last_seen: 6c53cb0b831ebe8739c6a003e22af14902d8b0b5
+    tracking:
+      last_checked_commit: 6c53cb0b831ebe8739c6a003e22af14902d8b0b5
+      last_checked_at: 2026-05-10
+    review_coverage:
+      status: reviewed
+      reviewed_commit: 6c53cb0b831ebe8739c6a003e22af14902d8b0b5
+      reviewed_at: 2026-05-24
+      granularity: source
+      outcome: prd_skill_integrated_and_ralph_boundary_reviewed_pm_readiness_absorbed_runtime_moved_to_software_engineering
+      open_items: 0
+    type: skill-source
+    policy: compare-prd-generator-skill-boundary
+    targets:
+      - root
+    watch_paths:
+      - skills/prd/SKILL.md
+      - skills/ralph/SKILL.md
+      - ralph.sh
+    review_segments:
+      - id: prd-generator-skill
+        label: PRD generator skill
+        source_type: skill-source
+        policy: compare-product-planning-prd-boundary
+        paths:
+          - skills/prd/SKILL.md
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 6c53cb0b831ebe8739c6a003e22af14902d8b0b5
+          reviewed_at: 2026-05-10
+          granularity: path
+          outcome: integrated_minimal_prd_baseline_into_product_requirements_story_acceptance_depth_routed_to_leaf_skills_implementation_verification_moved_to_software_engineering
+          open_items: 0
+      - id: prd-to-executable-item-boundary
+        label: PRD to executable item boundary
+        source_type: skill-source
+        policy: compare-prd-to-executable-item-boundary
+        paths:
+          - skills/ralph/SKILL.md
+          - ralph.sh
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 6c53cb0b831ebe8739c6a003e22af14902d8b0b5
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: reviewed_pm_readiness_absorbed_ralph_json_runtime_execution_and_archive_mechanics_moved_to_software_engineering
+          open_items: 0
+
+  - id: phuryn-pm-skills
+    repo: phuryn/pm-skills
+    feed: https://github.com/phuryn/pm-skills/commits/main.atom
+    branch: main
+    last_seen: 020ee82501d9c09f9b989517c4cf9641bad057ff
+    tracking:
+      last_checked_commit: 020ee82501d9c09f9b989517c4cf9641bad057ff
+      last_checked_at: 2026-05-10
+    review_coverage:
+      status: integrated
+      reviewed_commit: 020ee82501d9c09f9b989517c4cf9641bad057ff
+      reviewed_at: 2026-05-24
+      granularity: source
+      outcome: PM_scope_integrated_via_wave5_discovery_current_boundary_metrics_and_package_readiness_receipts_with_strategy_prioritization_rows_compressed_or_deferred_and_GTM_market_toolkit_rows_moved_or_deferred
+      open_items: 0
+    type: skill-source
+    policy: compare-pm-execution-skill-family
+    targets:
+      - root
+    watch_paths:
+      - pm-execution/skills/create-prd/
+      - pm-execution/skills/user-stories/
+      - pm-execution/skills/job-stories/
+      - pm-execution/skills/test-scenarios/
+      - pm-execution/skills/outcome-roadmap/
+      - pm-product-discovery/
+      - pm-product-strategy/
+      - pm-data-analytics/
+      - pm-execution/skills/brainstorm-okrs/
+      - pm-execution/skills/prioritization-frameworks/
+      - pm-execution/skills/pre-mortem/
+      - pm-execution/skills/stakeholder-map/
+    review_segments:
+      - id: prd-to-execution-family
+        label: PRD to stories and test scenarios family
+        source_type: skill-source
+        policy: compare-prd-story-acceptance-test-chain
+        paths:
+          - pm-execution/skills/create-prd/
+          - pm-execution/skills/user-stories/
+          - pm-execution/skills/job-stories/
+          - pm-execution/skills/test-scenarios/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 020ee82501d9c09f9b989517c4cf9641bad057ff
+          reviewed_at: 2026-05-10
+          granularity: segment
+          outcome: integrated_prd_story_and_acceptance_family_via_H3_H4_H5_receipts_and_R_product_requirements_R_product_user_stories_R_product_acceptance_criteria_reviews
+          open_items: 0
+      - id: outcome-roadmap
+        label: Outcome roadmap
+        source_type: skill-source
+        policy: compare-outcome-roadmap-product-planning-boundary
+        paths:
+          - pm-execution/skills/outcome-roadmap/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 020ee82501d9c09f9b989517c4cf9641bad057ff
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: reviewed_outcome_roadmap_deferred_to_future_product_roadmap_planning_feature_level_outcomes_metrics_dependencies_already_covered
+          open_items: 0
+      - id: product-discovery-family
+        label: Product discovery family
+        source_type: skill-source
+        policy: compare-product-discovery-brainstorm-assumption-experiment-family
+        paths:
+          - pm-product-discovery/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 020ee82501d9c09f9b989517c4cf9641bad057ff
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: integrated_discovery_brainstorm_assumption_interview_feature_request_and_metrics_rows_via_wave5_receipts_and_product_discovery_product_brainstorm_product_requirements_product_metrics_reviews_with_prioritization_rows_deferred_or_compressed
+          open_items: 0
+      - id: product-strategy-family
+        label: Product strategy family
+        source_type: skill-source
+        policy: compare-product-strategy-vision-canvas-value-proposition-family
+        paths:
+          - pm-product-strategy/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 020ee82501d9c09f9b989517c4cf9641bad057ff
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: compressed_feature_level_vision_positioning_value_proposition_rows_into_product_brainstorm_and_product_requirements_with_business_model_market_and_pricing_depth_deferred
+          open_items: 0
+      - id: execution-planning-family
+        label: Execution planning and risk family
+        source_type: skill-source
+        policy: compare-okrs-prioritization-premortem-stakeholder-planning-boundary
+        paths:
+          - pm-execution/skills/brainstorm-okrs/
+          - pm-execution/skills/prioritization-frameworks/
+          - pm-execution/skills/pre-mortem/
+          - pm-execution/skills/stakeholder-map/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 020ee82501d9c09f9b989517c4cf9641bad057ff
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: integrated_OKR_measurement_package_readiness_premortem_and_stakeholder_decision_rows_into_product_metrics_product_feature_creator_and_current_boundary_guidance_with_multi_candidate_prioritization_deferred_and_project_management_moved_out
+          open_items: 0
+      - id: product-metrics-analytics-family
+        label: Product metrics and analytics family
+        source_type: skill-source
+        policy: compare-product_metrics_ab_test_cohort_sql_boundary
+        paths:
+          - pm-data-analytics/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 020ee82501d9c09f9b989517c4cf9641bad057ff
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: integrated_product_metrics_AB_test_and_cohort_analysis_rows_into_product_metrics_with_SQL_implementation_moved_to_data_software_owner
+          open_items: 0
+
+  - id: alirezarezvani-claude-skills-product-prd
+    repo: alirezarezvani/claude-skills
+    feed: https://github.com/alirezarezvani/claude-skills/commits/main.atom
+    branch: main
+    last_seen: 7d493fed97e4d57553630e1a2432c1c02bf5b2b3
+    tracking:
+      last_checked_commit: 7d493fed97e4d57553630e1a2432c1c02bf5b2b3
+      last_checked_at: 2026-05-10
+    review_coverage:
+      status: reviewed
+      reviewed_commit: 7d493fed97e4d57553630e1a2432c1c02bf5b2b3
+      reviewed_at: 2026-05-24
+      granularity: source
+      outcome: PM_scope_integrated_or_moved_via_wave5_receipts_with_ui_design_system_moved_to_design_and_software_GTM_rows_out_of_PM
+      open_items: 0
+    type: skill-source
+    policy: compare-product-manager-toolkit-and-code-to-prd
+    classification:
+      provenance: third-party
+      focus: broad-catalog
+      domains:
+        - root
+        - design-system
+        - code-to-prd
+      absorption_priority: medium
+    targets:
+      - root
+    watch_paths:
+      - product-team/skills/product-manager-toolkit/
+      - product-team/skills/product-discovery/
+      - product-team/skills/product-strategist/
+      - product-team/skills/product-analytics/
+      - product-team/skills/experiment-designer/
+      - product-team/skills/roadmap-communicator/
+      - product-team/skills/competitive-teardown/
+      - product-team/agile-product-owner/skills/agile-product-owner/
+      - product-team/research-summarizer/skills/research-summarizer/
+      - product-team/skills/ux-researcher-designer/
+      - product-team/skills/ui-design-system/
+      - product-team/code-to-prd/skills/code-to-prd/
+      - commands/code-to-prd.md
+      - docs/skills/product-team/product-manager-toolkit.md
+      - docs/skills/product-team/product-discovery.md
+      - docs/skills/product-team/ui-design-system.md
+      - docs/skills/product-team/code-to-prd.md
+    review_segments:
+      - id: product-manager-toolkit
+        label: Product manager toolkit
+        source_type: skill-source
+        policy: compare-product-toolkit-prd-discovery-prioritization
+        paths:
+          - product-team/skills/product-manager-toolkit/
+          - docs/skills/product-team/product-manager-toolkit.md
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 7d493fed97e4d57553630e1a2432c1c02bf5b2b3
+          reviewed_at: 2026-05-10
+          granularity: segment
+          outcome: H6_receipt_reviewed_PRD_template_lifecycle_metrics_and_pitfalls_compressed_future_discovery_prioritization_metrics_deferred_GTM_moved
+          open_items: 0
+      - id: code-to-prd
+        label: Code to PRD skill
+        source_type: skill-source
+        policy: compare-codebase-to-prd-workflow
+        paths:
+          - product-team/code-to-prd/skills/code-to-prd/
+          - commands/code-to-prd.md
+          - docs/skills/product-team/code-to-prd.md
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 7d493fed97e4d57553630e1a2432c1c02bf5b2b3
+          reviewed_at: 2026-05-10
+          granularity: segment
+          outcome: integrated_as_code_to_product_feature_with_observed_evidence_uncertainty_labels_framework_hints_and_no_product_intent_overclaim
+          open_items: 0
+      - id: product-discovery
+        label: Product discovery
+        source_type: skill-source
+        policy: compare-product-discovery-to-brainstorm-and-requirements-boundary
+        paths:
+          - product-team/skills/product-discovery/
+          - docs/skills/product-team/product-discovery.md
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 7d493fed97e4d57553630e1a2432c1c02bf5b2b3
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: integrated_as_product_discovery_with_opportunity_assumption_problem_solution_validation_evidence_strength_and_proceed_pivot_stop_decisions
+          open_items: 0
+      - id: product-strategy-analytics-family
+        label: Product strategy, analytics, experiment, and roadmap family
+        source_type: skill-source
+        policy: compare-product-strategy-analytics-experiment-roadmap-boundary
+        paths:
+          - product-team/skills/product-strategist/
+          - product-team/skills/product-analytics/
+          - product-team/skills/experiment-designer/
+          - product-team/skills/roadmap-communicator/
+          - product-team/skills/competitive-teardown/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 7d493fed97e4d57553630e1a2432c1c02bf5b2b3
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: integrated_feature_level_strategy_context_analytics_experiment_and_package_readiness_rows_into_product_brainstorm_product_requirements_product_metrics_and_product_feature_creator_with_roadmap_prioritization_and_competitive_teardown_deferred
+          open_items: 0
+      - id: agile-product-owner-family
+        label: Agile product owner family
+        source_type: skill-source
+        policy: compare-agile-product-owner-backlog-story-acceptance-boundary
+        paths:
+          - product-team/agile-product-owner/skills/agile-product-owner/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 7d493fed97e4d57553630e1a2432c1c02bf5b2b3
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: integrated_backlog_story_acceptance_and_epic_breakdown_rows_into_product_user_stories_product_acceptance_criteria_and_package_readiness_with_sprint_velocity_mechanics_moved_out
+          open_items: 0
+      - id: research-and-ux-discovery-family
+        label: Research and UX discovery family
+        source_type: skill-source
+        policy: compare-research-summarizer-ux-research-product-discovery-design-boundary
+        paths:
+          - product-team/research-summarizer/skills/research-summarizer/
+          - product-team/skills/ux-researcher-designer/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 7d493fed97e4d57553630e1a2432c1c02bf5b2b3
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: reviewed_research_synthesis_persona_and_journey_rows_integrated_into_product_discovery_with_UX_craft_and_design_validation_moved_to_design
+          open_items: 0
+      - id: ui-design-system
+        label: UI design system
+        source_type: skill-source
+        policy: compare-design-system-skill-boundary
+        paths:
+          - product-team/skills/ui-design-system/
+          - docs/skills/product-team/ui-design-system.md
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 7d493fed97e4d57553630e1a2432c1c02bf5b2b3
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: moved_to_design_and_user_experience_not_PM_scope
+          open_items: 0
+
+  - id: alirezarezvani-claude-skills-apple-hig-expert
+    repo: alirezarezvani/claude-skills
+    feed: https://github.com/alirezarezvani/claude-skills/commits/main.atom
+    branch: main
+    last_seen: 7d493fed97e4d57553630e1a2432c1c02bf5b2b3
+    tracking:
+      last_checked_commit: 7d493fed97e4d57553630e1a2432c1c02bf5b2b3
+      last_checked_at: 2026-05-25
+    review_coverage:
+      status: integrated
+      reviewed_commit: 7d493fed97e4d57553630e1a2432c1c02bf5b2b3
+      reviewed_at: 2026-05-25
+      granularity: path
+      outcome: integrated_scorecard_and_quick_checklist_into_apple_hig_with_official_source_boundary_preserved_hig_checker_deferred
+      open_items: 0
+    type: skill-source
+    policy: compare-apple-hig-platform-interface-review-boundary
+    classification:
+      provenance: third-party
+      focus: single-skill
+      domains:
+        - apple-platform
+        - design-review
+      absorption_priority: medium
+    targets:
+      - root
+    watch_paths:
+      - product-team/apple-hig-expert/skills/apple-hig-expert/
+      - product-team/apple-hig-expert/.claude-plugin/plugin.json
+      - docs/skills/product-team/apple-hig-expert.md
+    review_segments:
+      - id: apple-hig-expert
+        label: Apple HIG Expert
+        source_type: skill-source
+        policy: compare-apple-hig-audit-accessibility-platform-specifics
+        paths:
+          - product-team/apple-hig-expert/skills/apple-hig-expert/
+          - docs/skills/product-team/apple-hig-expert.md
+        targets:
+          - root
+        candidate_owner: skills/apple-hig
+        routing_note: upstream_product_team_directory_is_provenance_only_route_by_apple_hig_review_workflow_inputs_outputs
+        review_coverage:
+          status: integrated
+          reviewed_commit: 7d493fed97e4d57553630e1a2432c1c02bf5b2b3
+          reviewed_at: 2026-05-25
+          granularity: path
+          outcome: compressed_hig_audit_scorecard_accessibility_platform_visual_checklists_into_apple_hig_reference_hig_checker_deferred_for_redesign
+          open_items: 0
+
+  - id: apple-design-resources-official
+    repo: official/apple-design-resources
+    source_url: https://developer.apple.com/design/resources/
+    branch: web
+    last_seen: sha256:6a5928ac665ff25f512d8e579ed33cfdc1f6883ba622c1a39159ffb911b67516
+    tracking:
+      last_checked_commit: sha256:6a5928ac665ff25f512d8e579ed33cfdc1f6883ba622c1a39159ffb911b67516
+      last_checked_at: 2026-05-25
+    review_coverage:
+      status: integrated
+      reviewed_commit: sha256:6a5928ac665ff25f512d8e579ed33cfdc1f6883ba622c1a39159ffb911b67516
+      reviewed_at: 2026-05-25
+      granularity: source
+      outcome: official_design_resources_fetch_probe_catalog_skill_added_as_atomic_adapter_for_hig_designmd_sfsymbols_and_apple_asset_callers
+      open_items: 0
+    type: curated-index
+    policy: official-apple-design-resource-catalog
+    classification:
+      provenance: official
+      focus: focused-domain
+      domains:
+        - apple-platform
+        - design-resources
+        - asset-catalog
+        - brand-resources
+      absorption_priority: high
+    targets:
+      - root
+    watch_paths:
+      - https://developer.apple.com/design/resources/
+    review_segments:
+      - id: apple-design-resources-catalog
+        label: Apple Design Resources catalog
+        source_type: resource
+        policy: official-resource-catalog-fetch-probe
+        paths:
+          - https://developer.apple.com/design/resources/
+        targets:
+          - root
+        candidate_owner: skills/apple-design-resource
+        routing_note: atomic_resource_adapter_only_hig_designmd_sfsymbols_and_app_store_skills_remain_behavior_owners
+        review_coverage:
+          status: integrated
+          reviewed_commit: sha256:6a5928ac665ff25f512d8e579ed33cfdc1f6883ba622c1a39159ffb911b67516
+          reviewed_at: 2026-05-25
+          granularity: source
+          outcome: fetch_script_and_generated_probe_catalog_added_without_promoting_design_resources_to_hig_or_implementation_authority
+          open_items: 0
+
+  - id: sketch-hq-skills
+    repo: sketch-hq/skills
+    feed: https://github.com/sketch-hq/skills/commits/main.atom
+    branch: main
+    last_seen: 5d0fb33b5e53b0bf84de03a2579536f7073ce668
+    tracking:
+      last_checked_commit: 5d0fb33b5e53b0bf84de03a2579536f7073ce668
+      last_checked_at: 2026-05-25
+    review_coverage:
+      status: integrated
+      reviewed_commit: 5d0fb33b5e53b0bf84de03a2579536f7073ce668
+      reviewed_at: 2026-05-25
+      granularity: source
+      outcome: official_sketch_mcp_skill_installed_as_source_owned_runtime_skill_and_core_design_context_handoff_workflow_absorbed_into_sketch_design
+      open_items: 0
+    type: skill-source
+    policy: track-official-sketch-skill-source
+    classification:
+      provenance: official
+      focus: focused-domain
+      domains:
+        - sketch
+        - design-to-code
+        - design-handoff
+        - mcp
+      absorption_priority: high
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - skills/sketch-implement-design/
+    review_segments:
+      - id: sketch-implement-design
+        label: Sketch implement design skill
+        source_type: skill-source
+        policy: source-owned-runtime-skill-install
+        paths:
+          - skills/sketch-implement-design/
+        targets:
+          - root
+        candidate_owner: skill-sources.yaml
+        routing_note: official_live_sketch_mcp_implementation_skill_installed_directly; offline_sketchtool_parser_remains_separate_future_skill_boundary
+        review_coverage:
+          status: integrated
+          reviewed_commit: 5d0fb33b5e53b0bf84de03a2579536f7073ce668
+          reviewed_at: 2026-05-25
+          granularity: path
+          outcome: installed_source_owned_sketch_implement_design_without_rewriting_as_offline_parser
+          open_items: 0
+      - id: sketch-design-workflow-absorption
+        label: Sketch design context and handoff workflow absorption
+        source_type: agent-source
+        policy: source-to-local-batch-pipeline-parity
+        paths:
+          - skills/sketch-implement-design/
+        targets:
+          - root
+        candidate_owner: skills/sketch-design
+        routing_note: official_live_mcp_design_context_and_handoff_workflow_absorbed_as_batchable_sketchtool_json_pipeline; live_selection_implementation_stays_source_owned
+        review_coverage:
+          status: integrated
+          reviewed_commit: 5d0fb33b5e53b0bf84de03a2579536f7073ce668
+          reviewed_at: 2026-05-25
+          granularity: path
+          outcome: core_design_context_visual_reference_asset_export_and_downstream_handoff_guidance_preserved_in_sketch_design
+          open_items: 0
+
+  - id: sketch-official-developer-docs
+    repo: official/sketch-developer-platform
+    source_url: https://www.sketch.com/docs/mcp-server/
+    branch: web
+    last_seen: sha256:4a5c66f3013323ff5ee51c4a7ba8e6412db16bc174b6edd8146dd1f2c17ebc72
+    tracking:
+      last_checked_commit: sha256:4a5c66f3013323ff5ee51c4a7ba8e6412db16bc174b6edd8146dd1f2c17ebc72
+      last_checked_at: 2026-05-25
+    review_coverage:
+      status: integrated
+      reviewed_commit: sha256:4a5c66f3013323ff5ee51c4a7ba8e6412db16bc174b6edd8146dd1f2c17ebc72
+      reviewed_at: 2026-05-25
+      granularity: source
+      outcome: official_mcp_cli_and_file_format_docs_absorbed_as_tool_handover_and_batch_parser_constraints_for_sketch_design
+      open_items: 0
+    type: signal-source
+    policy: track-official-sketch-mcp-cli-file-format-docs
+    classification:
+      provenance: official
+      focus: focused-domain
+      domains:
+        - sketch
+        - mcp
+        - cli
+        - file-format
+        - design-handoff
+      absorption_priority: high
+    targets:
+      - root
+    watch_paths:
+      - https://www.sketch.com/docs/mcp-server/
+      - https://developer.sketch.com/cli/
+      - https://developer.sketch.com/file-format/
+    review_segments:
+      - id: sketch-mcp-server-docs
+        label: Sketch MCP server docs
+        source_type: mcp-tool-source
+        policy: official-mcp-tool-handover
+        paths:
+          - https://www.sketch.com/docs/mcp-server/
+        targets:
+          - root
+        candidate_owner: skills/sketch-design
+        routing_note: use_mcp_tool_surface_for_optional_parity_and_live_selection_boundary_not_batch_dependency
+        review_coverage:
+          status: integrated
+          reviewed_commit: sha256:4a5c66f3013323ff5ee51c4a7ba8e6412db16bc174b6edd8146dd1f2c17ebc72
+          reviewed_at: 2026-05-25
+          granularity: path
+          outcome: mcp_tools_get_selection_as_image_and_run_code_preserved_as_parity_and_live_workflow_boundary
+          open_items: 0
+      - id: sketch-cli-file-format-docs
+        label: Sketch CLI and file format docs
+        source_type: tool-source
+        policy: official-cli-file-format-handover
+        paths:
+          - https://developer.sketch.com/cli/
+          - https://developer.sketch.com/file-format/
+        targets:
+          - root
+        candidate_owner: skills/sketch-design
+        routing_note: sketchtool_and_zip_json_format_are_primary_batch_extraction_backend_for_sketch_design
+        review_coverage:
+          status: integrated
+          reviewed_commit: snapshot:2026-05-25
+          reviewed_at: 2026-05-25
+          granularity: path
+          outcome: sketchtool_metadata_detach_export_and_sketch_zip_json_folder_model_preserved_as_parser_constraints
+          open_items: 0
+
+  - id: deanpeters-product-manager-skills-prd
+    repo: deanpeters/Product-Manager-Skills
+    feed: https://github.com/deanpeters/Product-Manager-Skills/commits/main.atom
+    branch: main
+    last_seen: d68d280f215959fac21bb7599c3fa356a11a488e
+    tracking:
+      last_checked_commit: d68d280f215959fac21bb7599c3fa356a11a488e
+      last_checked_at: 2026-05-10
+    review_coverage:
+      status: integrated
+      reviewed_commit: d68d280f215959fac21bb7599c3fa356a11a488e
+      reviewed_at: 2026-05-24
+      granularity: source
+      outcome: PM_scope_integrated_via_wave5_discovery_current_boundary_and_package_readiness_receipts_with_strategy_prioritization_rows_compressed_or_deferred_and_non_PM_rows_moved_or_deferred
+      open_items: 0
+    type: skill-source
+    policy: compare-prd-development-workflow
+    targets:
+      - root
+    watch_paths:
+      - skills/prd-development/
+      - skills/user-story/
+      - skills/user-story-mapping/
+      - skills/user-story-mapping-workshop/
+      - skills/user-story-splitting/
+      - skills/discovery-process/
+      - skills/opportunity-solution-tree/
+      - skills/problem-framing-canvas/
+      - skills/problem-statement/
+      - skills/jobs-to-be-done/
+      - skills/roadmap-planning/
+      - skills/lean-ux-canvas/
+      - skills/discovery-interview-prep/
+      - skills/customer-journey-map/
+      - skills/customer-journey-mapping-workshop/
+      - skills/proto-persona/
+      - skills/epic-hypothesis/
+      - skills/epic-breakdown-advisor/
+      - skills/feature-investment-advisor/
+      - skills/prioritization-advisor/
+      - skills/product-strategy-session/
+      - skills/recommendation-canvas/
+      - skills/storyboard/
+      - skills/positioning-statement/
+      - skills/positioning-workshop/
+    review_segments:
+      - id: prd-development-workflow
+        label: PRD development workflow
+        source_type: skill-source
+        policy: compare-engineering-ready-prd-workflow
+        paths:
+          - skills/prd-development/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: d68d280f215959fac21bb7599c3fa356a11a488e
+          reviewed_at: 2026-05-10
+          granularity: path
+          outcome: integrated_H2_PRD_questions_template_evidence_metrics_scope_risks_dependencies_and_anti_patterns_into_product_requirements
+          open_items: 0
+      - id: user-story-family
+        label: User story family
+        source_type: skill-source
+        policy: compare-user-story-family
+        paths:
+          - skills/user-story/
+          - skills/user-story-mapping/
+          - skills/user-story-mapping-workshop/
+          - skills/user-story-splitting/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: d68d280f215959fac21bb7599c3fa356a11a488e
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: integrated_story_format_story_mapping_walking_skeleton_story_splitting_and_anti_patterns_into_product_user_stories_with_detailed_criteria_routed_to_acceptance
+          open_items: 0
+      - id: discovery-planning-family
+        label: Discovery, positioning, strategy, and planning family
+        source_type: skill-source
+        policy: compare-product-discovery-positioning-strategy-problem-framing-jtbd-roadmap-family
+        paths:
+          - skills/discovery-process/
+          - skills/opportunity-solution-tree/
+          - skills/problem-framing-canvas/
+          - skills/problem-statement/
+          - skills/jobs-to-be-done/
+          - skills/roadmap-planning/
+          - skills/lean-ux-canvas/
+          - skills/discovery-interview-prep/
+          - skills/customer-journey-map/
+          - skills/customer-journey-mapping-workshop/
+          - skills/proto-persona/
+          - skills/epic-hypothesis/
+          - skills/epic-breakdown-advisor/
+          - skills/feature-investment-advisor/
+          - skills/prioritization-advisor/
+          - skills/product-strategy-session/
+          - skills/recommendation-canvas/
+          - skills/storyboard/
+          - skills/positioning-statement/
+          - skills/positioning-workshop/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: d68d280f215959fac21bb7599c3fa356a11a488e
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: integrated_discovery_interviews_journey_persona_positioning_problem_framing_storyboard_epic_and_current_boundary_rows_into_product_discovery_product_brainstorm_product_requirements_product_feature_creator_and_existing_story_acceptance_owners_with_roadmap_prioritization_deferred
+          open_items: 0
+
+  - id: product-on-purpose-pm-skills
+    repo: product-on-purpose/pm-skills
+    feed: https://github.com/product-on-purpose/pm-skills/commits/main.atom
+    branch: main
+    last_seen: 2b0310d88b8e5918fd298ea4ab1f7969c9a0b8ef
+    tracking:
+      last_checked_commit: 2b0310d88b8e5918fd298ea4ab1f7969c9a0b8ef
+      last_checked_at: 2026-05-10
+    review_coverage:
+      status: integrated
+      reviewed_commit: 2b0310d88b8e5918fd298ea4ab1f7969c9a0b8ef
+      reviewed_at: 2026-05-24
+      granularity: source
+      outcome: PM_scope_integrated_via_wave5_discovery_current_boundary_metrics_and_package_readiness_receipts_with_strategy_prioritization_rows_compressed_or_deferred_and_software_design_GTM_rows_moved_or_deferred
+      open_items: 0
+    type: skill-source
+    policy: compare-pm-skill-family-and-command-design
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - commands/
+      - _workflows/
+      - docs/workflows/
+      - commands/prd.md
+      - commands/user-stories.md
+      - commands/acceptance-criteria.md
+      - commands/workflow-feature-kickoff.md
+      - skills/deliver-prd/
+      - skills/deliver-user-stories/
+      - skills/deliver-acceptance-criteria/
+      - skills/deliver-edge-cases/
+      - skills/utility-pm-skill-builder/
+      - skills/foundation-lean-canvas/
+      - skills/foundation-okr-writer/
+      - skills/foundation-persona/
+      - skills/discover-interview-synthesis/
+      - skills/discover-stakeholder-summary/
+      - skills/define-hypothesis/
+      - skills/define-jtbd-canvas/
+      - skills/define-opportunity-tree/
+      - skills/define-problem-statement/
+      - skills/develop-solution-brief/
+      - skills/measure-experiment-design/
+      - skills/measure-experiment-results/
+      - skills/measure-dashboard-requirements/
+      - skills/measure-instrumentation-spec/
+      - skills/measure-okr-grader/
+      - skills/iterate-pivot-decision/
+      - skills/iterate-lessons-log/
+      - skills/iterate-refinement-notes/
+      - skills/iterate-retrospective/
+    review_segments:
+      - id: prd-delivery-family
+        label: PRD delivery family
+        source_type: skill-source
+        policy: compare-prd-user-story-acceptance-family
+        paths:
+          - commands/prd.md
+          - commands/user-stories.md
+          - commands/acceptance-criteria.md
+          - skills/deliver-prd/
+          - skills/deliver-user-stories/
+          - skills/deliver-acceptance-criteria/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 2b0310d88b8e5918fd298ea4ab1f7969c9a0b8ef
+          reviewed_at: 2026-05-10
+          granularity: segment
+          outcome: integrated_H8_H9_H10_deliver_PRD_user_stories_and_acceptance_criteria_into_first_wave_leaf_skills_with_command_wrappers_omitted
+          open_items: 0
+      - id: pm-skill-command-and-utility-model
+        label: PM skill command and utility model
+        source_type: skill-source
+        policy: compare-command-wrapper-and-skill-authoring-model
+        paths:
+          - commands/workflow-feature-kickoff.md
+          - skills/utility-pm-skill-builder/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 2b0310d88b8e5918fd298ea4ab1f7969c9a0b8ef
+          reviewed_at: 2026-05-10
+          granularity: segment
+          outcome: H11_reviewed_feature_kickoff_compressed_into_product_feature_creator_skill_authoring_utility_rows_moved_to_collection_creator_and_creator_pro_guardrails
+          open_items: 0
+      - id: pm-taxonomy-commands-and-workflows
+        label: PM taxonomy commands and workflows
+        source_type: skill-source
+        policy: compare-pm-skill-taxonomy-and-workflow-organization
+        paths:
+          - README.md
+          - commands/
+          - _workflows/
+          - docs/workflows/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 2b0310d88b8e5918fd298ea4ab1f7969c9a0b8ef
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: integrated_taxonomy_and_workflow_orchestration_into_product_feature_creator_with_non_PM_command_and_authoring_mechanics_moved_out
+          open_items: 0
+      - id: remaining-discovery-measure-iterate-family
+        label: Remaining product planning, discovery, measure, and iterate skill bodies
+        source_type: skill-source
+        policy: compare-product-planning-discovery-measure-iterate-product-flow-boundary
+        paths:
+          - skills/deliver-edge-cases/
+          - skills/foundation-lean-canvas/
+          - skills/foundation-okr-writer/
+          - skills/foundation-persona/
+          - skills/discover-interview-synthesis/
+          - skills/discover-stakeholder-summary/
+          - skills/define-hypothesis/
+          - skills/define-jtbd-canvas/
+          - skills/define-opportunity-tree/
+          - skills/define-problem-statement/
+          - skills/develop-solution-brief/
+          - skills/measure-experiment-design/
+          - skills/measure-experiment-results/
+          - skills/measure-dashboard-requirements/
+          - skills/measure-instrumentation-spec/
+          - skills/measure-okr-grader/
+          - skills/iterate-pivot-decision/
+          - skills/iterate-lessons-log/
+          - skills/iterate-refinement-notes/
+          - skills/iterate-retrospective/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 2b0310d88b8e5918fd298ea4ab1f7969c9a0b8ef
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: integrated_product_planning_discovery_measure_instrumentation_experiment_edge_case_refinement_and_learning_loop_rows_into_product_brainstorm_product_requirements_product_discovery_product_metrics_product_feature_creator_product_interaction_and_product_acceptance_criteria_with_ceremony_and_implementation_rows_moved_out
+          open_items: 0
+
+  - id: yhassy-wireframe-skill
+    repo: yhassy/wireframe-skill
+    feed: https://github.com/yhassy/wireframe-skill/commits/main.atom
+    branch: main
+    last_seen: 948d4331343b18d913d5bc502da72ed0c5f19101
+    tracking:
+      last_checked_commit: 948d4331343b18d913d5bc502da72ed0c5f19101
+      last_checked_at: 2026-05-24
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: product_prototype_schema_first_wireframe_reference_registered_pending_review
+      open_items: 1
+    type: skill-source
+    policy: compare-schema-first-wireframe-html-prototype-boundary
+    classification:
+      provenance: third-party
+      focus: focused-domain
+      domains:
+        - product-prototype
+        - wireframe
+        - html-artifact
+        - schema-first-rendering
+      absorption_priority: high
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - SKILL.md
+      - wireframe-designer.md
+      - wireframe-template.html
+    review_segments:
+      - id: schema-first-html-wireframe
+        label: Schema-first HTML wireframe prototype
+        source_type: skill-source
+        policy: compare-product-prototype-json-definition-and-html-preview
+        paths:
+          - README.md
+          - SKILL.md
+          - wireframe-designer.md
+          - wireframe-template.html
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: small
+        plan_required: true
+        ledger_strategy: section-parity
+
+  - id: agilek-wireframer-skill
+    repo: agilek/wireframer-skill
+    feed: https://github.com/agilek/wireframer-skill/commits/main.atom
+    branch: main
+    last_seen: 22ed714abb486d923bcf4d21498fbbeabc9f4fb3
+    tracking:
+      last_checked_commit: 22ed714abb486d923bcf4d21498fbbeabc9f4fb3
+      last_checked_at: 2026-05-24
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: product_prototype_clickable_spa_wireframe_reference_registered_pending_review
+      open_items: 1
+    type: skill-source
+    policy: compare-clickable-spa-wireframe-product-prototype-boundary
+    classification:
+      provenance: third-party
+      focus: focused-domain
+      domains:
+        - product-prototype
+        - wireframe
+        - clickable-spa
+        - flow-rendering
+      absorption_priority: high
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - SKILL.md
+      - ICONS.md
+      - samples/
+    review_segments:
+      - id: clickable-spa-wireframe
+        label: Clickable SPA wireframe prototype
+        source_type: skill-source
+        policy: compare-layout-content-flow_without_visual_design_ownership
+        paths:
+          - README.md
+          - SKILL.md
+          - ICONS.md
+          - samples/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: small
+        plan_required: true
+        ledger_strategy: section-parity
+
+  - id: magdoub-claude-wireframe-skill
+    repo: Magdoub/claude-wireframe-skill
+    feed: https://github.com/Magdoub/claude-wireframe-skill/commits/main.atom
+    branch: main
+    last_seen: 44a5814d1583c4dc7cafa36611838669f0895af9
+    tracking:
+      last_checked_commit: 44a5814d1583c4dc7cafa36611838669f0895af9
+      last_checked_at: 2026-05-24
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: product_prototype_black_and_white_interactive_wireframe_reference_registered_pending_review
+      open_items: 1
+    type: skill-source
+    policy: compare-bw-interactive-html-wireframe-boundary
+    classification:
+      provenance: third-party
+      focus: focused-domain
+      domains:
+        - product-prototype
+        - wireframe
+        - low-visual-fidelity
+        - html-artifact
+      absorption_priority: high
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - SKILL.md
+      - wireframe/
+      - examples/
+    review_segments:
+      - id: bw-interactive-html-wireframes
+        label: B&W interactive HTML wireframes
+        source_type: skill-source
+        policy: compare-low_visual_fidelity_clickable_product_prototype
+        paths:
+          - README.md
+          - SKILL.md
+          - wireframe/
+          - examples/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: small
+        plan_required: true
+        ledger_strategy: section-parity
+
+  - id: zeroz-cc-design
+    repo: ZeroZ-lab/cc-design
+    feed: https://github.com/ZeroZ-lab/cc-design/commits/master.atom
+    branch: master
+    last_seen: 85b00ea30a9a02575176c2d3ed2974e69e13917e
+    tracking:
+      last_checked_commit: 85b00ea30a9a02575176c2d3ed2974e69e13917e
+      last_checked_at: 2026-05-24
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: html_artifact_quality_and_prototype_guardrails_registered_pending_review
+      open_items: 1
+    type: skill-source
+    policy: compare-html-artifact-quality-without-high-fidelity-design-goal
+    classification:
+      provenance: third-party
+      focus: broad-catalog
+      domains:
+        - html-artifact
+        - prototype-quality
+        - browser-verification
+        - visual-design
+        - presentation-artifacts
+      absorption_priority: medium
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - SKILL.md
+      - EXAMPLES.md
+      - test-prompts.json
+      - docs/brainstorm-interactive-explainer.md
+      - templates/
+      - references/verification-protocol.md
+      - references/failure-mode-handling.md
+      - references/design-red-flags.md
+      - references/interaction-design-theory.md
+    review_segments:
+      - id: html-prototype-artifact-quality
+        label: HTML prototype artifact quality and guardrails
+        source_type: skill-source
+        policy: compare_html_artifact_completion_browser_quality_and_high_fidelity_boundary
+        paths:
+          - README.md
+          - SKILL.md
+          - EXAMPLES.md
+          - test-prompts.json
+          - docs/brainstorm-interactive-explainer.md
+          - templates/
+          - references/verification-protocol.md
+          - references/failure-mode-handling.md
+          - references/design-red-flags.md
+          - references/interaction-design-theory.md
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: large
+        plan_required: true
+        ledger_strategy: item-ledger
+        batching:
+          mode: product-prototype-relevant-files
+          source: paths
+          max_items: 20
+          sort: path
+
+  - id: jiji262-claude-design-skill
+    repo: jiji262/claude-design-skill
+    feed: https://github.com/jiji262/claude-design-skill/commits/main.atom
+    branch: main
+    last_seen: f1ac87c3decb175d99a269f23ca84860786a598b
+    tracking:
+      last_checked_commit: f1ac87c3decb175d99a269f23ca84860786a598b
+      last_checked_at: 2026-05-24
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: html_native_design_artifact_and_clickable_mockup_workflow_registered_pending_review
+      open_items: 1
+    type: skill-source
+    policy: compare-html-native-design-artifact-with-product-prototype-boundary
+    classification:
+      provenance: third-party
+      focus: focused-domain
+      domains:
+        - html-artifact
+        - clickable-mockup
+        - prototype-workflow
+        - visual-design
+      absorption_priority: medium
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - README.zh.md
+      - SKILL.md
+      - assets/prototype-shell.html
+      - demos/demo-3-prototype.html
+      - references/workflow.md
+      - references/output-formats.md
+      - references/verification.md
+      - references/design-principles.md
+    review_segments:
+      - id: html-native-clickable-prototype-workflow
+        label: HTML-native clickable prototype workflow
+        source_type: skill-source
+        policy: compare_clickable_mockup_workflow_without_visual_design_ownership
+        paths:
+          - README.md
+          - README.zh.md
+          - SKILL.md
+          - assets/prototype-shell.html
+          - demos/demo-3-prototype.html
+          - references/workflow.md
+          - references/output-formats.md
+          - references/verification.md
+          - references/design-principles.md
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: medium
+        plan_required: true
+        ledger_strategy: section-parity
+
+  - id: mattpocock-skills-prototype
+    repo: mattpocock/skills
+    feed: https://github.com/mattpocock/skills/commits/main.atom
+    branch: main
+    last_seen: b8be62ffacb0118fa3eaa29a0923c87c8c11985c
+    tracking:
+      last_checked_commit: b8be62ffacb0118fa3eaa29a0923c87c8c11985c
+      last_checked_at: 2026-05-24
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: throwaway_engineering_prototype_reference_registered_pending_review
+      open_items: 1
+    type: skill-source
+    policy: compare-throwaway-prototype-state-machine-data-model-boundary
+    classification:
+      provenance: third-party
+      focus: focused-domain
+      domains:
+        - prototype
+        - throwaway-code
+        - state-machine
+        - product-prototype
+        - root
+      absorption_priority: high
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - skills/engineering/prototype/
+      - skills/engineering/prototype/SKILL.md
+      - skills/engineering/prototype/UI.md
+      - skills/engineering/prototype/LOGIC.md
+    review_segments:
+      - id: engineering-prototype-boundary
+        label: Throwaway engineering prototype boundary
+        source_type: skill-source
+        policy: compare_sanity_check_prototype_without_production_frontend_claims
+        paths:
+          - README.md
+          - skills/engineering/prototype/SKILL.md
+          - skills/engineering/prototype/UI.md
+          - skills/engineering/prototype/LOGIC.md
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: small
+        plan_required: true
+        ledger_strategy: section-parity
+
+  - id: mattpocock-skills-alignment
+    repo: mattpocock/skills
+    feed: https://github.com/mattpocock/skills/commits/main.atom
+    branch: main
+    last_seen: 694fa30311e02c2639942308513555e61ee84a6f
+    tracking:
+      last_checked_commit: 694fa30311e02c2639942308513555e61ee84a6f
+      last_checked_at: 2026-06-17
+    review_coverage:
+      status: integrated
+      reviewed_commit: 694fa30311e02c2639942308513555e61ee84a6f
+      reviewed_at: 2026-06-17
+      granularity: source
+      outcome: integrated_grill_me_and_grill_with_docs_into_align_with_me_with_alignment_loop_domain_language_challenge_optional_agent_packet_and_explicit_stable_docs_promotion_gate
+      open_items: 0
+    type: skill-source
+    policy: compare-workflow-independent-context-alignment-boundary
+    classification:
+      provenance: third-party
+      focus: focused-domain
+      domains:
+        - context-alignment
+        - hitl
+        - domain-language
+        - documentation-promotion
+        - root
+      absorption_priority: high
+    targets:
+      - root
+    watch_paths:
+      - skills/productivity/grill-me/SKILL.md
+      - skills/engineering/grill-with-docs/SKILL.md
+      - skills/engineering/grill-with-docs/CONTEXT-FORMAT.md
+      - skills/engineering/grill-with-docs/ADR-FORMAT.md
+    review_segments:
+      - id: grill-context-alignment
+        label: Grill and docs-backed context alignment
+        source_type: skill-source
+        policy: compare-workflow-independent-context-alignment-boundary
+        paths:
+          - skills/productivity/grill-me/SKILL.md
+          - skills/engineering/grill-with-docs/SKILL.md
+          - skills/engineering/grill-with-docs/CONTEXT-FORMAT.md
+          - skills/engineering/grill-with-docs/ADR-FORMAT.md
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 694fa30311e02c2639942308513555e61ee84a6f
+          reviewed_at: 2026-06-17
+          granularity: segment
+          outcome: integrated_into_align_with_me_as_workflow_independent_alignment_loop_with_evidence_first_questions_recommended_defaults_domain_language_correction_optional_agent_packet_and_stable_docs_hitl_gate
+          open_items: 0
+        size_hint: small
+        plan_required: false
+        ledger_strategy: source-comparison-plus-authoring-review
+
+  - id: mattpocock-skills-context-handoff
+    repo: mattpocock/skills
+    feed: https://github.com/mattpocock/skills/commits/main.atom
+    branch: main
+    last_seen: 694fa30311e02c2639942308513555e61ee84a6f
+    tracking:
+      last_checked_commit: 694fa30311e02c2639942308513555e61ee84a6f
+      last_checked_at: 2026-06-18
+    review_coverage:
+      status: integrated
+      reviewed_commit: 694fa30311e02c2639942308513555e61ee84a6f
+      reviewed_at: 2026-06-18
+      granularity: source
+      outcome: integrated_handoff_into_context_handoff_preserving_temp_handoff_suggested_entry_points_artifact_references_redaction_and_focus_tailoring_with_guarded_project_user_session_scope_optional_packet_fields_resume_prompt_fixtures_and_full_surpass_review
+      open_items: 0
+    type: skill-source
+    policy: compare-scoped-context-handoff-boundary
+    classification:
+      provenance: third-party
+      focus: focused-domain
+      domains:
+        - context-handoff
+        - session-continuity
+        - agent-state
+        - scope-boundary
+        - root
+      absorption_priority: high
+    targets:
+      - root
+    watch_paths:
+      - skills/productivity/handoff/SKILL.md
+    review_segments:
+      - id: session-context-handoff
+        label: Session context handoff
+        source_type: skill-source
+        policy: compare-scoped-context-handoff-boundary
+        paths:
+          - skills/productivity/handoff/SKILL.md
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 694fa30311e02c2639942308513555e61ee84a6f
+          reviewed_at: 2026-06-18
+          granularity: segment
+          outcome: compressed_into_context_handoff_preserving_conversation_compaction_for_future_agent_temp_output_suggested_entry_points_artifact_reference_secret_redaction_and_next_session_focus_while_adding_guarded_project_user_session_scope_optional_packet_fields_resume_prompt_and_validation_fixtures
+          open_items: 0
+        size_hint: small
+        plan_required: false
+        ledger_strategy: source-comparison-plus-authoring-review
+
+  - id: figma-mcp-server-guide
+    repo: figma/mcp-server-guide
+    feed: https://github.com/figma/mcp-server-guide/commits/main.atom
+    branch: main
+    last_seen: a742f0a700a7772ff5ed85f7c9fc1dad5afa9fcc
+    tracking:
+      last_checked_commit: a742f0a700a7772ff5ed85f7c9fc1dad5afa9fcc
+      last_checked_at: 2026-05-24
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: figma_renderer_target_reference_registered_pending_segment_review
+      open_items: 2
+    type: skill-source
+    policy: compare-figma-renderer-target-and-canvas-operation-boundary
+    classification:
+      provenance: official
+      focus: focused-domain
+      domains:
+        - figma
+        - mcp
+        - renderer-target
+        - design-handoff
+        - product-prototype
+      absorption_priority: high
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - figma-power/mcp.json
+      - skills/figma-generate-design/
+      - skills/figma-use/
+    review_segments:
+      - id: figma-generate-design-renderer-target
+        label: Figma generate-design renderer target
+        source_type: skill-source
+        policy: compare_figma_screen_modal_panel_generation_as_optional_product_prototype_renderer
+        paths:
+          - skills/figma-generate-design/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: path
+          outcome: pending_review
+          open_items: 1
+        size_hint: small
+        plan_required: true
+        ledger_strategy: section-parity
+      - id: figma-use-canvas-operations
+        label: Figma canvas operation foundation
+        source_type: skill-source
+        policy: compare_figma_canvas_operations_as_renderer_infrastructure_not_product_truth
+        paths:
+          - README.md
+          - figma-power/mcp.json
+          - skills/figma-use/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: medium
+        plan_required: true
+        ledger_strategy: section-parity
+
+  - id: mohitagw-pm-claude-skills
+    repo: mohitagw15856/pm-claude-skills
+    feed: https://github.com/mohitagw15856/pm-claude-skills/commits/main.atom
+    branch: main
+    last_seen: 94e53d38a8eee47ae21e3c9f6763c8b16e997f6d
+    tracking:
+      last_checked_commit: 94e53d38a8eee47ae21e3c9f6763c8b16e997f6d
+      last_checked_at: 2026-05-24
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: figma_prototype_plan_and_pm_figma_handoff_reference_registered_pending_review
+      open_items: 1
+    type: skill-source
+    policy: compare-figma-prototype-plan-and-product-prototype-render-plan
+    classification:
+      provenance: third-party
+      focus: broad-catalog
+      domains:
+        - root
+        - figma
+        - prototype-plan
+        - design-handoff
+      absorption_priority: medium
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - examples/pm-figma-example.md
+      - skills/figma-prototype-plan/SKILL.md
+      - skills/figma-user-flow-planner/SKILL.md
+      - skills/figma-annotation-guide/SKILL.md
+      - plugins/pm-figma/
+    review_segments:
+      - id: figma-prototype-plan
+        label: Figma prototype plan and PM handoff
+        source_type: skill-source
+        policy: compare_figma_render_plan_scope_interactions_and_testing_tasks
+        paths:
+          - README.md
+          - examples/pm-figma-example.md
+          - skills/figma-prototype-plan/SKILL.md
+          - skills/figma-user-flow-planner/SKILL.md
+          - skills/figma-annotation-guide/SKILL.md
+          - plugins/pm-figma/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: medium
+        plan_required: true
+        ledger_strategy: item-ledger
+        batching:
+          mode: figma-prototype-planning-files
+          source: paths
+          max_items: 20
+          sort: path
+
+  - id: lyndonkl-claude-prototyping
+    repo: lyndonkl/claude
+    feed: https://github.com/lyndonkl/claude/commits/main.atom
+    branch: main
+    last_seen: 26bff1f71e7981d62f2094696807d987c2ecf3df
+    tracking:
+      last_checked_commit: 26bff1f71e7981d62f2094696807d987c2ecf3df
+      last_checked_at: 2026-05-24
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: prototyping_pretotyping_fidelity_guardrails_registered_pending_review
+      open_items: 1
+    type: skill-source
+    policy: compare-prototype-fidelity-and-overbuild-guardrails
+    classification:
+      provenance: third-party
+      focus: broad-catalog
+      domains:
+        - prototyping
+        - pretotyping
+        - fidelity-selection
+        - product-discovery
+        - product-prototype
+      absorption_priority: medium
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - skills/prototyping-pretotyping/
+    review_segments:
+      - id: prototyping-pretotyping-fidelity-guardrails
+        label: Prototyping, pretotyping, and fidelity guardrails
+        source_type: skill-source
+        policy: compare_fidelity_serves_goal_without_absorbing_discovery_or_mvp_flow
+        paths:
+          - README.md
+          - skills/prototyping-pretotyping/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: small
+        plan_required: true
+        ledger_strategy: section-parity
+
+  - id: microsoft-skills-frontend-design-review
+    repo: microsoft/skills
+    feed: https://github.com/microsoft/skills/commits/main.atom
+    branch: main
+    last_seen: 325091fc44bafebc11330a442af58039248c9f29
+    tracking:
+      last_checked_commit: 325091fc44bafebc11330a442af58039248c9f29
+      last_checked_at: 2026-05-24
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: frontend_design_review_quality_pillars_reference_registered_pending_review
+      open_items: 1
+    type: skill-source
+    policy: compare-frontend-design-review-quality-pillars-for-prototype-review
+    classification:
+      provenance: official-adjacent
+      focus: broad-catalog
+      domains:
+        - frontend-quality
+        - design-review
+        - accessibility
+        - prototype-review
+      absorption_priority: medium
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - .github/skills/frontend-design-review/
+    review_segments:
+      - id: frontend-design-review-quality-pillars
+        label: Frontend design review quality pillars
+        source_type: skill-source
+        policy: compare_design_review_quality_accessibility_and_system_compliance_for_lightweight_prototype_review
+        paths:
+          - README.md
+          - .github/skills/frontend-design-review/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: small
+        plan_required: true
+        ledger_strategy: section-parity
+
+  - id: divikwu-product-requirement-craft
+    repo: DivikWu/product-requirement-craft
+    feed: https://github.com/DivikWu/product-requirement-craft/commits/main.atom
+    branch: main
+    last_seen: bd98eff1a65465b6553422f2882a550c1bc42e02
+    tracking:
+      last_checked_commit: bd98eff1a65465b6553422f2882a550c1bc42e02
+      last_checked_at: 2026-05-23
+    review_coverage:
+      status: integrated
+      reviewed_commit: bd98eff1a65465b6553422f2882a550c1bc42e02
+      reviewed_at: 2026-05-24
+      granularity: source
+      outcome: integrated_problem_framing_SRD_PRD_chain_across_product_discovery_brainstorm_and_requirements
+      open_items: 0
+    type: skill-source
+    policy: compare-problem-framing-srd-prd-chain
+    targets:
+      - root
+    watch_paths:
+      - skills/requirement-writer/
+      - README.md
+      - README_zh.md
+    review_segments:
+      - id: requirement-writer-chain
+        label: Problem framing to SRD to PRD requirement writer
+        source_type: skill-source
+        policy: compare-problem-framing-srd-prd-chain
+        paths:
+          - skills/requirement-writer/
+          - README.md
+          - README_zh.md
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: bd98eff1a65465b6553422f2882a550c1bc42e02
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: integrated_problem_framing_layered_questioning_readiness_scoring_and_conditional_PRD_sections_into_discovery_brainstorm_requirements
+          open_items: 0
+
+  - id: anombyte93-prd-taskmaster
+    repo: anombyte93/prd-taskmaster
+    feed: https://github.com/anombyte93/prd-taskmaster/commits/main.atom
+    branch: main
+    last_seen: c7a000cc924e4e37c347c8becfa29d201077b1ce
+    tracking:
+      last_checked_commit: c7a000cc924e4e37c347c8becfa29d201077b1ce
+      last_checked_at: 2026-05-23
+    review_coverage:
+      status: reviewed
+      reviewed_commit: c7a000cc924e4e37c347c8becfa29d201077b1ce
+      reviewed_at: 2026-05-24
+      granularity: source
+      outcome: reviewed_PM_readiness_concepts_covered_or_compressed_taskmaster_runtime_and_task_system_moved_to_software_engineering
+      open_items: 0
+    type: skill-source
+    policy: compare-engineer-focused-prd-task-breakdown
+    targets:
+      - root
+    watch_paths:
+      - SKILL.md
+      - README.md
+      - templates/
+      - reference/
+    review_segments:
+      - id: taskmaster-prd-and-breakdown
+        label: Taskmaster PRD and task breakdown
+        source_type: skill-source
+        policy: compare-engineer-focused-prd-task-breakdown
+        paths:
+          - SKILL.md
+          - README.md
+          - templates/
+          - reference/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: c7a000cc924e4e37c347c8becfa29d201077b1ce
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: reviewed_lightweight_engineering_consumable_readiness_absorbed_generic_checklist_runtime_setup_task_generation_and_rollback_moved_or_rejected
+          open_items: 0
+
+  - id: github-awesome-copilot-product-prd
+    repo: github/awesome-copilot
+    feed: https://github.com/github/awesome-copilot/commits/main.atom
+    branch: main
+    last_seen: 5b049e4e196c10aab8ddfd9e492323d08cf985b0
+    tracking:
+      last_checked_commit: 5b049e4e196c10aab8ddfd9e492323d08cf985b0
+      last_checked_at: 2026-05-23
+    review_coverage:
+      status: integrated
+      reviewed_commit: 5b049e4e196c10aab8ddfd9e492323d08cf985b0
+      reviewed_at: 2026-05-24
+      granularity: source
+      outcome: integrated_PRD_package_hierarchy_engineering_consumable_readiness_and_anti_vague_rules_with_technical_architecture_moved_to_software_engineering
+      open_items: 0
+    type: skill-source
+    policy: compare-github-copilot-prd-and-breakdown-skills
+    targets:
+      - root
+    watch_paths:
+      - skills/prd/
+      - skills/breakdown-feature-prd/
+      - skills/breakdown-epic-pm/
+    review_segments:
+      - id: prd-and-breakdown-skills
+        label: PRD and feature breakdown skills
+        source_type: skill-source
+        policy: compare-github-copilot-prd-and-breakdown-skills
+        paths:
+          - skills/prd/
+          - skills/breakdown-feature-prd/
+          - skills/breakdown-epic-pm/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 5b049e4e196c10aab8ddfd9e492323d08cf985b0
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: integrated_Epic_feature_PRD_traceability_requirements_readiness_story_acceptance_routes_and_package_handoff_with_technical_architecture_moved_out
+          open_items: 0
+
+  - id: jamesrochabrun-skills-prd-generator
+    repo: jamesrochabrun/skills
+    feed: https://github.com/jamesrochabrun/skills/commits/main.atom
+    branch: main
+    last_seen: 2482c176372299c92af01f8414a67172f324e8db
+    tracking:
+      last_checked_commit: 2482c176372299c92af01f8414a67172f324e8db
+      last_checked_at: 2026-05-23
+    review_coverage:
+      status: integrated
+      reviewed_commit: 2482c176372299c92af01f8414a67172f324e8db
+      reviewed_at: 2026-05-24
+      granularity: source
+      outcome: integrated_minimal_PRD_checklist_into_product_requirements_readiness_checks_without_template_bloat
+      open_items: 0
+    type: skill-source
+    policy: compare-minimal-prd-generator-checklist
+    targets:
+      - root
+    watch_paths:
+      - skills/prd-generator/
+    review_segments:
+      - id: prd-generator-checklist
+        label: Minimal PRD generator checklist
+        source_type: skill-source
+        policy: compare-minimal-prd-generator-checklist
+        paths:
+          - skills/prd-generator/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 2482c176372299c92af01f8414a67172f324e8db
+          reviewed_at: 2026-05-24
+          granularity: segment
+          outcome: integrated_context_checklist_metric_prompts_placeholder_TBD_discipline_and_readiness_review_into_product_requirements
+          open_items: 0
+
+  - id: daymade-claude-code-skills-skill-packaging
+    repo: daymade/claude-code-skills
+    feed: https://github.com/daymade/claude-code-skills/commits/main.atom
+    branch: main
+    last_seen: bbf87f3c5ba2c19e611e39b9fce606e23e58f88a
+    tracking:
+      last_checked_commit: bbf87f3c5ba2c19e611e39b9fce606e23e58f88a
+      last_checked_at: 2026-05-23
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: pending_skill_packaging_workflow_review
+      open_items: 1
+    type: skill-source
+    policy: compare-skill-authoring-packaging-and-marketplace-workflow
+    targets:
+      - root
+    watch_paths:
+      - daymade-skill/skill-creator/
+      - daymade-skill/skill-reviewer/
+      - daymade-skill/skills-search/
+      - daymade-skill/skill-reviewer/references/marketplace_template.json
+      - README.md
+      - CLAUDE.md
+    review_segments:
+      - id: skill-packaging-workflow
+        label: Skill packaging workflow
+        source_type: skill-source
+        policy: compare-skill-authoring-packaging-and-marketplace-workflow
+        paths:
+          - daymade-skill/skill-creator/
+          - daymade-skill/skill-reviewer/
+          - daymade-skill/skills-search/
+          - daymade-skill/skill-reviewer/references/marketplace_template.json
+          - README.md
+          - CLAUDE.md
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+
+  - id: voltagent-awesome-design-md
+    repo: VoltAgent/awesome-design-md
+    feed: https://github.com/VoltAgent/awesome-design-md/commits/main.atom
+    branch: main
+    last_seen: 863444e92f1bc095e2a7fe41bc4907085834e0f6
+    tracking:
+      last_checked_commit: 863444e92f1bc095e2a7fe41bc4907085834e0f6
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: partial
+      reviewed_commit: 863444e92f1bc095e2a7fe41bc4907085834e0f6
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: apple_website_template_included_in_design_md_template_skill_70_templates_unreviewed
+      open_items: 70
+    type: curated-index
+    policy: strict-track-design-md-template-catalog
+    classification:
+      provenance: third-party
+      focus: focused-domain
+      domains:
+        - design-md-template
+        - design-system
+        - visual-identity
+      absorption_priority: medium
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - design-md/
+      - design-md/apple/
+      - CONTRIBUTING.md
+    review_segments:
+      - id: design-md-template-catalog
+        label: DESIGN.md template catalog
+        source_type: resource
+        policy: strict-track-template-files
+        paths:
+          - design-md/
+        targets:
+          - root
+        review_coverage:
+          status: partial
+          reviewed_commit: 863444e92f1bc095e2a7fe41bc4907085834e0f6
+          reviewed_at: 2026-05-02
+          granularity: segment
+          outcome: apple_website_included_70_templates_pending_path_review
+          open_items: 70
+        size_hint: large
+        plan_required: true
+        ledger_strategy: upstream-review-segments-plus-local-template-files
+        batching:
+          mode: literal-template-directory-batches
+          source: paths
+          max_items: 25
+          sort: path
+      - id: apple-website-design-md-template
+        label: Apple website DESIGN.md template
+        source_type: resource
+        policy: strict-track-included-template-file
+        paths:
+          - design-md/apple/
+        template_id: apple-website
+        local_template: skills/design-md-template/templates/apple-website/DESIGN.md
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 863444e92f1bc095e2a7fe41bc4907085834e0f6
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: included_in_design_md_template_skill
+          open_items: 0
+
+  - id: rohitg00-awesome-claude-design
+    repo: rohitg00/awesome-claude-design
+    feed: https://github.com/rohitg00/awesome-claude-design/commits/main.atom
+    branch: main
+    last_seen: 7f60ee56b9340f8c2671a08c2d8aab4037546a64
+    tracking:
+      last_checked_commit: 7f60ee56b9340f8c2671a08c2d8aab4037546a64
+      last_checked_at: 2026-05-25
+    review_coverage:
+      status: partial
+      reviewed_commit: 7f60ee56b9340f8c2671a08c2d8aab4037546a64
+      reviewed_at: 2026-05-25
+      granularity: source
+      outcome: apple_platform_glass_template_included_34_design_md_files_pending_template_enrichment_review
+      open_items: 34
+    type: curated-index
+    policy: strict-track-design-md-template-catalog
+    classification:
+      provenance: third-party
+      focus: broad-catalog
+      domains:
+        - design-md-template
+      absorption_priority: medium
+    targets:
+      - root
+    scope_note: design-md paths are template-inclusion candidates; README.md and CONTRIBUTING.md are catalog/provenance context only.
+    watch_paths:
+      - README.md
+      - design-md/
+      - design-md/glass/apple.md
+      - CONTRIBUTING.md
+    review_segments:
+      - id: aesthetic-family-design-md-catalog
+        label: Aesthetic family DESIGN.md catalog
+        source_type: resource
+        policy: strict-track-template-files
+        paths:
+          - design-md/
+        targets:
+          - root
+        review_coverage:
+          status: partial
+          reviewed_commit: 7f60ee56b9340f8c2671a08c2d8aab4037546a64
+          reviewed_at: 2026-05-25
+          granularity: segment
+          outcome: apple_platform_glass_template_included_34_design_md_files_pending_template_enrichment_review
+          open_items: 34
+        template_scope:
+          include: all markdown files under design-md/
+          exclude: README.md, CONTRIBUTING.md, prompts/, recipes/, showcase/, assets/
+        size_hint: large
+        plan_required: true
+        ledger_strategy: upstream-review-segments-plus-local-template-files
+        batching:
+          mode: literal-template-file-batches
+          source: paths
+          max_items: 25
+          sort: path
+      - id: apple-platform-liquid-glass-template
+        label: Apple Liquid Glass DESIGN.md template
+        source_type: resource
+        policy: strict-track-included-template-file
+        paths:
+          - design-md/glass/apple.md
+        template_id: apple-platform-liquid-glass
+        local_template: skills/design-md-template/templates/apple-platform-liquid-glass/DESIGN.md
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 7f60ee56b9340f8c2671a08c2d8aab4037546a64
+          reviewed_at: 2026-05-25
+          granularity: path
+          outcome: included_exact_in_design_md_template_skill_for_apple_platform_liquid_glass_reference
+          open_items: 0
+      - id: catalog-provenance-context
+        label: Catalog provenance context
+        source_type: resource
+        policy: catalog-context-only-no-template-inclusion
+        paths:
+          - README.md
+          - CONTRIBUTING.md
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 7f60ee56b9340f8c2671a08c2d8aab4037546a64
+          reviewed_at: 2026-05-25
+          granularity: segment
+          outcome: classified_as_catalog_context_only_not_design_md_template_material
+          open_items: 0
+
+  - id: meliwat-awesome-ios-design-md
+    repo: Meliwat/awesome-ios-design-md
+    feed: https://github.com/Meliwat/awesome-ios-design-md/commits/main.atom
+    branch: main
+    last_seen: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
+    tracking:
+      last_checked_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
+      last_checked_at: 2026-05-25
+    review_coverage:
+      status: partial
+      reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
+      reviewed_at: 2026-05-25
+      granularity: source
+      outcome: 7_apple_platform_templates_included_193_framework_neutral_design_md_files_pending_template_enrichment_review
+      open_items: 193
+    type: curated-index
+    policy: strict-track-design-md-template-catalog
+    classification:
+      provenance: third-party
+      focus: broad-catalog
+      domains:
+        - design-md-template
+      absorption_priority: medium
+    targets:
+      - root
+    scope_note: framework-neutral DESIGN.md files are template-inclusion candidates; SwiftUI, Expo, Android, and README files are context only unless a later owner requests them.
+    watch_paths:
+      - README.md
+      - design-md/
+      - design-md/messaging/imessage/DESIGN.md
+      - design-md/travel/apple-maps/DESIGN.md
+      - design-md/music/apple-music/DESIGN.md
+      - design-md/finance/apple-wallet/DESIGN.md
+      - design-md/fitness/apple-fitness/DESIGN.md
+      - design-md/productivity/apple-notes/DESIGN.md
+      - design-md/video/apple-tv/DESIGN.md
+      - CONTRIBUTING.md
+    review_segments:
+      - id: mobile-app-design-md-catalog
+        label: Mobile app DESIGN.md catalog
+        source_type: resource
+        policy: strict-track-template-files
+        paths:
+          - design-md/
+        targets:
+          - root
+        review_coverage:
+          status: partial
+          reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
+          reviewed_at: 2026-05-25
+          granularity: segment
+          outcome: 7_apple_platform_templates_included_193_framework_neutral_design_md_files_pending_template_enrichment_review_600_framework_flavor_files_context_only
+          open_items: 193
+        template_scope:
+          include: per-app DESIGN.md files only
+          context_only: per-app README.md, DESIGN-swiftui.md, DESIGN-expo.md, DESIGN-android.md
+        size_hint: large
+        plan_required: true
+        ledger_strategy: upstream-review-segments-plus-local-template-files
+        batching:
+          mode: literal-template-directory-batches
+          source: paths
+          max_items: 25
+          sort: path
+      - id: apple-ios-imessage-design-md-template
+        label: iMessage iOS DESIGN.md template
+        source_type: resource
+        policy: strict-track-included-template-file
+        paths:
+          - design-md/messaging/imessage/DESIGN.md
+        template_id: apple-ios-imessage
+        local_template: skills/design-md-template/templates/apple-ios-imessage/DESIGN.md
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
+          reviewed_at: 2026-05-25
+          granularity: path
+          outcome: included_exact_in_design_md_template_skill_for_apple_platform_reference
+          open_items: 0
+      - id: apple-ios-maps-design-md-template
+        label: Apple Maps iOS DESIGN.md template
+        source_type: resource
+        policy: strict-track-included-template-file
+        paths:
+          - design-md/travel/apple-maps/DESIGN.md
+        template_id: apple-ios-maps
+        local_template: skills/design-md-template/templates/apple-ios-maps/DESIGN.md
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
+          reviewed_at: 2026-05-25
+          granularity: path
+          outcome: included_exact_in_design_md_template_skill_for_apple_platform_reference
+          open_items: 0
+      - id: apple-ios-music-design-md-template
+        label: Apple Music iOS DESIGN.md template
+        source_type: resource
+        policy: strict-track-included-template-file
+        paths:
+          - design-md/music/apple-music/DESIGN.md
+        template_id: apple-ios-music
+        local_template: skills/design-md-template/templates/apple-ios-music/DESIGN.md
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
+          reviewed_at: 2026-05-25
+          granularity: path
+          outcome: included_exact_in_design_md_template_skill_for_apple_platform_reference
+          open_items: 0
+      - id: apple-ios-wallet-design-md-template
+        label: Apple Wallet iOS DESIGN.md template
+        source_type: resource
+        policy: strict-track-included-template-file
+        paths:
+          - design-md/finance/apple-wallet/DESIGN.md
+        template_id: apple-ios-wallet
+        local_template: skills/design-md-template/templates/apple-ios-wallet/DESIGN.md
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
+          reviewed_at: 2026-05-25
+          granularity: path
+          outcome: included_exact_in_design_md_template_skill_for_apple_platform_reference
+          open_items: 0
+      - id: apple-ios-fitness-design-md-template
+        label: Apple Fitness iOS DESIGN.md template
+        source_type: resource
+        policy: strict-track-included-template-file
+        paths:
+          - design-md/fitness/apple-fitness/DESIGN.md
+        template_id: apple-ios-fitness
+        local_template: skills/design-md-template/templates/apple-ios-fitness/DESIGN.md
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
+          reviewed_at: 2026-05-25
+          granularity: path
+          outcome: included_exact_in_design_md_template_skill_for_apple_platform_reference
+          open_items: 0
+      - id: apple-ios-notes-design-md-template
+        label: Apple Notes iOS DESIGN.md template
+        source_type: resource
+        policy: strict-track-included-template-file
+        paths:
+          - design-md/productivity/apple-notes/DESIGN.md
+        template_id: apple-ios-notes
+        local_template: skills/design-md-template/templates/apple-ios-notes/DESIGN.md
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
+          reviewed_at: 2026-05-25
+          granularity: path
+          outcome: included_exact_in_design_md_template_skill_for_apple_platform_reference
+          open_items: 0
+      - id: apple-ios-tv-design-md-template
+        label: Apple TV iOS DESIGN.md template
+        source_type: resource
+        policy: strict-track-included-template-file
+        paths:
+          - design-md/video/apple-tv/DESIGN.md
+        template_id: apple-ios-tv
+        local_template: skills/design-md-template/templates/apple-ios-tv/DESIGN.md
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
+          reviewed_at: 2026-05-25
+          granularity: path
+          outcome: included_exact_in_design_md_template_skill_for_apple_platform_reference
+          open_items: 0
+      - id: catalog-provenance-context
+        label: Catalog provenance context
+        source_type: resource
+        policy: catalog-context-only-no-template-inclusion
+        paths:
+          - README.md
+          - CONTRIBUTING.md
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
+          reviewed_at: 2026-05-25
+          granularity: segment
+          outcome: classified_as_catalog_context_only_not_design_md_template_material
+          open_items: 0
+
+  - id: dpearson-swift-ios-skills
+    repo: dpearson2699/swift-ios-skills
+    feed: https://github.com/dpearson2699/swift-ios-skills/commits/main.atom
+    branch: main
+    last_seen: ac15946545b378b565ae8f511d6daa7cd004b66a
+    tracking:
+      last_checked_commit: ac15946545b378b565ae8f511d6daa7cd004b66a
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: ac15946545b378b565ae8f511d6daa7cd004b66a
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: all_84_source_skills_mapped_to_local_owners
+      open_items: 0
+    type: skill-source
+    policy: compare-coverage
+    targets:
+      - root
+    watch_paths:
+      - skills/
+      - README.md
+      - .claude-plugin/
+      - CHANGELOG.md
+
+  - id: dimillian-skills
+    repo: Dimillian/Skills
+    feed: https://github.com/Dimillian/Skills/commits/main.atom
+    branch: main
+    last_seen: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+    tracking:
+      last_checked_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: reviewed
+      reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+      reviewed_at: 2026-05-03
+      granularity: path
+      outcome: 16_skill_folders_classified_existing_integrated_or_moved_with_handover_receipts
+      open_items: 0
+    type: skill-source
+    policy: compare-coverage
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - app-store-changelog/
+      - bug-hunt-swarm/
+      - docs/
+      - github/
+      - ios-debugger-agent/
+      - macos-menubar-tuist-app/
+      - macos-spm-app-packaging/
+      - orchestrate-batch-refactor/
+      - project-skill-audit/
+      - react-component-performance/
+      - review-and-simplify-changes/
+      - review-swarm/
+      - scripts/
+      - swift-concurrency-expert/
+      - swiftui-liquid-glass/
+      - swiftui-performance-audit/
+      - swiftui-ui-patterns/
+      - swiftui-view-refactor/
+    review_segments:
+      - id: app-store-changelog
+        label: App Store changelog skill
+        source_type: skill-source
+        policy: compare-coverage
+        paths:
+          - app-store-changelog/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: consolidated_into_app_store_whats_new
+          open_items: 0
+      - id: github
+        label: GitHub CLI skill
+        source_type: skill-source
+        policy: compare-existing-skill
+        paths:
+          - github/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: covered_by_github_plugin_skill_family
+          open_items: 0
+      - id: ios-debugger-agent
+        label: iOS debugger agent skill
+        source_type: skill-source
+        policy: compare-existing-skill
+        paths:
+          - ios-debugger-agent/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: covered_by_build_ios_apps_ios_debugger_agent_skill
+          open_items: 0
+      - id: macos-spm-app-packaging
+        label: macOS SwiftPM app packaging skill
+        source_type: skill-source
+        policy: compare-coverage
+        paths:
+          - macos-spm-app-packaging/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: consolidated_into_swiftpm_macos_app_packaging
+          open_items: 0
+      - id: project-skill-audit
+        label: Project skill audit skill
+        source_type: skill-source
+        policy: compare-coverage
+        paths:
+          - project-skill-audit/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: consolidated_into_codex_skill_evolver
+          open_items: 0
+      - id: review-and-simplify-changes
+        label: Review and simplify changes skill
+        source_type: skill-source
+        policy: compare-existing-agent-contract
+        paths:
+          - review-and-simplify-changes/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: covered_by_core_review_and_editing_contract
+          open_items: 0
+      - id: swift-concurrency-expert
+        label: Swift concurrency expert skill
+        source_type: skill-source
+        policy: compare-coverage
+        paths:
+          - swift-concurrency-expert/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: covered_by_swift_concurrency_patterns
+          open_items: 0
+      - id: swiftui-liquid-glass
+        label: SwiftUI Liquid Glass skill
+        source_type: skill-source
+        policy: compare-coverage
+        paths:
+          - swiftui-liquid-glass/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: covered_by_swiftui_patterns_liquid_glass_reference
+          open_items: 0
+      - id: swiftui-performance-audit
+        label: SwiftUI performance audit skill
+        source_type: skill-source
+        policy: compare-coverage
+        paths:
+          - swiftui-performance-audit/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: covered_by_swiftui_performance
+          open_items: 0
+      - id: swiftui-ui-patterns
+        label: SwiftUI UI patterns skill
+        source_type: skill-source
+        policy: compare-coverage
+        paths:
+          - swiftui-ui-patterns/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: covered_by_swiftui_patterns
+          open_items: 0
+      - id: swiftui-view-refactor
+        label: SwiftUI view refactor skill
+        source_type: skill-source
+        policy: compare-coverage
+        paths:
+          - swiftui-view-refactor/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: covered_by_swiftui_patterns_view_refactor_reference
+          open_items: 0
+      - id: bug-hunt-swarm
+        label: Bug hunt swarm skill
+        source_type: skill-source
+        policy: handover-candidate
+        paths:
+          - bug-hunt-swarm/
+        targets:
+          - root
+        review_coverage:
+          status: moved
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: moved_to_future_agent_orchestration_skill_thread_preserve_read_only_parallel_bug_packet_four_investigator_roles_ranked_hypotheses_and_fastest_proof_path_no_current_collection_owner
+          open_items: 0
+      - id: review-swarm
+        label: Review swarm skill
+        source_type: skill-source
+        policy: handover-candidate
+        paths:
+          - review-swarm/
+        targets:
+          - root
+        review_coverage:
+          status: moved
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: moved_to_future_agent_orchestration_skill_thread_preserve_read_only_diff_review_four_reviewer_roles_scope_packet_aggregation_and_high_signal_filtering_no_current_collection_owner
+          open_items: 0
+      - id: orchestrate-batch-refactor
+        label: Orchestrate batch refactor skill
+        source_type: skill-source
+        policy: handover-candidate
+        paths:
+          - orchestrate-batch-refactor/
+        targets:
+          - root
+        review_coverage:
+          status: moved
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: moved_to_future_agent_orchestration_skill_thread_preserve_parallel_analysis_then_dependency_aware_work_packets_explicit_file_ownership_worker_prompts_and_validation_waves_no_current_collection_owner
+          open_items: 0
+      - id: macos-menubar-tuist-app
+        label: macOS menubar Tuist app skill
+        source_type: skill-source
+        policy: compare-existing-swift-skills
+        paths:
+          - macos-menubar-tuist-app/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: covered_by_swiftui_macos_scenes_and_swiftpm_macos_app_packaging
+          open_items: 0
+      - id: react-component-performance
+        label: React component performance skill
+        source_type: skill-source
+        policy: handover-candidate
+        paths:
+          - react-component-performance/
+        targets:
+          - root
+        review_coverage:
+          status: moved
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: moved_to_future_web_frontend_react_performance_skill_thread_preserve_profiler_baseline_flamegraph_validation_render_churn_isolation_memoization_stable_callbacks_list_size_and_effect_dependency_guardrails
+          open_items: 0
+      - id: docs-and-scripts
+        label: Documentation site and repo scripts
+        source_type: resource
+        policy: non-capability-resource
+        paths:
+          - docs/
+          - scripts/
+        targets:
+          - root
+        review_coverage:
+          status: non_capability
+          reviewed_commit: 05ba982bfeb0d77d3c97d4542b0ee15034d05f84
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: source_repo_docs_site_and_index_script_not_absorbed
+          open_items: 0
+
+  - id: composiohq-awesome-codex-skills
+    repo: ComposioHQ/awesome-codex-skills
+    feed: https://github.com/ComposioHQ/awesome-codex-skills/commits/master.atom
+    branch: master
+    last_seen: 14667b4850a3d99b23f8fbc0cf73c879ef219c66
+    tracking:
+      last_checked_commit: 14667b4850a3d99b23f8fbc0cf73c879ef219c66
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: partial
+      reviewed_commit: 14667b4850a3d99b23f8fbc0cf73c879ef219c66
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: source_registered_watch_paths_defined
+      open_items: 1
+    type: skill-source
+    policy: compare-coverage
+    classification:
+      provenance: third-party
+      focus: broad-catalog
+      domains:
+        - brand-system
+        - canvas-design
+        - theme-system
+        - frontend-quality
+        - agent-workflows
+      absorption_priority: low
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - agent-deep-links/
+      - brand-guidelines/
+      - canvas-design/
+      - changelog-generator/
+      - codebase-migrate/
+      - competitive-ads-extractor/
+      - composio-skills/
+      - composio-skills/anchor-browser-automation/
+      - composio-skills/browser-tool-automation/
+      - composio-skills/browserbase-tool-automation/
+      - composio-skills/browserhub-automation/
+      - composio-skills/browserless-automation/
+      - composio-skills/cloudflare-browser-rendering-automation/
+      - composio-skills/hyperbrowser-automation/
+      - connect-apps/
+      - connect/
+      - content-research-writer/
+      - create-plan/
+      - datadog-logs/
+      - deploy-pipeline/
+      - developer-growth-analysis/
+      - domain-name-brainstormer/
+      - email-draft-polish/
+      - file-organizer/
+      - gh-address-comments/
+      - gh-fix-ci/
+      - helium-mcp/
+      - image-enhancer/
+      - internal-comms/
+      - invoice-organizer/
+      - issue-triage/
+      - langsmith-fetch/
+      - lead-research-assistant/
+      - linear/
+      - mcp-builder/
+      - meeting-insights-analyzer/
+      - meeting-notes-and-actions/
+      - notion-knowledge-capture/
+      - notion-meeting-intelligence/
+      - notion-research-documentation/
+      - notion-spec-to-implementation/
+      - paperjsx/
+      - pr-review-ci-fix/
+      - raffle-winner-picker/
+      - sentry-triage/
+      - skill-creator/
+      - skill-installer/
+      - skill-share/
+      - slack-gif-creator/
+      - spreadsheet-formula-helper/
+      - support-ticket-triage/
+      - tailored-resume-generator/
+      - template-skill/
+      - theme-factory/
+      - video-downloader/
+      - webapp-testing/
+    review_segments:
+      - id: swift-apple-subset
+        label: Swift and Apple platform subset
+        source_type: skill-source
+        policy: swift-apple-subset-intake
+        paths:
+          - README.md
+          - agent-deep-links/
+          - changelog-generator/
+          - composio-skills/
+          - mcp-builder/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 14667b4850a3d99b23f8fbc0cf73c879ef219c66
+          reviewed_at: 2026-05-03
+          granularity: segment
+          outcome: swift_apple_term_sweep_reviewed_changelog_covered_agent_deeplinks_and_mcp_moved_generated_false_positives_closed
+          open_items: 0
+      - id: apple-design-subset
+        label: Apple and design workflow subset
+        source_type: skill-source
+        policy: apple-design-subset-intake
+        paths:
+          - README.md
+          - brand-guidelines/
+          - canvas-design/
+          - theme-factory/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 14667b4850a3d99b23f8fbc0cf73c879ef219c66
+          reviewed_at: 2026-05-03
+          granularity: segment
+          outcome: apple_design_subset_reviewed_no_hig_gap_brand_moved_canvas_guardrails_compressed_theme_deferred
+          open_items: 0
+      - id: engineering-productivity-deeplink-formats
+        label: Deeplink formats skill
+        source_type: skill-source
+        policy: engineering-productivity-intake
+        paths:
+          - agent-deep-links/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 14667b4850a3d99b23f8fbc0cf73c879ef219c66
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: integrated_as_deeplink_formats_with_verified_support_matrix_and_fallback_commands
+          open_items: 0
+      - id: engineering-productivity-mcp-builder
+        label: MCP builder skill
+        source_type: skill-source
+        policy: engineering-productivity-intake
+        paths:
+          - mcp-builder/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 14667b4850a3d99b23f8fbc0cf73c879ef219c66
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: integrated_as_mcp_server_patterns_with_tool_design_transport_safety_pagination_and_eval_receipts
+          open_items: 0
+      - id: engineering-productivity-github-pr-ci
+        label: GitHub PR comment and CI workflows
+        source_type: skill-source
+        policy: engineering-productivity-intake
+        paths:
+          - gh-address-comments/
+          - gh-fix-ci/
+          - pr-review-ci-fix/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 14667b4850a3d99b23f8fbc0cf73c879ef219c66
+          reviewed_at: 2026-05-03
+          granularity: segment
+          outcome: gh_address_comments_and_gh_fix_ci_covered_by_installed_openai_github_plugin_pr_review_ci_fix_moved_to_generated_tool_wrapper_slice
+          open_items: 0
+      - id: software-engineering-webapp-testing
+        label: Webapp testing
+        source_type: skill-source
+        policy: software-engineering-development-process-intake
+        paths:
+          - webapp-testing/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 14667b4850a3d99b23f8fbc0cf73c879ef219c66
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: integrated_as_webapp_testing_with_server_lifecycle_backend_selection_functional_visual_qa_evidence_and_failure_diagnosis
+          open_items: 0
+      - id: software-engineering-engineering-issue-triage
+        label: Engineering issue triage
+        source_type: skill-source
+        policy: future-software-engineering-or-operations-decision
+        paths:
+          - issue-triage/
+          - linear/
+        targets:
+          - root
+        review_coverage:
+          status: deferred
+          reviewed_commit: 14667b4850a3d99b23f8fbc0cf73c879ef219c66
+          reviewed_at: 2026-05-03
+          granularity: segment
+          outcome: reviewed_then_local_skill_rollout_reverted_as_out_of_current_scope_preserve_read_first_backlog_sweeps_duplicate_clustering_tracker_schema_discovery_linear_jira_github_backend_boundaries_confirmation_gated_writes_and_digest_output
+          open_items: 0
+      - id: software-engineering-production-incident-triage
+        label: Production incident and observability triage
+        source_type: skill-source
+        policy: future-production-operations-decision
+        paths:
+          - sentry-triage/
+          - datadog-logs/
+        targets:
+          - root
+        review_coverage:
+          status: deferred
+          reviewed_commit: 14667b4850a3d99b23f8fbc0cf73c879ef219c66
+          reviewed_at: 2026-05-03
+          granularity: segment
+          outcome: reviewed_then_local_skill_rollout_reverted_as_out_of_current_scope_preserve_sentry_issue_event_breadcrumb_source_mapping_suspect_commit_checks_datadog_query_and_aggregate_shapes_trace_pivots_auth_scope_failures_and_confirmation_gated_status_updates
+          open_items: 0
+      - id: customer-support-ticket-triage-handover
+        label: Customer support ticket triage handover
+        source_type: skill-source
+        policy: future-customer-support-operations-decision
+        paths:
+          - support-ticket-triage/
+        targets:
+          - root
+        review_coverage:
+          status: moved
+          reviewed_commit: 14667b4850a3d99b23f8fbc0cf73c879ef219c66
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: moved_to_future_customer_support_operations_thread_preserve_category_priority_sla_hint_reply_draft_pii_masking_weak_signal_disambiguation_internal_notes_and_repro_step_mechanics_no_current_local_owner
+          open_items: 0
+      - id: engineering-productivity-generated-browser-wrappers
+        label: Generated browser service wrappers
+        source_type: mcp-tool-source
+        policy: generated-tool-wrapper-sample
+        paths:
+          - composio-skills/anchor-browser-automation/
+          - composio-skills/browser-tool-automation/
+          - composio-skills/browserbase-tool-automation/
+          - composio-skills/browserhub-automation/
+          - composio-skills/browserless-automation/
+          - composio-skills/cloudflare-browser-rendering-automation/
+          - composio-skills/hyperbrowser-automation/
+        targets:
+          - root
+        review_coverage:
+          status: moved
+          reviewed_commit: 14667b4850a3d99b23f8fbc0cf73c879ef219c66
+          reviewed_at: 2026-05-03
+          granularity: segment
+          outcome: moved_to_generated_tool_wrapper_slice_preserve_rube_mcp_search_first_connection_schema_memory_session_and_pagination_rules
+          open_items: 0
+
+  - id: composiohq-awesome-claude-skills
+    repo: ComposioHQ/awesome-claude-skills
+    feed: https://github.com/ComposioHQ/awesome-claude-skills/commits/master.atom
+    branch: master
+    last_seen: 3bf63cdff23aa53774736e0f0cdd73e8c17bd599
+    tracking:
+      last_checked_commit: 48ffe0c633c6279bb100ae59e0c3ec7f4d0a81d8
+      last_checked_at: 2026-05-03
+    review_coverage:
+      status: partial
+      reviewed_commit: 3bf63cdff23aa53774736e0f0cdd73e8c17bd599
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: segmented_for_future_review
+      open_items: 4
+    type: skill-source
+    policy: compare-coverage
+    classification:
+      provenance: third-party
+      focus: broad-catalog
+      domains:
+        - brand-system
+        - canvas-design
+        - theme-system
+        - artifact-design
+        - frontend-quality
+        - agent-workflows
+      absorption_priority: low
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - CONTRIBUTING.md
+      - .github/
+      - artifacts-builder/
+      - brand-guidelines/
+      - canvas-design/
+      - changelog-generator/
+      - competitive-ads-extractor/
+      - composio-skills/
+      - composio-skills/anchor-browser-automation/
+      - composio-skills/browser-tool-automation/
+      - composio-skills/browserbase-tool-automation/
+      - composio-skills/browserhub-automation/
+      - composio-skills/browserless-automation/
+      - composio-skills/cloudflare-browser-rendering-automation/
+      - composio-skills/hyperbrowser-automation/
+      - connect-apps-plugin/
+      - connect-apps/
+      - connect/
+      - content-research-writer/
+      - developer-growth-analysis/
+      - document-skills/
+      - domain-name-brainstormer/
+      - file-organizer/
+      - image-enhancer/
+      - internal-comms/
+      - invoice-organizer/
+      - langsmith-fetch/
+      - lead-research-assistant/
+      - mcp-builder/
+      - meeting-insights-analyzer/
+      - raffle-winner-picker/
+      - skill-creator/
+      - skill-share/
+      - slack-gif-creator/
+      - tailored-resume-generator/
+      - template-skill/
+      - theme-factory/
+      - twitter-algorithm-optimizer/
+      - video-downloader/
+      - webapp-testing/
+    review_segments:
+      - id: swift-apple-subset
+        label: Swift and Apple platform subset
+        source_type: skill-source
+        policy: swift-apple-subset-intake
+        paths:
+          - README.md
+          - changelog-generator/
+          - composio-skills/
+          - mcp-builder/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 48ffe0c633c6279bb100ae59e0c3ec7f4d0a81d8
+          reviewed_at: 2026-05-03
+          granularity: segment
+          outcome: swift_apple_subset_reviewed_ios_simulator_existing_wholiver_integrated_changelog_covered_mcp_moved_generated_false_positives_closed
+          open_items: 0
+      - id: apple-design-subset
+        label: Apple and design workflow subset
+        source_type: skill-source
+        policy: apple-design-subset-intake
+        paths:
+          - README.md
+          - brand-guidelines/
+          - canvas-design/
+          - theme-factory/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 48ffe0c633c6279bb100ae59e0c3ec7f4d0a81d8
+          reviewed_at: 2026-05-03
+          granularity: segment
+          outcome: apple_design_subset_reviewed_no_hig_gap_brand_moved_canvas_guardrails_compressed_theme_deferred
+          open_items: 0
+      - id: top-level-workflow-skills
+        label: Top-level workflow skills
+        source_type: skill-source
+        policy: compare-coverage
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        paths:
+          - artifacts-builder/
+          - changelog-generator/
+          - competitive-ads-extractor/
+          - connect-apps/
+          - connect/
+          - content-research-writer/
+          - developer-growth-analysis/
+          - domain-name-brainstormer/
+          - file-organizer/
+          - image-enhancer/
+          - internal-comms/
+          - invoice-organizer/
+          - langsmith-fetch/
+          - lead-research-assistant/
+          - mcp-builder/
+          - meeting-insights-analyzer/
+          - raffle-winner-picker/
+          - skill-creator/
+          - skill-share/
+          - slack-gif-creator/
+          - tailored-resume-generator/
+          - template-skill/
+          - twitter-algorithm-optimizer/
+          - video-downloader/
+          - webapp-testing/
+        targets:
+          - root
+        size_hint: medium
+        plan_required: true
+        ledger_strategy: item-ledger
+      - id: engineering-productivity-mcp-builder
+        label: MCP builder skill
+        source_type: skill-source
+        policy: engineering-productivity-intake
+        paths:
+          - mcp-builder/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 48ffe0c633c6279bb100ae59e0c3ec7f4d0a81d8
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: integrated_as_mcp_server_patterns_with_tool_design_transport_safety_pagination_and_eval_receipts
+          open_items: 0
+      - id: software-engineering-webapp-testing
+        label: Webapp testing
+        source_type: skill-source
+        policy: software-engineering-development-process-intake
+        paths:
+          - webapp-testing/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 48ffe0c633c6279bb100ae59e0c3ec7f4d0a81d8
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: integrated_as_webapp_testing_with_server_lifecycle_backend_selection_functional_visual_qa_evidence_and_failure_diagnosis
+          open_items: 0
+      - id: engineering-productivity-generated-browser-wrappers
+        label: Generated browser service wrappers
+        source_type: mcp-tool-source
+        policy: generated-tool-wrapper-sample
+        paths:
+          - composio-skills/anchor-browser-automation/
+          - composio-skills/browser-tool-automation/
+          - composio-skills/browserbase-tool-automation/
+          - composio-skills/browserhub-automation/
+          - composio-skills/browserless-automation/
+          - composio-skills/cloudflare-browser-rendering-automation/
+          - composio-skills/hyperbrowser-automation/
+        targets:
+          - root
+        review_coverage:
+          status: moved
+          reviewed_commit: 48ffe0c633c6279bb100ae59e0c3ec7f4d0a81d8
+          reviewed_at: 2026-05-03
+          granularity: segment
+          outcome: moved_to_generated_tool_wrapper_slice_preserve_rube_mcp_search_first_connection_schema_memory_session_and_pagination_rules
+          open_items: 0
+      - id: document-skills
+        label: Document skills
+        source_type: skill-source
+        policy: compare-coverage
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        paths:
+          - document-skills/
+        targets:
+          - root
+        size_hint: small
+        plan_required: true
+        ledger_strategy: item-ledger
+      - id: claude-plugin-surfaces
+        label: Claude plugin surfaces
+        source_type: skill-source
+        policy: compare-coverage
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        paths:
+          - connect-apps-plugin/
+        targets:
+          - root
+        size_hint: small
+        plan_required: true
+        ledger_strategy: item-ledger
+      - id: composio-automation-skills
+        label: Composio automation skills
+        source_type: skill-source
+        policy: batch-audit-generated-family
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        paths:
+          - composio-skills/
+        targets:
+          - root
+        size_hint: large
+        plan_required: true
+        ledger_strategy: batch-then-exceptions
+        batching:
+          mode: generated-path-batches
+          source: paths
+          max_items: 50
+          sort: path
+
+  - id: twostraws-swift-agent-skills
+    repo: twostraws/Swift-Agent-Skills
+    feed: https://github.com/twostraws/Swift-Agent-Skills/commits/main.atom
+    branch: main
+    last_seen: 80f4131983eaf6dff8de6ce0884bfe33485156e3
+    tracking:
+      last_checked_commit: 80f4131983eaf6dff8de6ce0884bfe33485156e3
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: reviewed
+      reviewed_commit: 80f4131983eaf6dff8de6ce0884bfe33485156e3
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: 27_github_links_classified_original_sources_registered_or_existing
+      open_items: 0
+    type: curated-index
+    policy: discovery-only
+    targets:
+      - root
+    watch_paths:
+      - README.md
+
+  - id: arjitj2-swiftui-design-principles
+    repo: arjitj2/swiftui-design-principles
+    feed: https://github.com/arjitj2/swiftui-design-principles/commits/main.atom
+    branch: main
+    last_seen: 791d22d73f844167a3872530e3941185b730d8be
+    tracking:
+      last_checked_commit: 791d22d73f844167a3872530e3941185b730d8be
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: 791d22d73f844167a3872530e3941185b730d8be
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_swiftui_design_and_widgetkit_design
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-swiftui-design-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - AGENTS.md
+      - SKILL.md
+      - metadata.json
+
+  - id: wholiver-swiftui-design-skill
+    repo: wholiver/swiftui-design-skill
+    feed: https://github.com/wholiver/swiftui-design-skill/commits/main.atom
+    branch: main
+    last_seen: 2c82638ebd3c801d9d2d12b5f2d6c20495939995
+    tracking:
+      last_checked_commit: 2c82638ebd3c801d9d2d12b5f2d6c20495939995
+      last_checked_at: 2026-05-03
+    review_coverage:
+      status: integrated
+      reviewed_commit: 2c82638ebd3c801d9d2d12b5f2d6c20495939995
+      reviewed_at: 2026-05-03
+      granularity: source
+      outcome: anti_ai_slop_design_direction_brand_protocol_and_five_dimension_review_consolidated_into_swiftui_design
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-swiftui-design-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - README-zh.md
+      - SKILL.md
+      - metadata.json
+      - references/
+      - templates/
+      - LICENSE
+
+  - id: twostraws-swiftdata-agent-skill
+    repo: twostraws/SwiftData-Agent-Skill
+    feed: https://github.com/twostraws/SwiftData-Agent-Skill/commits/main.atom
+    branch: main
+    last_seen: 922d989473a9914210b41529a1ac5636aff4b8c1
+    tracking:
+      last_checked_commit: 922d989473a9914210b41529a1ac5636aff4b8c1
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: 922d989473a9914210b41529a1ac5636aff4b8c1
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_swiftdata_patterns
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-swiftdata-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - swiftdata-pro/
+
+  - id: vanab-swiftdata-agent-skill
+    repo: vanab/swiftdata-agent-skill
+    feed: https://github.com/vanab/swiftdata-agent-skill/commits/main.atom
+    branch: main
+    last_seen: 4819a5381fa5fdce894451822917b1135c19e050
+    tracking:
+      last_checked_commit: 4819a5381fa5fdce894451822917b1135c19e050
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: 4819a5381fa5fdce894451822917b1135c19e050
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_swiftdata_patterns
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-swiftdata-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - swiftdata-expert-skill/
+
+  - id: twostraws-swift-concurrency-agent-skill
+    repo: twostraws/Swift-Concurrency-Agent-Skill
+    feed: https://github.com/twostraws/Swift-Concurrency-Agent-Skill/commits/main.atom
+    branch: main
+    last_seen: e710f8d577ccbff1ac047aac1594a5683000cb0b
+    tracking:
+      last_checked_commit: e710f8d577ccbff1ac047aac1594a5683000cb0b
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: reviewed
+      reviewed_commit: e710f8d577ccbff1ac047aac1594a5683000cb0b
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: covered_by_existing_swift_concurrency_patterns
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-swift-concurrency-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - swift-concurrency-pro/
+
+  - id: twostraws-swift-testing-agent-skill
+    repo: twostraws/Swift-Testing-Agent-Skill
+    feed: https://github.com/twostraws/Swift-Testing-Agent-Skill/commits/main.atom
+    branch: main
+    last_seen: 3d434c7d81f35e5726d4363fc30260735d541c2f
+    tracking:
+      last_checked_commit: 3d434c7d81f35e5726d4363fc30260735d541c2f
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: 3d434c7d81f35e5726d4363fc30260735d541c2f
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_swift_testing_patterns
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-swift-testing-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - swift-testing-pro/
+
+  - id: bocato-swift-testing-agent-skill
+    repo: bocato/swift-testing-agent-skill
+    feed: https://github.com/bocato/swift-testing-agent-skill/commits/main.atom
+    branch: main
+    last_seen: c2dd1b051c8359fa29acdbf0ceb0c6b0e8341a1c
+    tracking:
+      last_checked_commit: c2dd1b051c8359fa29acdbf0ceb0c6b0e8341a1c
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: c2dd1b051c8359fa29acdbf0ceb0c6b0e8341a1c
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_swift_testing_patterns
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-swift-testing-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - CHANGELOG.md
+      - swift-testing/
+      - .claude-plugin/
+
+  - id: erikote04-swift-api-design-guidelines-agent-skill
+    repo: Erikote04/Swift-API-Design-Guidelines-Agent-Skill
+    feed: https://github.com/Erikote04/Swift-API-Design-Guidelines-Agent-Skill/commits/main.atom
+    branch: main
+    last_seen: 36cdc1b5680f5d6c5c52c353a6857d176f4929e8
+    tracking:
+      last_checked_commit: 36cdc1b5680f5d6c5c52c353a6857d176f4929e8
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: reviewed
+      reviewed_commit: 36cdc1b5680f5d6c5c52c353a6857d176f4929e8
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: covered_by_swift_programming_language_api_guidance
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-swift-language-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - AGENTS.md
+      - swift-api-design-guidelines-skill/
+      - .claude-plugin/
+
+  - id: n0an-swift-formatstyle-agent-skill
+    repo: n0an/Swift-FormatStyle-Agent-Skill
+    feed: https://github.com/n0an/Swift-FormatStyle-Agent-Skill/commits/main.atom
+    branch: main
+    last_seen: 20f0e18d3303775cb1b73ffce65f4d104d1f80de
+    tracking:
+      last_checked_commit: 20f0e18d3303775cb1b73ffce65f4d104d1f80de
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: reviewed
+      reviewed_commit: 20f0e18d3303775cb1b73ffce65f4d104d1f80de
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: covered_by_swift_programming_language_formatstyle_guidance
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-swift-language-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - swift-format-style/
+      - .claude-plugin/
+      - gemini-extension.json
+
+  - id: dadederk-ios-accessibility-agent-skill
+    repo: dadederk/iOS-Accessibility-Agent-Skill
+    feed: https://github.com/dadederk/iOS-Accessibility-Agent-Skill/commits/main.atom
+    branch: main
+    last_seen: dcc3a36ce1d0099341d545c1af4eb5a8c989bf66
+    tracking:
+      last_checked_commit: dcc3a36ce1d0099341d545c1af4eb5a8c989bf66
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: dcc3a36ce1d0099341d545c1af4eb5a8c989bf66
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_accessibility_patterns
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-accessibility-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - ios-accessibility/
+
+  - id: pasqualevittoriosi-swift-accessibility-skill
+    repo: PasqualeVittoriosi/swift-accessibility-skill
+    feed: https://github.com/PasqualeVittoriosi/swift-accessibility-skill/commits/main.atom
+    branch: main
+    last_seen: 3791850af76f11cffa552b3394f2b8732d7ce3c7
+    tracking:
+      last_checked_commit: 3791850af76f11cffa552b3394f2b8732d7ce3c7
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: 3791850af76f11cffa552b3394f2b8732d7ce3c7
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_accessibility_patterns
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-accessibility-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - swift-accessibility-skill/
+      - .claude-plugin/
+
+  - id: rgmez-apple-accessibility-skills
+    repo: rgmez/apple-accessibility-skills
+    feed: https://github.com/rgmez/apple-accessibility-skills/commits/main.atom
+    branch: main
+    last_seen: 299b267cd996643a5752d4f92f05dcdc147991b6
+    tracking:
+      last_checked_commit: 299b267cd996643a5752d4f92f05dcdc147991b6
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: 299b267cd996643a5752d4f92f05dcdc147991b6
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_accessibility_patterns
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-accessibility-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - AGENTS.md
+      - CHANGELOG.md
+      - skills/
+      - docs/
+      - examples/
+
+  - id: rudrankriyam-app-store-connect-cli-skills
+    repo: rudrankriyam/app-store-connect-cli-skills
+    feed: https://github.com/rudrankriyam/app-store-connect-cli-skills/commits/main.atom
+    branch: main
+    last_seen: c45a9fa1f63dc2d2152010905260c2d8586dc51f
+    tracking:
+      last_checked_commit: c45a9fa1f63dc2d2152010905260c2d8586dc51f
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: c45a9fa1f63dc2d2152010905260c2d8586dc51f
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_market_operations_app_store_skills
+      open_items: 0
+    type: skill-source
+    policy: compare-tool-and-go-to-market-coverage
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - skills/
+
+  - id: timbroddin-app-store-aso-skill
+    repo: timbroddin/app-store-aso-skill
+    feed: https://github.com/timbroddin/app-store-aso-skill/commits/main.atom
+    branch: main
+    last_seen: 9e4e432f25e2192b00ac485a585ce97a8a063fb0
+    tracking:
+      last_checked_commit: 9e4e432f25e2192b00ac485a585ce97a8a063fb0
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: 9e4e432f25e2192b00ac485a585ce97a8a063fb0
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_app_store_aso
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-go-to-market-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - SKILL.md
+      - references/
+      - scripts/
+
+  - id: mhaviv-swift-focusengine-agent-skill
+    repo: mhaviv/Swift-FocusEngine-Agent-Skill
+    feed: https://github.com/mhaviv/Swift-FocusEngine-Agent-Skill/commits/main.atom
+    branch: main
+    last_seen: 01cbce1801f920c49b66af34f0983e285365ed58
+    tracking:
+      last_checked_commit: 01cbce1801f920c49b66af34f0983e285365ed58
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: 01cbce1801f920c49b66af34f0983e285365ed58
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_focus_engine_patterns
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-focus-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - SKILL.md
+      - swift-focusengine-pro/
+      - .claude-plugin/
+
+  - id: ivan-magda-swift-security-skill
+    repo: ivan-magda/swift-security-skill
+    feed: https://github.com/ivan-magda/swift-security-skill/commits/main.atom
+    branch: main
+    last_seen: 2a27cb24da5856d632d37f7b9295af30f7302ddc
+    tracking:
+      last_checked_commit: 2a27cb24da5856d632d37f7b9295af30f7302ddc
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: 2a27cb24da5856d632d37f7b9295af30f7302ddc
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_keychain_cryptokit_certificate_trust_skills
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-security-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - AGENTS.md
+      - swift-security-expert/
+      - .claude-plugin/
+      - tests/
+
+  - id: conorluddy-ios-simulator-skill
+    repo: conorluddy/ios-simulator-skill
+    feed: https://github.com/conorluddy/ios-simulator-skill/commits/main.atom
+    branch: main
+    last_seen: 8b686edc373f57d2a3a8f472d73e5aa7c226c2f5
+    tracking:
+      last_checked_commit: 8b686edc373f57d2a3a8f472d73e5aa7c226c2f5
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: 8b686edc373f57d2a3a8f472d73e5aa7c226c2f5
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_ios_simulator
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-ios-simulator-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - CLAUDE.md
+      - DEV.md
+      - ios-simulator-skill/
+      - references/
+      - pyproject.toml
+
+  - id: daetojemax-figma-to-swiftui-skill
+    repo: daetojemax/figma-to-swiftui-skill
+    feed: https://github.com/daetojemax/figma-to-swiftui-skill/commits/master.atom
+    branch: master
+    last_seen: a8ec942052c65f5f19d12275996e5144ac908625
+    tracking:
+      last_checked_commit: a8ec942052c65f5f19d12275996e5144ac908625
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: reviewed
+      reviewed_commit: a8ec942052c65f5f19d12275996e5144ac908625
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: covered_by_existing_figma_swiftui_skill
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-figma-swiftui-skill
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - SKILL.md
+      - references/
+
+  - id: andrewgleave-skills-writing-for-interfaces
+    repo: andrewgleave/skills
+    feed: https://github.com/andrewgleave/skills/commits/main.atom
+    branch: main
+    last_seen: d6c72b885a1902d4b74d4bd9beca80f2a1b96b51
+    tracking:
+      last_checked_commit: d6c72b885a1902d4b74d4bd9beca80f2a1b96b51
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: reviewed
+      reviewed_commit: d6c72b885a1902d4b74d4bd9beca80f2a1b96b51
+      reviewed_at: 2026-05-02
+      granularity: path
+      outcome: covered_by_existing_interface_writing_skill
+      open_items: 0
+      paths:
+        - writing-for-interfaces/
+    type: skill-source
+    policy: compare-path-coverage
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - writing-for-interfaces/
+
+  - id: twostraws-swiftagents
+    repo: twostraws/SwiftAgents
+    feed: https://github.com/twostraws/SwiftAgents/commits/main.atom
+    branch: main
+    last_seen: 70132f3d11561f45ccfab8823bb3d26bbe470b2f
+    tracking:
+      last_checked_commit: 70132f3d11561f45ccfab8823bb3d26bbe470b2f
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: reviewed
+      reviewed_commit: 70132f3d11561f45ccfab8823bb3d26bbe470b2f
+      reviewed_at: 2026-05-03
+      granularity: source
+      outcome: swift_agent_guidance_reviewed_existing_swift_library_skill_family_covers_modern_swift_swiftui_swiftdata_concurrency_formatstyle_localization_and_xcode_mcp_notes_no_new_skill
+      open_items: 0
+    type: signal-source
+    policy: signal-only-agent-workflow-review
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - AGENTS.md
+
+  - id: techopolis-awesome-ios-ai
+    repo: Techopolis/awesome-ios-ai
+    feed: https://github.com/Techopolis/awesome-ios-ai/commits/main.atom
+    branch: main
+    last_seen: e77e8d1fc2dfc5368702c3f8d44ce2f27348df65
+    tracking:
+      last_checked_commit: e77e8d1fc2dfc5368702c3f8d44ce2f27348df65
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: reviewed
+      reviewed_commit: e77e8d1fc2dfc5368702c3f8d44ce2f27348df65
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: classified
+      open_items: 0
+    type: curated-index
+    policy: discovery-only
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - companion-skills.txt
+
+  - id: avdlee-swiftui-agent-skill
+    repo: AvdLee/SwiftUI-Agent-Skill
+    feed: https://github.com/AvdLee/SwiftUI-Agent-Skill/commits/main.atom
+    branch: main
+    last_seen: 0066966574a22d30e6b89242be265b39fd19a0f4
+    tracking:
+      last_checked_commit: 0066966574a22d30e6b89242be265b39fd19a0f4
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: 0066966574a22d30e6b89242be265b39fd19a0f4
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_swiftui_patterns_family
+      open_items: 0
+    type: skill-source
+    policy: compare-coverage
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - AGENTS.md
+      - swiftui-expert-skill/
+      - agents/
+      - .agents/
+      - .claude-plugin/
+      - assets/
+
+  - id: twostraws-swiftui-agent-skill
+    repo: twostraws/SwiftUI-Agent-Skill
+    feed: https://github.com/twostraws/SwiftUI-Agent-Skill/commits/main.atom
+    branch: main
+    last_seen: be297ff80dddec529af1f9b1f1f114aab6c9d11c
+    tracking:
+      last_checked_commit: be297ff80dddec529af1f9b1f1f114aab6c9d11c
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: reviewed
+      reviewed_commit: be297ff80dddec529af1f9b1f1f114aab6c9d11c
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: covered_by_existing_swiftui_skill_family
+      open_items: 0
+    type: skill-source
+    policy: compare-coverage
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - swiftui-pro/
+      - .claude-plugin/
+      - assets/
+
+  - id: avdlee-swift-concurrency-agent-skill
+    repo: AvdLee/Swift-Concurrency-Agent-Skill
+    feed: https://github.com/AvdLee/Swift-Concurrency-Agent-Skill/commits/main.atom
+    branch: main
+    last_seen: a73e4f9917bb8b8d35a7af7b89afd19b6ebd634e
+    tracking:
+      last_checked_commit: a73e4f9917bb8b8d35a7af7b89afd19b6ebd634e
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: a73e4f9917bb8b8d35a7af7b89afd19b6ebd634e
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_swift_concurrency_patterns
+      open_items: 0
+    type: skill-source
+    policy: compare-coverage
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - swift-concurrency/
+      - .claude-plugin/
+      - assets/
+
+  - id: efremidze-swift-architecture-skill
+    repo: efremidze/swift-architecture-skill
+    feed: https://github.com/efremidze/swift-architecture-skill/commits/main.atom
+    branch: main
+    last_seen: 457f1355657f2431d7c19e1cfa8d9480ea9d30ed
+    tracking:
+      last_checked_commit: 457f1355657f2431d7c19e1cfa8d9480ea9d30ed
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: reviewed
+      reviewed_commit: 457f1355657f2431d7c19e1cfa8d9480ea9d30ed
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: covered_by_swiftui_and_uikit_architecture_skills
+      open_items: 0
+    type: skill-source
+    policy: compare-coverage
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - AGENTS.md
+      - CLAUDE.md
+      - swift-architecture-skill/
+      - tooling/
+      - .claude-plugin/
+
+  - id: efremidze-swift-patterns-skill
+    repo: efremidze/swift-patterns-skill
+    feed: https://github.com/efremidze/swift-patterns-skill/commits/main.atom
+    branch: main
+    last_seen: 2e9b66b0470a324cf3a6898549279e622aa7df71
+    tracking:
+      last_checked_commit: 2e9b66b0470a324cf3a6898549279e622aa7df71
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: reviewed
+      reviewed_commit: 2e9b66b0470a324cf3a6898549279e622aa7df71
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: covered_by_existing_swiftui_pattern_family
+      open_items: 0
+    type: skill-source
+    policy: compare-existing-swiftui-skills
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - AGENTS.md
+      - swift-patterns/
+      - .claude-plugin/
+    review_segments:
+      - id: swift-patterns-skill
+        label: Swift patterns skill
+        source_type: skill-source
+        policy: compare-existing-swiftui-skills
+        paths:
+          - swift-patterns/
+        targets:
+          - root
+        size_hint: medium
+        plan_required: true
+        ledger_strategy: item-ledger
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 2e9b66b0470a324cf3a6898549279e622aa7df71
+          reviewed_at: 2026-05-02
+          granularity: segment
+          outcome: covered_by_existing_swiftui_pattern_family
+          open_items: 0
+
+  - id: avdlee-core-data-agent-skill
+    repo: AvdLee/Core-Data-Agent-Skill
+    feed: https://github.com/AvdLee/Core-Data-Agent-Skill/commits/main.atom
+    branch: main
+    last_seen: 855ca7d0df50e82b00c12881dd9cd23c19ef5f49
+    tracking:
+      last_checked_commit: 855ca7d0df50e82b00c12881dd9cd23c19ef5f49
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: 855ca7d0df50e82b00c12881dd9cd23c19ef5f49
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_core_data_patterns
+      open_items: 0
+    type: skill-source
+    policy: compare-coverage
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - core-data-expert/
+      - .claude-plugin/
+
+  - id: avdlee-swift-testing-agent-skill
+    repo: AvdLee/Swift-Testing-Agent-Skill
+    feed: https://github.com/AvdLee/Swift-Testing-Agent-Skill/commits/main.atom
+    branch: main
+    last_seen: 798e9b1a2bcac164d4f0c781908199e754f0bab6
+    tracking:
+      last_checked_commit: 798e9b1a2bcac164d4f0c781908199e754f0bab6
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: 798e9b1a2bcac164d4f0c781908199e754f0bab6
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: consolidated_into_swift_testing_patterns
+      open_items: 0
+    type: skill-source
+    policy: compare-coverage
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - swift-testing-expert/
+      - .claude-plugin/
+
+  - id: johnrogers-claude-swift-engineering
+    repo: johnrogers/claude-swift-engineering
+    feed: https://github.com/johnrogers/claude-swift-engineering/commits/main.atom
+    branch: main
+    last_seen: 1dc2cf4d020bd524168f20bec95104da6cb2888c
+    tracking:
+      last_checked_commit: 1dc2cf4d020bd524168f20bec95104da6cb2888c
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: partial
+      reviewed_commit: 1dc2cf4d020bd524168f20bec95104da6cb2888c
+      reviewed_at: 2026-05-03
+      granularity: path
+      outcome: 18_skills_and_agent_surfaces_classified_generating_swift_package_docs_integrated_agent_workflow_moved_to_agent_evolution_handover_remaining_persistence_items_deferred
+      open_items: 2
+    type: skill-source
+    policy: compare-coverage
+    targets:
+      - root
+    watch_paths:
+      - plugins/swift-engineering/README.md
+      - plugins/swift-engineering/.claude-plugin/
+      - plugins/swift-engineering/agents/
+      - plugins/swift-engineering/claude/
+      - plugins/swift-engineering/commands/
+      - plugins/swift-engineering/hooks-scripts/
+      - plugins/swift-engineering/rules/
+      - plugins/swift-engineering/scripts/
+      - plugins/swift-engineering/skills/composable-architecture/
+      - plugins/swift-engineering/skills/foundation-models/
+      - plugins/swift-engineering/skills/generating-swift-package-docs/
+      - plugins/swift-engineering/skills/grdb/
+      - plugins/swift-engineering/skills/haptics/
+      - plugins/swift-engineering/skills/ios-26-platform/
+      - plugins/swift-engineering/skills/ios-hig/
+      - plugins/swift-engineering/skills/localization/
+      - plugins/swift-engineering/skills/modern-swift/
+      - plugins/swift-engineering/skills/sqlite-data/
+      - plugins/swift-engineering/skills/storekit/
+      - plugins/swift-engineering/skills/swift-diagnostics/
+      - plugins/swift-engineering/skills/swift-networking/
+      - plugins/swift-engineering/skills/swift-style/
+      - plugins/swift-engineering/skills/swift-testing/
+      - plugins/swift-engineering/skills/swiftui-advanced/
+      - plugins/swift-engineering/skills/swiftui-patterns/
+    review_segments:
+      - id: swift-skill-family-covered
+        label: Swift skill family covered paths
+        source_type: skill-source
+        policy: compare-existing-swift-skills
+        paths:
+          - plugins/swift-engineering/skills/foundation-models/
+          - plugins/swift-engineering/skills/ios-26-platform/
+          - plugins/swift-engineering/skills/ios-hig/
+          - plugins/swift-engineering/skills/localization/
+          - plugins/swift-engineering/skills/modern-swift/
+          - plugins/swift-engineering/skills/storekit/
+          - plugins/swift-engineering/skills/swift-diagnostics/
+          - plugins/swift-engineering/skills/swift-networking/
+          - plugins/swift-engineering/skills/swift-style/
+          - plugins/swift-engineering/skills/swift-testing/
+          - plugins/swift-engineering/skills/swiftui-advanced/
+          - plugins/swift-engineering/skills/swiftui-patterns/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 1dc2cf4d020bd524168f20bec95104da6cb2888c
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: covered_by_existing_swift_library_skill_family
+          open_items: 0
+      - id: composable-architecture
+        label: The Composable Architecture skill candidate
+        source_type: skill-source
+        policy: integrated-into-software-engineering
+        paths:
+          - plugins/swift-engineering/skills/composable-architecture/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 1dc2cf4d020bd524168f20bec95104da6cb2888c
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: integrated_as_swiftui_tca_architecture_with_section_parity_audited_best_practice_recipes_closed_loop_examples_and_swiftui_architecture_fit_check_handoff
+          open_items: 0
+      - id: generating-swift-package-docs
+        label: Swift package generated interface docs candidate
+        source_type: skill-source
+        policy: integrated-into-software-engineering
+        paths:
+          - plugins/swift-engineering/skills/generating-swift-package-docs/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 1dc2cf4d020bd524168f20bec95104da6cb2888c
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: integrated_as_swiftpm_distiller_dependency_interface_evidence_mode_with_swift_interface_distiller_cli_backend_replacing_interfazzle_python_flow
+          open_items: 0
+      - id: grdb
+        label: GRDB skill candidate
+        source_type: skill-source
+        policy: deferred-package-persistence-candidate
+        paths:
+          - plugins/swift-engineering/skills/grdb/
+        targets:
+          - root
+        review_coverage:
+          status: deferred
+          reviewed_commit: 1dc2cf4d020bd524168f20bec95104da6cb2888c
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: explicitly_deferred_after_fit_check_preserve_grdb_patterns_evidence_for_future_package_persistence_round_retrace_original_source_from_repo_commit_path_no_plan_dependency
+          open_items: 1
+      - id: sqlite-data
+        label: SQLiteData skill candidate
+        source_type: skill-source
+        policy: deferred-package-persistence-candidate
+        paths:
+          - plugins/swift-engineering/skills/sqlite-data/
+        targets:
+          - root
+        review_coverage:
+          status: deferred
+          reviewed_commit: 1dc2cf4d020bd524168f20bec95104da6cb2888c
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: explicitly_deferred_after_fit_check_preserve_sqlite_data_patterns_evidence_for_future_package_persistence_round_retrace_original_source_from_repo_commit_path_no_plan_dependency
+          open_items: 1
+      - id: haptics
+        label: Haptics skill candidate
+        source_type: skill-source
+        policy: integrated-into-software-engineering
+        paths:
+          - plugins/swift-engineering/skills/haptics/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 1dc2cf4d020bd524168f20bec95104da6cb2888c
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: integrated_as_core_haptics_patterns_with_swiftui_sensoryfeedback_handoff_and_guardrail_parity
+          open_items: 0
+      - id: swift-engineering-agents
+        label: Swift engineering agents and commands
+        source_type: agent-source
+        policy: signal-only-agent-workflow-review
+        paths:
+          - plugins/swift-engineering/agents/
+          - plugins/swift-engineering/claude/
+          - plugins/swift-engineering/commands/
+          - plugins/swift-engineering/hooks-scripts/
+          - plugins/swift-engineering/rules/
+        targets:
+          - root
+        review_coverage:
+          status: moved
+          reviewed_commit: 1dc2cf4d020bd524168f20bec95104da6cb2888c
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: claude_subagent_roster_forced_eval_hooks_snapshot_reflect_commands_and_thinking_rules_moved_to_agent_evolution_or_future_agent_orchestration_thread_no_swift_capability_skill_created
+          open_items: 0
+      - id: plugin-metadata-and-scripts
+        label: Plugin metadata and repository scripts
+        source_type: resource
+        policy: non-capability-resource
+        paths:
+          - plugins/swift-engineering/.claude-plugin/
+          - plugins/swift-engineering/README.md
+          - plugins/swift-engineering/scripts/
+        targets:
+          - root
+        review_coverage:
+          status: non_capability
+          reviewed_commit: 1dc2cf4d020bd524168f20bec95104da6cb2888c
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: plugin_packaging_metadata_not_absorbed
+          open_items: 0
+
+  - id: swiftwasm-skills
+    repo: swiftwasm/skills
+    feed: https://github.com/swiftwasm/skills/commits/main.atom
+    branch: main
+    last_seen: 9572ca7512816a197bab3e2fd5be4917971c06ca
+    tracking:
+      last_checked_commit: 9572ca7512816a197bab3e2fd5be4917971c06ca
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: integrated
+      reviewed_commit: 9572ca7512816a197bab3e2fd5be4917971c06ca
+      reviewed_at: 2026-05-02
+      granularity: source
+      outcome: local_skills_created
+      open_items: 0
+    type: skill-source
+    policy: compare-coverage
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - AGENTS.md
+      - .claude-plugin/
+      - bridge-js/
+      - javascriptkit/
+      - porting/
+    review_segments:
+      - id: bridge-js
+        label: BridgeJS skill
+        source_type: skill-source
+        policy: compare-existing-swift-package-skills
+        review_coverage:
+          status: integrated
+          reviewed_commit: 9572ca7512816a197bab3e2fd5be4917971c06ca
+          reviewed_at: 2026-05-02
+          granularity: segment
+          outcome: local_skill_created
+          open_items: 0
+        paths:
+          - bridge-js/
+        targets:
+          - root
+        size_hint: small
+        plan_required: true
+        ledger_strategy: item-ledger
+      - id: javascriptkit
+        label: JavaScriptKit skill
+        source_type: skill-source
+        policy: compare-existing-swift-package-skills
+        review_coverage:
+          status: integrated
+          reviewed_commit: 9572ca7512816a197bab3e2fd5be4917971c06ca
+          reviewed_at: 2026-05-02
+          granularity: segment
+          outcome: local_skill_created
+          open_items: 0
+        paths:
+          - javascriptkit/
+        targets:
+          - root
+        size_hint: small
+        plan_required: true
+        ledger_strategy: item-ledger
+      - id: swift-wasm-porting
+        label: Swift Wasm porting skill
+        source_type: skill-source
+        policy: compare-existing-swift-platform-skills
+        review_coverage:
+          status: integrated
+          reviewed_commit: 9572ca7512816a197bab3e2fd5be4917971c06ca
+          reviewed_at: 2026-05-02
+          granularity: segment
+          outcome: local_skill_created
+          open_items: 0
+        paths:
+          - porting/
+        targets:
+          - root
+        size_hint: small
+        plan_required: true
+        ledger_strategy: item-ledger
+
+  - id: techopolis-swift-agents
+    repo: Techopolis/swift-agents
+    feed: https://github.com/Techopolis/swift-agents/commits/main.atom
+    branch: main
+    last_seen: e69ced60bc6219f9abd39019f3c50c9b3643e7b5
+    tracking:
+      last_checked_commit: e69ced60bc6219f9abd39019f3c50c9b3643e7b5
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: reviewed
+      reviewed_commit: e69ced60bc6219f9abd39019f3c50c9b3643e7b5
+      reviewed_at: 2026-05-03
+      granularity: source
+      outcome: swift_agent_roster_and_companion_skill_model_reviewed_domain_capability_material_covered_or_tracked_elsewhere_agent_roster_shape_moved_to_future_agent_orchestration_thread
+      open_items: 0
+    type: signal-source
+    policy: signal-only-agent-workflow-review
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - companion-skills.txt
+      - .github/agents/
+      - .github/copilot-instructions.md
+      - .github/hooks/
+      - agents/
+      - hooks/
+      - .claude/
+      - .claude-plugin/
+      - settings.json
+      - install.sh
+      - update.sh
+      - uninstall.sh
+    review_segments:
+      - id: swift-agent-roster
+        label: Swift agent roster
+        source_type: agent-source
+        policy: signal-only-agent-workflow-review
+        paths:
+          - .github/agents/
+          - .github/copilot-instructions.md
+          - agents/
+        targets:
+          - root
+        review_coverage:
+          status: moved
+          reviewed_commit: e69ced60bc6219f9abd39019f3c50c9b3643e7b5
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: moved_to_future_agent_orchestration_thread_preserve_swift_lead_specialist_roster_companion_skill_separation_hook_driven_routing_and_domain_review_roles_no_current_local_skill_owner
+          open_items: 0
+      - id: installer-and-hook-surface
+        label: Installer, hook, and plugin surface
+        source_type: resource
+        policy: non-capability-resource
+        paths:
+          - .claude/
+          - .claude-plugin/
+          - .github/hooks/
+          - hooks/
+          - install.sh
+          - settings.json
+          - uninstall.sh
+          - update.sh
+        targets:
+          - root
+        review_coverage:
+          status: non_capability
+          reviewed_commit: e69ced60bc6219f9abd39019f3c50c9b3643e7b5
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: installer_and_host_packaging_not_absorbed
+          open_items: 0
+
+  - id: getsentry-xcodebuildmcp
+    repo: getsentry/XcodeBuildMCP
+    feed: https://github.com/getsentry/XcodeBuildMCP/commits/main.atom
+    branch: main
+    last_seen: 28f725c9272cc8aaa82b258145535c9b806f34f3
+    tracking:
+      last_checked_commit: 28f725c9272cc8aaa82b258145535c9b806f34f3
+      last_checked_at: 2026-05-03
+    review_coverage:
+      status: moved
+      reviewed_commit: 28f725c9272cc8aaa82b258145535c9b806f34f3
+      reviewed_at: 2026-05-03
+      granularity: source
+      outcome: current_cli_mcp_daemon_manifest_schema_and_official_skills_reviewed_moved_to_future_mcp_tool_backed_swift_build_debug_thread_preserve_remote_build_debug_ci_host_and_workflow_enabled_tool_surface
+      open_items: 0
+    type: skill-source
+    policy: compare-tool-and-skill-coverage
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - AGENTS.md
+      - CHANGELOG.md
+      - config.example.yaml
+      - server.json
+      - skills/
+      - manifests/
+      - schemas/
+      - src/cli/
+      - src/mcp/
+      - src/daemon/
+    review_segments:
+      - id: xcodebuildmcp-agent-skills
+        label: XcodeBuildMCP agent skills
+        source_type: skill-source
+        policy: compare-existing-xcode-tool-skills
+        paths:
+          - skills/
+        targets:
+          - root
+        review_coverage:
+          status: moved
+          reviewed_commit: 28f725c9272cc8aaa82b258145535c9b806f34f3
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: moved_to_future_mcp_tool_backed_skill_thread_preserve_official_mcp_skill_cli_skill_help_first_discovery_session_defaults_enabled_workflows_and_install_paths_no_current_local_skill_created
+          open_items: 0
+      - id: xcodebuildmcp-tool-surface
+        label: XcodeBuildMCP tool surface
+        source_type: mcp-tool-source
+        policy: tool-behavior-primary-source-required
+        paths:
+          - manifests/
+          - schemas/
+          - src/cli/
+          - src/mcp/
+          - src/daemon/
+        targets:
+          - root
+        review_coverage:
+          status: moved
+          reviewed_commit: 28f725c9272cc8aaa82b258145535c9b806f34f3
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: moved_to_future_mcp_tool_backed_skill_thread_preserve_cli_mcp_daemon_manifest_schema_resources_workflows_debug_ui_automation_device_simulator_macos_swiftpm_and_xcode_ide_bridge_surface
+          open_items: 0
+        size_hint: large
+        plan_required: true
+        ledger_strategy: path-ledger
+        batching:
+          mode: path-family-batches
+          source: paths
+          max_items: 25
+          sort: path
+
+  - id: modelcontextprotocol-swift-sdk
+    repo: modelcontextprotocol/swift-sdk
+    feed: https://github.com/modelcontextprotocol/swift-sdk/commits/main.atom
+    branch: main
+    last_seen: a0ae212ebf6eab5f754c3129608bc5557637e605
+    tracking:
+      last_checked_commit: a0ae212ebf6eab5f754c3129608bc5557637e605
+      last_checked_at: 2026-05-02
+    review_coverage:
+      status: moved
+      reviewed_commit: a0ae212ebf6eab5f754c3129608bc5557637e605
+      reviewed_at: 2026-05-03
+      granularity: source
+      outcome: official_mcp_swift_sdk_reviewed_moved_to_future_mcp_package_usage_distillation_thread_preserve_client_server_transport_auth_conformance_and_platform_availability_surface_no_current_local_skill_created
+      open_items: 0
+    type: signal-source
+    policy: primary-source-mcp-swift-sdk-review
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - Package.swift
+      - Package@swift-6.0.swift
+      - Package.resolved
+      - Sources/
+      - Tests/
+      - scripts/
+      - conformance-baseline.yml
+      - .spi.yml
+    review_segments:
+      - id: swift-mcp-sdk
+        label: MCP Swift SDK
+        source_type: tool-source
+        policy: primary-source-sdk-review
+        paths:
+          - README.md
+          - Package.swift
+          - Package@swift-6.0.swift
+          - Sources/
+          - Tests/
+          - scripts/
+          - conformance-baseline.yml
+        targets:
+          - root
+        review_coverage:
+          status: moved
+          reviewed_commit: a0ae212ebf6eab5f754c3129608bc5557637e605
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: moved_to_future_mcp_package_usage_distillation_thread_preserve_mcp_library_product_examples_client_server_stdio_http_tools_resources_prompts_sampling_elicitation_roots_logging_auth_and_conformance_tests
+          open_items: 0
+
+  - id: artemnovichkov-xcode-26-system-prompts
+    repo: artemnovichkov/xcode-26-system-prompts
+    feed: https://github.com/artemnovichkov/xcode-26-system-prompts/commits/main.atom
+    branch: main
+    last_seen: c1d1a2bef0d499afc06b40d5de3091ec77c5a486
+    tracking:
+      last_checked_commit: c1d1a2bef0d499afc06b40d5de3091ec77c5a486
+      last_checked_at: 2026-05-25
+    review_coverage:
+      status: reviewed
+      reviewed_commit: c1d1a2bef0d499afc06b40d5de3091ec77c5a486
+      reviewed_at: 2026-05-25
+      granularity: path
+      outcome: signal_reviewed_local_xcode_intelligence_chat_prompts_skill_added_for_bundle_extraction_no_prompt_text_absorbed
+      open_items: 0
+    type: signal-source
+    policy: signal-only-primary-source-required
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - AdditionalDocumentation/
+      - AdditionalFiles.idechatprompttemplate
+      - AgentAdditionalContext.idechatprompttemplate
+      - AgentSystemPromptAddition.idechatprompttemplate
+      - AgentVersions.plist
+      - BasicSystemPrompt.idechatprompttemplate
+      - ChatTitleResolver.idechatprompttemplate
+      - CodingToolTemplateDocument.idechatprompttemplate
+      - CodingToolTemplateExplain.idechatprompttemplate
+      - CodingToolTemplateGeneratePlayground.idechatprompttemplate
+      - CodingToolTemplateGeneratePreview.idechatprompttemplate
+      - ContextItems.idechatprompttemplate
+      - CurrentFile.idechatprompttemplate
+      - CurrentFileAbbreviated.idechatprompttemplate
+      - CurrentFileName.idechatprompttemplate
+      - CurrentSelection.idechatprompttemplate
+      - FastApplyIntegratorSystemPrompt.idechatprompttemplate
+      - FastApplyIntegratorUserPrompt.idechatprompttemplate
+      - GenerateDocumentation.idechatprompttemplate
+      - GeneratePlayground.idechatprompttemplate
+      - GeneratePreview.idechatprompttemplate
+      - IDEIntelligenceChat.xcplugindata
+      - InQueryDetailedGuidelines.idechatprompttemplate
+      - InQueryShortGuidelines.idechatprompttemplate
+      - InstructionEmbeddingsQueryExpansion.idechatprompttemplate
+      - IntegratorSystemPrompt.idechatprompttemplate
+      - IntegratorUserPrompt.idechatprompttemplate
+      - Interfaces.idechatprompttemplate
+      - Issues.idechatprompttemplate
+      - LocalInfillEmbeddingsQueryExpansion.idechatprompttemplate
+      - NewCodeIntegratorSystemPrompt.idechatprompttemplate
+      - NewCodeIntegratorUserPrompt.idechatprompttemplate
+      - NewKnowledge.idechatprompttemplate
+      - NoSelection.idechatprompttemplate
+      - OriginalFile.idechatprompttemplate
+      - PlannerExecutorStyleNoClassify.idechatprompttemplate
+      - PlannerExecutorStylePlannerSystemPrompt-gpt_5.idechatprompttemplate
+      - PlannerExecutorStylePlannerSystemPrompt.idechatprompttemplate
+      - Query.idechatprompttemplate
+      - ReasoningSystemPrompt.idechatprompttemplate
+      - SearchResults.idechatprompttemplate
+      - Snippets.idechatprompttemplate
+      - TextEditorToolSystemPrompt.idechatprompttemplate
+      - ToolAssistedBasicSystemPrompt.idechatprompttemplate
+      - ToolAssistedInQueryDetailedGuidelines.idechatprompttemplate
+      - ToolAssistedInQueryShortGuidelines.idechatprompttemplate
+      - ToolAssistedReasoningSystemPrompt.idechatprompttemplate
+      - VariantASystemPrompt.idechatprompttemplate
+      - VariantBSystemPrompt.idechatprompttemplate
+      - bert-estimate.vocab
+    review_segments:
+      - id: xcode-system-prompt-templates
+        label: Xcode system prompt templates
+        source_type: signal-source
+        policy: signal-only-software-engineering
+        paths:
+          - AdditionalFiles.idechatprompttemplate
+          - AgentAdditionalContext.idechatprompttemplate
+          - AgentSystemPromptAddition.idechatprompttemplate
+          - AgentVersions.plist
+          - BasicSystemPrompt.idechatprompttemplate
+          - ChatTitleResolver.idechatprompttemplate
+          - CodingToolTemplateDocument.idechatprompttemplate
+          - CodingToolTemplateExplain.idechatprompttemplate
+          - CodingToolTemplateGeneratePlayground.idechatprompttemplate
+          - CodingToolTemplateGeneratePreview.idechatprompttemplate
+          - ContextItems.idechatprompttemplate
+          - CurrentFile.idechatprompttemplate
+          - CurrentFileAbbreviated.idechatprompttemplate
+          - CurrentFileName.idechatprompttemplate
+          - CurrentSelection.idechatprompttemplate
+          - FastApplyIntegratorSystemPrompt.idechatprompttemplate
+          - FastApplyIntegratorUserPrompt.idechatprompttemplate
+          - GenerateDocumentation.idechatprompttemplate
+          - GeneratePlayground.idechatprompttemplate
+          - GeneratePreview.idechatprompttemplate
+          - IDEIntelligenceChat.xcplugindata
+          - InQueryDetailedGuidelines.idechatprompttemplate
+          - InQueryShortGuidelines.idechatprompttemplate
+          - InstructionEmbeddingsQueryExpansion.idechatprompttemplate
+          - IntegratorSystemPrompt.idechatprompttemplate
+          - IntegratorUserPrompt.idechatprompttemplate
+          - Interfaces.idechatprompttemplate
+          - Issues.idechatprompttemplate
+          - LocalInfillEmbeddingsQueryExpansion.idechatprompttemplate
+          - NewCodeIntegratorSystemPrompt.idechatprompttemplate
+          - NewCodeIntegratorUserPrompt.idechatprompttemplate
+          - NewKnowledge.idechatprompttemplate
+          - NoSelection.idechatprompttemplate
+          - OriginalFile.idechatprompttemplate
+          - PlannerExecutorStyleNoClassify.idechatprompttemplate
+          - PlannerExecutorStylePlannerSystemPrompt-gpt_5.idechatprompttemplate
+          - PlannerExecutorStylePlannerSystemPrompt.idechatprompttemplate
+          - Query.idechatprompttemplate
+          - ReasoningSystemPrompt.idechatprompttemplate
+          - SearchResults.idechatprompttemplate
+          - Snippets.idechatprompttemplate
+          - TextEditorToolSystemPrompt.idechatprompttemplate
+          - ToolAssistedBasicSystemPrompt.idechatprompttemplate
+          - ToolAssistedInQueryDetailedGuidelines.idechatprompttemplate
+          - ToolAssistedInQueryShortGuidelines.idechatprompttemplate
+          - ToolAssistedReasoningSystemPrompt.idechatprompttemplate
+          - VariantASystemPrompt.idechatprompttemplate
+          - VariantBSystemPrompt.idechatprompttemplate
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: c1d1a2bef0d499afc06b40d5de3091ec77c5a486
+          reviewed_at: 2026-05-25
+          granularity: path
+          outcome: reviewed_prompt_template_signal_changes_local_extraction_skill_owns_artifact_generation_no_behavior_absorption
+          open_items: 0
+      - id: additional-documentation
+        label: Xcode additional documentation
+        source_type: signal-source
+        policy: primary-source-required-before-integration
+        paths:
+          - AdditionalDocumentation/
+        targets:
+          - root
+        review_coverage:
+          status: reviewed
+          reviewed_commit: 014ea5707f576669205bb9198f6de6486365e27b
+          reviewed_at: 2026-05-02
+          granularity: path
+          outcome: ios26_framework_docs_signal_existing_skills_or_primary_source_required
+          open_items: 0
+      - id: supporting-files
+        label: Supporting embedding and index files
+        source_type: resource
+        policy: non-capability-resource
+        paths:
+          - README.md
+          - bert-estimate.vocab
+        targets:
+          - root
+        review_coverage:
+          status: non_capability
+          reviewed_commit: c1d1a2bef0d499afc06b40d5de3091ec77c5a486
+          reviewed_at: 2026-05-25
+          granularity: path
+          outcome: readme_and_support_file_signal_changes_reviewed_extraction_skill_added_no_direct_absorption
+          open_items: 0
+
+  - id: magiccube-helixent
+    repo: MagicCube/helixent
+    feed: https://github.com/MagicCube/helixent/commits/main.atom
+    branch: main
+    last_seen: 0fca9272760c457d38082bfa8d4c561ce22e9850
+    tracking:
+      last_checked_commit: 0fca9272760c457d38082bfa8d4c561ce22e9850
+      last_checked_at: 2026-05-07
+    review_coverage:
+      status: reviewed
+      reviewed_commit: 0fca9272760c457d38082bfa8d4c561ce22e9850
+      reviewed_at: 2026-05-07
+      granularity: segment
+      outcome: two_plan_mode_skills_copied_and_locally_hardened_skill_runtime_and_coding_tooling_moved_to_future_agent_runtime_thread
+      open_items: 0
+    type: skill-source
+    policy: compare-skill-runtime-and-agent-workflow
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - README.zh.md
+      - AGENTS.md
+      - CLAUDE.md
+      - package.json
+      - skills/
+      - skills/coding-plan/
+      - skills/deep-research-plan/
+      - src/agent/agent.ts
+      - src/agent/agent-middleware.ts
+      - src/agent/skills/
+      - src/agent/todos/
+      - src/agent/tool-result-policy.ts
+      - src/agent/tool-result-runtime.ts
+      - src/agent/tool-result-summary.ts
+      - src/coding/agents/
+      - src/coding/agents/lead-agent.ts
+      - src/coding/permissions/
+      - src/coding/tools/
+    review_segments:
+      - id: plan-mode-skills
+        label: Coding and research plan mode skills
+        source_type: skill-source
+        policy: compare-agent-planning-workflow
+        paths:
+          - skills/coding-plan/
+          - skills/deep-research-plan/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 0fca9272760c457d38082bfa8d4c561ce22e9850
+          reviewed_at: 2026-05-07
+          granularity: path
+          outcome: copied_as_software_engineering_coding_plan_and_deep_research_plan_with_repo_discovered_plan_surfaces_active_plan_handling_todo_progress_boundary_source_authority_and_closeout_hardening
+          open_items: 0
+        size_hint: small
+        plan_required: true
+        ledger_strategy: instruction-parity
+      - id: skill-runtime
+        label: Skill discovery and progressive loading runtime
+        source_type: agent-source
+        policy: compare-skill-runtime-design
+        paths:
+          - src/agent/skills/
+          - src/agent/agent.ts
+          - src/agent/agent-middleware.ts
+          - src/coding/agents/lead-agent.ts
+        targets:
+          - root
+        review_coverage:
+          status: moved
+          reviewed_commit: 0fca9272760c457d38082bfa8d4c561ce22e9850
+          reviewed_at: 2026-05-07
+          granularity: path
+          outcome: moved_to_future_agent_runtime_thread_preserve_skill_dirs_project_home_discovery_progressive_loading_requested_skill_handling_duplicate_name_caveat_and_agents_md_injection_shape
+          open_items: 0
+        size_hint: small
+        plan_required: true
+        ledger_strategy: tool-capability-and-runtime-ledger
+      - id: coding-agent-tooling
+        label: Coding agent tools, approvals, todos, and tool-result policy
+        source_type: agent-source
+        policy: compare-agent-tool-workflow
+        paths:
+          - src/agent/todos/
+          - src/agent/tool-result-policy.ts
+          - src/agent/tool-result-runtime.ts
+          - src/agent/tool-result-summary.ts
+          - src/coding/permissions/
+          - src/coding/tools/
+        targets:
+          - root
+        review_coverage:
+          status: moved
+          reviewed_commit: 0fca9272760c457d38082bfa8d4c561ce22e9850
+          reviewed_at: 2026-05-07
+          granularity: path
+          outcome: moved_to_future_agent_runtime_thread_preserve_tool_name_approval_gate_todo_reminder_contract_tool_result_summary_policy_and_custom_apply_patch_limitations
+          open_items: 0
+        size_hint: medium
+        plan_required: true
+        ledger_strategy: tool-capability-and-runtime-ledger
+
+  - id: anthropics-skills
+    repo: anthropics/skills
+    feed: https://github.com/anthropics/skills/commits/main.atom
+    branch: main
+    last_seen: d211d437443a7b2496a3dad9575e7dddd724c585
+    tracking:
+      last_checked_commit: d211d437443a7b2496a3dad9575e7dddd724c585
+      last_checked_at: 2026-05-07
+    review_coverage:
+      status: partial
+      reviewed_commit: d211d437443a7b2496a3dad9575e7dddd724c585
+      reviewed_at: 2026-05-07
+      granularity: source
+      outcome: official_anthropic_skill_creator_eval_loop_integrated_into_skill_creator_pro_remaining_segments_pending
+      open_items: 4
+    type: skill-source
+    policy: official-skill-source-compare-coverage
+    classification:
+      provenance: official
+      focus: broad-catalog
+      domains:
+        - interface-design
+        - visual-design
+        - frontend-quality
+        - brand-system
+        - theme-system
+        - artifact-design
+        - generative-visuals
+        - skill-authoring
+      absorption_priority: high
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - .claude-plugin/
+      - skills/algorithmic-art/
+      - skills/brand-guidelines/
+      - skills/canvas-design/
+      - skills/claude-api/
+      - skills/doc-coauthoring/
+      - skills/docx/
+      - skills/frontend-design/
+      - skills/internal-comms/
+      - skills/mcp-builder/
+      - skills/pdf/
+      - skills/pptx/
+      - skills/skill-creator/
+      - skills/slack-gif-creator/
+      - skills/theme-factory/
+      - skills/web-artifacts-builder/
+      - skills/webapp-testing/
+      - skills/xlsx/
+      - spec/
+      - template/
+      - THIRD_PARTY_NOTICES.md
+    review_segments:
+      - id: official-spec-and-template
+        label: Agent Skills spec and template
+        source_type: resource
+        policy: official-agent-skills-standard-reference
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        paths:
+          - README.md
+          - .claude-plugin/
+          - spec/
+          - template/
+        targets:
+          - root
+        size_hint: small
+        plan_required: true
+        ledger_strategy: section-parity
+      - id: design-and-artifact-skills
+        label: Design and artifact skills
+        source_type: skill-source
+        policy: compare-coverage
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        paths:
+          - skills/algorithmic-art/
+          - skills/brand-guidelines/
+          - skills/canvas-design/
+          - skills/frontend-design/
+          - skills/theme-factory/
+          - skills/web-artifacts-builder/
+        targets:
+          - root
+        size_hint: medium
+        plan_required: true
+        ledger_strategy: item-ledger
+      - id: document-skills
+        label: Document skills
+        source_type: skill-source
+        policy: compare-coverage
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        paths:
+          - skills/doc-coauthoring/
+          - skills/docx/
+          - skills/pdf/
+          - skills/pptx/
+          - skills/xlsx/
+        targets:
+          - root
+        size_hint: medium
+        plan_required: true
+        ledger_strategy: item-ledger
+      - id: development-and-agent-workflow-skills
+        label: Development and agent workflow skills
+        source_type: skill-source
+        policy: compare-coverage
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        paths:
+          - skills/claude-api/
+          - skills/internal-comms/
+          - skills/mcp-builder/
+          - skills/slack-gif-creator/
+          - skills/webapp-testing/
+        targets:
+          - root
+        size_hint: medium
+        plan_required: true
+        ledger_strategy: item-ledger
+      - id: official-anthropic-skill-creator
+        label: Official Anthropic skill creator co-development and eval loop
+        source_type: skill-source
+        policy: official-skill-source-compare-coverage
+        paths:
+          - skills/skill-creator/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: d211d437443a7b2496a3dad9575e7dddd724c585
+          reviewed_at: 2026-05-07
+          granularity: path
+          outcome: integrated_as_skill_creator_pro_full_claude_code_skill_creator_flow_for_codex_covering_intent_capture_interview_research_draft_eval_workspace_with_skill_baseline_runs_assertions_timing_grading_benchmark_analyzer_static_review_feedback_iteration_blind_comparison_description_optimization_packaging_decision_templates_scripts_reusable_grader_analyzer_comparator_prompts_description_optimizer_package_skill_archive_builder_and_eval_review_artifact_policy
+          open_items: 0
+      - id: official-anthropic-mcp-builder
+        label: Official Anthropic MCP builder skill
+        source_type: skill-source
+        policy: official-skill-source-compare-coverage
+        paths:
+          - skills/mcp-builder/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 5128e1865d670f5d6c9cef000e6dfc4e951fb5b9
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: integrated_as_mcp_server_patterns_official_sdk_api_shapes_transport_guidance_and_eval_contract
+          open_items: 0
+      - id: official-anthropic-webapp-testing
+        label: Official Anthropic webapp testing skill
+        source_type: skill-source
+        policy: official-skill-source-compare-coverage
+        paths:
+          - skills/webapp-testing/
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 5128e1865d670f5d6c9cef000e6dfc4e951fb5b9
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: integrated_as_webapp_testing_preserving_static_dynamic_decision_tree_with_server_helper_networkidle_reconnaissance_and_python_playwright_shapes
+          open_items: 0
+
+  - id: olzn-ui-craft
+    repo: olzn/ui-craft
+    feed: https://github.com/olzn/ui-craft/commits/main.atom
+    branch: main
+    last_seen: e42434b0f3ad317363ad6e7b4d2b568a27cdcfa6
+    tracking:
+      last_checked_commit: e42434b0f3ad317363ad6e7b4d2b568a27cdcfa6
+      last_checked_at: 2026-05-23
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: ui_craft_design_reference_registered_pending_segment_review
+      open_items: 3
+    type: skill-source
+    policy: compare-ui-craft-surface-system-interaction
+    classification:
+      provenance: third-party
+      focus: focused-domain
+      domains:
+        - design-system
+        - design-tokens
+        - component-spec
+        - layout-composition
+        - typography
+        - color-system
+        - motion-system
+        - interaction-design
+        - ux-writing
+        - interface-naming
+        - interface-review
+      absorption_priority: high
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - ui-craft/
+      - surface/
+      - system/
+    review_segments:
+      - id: ui-craft-coordinator
+        label: UI craft coordinator skill
+        source_type: skill-source
+        policy: compare-coordinator-skill-and-suite-routing
+        paths:
+          - README.md
+          - ui-craft/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: small
+        plan_required: true
+        ledger_strategy: section-parity
+      - id: surface-suite
+        label: Surface quality suite
+        source_type: skill-source
+        policy: compare-surface-quality-visual-direction-and-interaction
+        paths:
+          - surface/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: medium
+        plan_required: true
+        ledger_strategy: item-ledger
+      - id: system-suite
+        label: Design system suite
+        source_type: skill-source
+        policy: compare-design-system-structure-naming-and-patterns
+        paths:
+          - system/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: medium
+        plan_required: true
+        ledger_strategy: item-ledger
+
+  - id: dammyjay93-interface-design
+    repo: Dammyjay93/interface-design
+    feed: https://github.com/Dammyjay93/interface-design/commits/main.atom
+    branch: main
+    last_seen: 8c407c1c42890010a9eb403a9f419b1eeadcfdad
+    tracking:
+      last_checked_commit: 8c407c1c42890010a9eb403a9f419b1eeadcfdad
+      last_checked_at: 2026-05-23
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: interface_design_boundary_reference_registered_pending_review
+      open_items: 1
+    type: skill-source
+    policy: compare-interface-design-skill-boundary
+    classification:
+      provenance: third-party
+      focus: focused-domain
+      domains:
+        - interface-design
+        - interface-review
+        - interaction-design
+        - design-handoff
+      absorption_priority: high
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - .claude/skills/interface-design/
+      - .claude/commands/
+      - reference/
+    review_segments:
+      - id: interface-design-boundary
+        label: Interface design skill boundary
+        source_type: skill-source
+        policy: compare-app-tool-dashboard-interface-boundary
+        paths:
+          - README.md
+          - .claude/skills/interface-design/
+          - .claude/commands/
+          - reference/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: small
+        plan_required: true
+        ledger_strategy: section-parity
+
+  - id: owl-listener-designer-skills
+    repo: Owl-Listener/designer-skills
+    feed: https://github.com/Owl-Listener/designer-skills/commits/main.atom
+    branch: main
+    last_seen: 5446f2a8eb8f90d6784578961024ec2db1d231e5
+    tracking:
+      last_checked_commit: 5446f2a8eb8f90d6784578961024ec2db1d231e5
+      last_checked_at: 2026-05-23
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: designer_skills_domain_and_command_system_registered_pending_segment_review
+      open_items: 3
+    type: skill-source
+    policy: compare-designer-skills-domain-command-split
+    classification:
+      provenance: third-party
+      focus: broad-catalog
+      domains:
+        - design-research
+        - usability-testing
+        - design-system
+        - interaction-design
+        - interface-review
+        - visual-design
+        - design-handoff
+      absorption_priority: medium
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - design-research/
+      - design-systems/
+      - design-ops/
+      - designer-toolkit/
+      - interaction-design/
+      - prototyping-testing/
+      - ui-design/
+      - ux-strategy/
+      - visual-critique/
+    review_segments:
+      - id: skills-and-commands-taxonomy
+        label: Skills and commands taxonomy
+        source_type: skill-source
+        policy: compare-domain-knowledge-units-versus-workflow-commands
+        paths:
+          - README.md
+          - design-research/
+          - design-systems/
+          - design-ops/
+          - designer-toolkit/
+          - interaction-design/
+          - prototyping-testing/
+          - ui-design/
+          - ux-strategy/
+          - visual-critique/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: large
+        plan_required: true
+        ledger_strategy: item-ledger
+        batching:
+          mode: literal-domain-directory-batches
+          source: paths
+          max_items: 25
+          sort: path
+      - id: research-and-usability-workflows
+        label: Research discovery and usability workflows
+        source_type: skill-source
+        policy: compare-research-discovery-and-usability-test-skills
+        paths:
+          - design-research/
+          - prototyping-testing/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: medium
+        plan_required: true
+        ledger_strategy: item-ledger
+      - id: design-system-and-review-workflows
+        label: Design system audit and review workflows
+        source_type: skill-source
+        policy: compare-design-system-audit-and-visual-critique-workflows
+        paths:
+          - design-systems/
+          - design-ops/
+          - visual-critique/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: medium
+        plan_required: true
+        ledger_strategy: item-ledger
+
+  - id: vercel-labs-agent-skills
+    repo: vercel-labs/agent-skills
+    feed: https://github.com/vercel-labs/agent-skills/commits/main.atom
+    branch: main
+    last_seen: 18a24346600009dc3fcb99e4b2cd83b301601775
+    tracking:
+      last_checked_commit: 18a24346600009dc3fcb99e4b2cd83b301601775
+      last_checked_at: 2026-05-23
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: vercel_agent_skills_design_and_react_quality_registered_pending_segment_review
+      open_items: 2
+    type: skill-source
+    policy: compare-web-design-and-react-quality-guidelines
+    classification:
+      provenance: official-adjacent
+      focus: focused-domain
+      domains:
+        - interface-review
+        - frontend-quality
+        - accessibility
+        - react-quality
+      absorption_priority: high
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - skills/web-design-guidelines/
+      - skills/react-best-practices/
+      - packages/react-best-practices-build/
+    review_segments:
+      - id: web-design-guidelines
+        label: Web design guidelines
+        source_type: skill-source
+        policy: compare-ui-review-accessibility-and-ux-audit-guidelines
+        paths:
+          - skills/web-design-guidelines/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: path
+          outcome: pending_review
+          open_items: 1
+        size_hint: small
+        plan_required: true
+        ledger_strategy: section-parity
+      - id: react-best-practices
+        label: React best practices
+        source_type: skill-source
+        policy: compare-react-implementation-quality-guidelines
+        paths:
+          - skills/react-best-practices/
+          - packages/react-best-practices-build/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: large
+        plan_required: true
+        ledger_strategy: item-ledger
+        batching:
+          mode: rule-file-batches
+          source: paths
+          max_items: 25
+          sort: path
+
+  - id: uxuiprinciples-agent-skills
+    repo: uxuiprinciples/agent-skills
+    feed: https://github.com/uxuiprinciples/agent-skills/commits/main.atom
+    branch: main
+    last_seen: 2dc7f30ce8e54bc798236a9ed82b7daef0b53bc1
+    tracking:
+      last_checked_commit: 2dc7f30ce8e54bc798236a9ed82b7daef0b53bc1
+      last_checked_at: 2026-05-23
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: ux_ui_audit_skills_registered_pending_review
+      open_items: 1
+    type: skill-source
+    policy: compare-ux-ui-audit-principles-and-remediation-checklists
+    classification:
+      provenance: third-party
+      focus: focused-domain
+      domains:
+        - ux-audit
+        - interface-review
+        - accessibility
+        - interaction-design
+        - severity-remediation
+      absorption_priority: high
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - ai-interface-reviewer/
+      - flow-checker/
+      - interface-auditor/
+      - uxui-evaluator/
+      - vibe-coding-advisor/
+    review_segments:
+      - id: ux-ui-audit-skills
+        label: UX/UI audit skills
+        source_type: skill-source
+        policy: compare-ux-principles-severity-and-remediation-checklists
+        paths:
+          - README.md
+          - ai-interface-reviewer/
+          - flow-checker/
+          - interface-auditor/
+          - uxui-evaluator/
+          - vibe-coding-advisor/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: medium
+        plan_required: true
+        ledger_strategy: item-ledger
+
+  - id: nextlevelbuilder-ui-ux-pro-max-skill
+    repo: nextlevelbuilder/ui-ux-pro-max-skill
+    feed: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill/commits/main.atom
+    branch: main
+    last_seen: b7e3af80f6e331f6fb456667b82b12cade7c9d35
+    tracking:
+      last_checked_commit: b7e3af80f6e331f6fb456667b82b12cade7c9d35
+      last_checked_at: 2026-05-23
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: ui_ux_pro_max_checklist_reference_registered_pending_segment_review
+      open_items: 2
+    type: skill-source
+    policy: compare-ui-ux-pro-max-checklist-reference
+    classification:
+      provenance: third-party
+      focus: checklist-heavy
+      domains:
+        - visual-design
+        - color-system
+        - typography
+        - chart-design
+        - ui-patterns
+        - frontend-quality
+      absorption_priority: medium
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - .claude/skills/ui-ux-pro-max/
+      - src/ui-ux-pro-max/data/
+      - src/ui-ux-pro-max/templates/base/
+    review_segments:
+      - id: ui-ux-pro-max-skill
+        label: UI UX Pro Max skill
+        source_type: skill-source
+        policy: compare-heavy-ui-ux-checklist-boundary
+        paths:
+          - README.md
+          - .claude/skills/ui-ux-pro-max/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: medium
+        plan_required: true
+        ledger_strategy: section-parity
+      - id: ui-ux-pro-max-reference-data
+        label: UI UX Pro Max reference data
+        source_type: resource
+        policy: compare-heavy-ui-ux-reference-data-without-direct-copy
+        paths:
+          - src/ui-ux-pro-max/data/
+          - src/ui-ux-pro-max/templates/base/
+        targets:
+          - root
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        size_hint: large
+        plan_required: true
+        ledger_strategy: item-ledger
+        batching:
+          mode: reference-data-batches
+          source: paths
+          max_items: 25
+          sort: path
+
+  - id: openai-cookbook-codex-exec-plans
+    repo: openai/openai-cookbook
+    feed: https://github.com/openai/openai-cookbook/commits/main.atom
+    branch: main
+    last_seen: 2ccacf2741223b4c47ade0299bdcb85e1a056ddb
+    tracking:
+      last_checked_commit: 2ccacf2741223b4c47ade0299bdcb85e1a056ddb
+      last_checked_at: 2026-05-07
+    review_coverage:
+      status: integrated
+      reviewed_commit: 2ccacf2741223b4c47ade0299bdcb85e1a056ddb
+      reviewed_at: 2026-05-07
+      granularity: path
+      outcome: official_codex_execplan_article_integrated_into_coding_plan_execplans_reference_and_plan_policy_surface_handling
+      open_items: 0
+    type: signal-source
+    policy: official-codex-execplan-reference
+    targets:
+      - root
+    watch_paths:
+      - articles/codex_exec_plans.md
+    review_segments:
+      - id: codex-exec-plans
+        label: Codex ExecPlan Cookbook article
+        source_type: resource
+        policy: official-codex-execplan-reference
+        paths:
+          - articles/codex_exec_plans.md
+        targets:
+          - root
+        review_coverage:
+          status: integrated
+          reviewed_commit: 2ccacf2741223b4c47ade0299bdcb85e1a056ddb
+          reviewed_at: 2026-05-07
+          granularity: path
+          outcome: integrated_into_coding_plan_reference_as_execplan_variant_for_multi_hour_self_contained_living_plans_with_progress_decision_log_evidence_milestones_idempotence_and_recovery
+          open_items: 0
+        size_hint: small
+        plan_required: false
+        ledger_strategy: section-parity
+
+  - id: openai-skills
+    repo: openai/skills
+    feed: https://github.com/openai/skills/commits/main.atom
+    branch: main
+    last_seen: af9b54f235d0d56c6b4410be54d578b0fda4ddfc
+    tracking:
+      last_checked_commit: af9b54f235d0d56c6b4410be54d578b0fda4ddfc
+      last_checked_at: 2026-05-03
+    review_coverage:
+      status: partial
+      reviewed_commit: af9b54f235d0d56c6b4410be54d578b0fda4ddfc
+      reviewed_at: 2026-05-25
+      granularity: source
+      outcome: official_openai_skill_creator_source_absorbed_into_skill_creator_for_codex_skill_anatomy_trigger_contract_progressive_disclosure_agents_openai_yaml_init_scaffold_metadata_generator_license_and_source_baseline_tracking_remaining_system_curated_docs_segments_pending
+      open_items: 3
+    type: skill-source
+    policy: official-skill-source-compare-coverage
+    classification:
+      provenance: official
+      focus: broad-catalog
+      domains:
+        - codex-skills
+        - agent-workflows
+        - github-workflows
+        - browser-testing
+        - design-adjacent-skills
+      absorption_priority: medium
+    targets:
+      - root
+    watch_paths:
+      - README.md
+      - contributing.md
+      - skills/.system/
+      - skills/.system/skill-creator/
+      - skills/.curated/
+      - skills/.curated/gh-address-comments/
+      - skills/.curated/gh-fix-ci/
+      - skills/.curated/linear/
+      - skills/.curated/playwright/
+      - skills/.curated/playwright-interactive/
+      - skills/.curated/yeet/
+    review_segments:
+      - id: system-skills
+        label: Codex system skills
+        source_type: skill-source
+        policy: official-codex-system-skill-compare
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        paths:
+          - skills/.system/
+        targets:
+          - root
+        size_hint: small
+        plan_required: true
+        ledger_strategy: item-ledger
+      - id: official-openai-skill-creator
+        label: Official OpenAI Codex skill creator
+        source_type: skill-source
+        policy: official-codex-system-skill-compare
+        review_coverage:
+          status: integrated
+          reviewed_commit: af9b54f235d0d56c6b4410be54d578b0fda4ddfc
+          reviewed_at: 2026-05-25
+          granularity: path
+          outcome: integrated_into_skill_creator_pro_as_openai_source_baseline_for_codex_skill_shape_name_description_trigger_contract_progressive_disclosure_scripts_references_assets_agents_openai_yaml_init_skill_generate_openai_yaml_basic_validator_conventions_source_license_and_provenance_assets_without_replacing_anthropic_eval_review_benchmark_packaging_semantics
+          open_items: 0
+        paths:
+          - skills/.system/skill-creator/
+        targets:
+          - root
+        size_hint: small
+        plan_required: false
+        ledger_strategy: section-parity
+      - id: curated-skills
+        label: Codex curated skills
+        source_type: skill-source
+        policy: official-codex-curated-skill-compare
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        paths:
+          - skills/.curated/
+        targets:
+          - root
+        size_hint: large
+        plan_required: true
+        ledger_strategy: item-ledger
+        batching:
+          mode: literal-skill-directory-batches
+          source: paths
+          max_items: 25
+          sort: path
+      - id: official-openai-github-workflows
+        label: Official OpenAI GitHub workflow skills
+        source_type: skill-source
+        policy: official-codex-curated-skill-compare
+        review_coverage:
+          status: reviewed
+          reviewed_commit: af9b54f235d0d56c6b4410be54d578b0fda4ddfc
+          reviewed_at: 2026-05-03
+          granularity: segment
+          outcome: gh_address_comments_gh_fix_ci_and_yeet_reviewed_runtime_github_plugin_is_current_owner_no_local_engineering_productivity_duplicate
+          open_items: 0
+        paths:
+          - skills/.curated/gh-address-comments/
+          - skills/.curated/gh-fix-ci/
+          - skills/.curated/yeet/
+        targets:
+          - root
+        size_hint: small
+        plan_required: false
+        ledger_strategy: item-ledger
+      - id: official-openai-linear-workflows
+        label: Official OpenAI Linear workflow skill
+        source_type: skill-source
+        policy: official-codex-curated-skill-compare
+        review_coverage:
+          status: reviewed
+          reviewed_commit: af9b54f235d0d56c6b4410be54d578b0fda4ddfc
+          reviewed_at: 2026-05-03
+          granularity: path
+          outcome: reviewed_official_linear_skill_remains_upstream_reference_no_local_duplicate_preserve_mcp_backend_boundary_read_first_batches_identifier_confirmation_operation_families_setup_handoff_and_rate_limit_guardrails
+          open_items: 0
+        paths:
+          - skills/.curated/linear/
+        targets:
+          - root
+        size_hint: small
+        plan_required: false
+        ledger_strategy: item-ledger
+      - id: official-openai-browser-playwright-workflows
+        label: Official OpenAI browser and Playwright workflow skills
+        source_type: skill-source
+        policy: official-codex-curated-skill-compare
+        review_coverage:
+          status: integrated
+          reviewed_commit: af9b54f235d0d56c6b4410be54d578b0fda4ddfc
+          reviewed_at: 2026-05-03
+          granularity: segment
+          outcome: integrated_as_webapp_testing_with_browser_use_and_playwright_execution_backends_cli_snapshots_interactive_qa_inventory_visual_qa_viewport_fit_and_artifact_rules_preserved
+          open_items: 0
+        paths:
+          - skills/.curated/playwright/
+          - skills/.curated/playwright-interactive/
+        targets:
+          - root
+        size_hint: medium
+        plan_required: false
+        ledger_strategy: item-ledger
+      - id: docs-and-install-surface
+        label: Codex skills docs and install surface
+        source_type: resource
+        policy: official-codex-skills-docs-reference
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        paths:
+          - README.md
+          - contributing.md
+        targets:
+          - root
+        size_hint: small
+        plan_required: true
+        ledger_strategy: section-parity
+
+  - id: multica-ai-andrej-karpathy-skills
+    repo: multica-ai/andrej-karpathy-skills
+    feed: https://github.com/multica-ai/andrej-karpathy-skills/commits/main.atom
+    branch: main
+    last_seen: 2c606141936f1eeef17fa3043a72095b4765b9c2
+    tracking:
+      last_checked_commit: 2c606141936f1eeef17fa3043a72095b4765b9c2
+      last_checked_at: 2026-05-30
+    review_coverage:
+      status: unreviewed
+      granularity: source
+      outcome: pending_review
+      open_items: 1
+    type: skill-source
+    policy: compare-agent-work-principles
+    classification:
+      provenance: third-party
+      focus: focused-domain
+      domains:
+        - agent-workflows
+        - skill-authoring
+        - agent-operating-guidance
+      absorption_priority: low
+    targets:
+      - root
+    watch_paths:
+      - README.md
+    review_segments:
+      - id: agent-work-principles
+        label: Agent work principles
+        source_type: skill-source
+        policy: compare-agent-work-principles
+        review_coverage:
+          status: unreviewed
+          granularity: segment
+          outcome: pending_review
+          open_items: 1
+        paths:
+          - README.md
+        targets:
+          - root
+        size_hint: small
+        plan_required: false
+        ledger_strategy: section-parity

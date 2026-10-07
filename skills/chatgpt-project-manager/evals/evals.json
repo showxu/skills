@@ -1,0 +1,13 @@
+{
+  "skill_name": "chatgpt-project-manager",
+  "evals": [
+    {"id": 1, "prompt": "Create a Research section, put these two ChatGPT projects and this Codex project in it, then place my pinned chats in the order I listed.", "expected_output": "Backend-aware change plan and verified per-object layout results; complete reorder inputs preserve unrequested positions.", "files": []},
+    {"id": 2, "prompt": "Move the chat called Release notes into the Mobile project.", "expected_output": "Resolve account, selected chat and destination identities; clarify remaining ambiguity before moving; verify unchanged conversation identity.", "files": []},
+    {"id": 3, "prompt": "Create a project called Reading, rename this chat to Book notes, move it into Reading, and archive it.", "expected_output": "Use the permitted ChatGPT surface with fresh UI state and per-step verification when native tools are unavailable.", "files": []},
+    {"id": 4, "prompt": "Rename this desktop section and move the ChatGPT chat into a project.", "expected_output": "Respect target-access restrictions; complete independent permitted operations and report blocked desktop state separately.", "files": []},
+    {"id": 5, "prompt": "Rename this project to Mobile and delete the empty Later section.", "expected_output": "Preserve unedited project fields; check current section membership and cascade before deletion; verify both results.", "files": []},
+    {"id": 6, "prompt": "Create Inbox, move these five threads into it, then delete the empty old section.", "expected_output": "Dependency-ordered changes, stable returned IDs, per-step results and reconciliation of uncertain outcomes before retries or deletion.", "files": []},
+    {"id": 7, "prompt": "Move this Codex thread into the Tools project.", "expected_output": "Verified project membership with intentional execution bindings preserved.", "files": []},
+    {"id": 8, "prompt": "Commands still run from the old repo. Repair this thread to run from the new folder and keep its conversation.", "expected_output": "Scoped execution repair with verified backups, preserved history, effective cwd alignment and a separate live-shell status.", "files": []}
+  ]
+}

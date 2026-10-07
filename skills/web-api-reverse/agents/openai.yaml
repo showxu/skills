@@ -1,0 +1,4 @@
+interface:
+  display_name: "Web API Reverse"
+  short_description: "Build evidence-backed Web API contracts"
+  default_prompt: "Use $web-api-reverse to discover, sanitize, verify, promote, publish, validate, or code-generate an undocumented or drift-prone Web API while keeping browser capture separate from provider runtime."

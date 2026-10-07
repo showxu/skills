@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repository Docs"
+  short_description: "Create and audit repository documentation roles"
+  default_prompt: "Use $repository-docs to audit this repository’s documentation roles and propose the smallest fixes."

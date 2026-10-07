@@ -1,0 +1,287 @@
+#!/usr/bin/env python3
+"""Clear local Flinto cache or state on macOS.
+
+This is a prototype-tool recovery helper for interaction-design work. It does
+not uninstall Flinto or remove project files. By default it is a dry run; pass
+--execute to delete the listed targets.
+"""
+
+from __future__ import annotations
+
+import argparse
+import fnmatch
+import shutil
+import subprocess
+import sys
+import time
+from dataclasses import dataclass
+from pathlib import Path
+
+
+APP_NAME = "Flinto"
+BUNDLE_ID = "com.flinto.Flinto"
+PROTECTED_CONTAINER_METADATA = ".com.apple.containermanagerd.metadata.plist"
+
+
+@dataclass(frozen=True)
+class Target:
+    path: Path
+    reason: str
+
+
+def library_dir() -> Path:
+    return Path.home() / "Library"
+
+
+def container_dir() -> Path:
+    return library_dir() / "Containers" / BUNDLE_ID
+
+
+def container_library_dir() -> Path:
+    return container_dir() / "Data" / "Library"
+
+
+def exists(path: Path) -> bool:
+    return path.exists() or path.is_symlink()
+
+
+def add_if_exists(targets: list[Target], path: Path, reason: str) -> None:
+    if exists(path):
+        targets.append(Target(path, reason))
+
+
+def container_has_only_protected_metadata(path: Path) -> bool:
+    if path != container_dir() or not path.is_dir():
+        return False
+    try:
+        entries = list(path.iterdir())
+    except PermissionError:
+        return False
+    return len(entries) == 1 and entries[0].name == PROTECTED_CONTAINER_METADATA
+
+
+def add_container_path_if_exists(targets: list[Target], path: Path, reason: str) -> None:
+    if container_has_only_protected_metadata(container_dir()):
+        return
+    add_if_exists(targets, path, reason)
+
+
+def add_case_insensitive_matches(targets: list[Target], parent: Path, pattern: str, reason: str) -> None:
+    if not parent.exists():
+        return
+    folded_pattern = pattern.casefold()
+    try:
+        children = sorted(parent.iterdir(), key=lambda item: item.name.casefold())
+    except PermissionError as exc:
+        print(f"scan-error\t{parent}\t{exc}", file=sys.stderr)
+        return
+
+    for child in children:
+        if fnmatch.fnmatchcase(child.name.casefold(), folded_pattern):
+            targets.append(Target(child, reason))
+
+
+def cache_targets() -> list[Target]:
+    targets: list[Target] = []
+    add_container_path_if_exists(targets, container_library_dir() / "Caches" / BUNDLE_ID, "container cache")
+    add_case_insensitive_matches(targets, library_dir() / "Caches", "*flinto*", "user cache")
+    return targets
+
+
+def support_targets() -> list[Target]:
+    targets = cache_targets()
+    container_library = container_library_dir()
+    support_paths = [
+        (container_library / "Application Support", "container application support"),
+        (container_library / "HTTPStorages" / BUNDLE_ID, "container HTTP storage"),
+        (container_library / "WebKit", "container WebKit storage"),
+        (container_library / "Saved Application State", "container saved application state"),
+        (container_library / "Logs", "container logs"),
+    ]
+    for path, reason in support_paths:
+        add_container_path_if_exists(targets, path, reason)
+    return targets
+
+
+def all_targets() -> list[Target]:
+    targets: list[Target] = []
+    add_if_exists(targets, container_dir(), "container")
+    add_if_exists(targets, library_dir() / "Application Scripts" / BUNDLE_ID, "application scripts")
+
+    glob_parents = [
+        ("Caches", "user cache"),
+        ("Application Support", "user application support"),
+        ("Preferences", "user preferences"),
+        ("Saved Application State", "user saved application state"),
+        ("HTTPStorages", "user HTTP storage"),
+        ("WebKit", "user WebKit storage"),
+        ("Cookies", "user cookies"),
+        ("Logs", "user logs"),
+        ("Group Containers", "group container"),
+        ("Application Scripts", "application scripts"),
+    ]
+    for parent_name, reason in glob_parents:
+        add_case_insensitive_matches(targets, library_dir() / parent_name, "*flinto*", reason)
+    return targets
+
+
+def dedupe_targets(targets: list[Target]) -> list[Target]:
+    seen: set[str] = set()
+    deduped: list[Target] = []
+    for target in targets:
+        key = str(target.path)
+        if key not in seen:
+            seen.add(key)
+            deduped.append(target)
+    return deduped
+
+
+def targets_for_scope(scope: str) -> list[Target]:
+    if scope == "cache":
+        return dedupe_targets(cache_targets())
+    if scope == "support":
+        return dedupe_targets(support_targets())
+    if scope == "all":
+        return dedupe_targets(all_targets())
+    raise ValueError(f"unknown scope: {scope}")
+
+
+def is_library_target(path: Path) -> bool:
+    try:
+        path.absolute().relative_to(library_dir().absolute())
+    except ValueError:
+        return False
+    return True
+
+
+def flinto_running() -> bool:
+    result = subprocess.run(["pgrep", "-x", APP_NAME], capture_output=True, text=True, check=False)
+    return result.returncode == 0
+
+
+def wait_until_not_running(timeout: float) -> bool:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if not flinto_running():
+            return True
+        time.sleep(0.25)
+    return not flinto_running()
+
+
+def quit_flinto(timeout: float, force: bool) -> bool:
+    if not flinto_running():
+        return True
+
+    subprocess.run(
+        ["osascript", "-e", f'tell application "{APP_NAME}" to quit'],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if wait_until_not_running(timeout):
+        return True
+
+    if force:
+        subprocess.run(["pkill", "-x", APP_NAME], capture_output=True, text=True, check=False)
+        return wait_until_not_running(timeout)
+
+    return False
+
+
+def remove_target(target: Target) -> tuple[str, str]:
+    path = target.path
+    if not exists(path):
+        return ("missing", "")
+    if not is_library_target(path):
+        return ("blocked", "target is outside ~/Library")
+
+    try:
+        if path.is_symlink() or path.is_file():
+            path.unlink()
+        elif path.is_dir():
+            shutil.rmtree(path)
+        else:
+            path.unlink()
+    except OSError as exc:
+        if container_has_only_protected_metadata(path):
+            return (
+                "protected-residual",
+                f"macOS left {PROTECTED_CONTAINER_METADATA}; Flinto data was removed",
+            )
+        return ("error", str(exc))
+
+    return ("removed", "")
+
+
+def print_targets(scope: str, dry_run: bool, targets: list[Target]) -> None:
+    mode = "dry-run" if dry_run else "execute"
+    print(f"scope\t{scope}")
+    print(f"mode\t{mode}")
+    print(f"flinto_running\t{'yes' if flinto_running() else 'no'}")
+    if not targets:
+        print("target\t none")
+        return
+    for target in targets:
+        print(f"target\t{target.reason}\t{target.path}")
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Clear Flinto cache or local state on macOS.")
+    parser.add_argument(
+        "--scope",
+        choices=["cache", "support", "all"],
+        default="cache",
+        help=(
+            "cache removes Flinto caches only; support also removes Application Support, "
+            "HTTP/WebKit storage, saved state, and logs; all removes the Flinto container "
+            "and named user Library leftovers."
+        ),
+    )
+    parser.add_argument("--execute", action="store_true", help="Delete targets. Without this flag, only list them.")
+    parser.add_argument(
+        "--no-quit-app",
+        action="store_true",
+        help="Do not ask Flinto to quit before deletion. Use only when you know it is safe.",
+    )
+    parser.add_argument(
+        "--force-quit",
+        action="store_true",
+        help="If graceful quit times out, terminate Flinto with pkill before deletion.",
+    )
+    parser.add_argument("--quit-timeout", type=float, default=5.0, help="Seconds to wait for Flinto to quit.")
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    if sys.platform != "darwin":
+        print("flinto-cli only supports macOS Library paths", file=sys.stderr)
+        return 2
+
+    targets = targets_for_scope(args.scope)
+    print_targets(args.scope, not args.execute, targets)
+
+    if not args.execute:
+        return 0
+
+    if flinto_running() and not args.no_quit_app:
+        print("quit\trequesting Flinto quit")
+        if not quit_flinto(args.quit_timeout, args.force_quit):
+            print("quit-error\tFlinto is still running; quit it manually or rerun with --force-quit", file=sys.stderr)
+            return 2
+        print("quit\tFlinto not running")
+    elif flinto_running():
+        print("warning\tFlinto is running and --no-quit-app was set", file=sys.stderr)
+
+    failures = 0
+    for target in targets:
+        status, detail = remove_target(target)
+        print(f"{status}\t{target.reason}\t{target.path}" + (f"\t{detail}" if detail else ""))
+        if status in {"blocked", "error"}:
+            failures += 1
+
+    return 1 if failures else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

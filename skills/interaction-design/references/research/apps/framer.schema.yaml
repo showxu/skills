@@ -1,0 +1,209 @@
+schema_version: interaction-schema-facts.v1
+app: framer
+source_report: references/research/apps/framer.md
+status: research_fact_store
+mapping_policy:
+  status: hypothesis
+  meaning: Draft candidate mapping for future UI Design Schema and Interaction Design Schema synthesis.
+  not_a_fact: true
+  not_current_contract_validation: true
+  review_required: true
+role:
+  classification: secondary_web_runtime_donor
+  orientation:
+    - web_runtime
+    - code_components
+    - published_artifact
+  summary: Web-native runtime donor for pages, frames, components, code components, overrides, property controls, routes, CMS data, plugins, and published runtime interaction_design_schema.behavior.
+authority:
+  primary:
+    - official_docs
+    - official_api
+  notes:
+    - No stable unauthenticated editable project artifact is available.
+    - Developer docs are schema evidence for runtime/component bindings.
+evidence:
+  - id: framer_developers
+    grade: official_docs
+    title: Framer developers
+    url: https://www.framer.com/developers/
+  - id: framer_overrides_intro
+    grade: official_docs
+    title: Code overrides introduction
+    url: https://www.framer.com/developers/overrides-introduction/
+  - id: framer_override_examples
+    grade: official_docs
+    title: Override examples
+    url: https://www.framer.com/developers/overrides-examples
+  - id: framer_property_controls
+    grade: official_docs
+    title: Property controls
+    url: https://www.framer.com/developers/property-controls
+  - id: framer_reference
+    grade: official_api
+    title: Framer Plugin/API reference
+    url: https://www.framer.com/developers/reference
+  - id: framer_cms
+    grade: official_docs
+    title: Framer CMS guide
+    url: https://www.framer.com/developers/cms
+  - id: framer_plugins
+    grade: official_api
+    title: Framer plugin reference
+    url: https://www.framer.com/developers/plugins/reference
+objects:
+  - name: Project
+    category: artifact_root
+    evidence: [framer_developers]
+    draft_schema_mapping: [research_evidence.web_project]
+    decision: reference
+    fields:
+      - name: pages
+        type: Page[]
+        draft_schema_mapping: [interaction_design_schema.behavior.surfaces]
+        decision: absorb
+      - name: routes
+        type: Route[]
+        draft_schema_mapping: [interaction_design_schema.behavior.navigation.routes]
+        decision: absorb
+      - name: components
+        type: Component[]
+        draft_schema_mapping: [ui_design_schema.components]
+        decision: absorb
+      - name: cms_data
+        type: CMSData[]
+        draft_schema_mapping: [interaction_design_schema.behavior.data_sources]
+        decision: reference
+  - name: Page
+    category: surface
+    evidence: [framer_developers]
+    draft_schema_mapping: [interaction_design_schema.behavior.screens, ui_design_schema.pages]
+    decision: absorb
+    fields:
+      - name: frames
+        type: Frame[]
+        draft_schema_mapping: [ui_design_schema.children]
+        decision: absorb
+      - name: route
+        type: Route
+        draft_schema_mapping: [interaction_design_schema.behavior.navigation.route]
+        decision: absorb
+  - name: Frame
+    category: actor
+    evidence: [framer_developers]
+    draft_schema_mapping: [ui_design_schema.actors]
+    decision: absorb
+    fields:
+      - name: children
+        draft_schema_mapping: [ui_design_schema.children]
+        decision: absorb
+      - name: layout
+        draft_schema_mapping: [ui_design_schema.layout]
+        decision: absorb
+      - name: events
+        draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+        decision: absorb
+      - name: animation
+        draft_schema_mapping: [prototype_projection_contract.motion]
+        decision: reference
+  - name: Component
+    category: component
+    evidence: [framer_developers]
+    draft_schema_mapping: [ui_design_schema.components]
+    decision: absorb
+    fields:
+      - name: props
+        draft_schema_mapping: [ui_design_schema.component_properties]
+        decision: absorb
+      - name: events
+        draft_schema_mapping: [interaction_design_schema.behavior.triggers]
+        decision: absorb
+      - name: variants
+        draft_schema_mapping: [ui_design_schema.component_states]
+        decision: absorb
+  - name: CodeComponent
+    category: runtime_binding
+    evidence: [framer_property_controls, framer_reference]
+    draft_schema_mapping: [prototype_projection_contract.runtime_binding, implementation_boundary.code_component]
+    decision: defer_to_implementation_boundary
+    fields:
+      - name: props
+        draft_schema_mapping: [prototype_projection_contract.runtime_binding.props]
+        decision: reference
+      - name: propertyControls
+        draft_schema_mapping: [ui_design_schema.component_properties]
+        decision: absorb
+      - name: render
+        draft_schema_mapping: [implementation_boundary.render_function]
+        decision: do_not_absorb_into_behavior
+  - name: Override
+    category: runtime_binding
+    evidence: [framer_overrides_intro, framer_override_examples]
+    draft_schema_mapping: [prototype_projection_contract.runtime_binding.overrides]
+    decision: reference
+    fields:
+      - name: target_component
+        draft_schema_mapping: [prototype_projection_contract.runtime_binding.target]
+        decision: reference
+      - name: props_patch
+        draft_schema_mapping: [prototype_projection_contract.runtime_binding.props_patch]
+        decision: reference
+      - name: event_handler
+        draft_schema_mapping: [interaction_design_schema.behavior.actions]
+        decision: absorb_when_behavior_source_exists
+  - name: PropertyControl
+    category: ui_layer
+    evidence: [framer_property_controls]
+    draft_schema_mapping: [ui_design_schema.component_properties]
+    decision: absorb
+    fields:
+      - name: control_type
+        draft_schema_mapping: [ui_design_schema.property_control.type]
+        decision: absorb
+      - name: default_value
+        draft_schema_mapping: [ui_design_schema.property_control.default]
+        decision: absorb
+      - name: options
+        draft_schema_mapping: [ui_design_schema.property_control.options]
+        decision: absorb
+  - name: Route
+    category: navigation
+    evidence: [framer_developers]
+    draft_schema_mapping: [interaction_design_schema.behavior.navigation.routes]
+    decision: absorb
+    fields:
+      - name: path
+        draft_schema_mapping: [interaction_design_schema.behavior.navigation.path]
+        decision: absorb
+      - name: page_ref
+        draft_schema_mapping: [interaction_design_schema.behavior.navigation.target_surface]
+        decision: absorb
+  - name: CMSData
+    category: data
+    evidence: [framer_cms]
+    draft_schema_mapping: [interaction_design_schema.behavior.data_sources]
+    decision: reference
+    fields:
+      - name: collection
+        draft_schema_mapping: [interaction_design_schema.behavior.data_source.collection]
+        decision: reference
+      - name: fields
+        draft_schema_mapping: [interaction_design_schema.behavior.data_source.fields]
+        decision: reference
+      - name: query_or_fetch
+        draft_schema_mapping: [prototype_projection_contract.runtime_binding.data_fetch]
+        decision: reference
+  - name: Plugin
+    category: tooling
+    evidence: [framer_plugins]
+    draft_schema_mapping: [tooling.plugin_extension]
+    decision: reference
+    fields:
+      - name: capabilities
+        draft_schema_mapping: [tooling.capabilities]
+        decision: reference
+gaps:
+  - id: framer_editable_project_artifact
+    status: deferred
+    description: Full editable project internals are unavailable as stable local artifact evidence.
+    impact: Framer remains web-runtime/component donor, not file-format authority.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Product Documentation"
+  short_description: "Orchestrate Product Documentation packages"
+  default_prompt: "Use $product-documentation to orchestrate Product Documentation package routing, sequencing, placement strategy, package graph, source graph, reading order, source references, source-of-truth validation, package readiness, prototype_artifact_brief packaging, downstream prototype artifact dispatch, prototype source-retention policy, prototype coverage/gap verification, and cross-artifact verification across product-discovery, product-requirements, and interaction-design. Do not use for generic repository documentation normalization, SwiftPM documentation structure, non-canonical product skills, downstream artifact rendering, or full stage artifacts as owned output."

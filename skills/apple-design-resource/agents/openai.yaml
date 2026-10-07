@@ -1,0 +1,4 @@
+interface:
+  display_name: "Apple Design Resource"
+  short_description: "Index official Apple design resources"
+  default_prompt: "Use $apple-design-resource to fetch, index, probe, or summarize official Apple Design Resources links and direct Apple design asset downloads for other skills."

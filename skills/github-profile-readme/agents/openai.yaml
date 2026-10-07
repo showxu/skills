@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub Profile README"
+  short_description: "Build and maintain a personal GitHub profile page"
+  default_prompt: "Use $github-profile-readme to review my GitHub profile README, propose improvements with previews, and wait for my approval before publishing."

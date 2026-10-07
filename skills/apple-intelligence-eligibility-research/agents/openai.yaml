@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Eligibility Research"
+  short_description: "Audit Apple Intelligence eligibility bypass repos"
+  default_prompt: "Use $apple-intelligence-eligibility-research to inspect Apple Intelligence eligibility bypass repositories read-only and produce an evidence-backed risk report."

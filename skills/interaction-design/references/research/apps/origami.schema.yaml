@@ -1,0 +1,250 @@
+schema_version: interaction-schema-facts.v1
+app: origami
+source_report: references/research/apps/origami.md
+status: research_fact_store
+mapping_policy:
+  status: hypothesis
+  meaning: Draft candidate mapping for future UI Design Schema and Interaction Design Schema synthesis.
+  not_a_fact: true
+  not_current_contract_validation: true
+  review_required: true
+role:
+  classification: specialized_patch_graph_donor
+  orientation:
+    - prototype_time
+    - runtime_signal_flow
+    - patch_graph
+  summary: Signal-flow and patch-graph donor for ports, cables, components, interaction patches, logic patches, animation patches, and runtime bindings.
+authority:
+  primary:
+    - official_docs
+  secondary:
+    - artifact_probe
+evidence:
+  - id: origami_docs
+    grade: official_docs
+    title: Origami documentation
+    url: https://origami.design/documentation/
+  - id: origami_releases
+    grade: official_docs
+    title: Origami releases
+    url: https://origami.design/releases
+  - id: origami_js_patch_api
+    grade: official_api
+    title: Origami JavaScript Patch API
+    url: https://origami.design/documentation/concepts/scriptingapi
+  - id: local_origami_artifacts
+    grade: artifact_probe
+    title: Local Origami official examples and app-bundle artifacts
+    path: references/research/artifacts/origami/
+objects:
+  - name: Document
+    category: artifact_root
+    evidence: [origami_docs, local_origami_artifacts]
+    draft_schema_mapping: [research_evidence.prototype_artifact]
+    decision: reference
+    fields:
+      - name: layers
+        type: Layer[]
+        draft_schema_mapping: [ui_design_schema.layers]
+        decision: absorb
+      - name: patches
+        type: Patch[]
+        draft_schema_mapping: [interaction_design_schema.runtime.patch_graph]
+        decision: absorb
+      - name: components
+        type: Component[]
+        draft_schema_mapping: [interaction_design_schema.runtime.components]
+        decision: absorb
+  - name: Layer
+    category: actor
+    evidence: [origami_docs]
+    draft_schema_mapping: [ui_design_schema.actor, prototype_projection_contract.layer]
+    decision: absorb
+    fields:
+      - name: properties
+        draft_schema_mapping: [ui_design_schema.properties]
+        decision: reference
+      - name: bindings
+        draft_schema_mapping: [interaction_design_schema.runtime.layer_property_bindings]
+        decision: absorb
+      - name: children
+        type: Layer[]
+        draft_schema_mapping: [ui_design_schema.children]
+        decision: absorb
+  - name: Patch
+    category: runtime_binding
+    evidence: [origami_docs, origami_js_patch_api]
+    draft_schema_mapping: [interaction_design_schema.runtime.patch]
+    decision: absorb
+    fields:
+      - name: type
+        enum_ref: PatchCategory
+        draft_schema_mapping: [interaction_design_schema.runtime.patch.type]
+        decision: absorb
+      - name: inputs
+        type: InputPort[]
+        draft_schema_mapping: [interaction_design_schema.runtime.inputs]
+        decision: absorb
+      - name: outputs
+        type: OutputPort[]
+        draft_schema_mapping: [interaction_design_schema.runtime.outputs]
+        decision: absorb
+      - name: layer_binding
+        draft_schema_mapping: [interaction_design_schema.runtime.layer_property_bindings]
+        decision: absorb
+  - name: InputPort
+    category: runtime_binding
+    evidence: [origami_docs]
+    draft_schema_mapping: [interaction_design_schema.runtime.input_port]
+    decision: absorb
+    fields:
+      - name: name
+        draft_schema_mapping: [interaction_design_schema.runtime.port.name]
+        decision: absorb
+      - name: value_type
+        draft_schema_mapping: [interaction_design_schema.runtime.port.type]
+        decision: absorb
+      - name: connected_from
+        draft_schema_mapping: [interaction_design_schema.runtime.connection.source]
+        decision: absorb
+  - name: OutputPort
+    category: runtime_binding
+    evidence: [origami_docs]
+    draft_schema_mapping: [interaction_design_schema.runtime.output_port]
+    decision: absorb
+    fields:
+      - name: name
+        draft_schema_mapping: [interaction_design_schema.runtime.port.name]
+        decision: absorb
+      - name: value_type
+        draft_schema_mapping: [interaction_design_schema.runtime.port.type]
+        decision: absorb
+      - name: connected_to
+        draft_schema_mapping: [interaction_design_schema.runtime.connection.target]
+        decision: absorb
+  - name: Connection
+    category: runtime_binding
+    evidence: [origami_docs]
+    draft_schema_mapping: [interaction_design_schema.runtime.connections]
+    decision: absorb
+    fields:
+      - name: source_patch
+        draft_schema_mapping: [interaction_design_schema.runtime.connection.source_patch]
+        decision: absorb
+      - name: source_port
+        draft_schema_mapping: [interaction_design_schema.runtime.connection.source_port]
+        decision: absorb
+      - name: target_patch
+        draft_schema_mapping: [interaction_design_schema.runtime.connection.target_patch]
+        decision: absorb
+      - name: target_port
+        draft_schema_mapping: [interaction_design_schema.runtime.connection.target_port]
+        decision: absorb
+  - name: Signal
+    category: runtime_value
+    evidence: [origami_docs]
+    draft_schema_mapping: [interaction_design_schema.runtime.signal]
+    decision: absorb
+    fields:
+      - name: value
+        draft_schema_mapping: [interaction_design_schema.runtime.signal.value]
+        decision: absorb
+      - name: value_type
+        draft_schema_mapping: [interaction_design_schema.runtime.signal.type]
+        decision: absorb
+      - name: timestamp
+        draft_schema_mapping: [interaction_design_schema.runtime.signal.time]
+        decision: reference
+  - name: Component
+    category: component
+    evidence: [origami_docs, local_origami_artifacts]
+    draft_schema_mapping: [interaction_design_schema.runtime.component]
+    decision: absorb
+    fields:
+      - name: layers
+        type: Layer[]
+        draft_schema_mapping: [ui_design_schema.layers]
+        decision: absorb
+      - name: patches
+        type: Patch[]
+        draft_schema_mapping: [interaction_design_schema.runtime.patch_graph]
+        decision: absorb
+      - name: published_inputs
+        type: InputPort[]
+        draft_schema_mapping: [interaction_design_schema.runtime.component.inputs]
+        decision: absorb
+      - name: published_outputs
+        type: OutputPort[]
+        draft_schema_mapping: [interaction_design_schema.runtime.component.outputs]
+        decision: absorb
+  - name: InteractionPatch
+    category: trigger
+    evidence: [local_origami_artifacts]
+    draft_schema_mapping: [interaction_design_schema.behavior.triggers, interaction_design_schema.platform.input_bindings]
+    decision: absorb
+    fields:
+      - name: input_kind
+        enum_ref: InteractionPatchKind
+        draft_schema_mapping: [interaction_design_schema.platform.input_bindings.kind]
+        decision: absorb
+      - name: output_signal
+        draft_schema_mapping: [interaction_design_schema.behavior.trigger.output]
+        decision: absorb
+  - name: LogicPatch
+    category: condition
+    evidence: [local_origami_artifacts]
+    draft_schema_mapping: [interaction_design_schema.behavior.conditions, interaction_design_schema.runtime.logic]
+    decision: absorb
+    fields:
+      - name: logic_kind
+        draft_schema_mapping: [interaction_design_schema.behavior.condition.operator]
+        decision: absorb
+      - name: inputs
+        draft_schema_mapping: [interaction_design_schema.behavior.condition.inputs]
+        decision: absorb
+      - name: output
+        draft_schema_mapping: [interaction_design_schema.behavior.condition.output]
+        decision: absorb
+  - name: AnimationPatch
+    category: animation
+    evidence: [local_origami_artifacts]
+    draft_schema_mapping: [prototype_projection_contract.motion]
+    decision: reference
+    fields:
+      - name: animation_kind
+        draft_schema_mapping: [prototype_projection_contract.motion.kind]
+        decision: reference
+      - name: time_input
+        draft_schema_mapping: [prototype_projection_contract.motion.time]
+        decision: reference
+      - name: output_value
+        draft_schema_mapping: [prototype_projection_contract.motion.output]
+        decision: reference
+enums:
+  - name: PatchCategory
+    evidence: [local_origami_artifacts]
+    values:
+      - interaction
+      - navigation
+      - layer
+      - component
+      - logic
+      - loop
+      - animation
+      - data
+  - name: InteractionPatchKind
+    evidence: [local_origami_artifacts]
+    values:
+      - touch
+      - drag
+      - scroll
+      - keyboard
+      - hover
+      - pinch
+      - swipe
+gaps:
+  - id: origami_file_schema_parser
+    status: deferred
+    description: Official examples are available, but no local importer/exporter schema is defined.
+    impact: Use as patch-graph concept donor until adapter work is approved.

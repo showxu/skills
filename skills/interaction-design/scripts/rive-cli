@@ -1,0 +1,227 @@
+#!/usr/bin/env python3
+"""Fetch public Rive runtime .riv files for interaction-design research.
+
+This CLI accepts Rive Community / Marketplace pages or direct .riv URLs,
+extracts public runtime-file URLs, downloads them, verifies the RIVE file magic,
+and records a manifest with source URLs, sizes, and SHA-256 hashes.
+
+It is a research artifact helper, not a Rive importer, renderer, or editor-source
+tool. Editable .rev files are not exposed by public player pages and are out of
+scope for this script.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import re
+import sys
+import urllib.error
+import urllib.parse
+import urllib.request
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Iterable
+
+
+USER_AGENT = "interaction-design-rive-artifact-fetcher/1.0"
+RIVE_MAGIC = b"RIVE"
+RIV_URL_RE = re.compile(
+    r"https://(?:public|cdn)\.rive\.app/[^\"'<>\\\s]+?\.riv(?:\?[^\"'<>\\\s]*)?"
+)
+
+
+@dataclass(frozen=True)
+class Candidate:
+    url: str
+    discovered_from: str
+
+
+def skill_root() -> Path:
+    return Path(__file__).resolve().parents[1]
+
+
+def default_output_dir() -> Path:
+    return (
+        skill_root()
+        / "references"
+        / "research"
+        / "artifacts"
+        / "rive"
+        / "local-probe"
+    )
+
+
+def request_bytes(url: str, timeout: int) -> tuple[bytes, str]:
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    with urllib.request.urlopen(req, timeout=timeout) as response:
+        content_type = response.headers.get("content-type", "")
+        return response.read(), content_type
+
+
+def normalize_riv_url(url: str) -> str:
+    parsed = urllib.parse.urlsplit(url)
+    return urllib.parse.urlunsplit((parsed.scheme, parsed.netloc, parsed.path, "", ""))
+
+
+def is_direct_public_riv_url(url: str) -> bool:
+    parsed = urllib.parse.urlsplit(url)
+    return (
+        parsed.scheme == "https"
+        and parsed.netloc in {"public.rive.app", "cdn.rive.app"}
+        and parsed.path.endswith(".riv")
+    )
+
+
+def candidates_from_source(source: str, timeout: int) -> list[Candidate]:
+    source = source.strip()
+    if not source:
+        return []
+    if is_direct_public_riv_url(source):
+        return [Candidate(normalize_riv_url(source), source)]
+
+    data, _ = request_bytes(source, timeout)
+    text = data.decode("utf-8", errors="ignore")
+    urls = sorted({normalize_riv_url(match.group(0)) for match in RIV_URL_RE.finditer(text)})
+    return [Candidate(url, source) for url in urls]
+
+
+def iter_sources(args: argparse.Namespace) -> Iterable[str]:
+    for url in args.urls:
+        yield url
+    for file_path in args.url_file:
+        with Path(file_path).expanduser().open("r", encoding="utf-8") as handle:
+            for line in handle:
+                stripped = line.strip()
+                if stripped and not stripped.startswith("#"):
+                    yield stripped
+
+
+def slug_from_url(url: str) -> str:
+    parsed = urllib.parse.urlsplit(url)
+    name = Path(parsed.path).name
+    if not name.endswith(".riv"):
+        raise ValueError(f"not a .riv URL: {url}")
+    safe = re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-")
+    return safe or "runtime-file.riv"
+
+
+def read_manifest(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return []
+    return data if isinstance(data, list) else []
+
+
+def write_manifest(path: Path, rows: list[dict]) -> None:
+    rows = sorted(rows, key=lambda row: (row.get("name", ""), row.get("url", "")))
+    path.write_text(json.dumps(rows, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def manifest_path_for(path: Path) -> str:
+    try:
+        return str(path.relative_to(skill_root()))
+    except ValueError:
+        return str(path)
+
+
+def upsert_manifest_row(rows: list[dict], row: dict) -> list[dict]:
+    key = row.get("url")
+    replaced = False
+    updated = []
+    for existing in rows:
+        if existing.get("url") == key:
+            updated.append(row)
+            replaced = True
+        else:
+            updated.append(existing)
+    if not replaced:
+        updated.append(row)
+    return updated
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        prog="rive-cli",
+        description="Download public Rive .riv runtime files from Rive pages or direct URLs."
+    )
+    parser.add_argument("urls", nargs="*", help="Rive Community / Marketplace pages or direct public .riv URLs.")
+    parser.add_argument("--url-file", action="append", default=[], help="File with one source URL per line.")
+    parser.add_argument(
+        "--output-dir",
+        default=str(default_output_dir()),
+        help="Directory for downloaded .riv files and download-manifest.json.",
+    )
+    parser.add_argument("--dry-run", action="store_true", help="List discovered .riv URLs without downloading.")
+    parser.add_argument("--timeout", type=int, default=45, help="Network timeout in seconds.")
+    args = parser.parse_args()
+
+    sources = list(iter_sources(args))
+    if not sources:
+        parser.error("provide at least one page or .riv URL")
+
+    candidates: dict[str, Candidate] = {}
+    for source in sources:
+        try:
+            for candidate in candidates_from_source(source, args.timeout):
+                candidates.setdefault(candidate.url, candidate)
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            print(f"fetch-source-error\t{source}\t{exc}", file=sys.stderr)
+
+    if not candidates:
+        print("no public .riv URLs discovered", file=sys.stderr)
+        return 1
+
+    for candidate in candidates.values():
+        print(f"discovered\t{candidate.url}\tfrom\t{candidate.discovered_from}")
+
+    if args.dry_run:
+        return 0
+
+    output_dir = Path(args.output_dir).expanduser().resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = output_dir / "download-manifest.json"
+    manifest_rows = read_manifest(manifest_path)
+
+    failures = 0
+    for candidate in candidates.values():
+        filename = slug_from_url(candidate.url)
+        target = output_dir / filename
+        try:
+            data, content_type = request_bytes(candidate.url, args.timeout)
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            failures += 1
+            print(f"download-error\t{candidate.url}\t{exc}", file=sys.stderr)
+            continue
+
+        if not data.startswith(RIVE_MAGIC):
+            failures += 1
+            print(f"invalid-rive-magic\t{candidate.url}\tfirst-bytes={data[:16].hex()}", file=sys.stderr)
+            continue
+
+        target.write_bytes(data)
+        sha256 = hashlib.sha256(data).hexdigest()
+        row = {
+            "name": target.stem,
+            "url": candidate.url,
+            "discovered_from": candidate.discovered_from,
+            "path": manifest_path_for(target),
+            "bytes": len(data),
+            "sha256": sha256,
+            "content_type": content_type,
+            "verified_magic": "RIVE",
+        }
+        manifest_rows = upsert_manifest_row(manifest_rows, row)
+        print(f"downloaded\t{target}\t{len(data)}\t{sha256}")
+
+    write_manifest(manifest_path, manifest_rows)
+    print(f"manifest\t{manifest_path}")
+    return 1 if failures else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

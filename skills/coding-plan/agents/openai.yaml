@@ -1,0 +1,4 @@
+interface:
+  display_name: "Coding Plan"
+  short_description: "Write repo-local coding plan files"
+  default_prompt: "Use $coding-plan to inspect a code repository read-only and write or update the right local plan file before implementation."

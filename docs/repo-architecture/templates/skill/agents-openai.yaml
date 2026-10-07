@@ -1,0 +1,4 @@
+interface:
+  display_name: "<Skill Display Name>"
+  short_description: "<Short action phrase>"
+  default_prompt: "Use $<skill-name> to <task>."

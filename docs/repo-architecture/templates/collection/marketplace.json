@@ -1,0 +1,21 @@
+{
+  "name": "<collection-name>",
+  "owner": {
+    "name": "<owner>"
+  },
+  "metadata": {
+    "description": "<collection description>",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "<skill-name>",
+      "description": "<plugin description>",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/<skill-name>"
+      ]
+    }
+  ]
+}

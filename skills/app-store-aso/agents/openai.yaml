@@ -1,0 +1,7 @@
+interface:
+  display_name: "App Store ASO"
+  short_description: "Audit App Store listing optimization"
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#0EA5E9"
+  default_prompt: "Use $app-store-aso to audit this App Store listing for keyword, localization, and conversion opportunities."

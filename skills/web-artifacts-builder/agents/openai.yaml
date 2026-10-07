@@ -1,0 +1,4 @@
+interface:
+  display_name: "Web Artifacts Builder"
+  short_description: "Build shareable single-file HTML artifacts"
+  default_prompt: "Use $web-artifacts-builder to scaffold, build, and bundle a React/Tailwind/shadcn Web artifact into a shareable single-file HTML review artifact."

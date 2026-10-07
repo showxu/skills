@@ -1,0 +1,7 @@
+interface:
+  display_name: "Apple Framework Icon Design"
+  short_description: "Generate and verify Apple framework-style icons from DESIGN.md"
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#69A1E8"
+  default_prompt: "Use $apple-framework-icon-design to add, regenerate, or verify stacked, volumetric, or flat icons from this project's DESIGN.md Iconography section, preserving its family style."

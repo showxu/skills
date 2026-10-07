@@ -1,0 +1,7 @@
+interface:
+  display_name: "SF Symbols Export"
+  short_description: "Export SF Symbols as square SVG/PNG assets"
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#0A84FF"
+  default_prompt: "Use $sfsymbols-export to generate square SVG and PNG icon assets from local SF Symbols glyphs."
