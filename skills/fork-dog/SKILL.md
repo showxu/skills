@@ -1,9 +1,9 @@
 ---
-name: forking-dog
+name: fork-dog
 description: Orchestrate HITL-governed fork/adoption work from upstream and donor sources into a local product or repository. Use for upstream intake, reference governance, donor classification, capability and semantic matrices, local architecture mapping, accept/reject/defer decisions, local truth promotion, implementation handoff, validation closeout, and multi-skill coordination for fork/adoption projects. Do not use for shallow research, copy-only vendoring, one-off code review, generic implementation without donor evidence, generic docs normalization, or skill/package creation by itself.
 ---
 
-# Forking Dog
+# Fork Dog
 
 ## Purpose
 

@@ -1,6 +1,6 @@
 # Eval Fixtures
 
-These fixtures protect `forking-dog` routing, HITL gates, adoption artifacts,
+These fixtures protect `fork-dog` routing, HITL gates, adoption artifacts,
 and non-claims. They are durable behavior inputs, not run logs.
 
 ## Fixture: Multi-Upstream CLI Adoption
@@ -83,7 +83,7 @@ adoption target, or architecture reconstruction goal.
 
 Expected behavior:
 
-- Do not use `forking-dog` as the primary owner.
+- Do not use `fork-dog` as the primary owner.
 - Provide ordinary research or ask for the local adoption target.
 
 Forbidden behavior:

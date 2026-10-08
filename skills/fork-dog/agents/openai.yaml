@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fork Dog"
+  short_description: "Govern fork/adoption from upstream evidence to local truth"
+  default_prompt: "Use $fork-dog to run a HITL-governed upstream adoption workflow: intake sources, distill donor capabilities, build a local capability matrix, map accepted ideas to local architecture, promote docs truth, and hand off implementation planning."
