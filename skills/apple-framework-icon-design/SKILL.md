@@ -101,6 +101,8 @@ checked-in logos still match their source.
   160 px and 40 px, and no two members are confused at 40 px.
 - SVGs are square, XML-valid, and contain no fonts or embedded rasters.
 - PNGs are 1024 px square and match their SVGs.
+- Check the SVG at its actual display sizes in supported browsers, including
+  Safari when applicable, since rendering can differ from PNG exports.
 - After a generator change, `--fidelity` silhouette IoU stays at or above the
   figures recorded in `references/geometry-and-color.md`.
 
