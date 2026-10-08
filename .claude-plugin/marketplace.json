@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Unified local skills marketplace for product management, design and user experience, Web app build, go-to-market, software engineering, and skill toolkit workflows",
-    "version": "0.1.0"
+    "version": "0.1.1"
   },
   "plugins": [
     {
@@ -85,7 +85,7 @@
         "./skills/cli-creator",
         "./skills/repository-docs",
         "./skills/pyproject-docs",
-        "./skills/forking-dog",
+        "./skills/fork-dog",
         "./skills/deeplink-formats",
         "./skills/apple-intelligence-eligibility-research",
         "./skills/xcode-intelligence-chat-prompts",
@@ -109,7 +109,7 @@
         "./skills/skill-distiller",
         "./skills/skill-creator",
         "./skills/agent-evolver",
-        "./skills/forking-dog",
+        "./skills/fork-dog",
         "./skills/chatgpt-project-manager"
       ]
     }
