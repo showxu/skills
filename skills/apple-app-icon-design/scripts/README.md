@@ -28,5 +28,5 @@ render failure, or drift exits 1. A successful document-only run does not
 establish native rendition or visual readiness.
 
 Run `python3 scripts/test_app_icons.py` for document, drift, preservation,
-and failure-path regressions. The tests need only Python; use the native
+dimension, and failure-path regressions. The tests need only Python; use the native
 example and contact sheet to validate renderer behavior and visual quality.

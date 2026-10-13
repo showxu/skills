@@ -5,9 +5,14 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import struct
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
+import zlib
+
+import app_icons
 
 SCRIPT = Path(__file__).with_name("app_icons.py")
 SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><path fill="white" d="M256 256H768V768H256Z"/></svg>'
@@ -108,6 +113,45 @@ class DocumentTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("outlined artwork", result.stderr)
         self.assertFalse(self.out.exists())
+
+
+class RenderDimensionsTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+
+    def png(self, path, width, height):
+        def chunk(kind, data):
+            return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data))
+        header = struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)
+        rows = (b"\0" + b"\xff\0\0\xff" * width) * height
+        path.write_bytes(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", header) +
+                         chunk(b"IDAT", zlib.compress(rows)) + chunk(b"IEND", b""))
+
+    def test_native_renderer_dimensions_are_verified(self):
+        def wrong_size(args):
+            self.png(Path(args[args.index("--output-file") + 1]), 16, 16)
+            return ""
+        glyph = self.root / "glyph.svg"
+        glyph.write_text(SVG)
+        spec = {"background": "#123456", "groups": [{"layers": [{"source": "glyph.svg"}]}]}
+        with patch.object(app_icons, "run", side_effect=wrong_size):
+            with self.assertRaisesRegex(ValueError, "expected 1024x1024, got 16x16"):
+                app_icons.build("example", spec, self.root, self.root / "candidate", "renderer")
+
+    def test_web_renderer_dimensions_are_verified(self):
+        target = self.root / "web.png"
+        with patch.object(app_icons, "run", side_effect=lambda _: self.png(target, 32, 32)):
+            with self.assertRaisesRegex(ValueError, "expected 180x180, got 32x32"):
+                app_icons.render_png(self.root / "web.svg", target, 180)
+        app_icons.png_payload(target, 32)
+
+    def test_missing_png_header_is_rejected(self):
+        target = self.root / "invalid.png"
+        target.write_bytes(b"\x89PNG\r\n\x1a\n")
+        with self.assertRaisesRegex(ValueError, "image header"):
+            app_icons.png_payload(target, 1024)
 
 
 if __name__ == "__main__":
