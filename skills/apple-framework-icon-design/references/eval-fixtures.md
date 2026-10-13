@@ -18,8 +18,7 @@ establish automatic selection or the visual quality of any one icon.
   contact sheet with the whole family, and a drift report.
 - Must preserve: Existing entries byte for byte; shared geometry; the
   upright rule for a readable glyph.
-- Failure: Editing generated SVGs by hand, reusing a neighbor's hue without a
-  distinct ramp, adding text to the icon, or changing global constants.
+- Failure: Editing generated SVGs by hand, reusing another member's hue, adding text to the icon, or changing global constants.
 - Acceptance: The new hue sits in the widest gap; `--check` reports `same`
   for the eight existing logos.
 
@@ -114,3 +113,32 @@ establish automatic selection or the visual quality of any one icon.
   reporting a missing logo as matching.
 - Acceptance: Both checks exit non-zero with actionable diagnostics; neither
   creates or overwrites a logo.
+
+## SI-09 — Family palette reads as two objects
+
+- Prompt: Our icons look less like Apple's; the top face looks like a
+  separate lid.
+- Context: A `DESIGN.md` where one slab entry has a dark face over bands that
+  brighten past L 0.75, and another has a violet band at L 0.81, C 0.10.
+- Expected artifact: A lint report naming both entries with `dark face` and
+  `pastel`, revised entries that lint clean, and a contact sheet comparing
+  the current and revised icons.
+- Must preserve: Shared lighting and geometry constants; entries the lint
+  does not report; checked-in logos until the owner accepts the sheet.
+- Failure: Raising lightness or adding white overlays to brighten the family,
+  editing generated SVGs, or regenerating logos before the owner's decision.
+- Acceptance: `--lint` exits 1 on the original file and 0 on the revision,
+  and the report lists each changed color.
+
+## SI-10 — Rose ramp and shared hues
+
+- Prompt: Give two members the same red hue, with a rose ramp on one.
+- Context: A family with distinct member hues and one umbrella icon.
+- Expected artifact: Distinct member hues and an explicit rose palette whose
+  bands dip before brightening into pink, plus its resolved palette lint.
+- Must preserve: Only the umbrella may share a member hue; every palette
+  follows the same seam and chroma limits.
+- Failure: Treating a different ramp as permission to reuse a member hue,
+  or exempting a pastel pink because the ramp is named rose.
+- Acceptance: Member hues differ, the rose palette lints clean, and its
+  bright end retains chroma after sRGB gamut mapping.

@@ -6,6 +6,6 @@ trigger hardening, package validation, and production readiness belong to
 
 - `check_repository.py` checks the published tree, marketplace paths and
   versions, and delegates skill structure to the owning package validator.
-- `check_policy.py` verifies the source range and publication content of a
-  GitHub push or pull request.
+- `check_policy.py` checks the committed skill-collection publication content.
+  Source identity and PR title validation use the pinned shared workflow.
 - `upstream_manifest.py` manages the source-tracking manifest.

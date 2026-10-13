@@ -2,14 +2,25 @@ name: Skill collection validation
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
+    types: [opened, synchronize, reopened, edited]
 
 permissions:
   contents: read
 
 jobs:
+  source-policy:
+    uses: swift-library/.github/.github/workflows/policy.yml@c78fc385d51fa49d4adf9782c6689198064c9d9a
+    with:
+      allow-terms: |
+        ChatGPT
+        Codex
+        Cursor
+        Claude
+
   policy:
+    needs: source-policy
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -18,9 +29,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
           persist-credentials: false
-      - name: Check source identity and publication content
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Check collection publication content
         run: python3 -B scripts/check_policy.py
 
   validate:
@@ -37,6 +46,11 @@ jobs:
           persist-credentials: false
       - name: Check collection and publication surface
         run: python3 -B scripts/check_repository.py
+      - name: Check framework icon palettes
+        run: |
+          python3 -B skills/apple-framework-icon-design/scripts/test_design_icons.py
+          python3 -B skills/apple-framework-icon-design/scripts/design_icons.py skills/apple-framework-icon-design/examples/DESIGN.example.md --lint
+          python3 -B skills/apple-framework-icon-design/scripts/design_icons.py skills/apple-framework-icon-design/examples/DESIGN.tiles.example.md --lint
       - name: Check documentation adapters
         run: python3 -B skills/repository-docs/scripts/derive_rules.py skills/pyproject-docs --check
       - name: Exercise repository policy

@@ -52,22 +52,26 @@ checked-in logos still match their source.
    listed in `references/iconography-format.md`.
 4. Render into a scratch directory:
    `design_icons.py DESIGN.md --out /tmp/icons --name NAME --png`.
-5. Review with a contact sheet on white and dark backgrounds at header and
-   table sizes: `design_icons.py DESIGN.md --sheet /tmp/sheet.svg`. Compare
-   against the failure patterns in `references/geometry-and-color.md`.
+5. Run `design_icons.py DESIGN.md --lint` and fix every slab palette it
+   reports as a seam, a dark face, or pastel. Review with a contact sheet on
+   white and dark backgrounds at header and table sizes:
+   `design_icons.py DESIGN.md --sheet /tmp/sheet.svg`. Compare against the
+   failure patterns in `references/geometry-and-color.md`.
 6. Iterate on the entry, not on the SVG. Never hand-edit generated files.
 7. Copy the accepted SVG and 1024 px PNG into the repository's assets.
 8. Run the drift check for every repository in the family:
    `design_icons.py DESIGN.md --check NAME=PATH ...`.
-9. After changing geometry constants or ramps in the generator, run
-   `design_icons.py --fidelity REFDIR` against the owner's reference icons
-   and compare with the figures in `references/geometry-and-color.md`.
+9. After changing geometry constants, ramps, or slab lighting in the
+   generator, run `design_icons.py --fidelity REFDIR` against the owner's
+   reference icons and compare with the figures in
+   `references/geometry-and-color.md`.
 
 ## Reference Files To Consult
 
-- `references/geometry-and-color.md`: fixed geometry and its measurement,
-  styles, ramp behavior, hue spacing, glyph rotation, fidelity figures, and
-  observed failures. Read before choosing parameters.
+- `references/geometry-and-color.md`: fixed geometry, slab lighting, and
+  their measurement, styles, ramp behavior, palette lint rules, hue spacing,
+  glyph rotation, fidelity figures, and observed failures. Read before
+  choosing parameters.
 - `references/iconography-format.md`: the JSON block, every field, the glyph
   library, standing objects, panels, and custom glyphs. Read when editing
   entries.
@@ -97,14 +101,18 @@ checked-in logos still match their source.
 ## Validation Rules
 
 - `--check` reports `same` for every family member.
+- `--lint` reports `clean`, or each finding is an owner decision recorded in
+  the report.
 - The contact sheet shows each icon clearly on white and on `#0d1117` at
   160 px and 40 px, and no two members are confused at 40 px.
 - SVGs are square, XML-valid, and contain no fonts or embedded rasters.
 - PNGs are 1024 px square and match their SVGs.
 - Check the SVG at its actual display sizes in supported browsers, including
   Safari when applicable, since rendering can differ from PNG exports.
-- After a generator change, `--fidelity` silhouette IoU stays at or above the
-  figures recorded in `references/geometry-and-color.md`.
+- After a generator change, `--fidelity` silhouette IoU, ramp differences,
+  and slab side contrast stay at or better than the figures recorded in
+  `references/geometry-and-color.md`, or the recorded figures are updated
+  with the run that changed them.
 
 ## Output Format
 
@@ -114,7 +122,8 @@ Changed entries: <names or none>
 Generated: <files>
 Contact sheet: <path>
 Drift check: <n same, n drift, n missing>
-Fidelity: <mean silhouette IoU per style, or not run>
+Lint: <clean, or findings with the owner's decision>
+Fidelity: <mean silhouette IoU, ramp differences, and side contrast per style, or not run>
 Open questions: <hue, glyph, or style decisions for the owner, or none>
 ```
 

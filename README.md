@@ -11,7 +11,7 @@ The `showxu-skills` marketplace publishes one `showxu-skills` plugin containing
 the repository's `skills/` directory.
 
 ```bash
-codex plugin marketplace add showxu/skills --ref main
+codex plugin marketplace add showxu/skills --ref master
 codex plugin add showxu-skills@showxu-skills
 ```
 
