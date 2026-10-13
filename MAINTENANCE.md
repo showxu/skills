@@ -12,13 +12,18 @@ It checks publication content, both marketplace formats, shared versions, and
 skill package structure. It does not establish behavioral readiness: use each
 changed skill's fixtures and declared validation route.
 
+The pinned shared source policy validates pull request titles and added lines,
+and checks verified committers on default-branch pushes. The required `policy`
+job depends on that shared check and scans collection publication content.
+Commit and PR conventions follow [CONTRIBUTING.md](CONTRIBUTING.md).
+
 CI also exercises the organization governance scripts, documentation-rule
 derivation and repository policy tests. Temporary outputs belong in `.build/`.
 
 ## GitHub Settings
 
-- The default branch is `main`. Changes after the initial signed publication
-  use pull requests and squash merges. Merge commits and rebase merges are
+- The default branch is `master`. Changes use pull requests and squash merges
+  with a Conventional Commit title and an empty body. Merge commits and rebase merges are
   disabled, and merged branches are deleted.
 - The active `default branch` ruleset has no bypass actors. It prevents branch
   deletion and force pushes, requires signed commits, resolved review threads,
@@ -38,7 +43,7 @@ enabled. Required policy and validation checks still gate every merge.
 
 Keep the Codex plugin version equal to Claude marketplace `metadata.version`.
 Unversioned Claude entries use commit-based installation versions. The Codex
-marketplace points to the repository's `main` branch.
+marketplace points to the repository's `master` branch.
 
 After publication, verify the README's marketplace and plugin installation
 commands against the public revision in isolated host configuration directories.

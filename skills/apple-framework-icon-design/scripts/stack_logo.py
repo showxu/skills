@@ -57,6 +57,20 @@ def oklch(L: float, C: float, h: float) -> str:
 _oklch = oklch
 
 
+def _keep_chroma(L: float, C: float, h: float, floor: float = 0.06) -> float:
+    """Lightness, lowered by up to `floor`, at which C still fits in sRGB.
+
+    Blues, violets and reds cannot hold slab chroma near L 0.80; lowering the
+    tone keeps them saturated instead of letting them turn pastel.
+    """
+    for _ in range(round(floor / 0.01)):
+        a, b = C * math.cos(math.radians(h)), C * math.sin(math.radians(h))
+        if all(-1e-4 <= c <= 1 + 1e-4 for c in _oklab_to_linear_srgb(L, a, b)):
+            break
+        L -= 0.01
+    return L
+
+
 @dataclass
 class Palette:
     face_back: str
@@ -106,9 +120,12 @@ def palette_for(hue: float, mode: str, bands: int, vivid: float = 1.0, tone: flo
             than blues and look pastel at the same chroma.
     tone:   lightness offset for the whole ramp, so continuity is kept.
     drift:  hue direction override (+1 / -1).
+
+    A color whose chroma does not fit in sRGB is darkened before its chroma
+    is reduced.
     """
     def oklch(L, C, h):  # noqa: E306
-        return _oklch(L + tone, C * vivid, h)
+        return _oklch(_keep_chroma(L + tone, C * vivid, h), C * vivid, h)
 
     lift, drift = _hue_rules(hue, drift)
     n = max(1, bands - 1)
@@ -116,7 +133,7 @@ def palette_for(hue: float, mode: str, bands: int, vivid: float = 1.0, tone: flo
         face_back = oklch(0.82 + lift, 0.12, hue - 20 * drift)
         face_front = oklch(0.60 + lift, 0.12, hue + 20 * drift)
         ramp = [
-            oklch(0.66 + lift + 0.20 * (i / n) ** 1.2, 0.10 + 0.03 * i / n, hue + (12 - 30 * i / n) * drift)
+            oklch(0.66 + lift + 0.20 * (i / n) ** 1.2, 0.12 + 0.04 * i / n, hue + (12 - 30 * i / n) * drift)
             for i in range(bands)
         ]
         return Palette(face_back, face_front, ramp, glyph_shadow=oklch(0.38, 0.10, hue + 18 * drift))
@@ -495,7 +512,7 @@ STYLES = ("stacked", "volumetric", "flat")
 # glyph's own axes: -45 is upright; on the slab, -90 reads along the
 # up-right edge like text on the face.
 STYLE_DEFAULTS = {
-    "stacked": {"glyph_rotation": -90, "glyph_relief": 0.018, "texture_opacity": 0.30},
+    "stacked": {"glyph_rotation": -90, "glyph_relief": 0.018, "texture_opacity": 0.14},
     "volumetric": {"glyph_rotation": -45, "glyph_relief": 0.045, "texture_opacity": 0.18},
     "flat": {"glyph_rotation": -45, "glyph_relief": 0, "texture_opacity": 0.18},
 }
@@ -701,20 +718,23 @@ def _slab_group(spec: Spec, pal: Palette, cx: float, cy: float, size: float, uid
         y = top_y + i * t
         pts = [(x, py + i * t) for x, py in face]
         body.append(f'<path d="{path_d(band(pts, t))}" fill="{pal.bands[i]}"/>')
-        # Side shading: lighter on the left face, darker on the right face.
+        # Each side is its own lit plane: the left keeps the band color, the
+        # right falls into shade, and the front corner catches a narrow highlight.
         shade = f"{uid}-sh{i}"
         defs.append(
             f'<linearGradient id="{shade}" gradientUnits="userSpaceOnUse" x1="{cx - half_w:.1f}" y1="0" x2="{cx + half_w:.1f}" y2="0">'
-            f'<stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/>'
-            f'<stop offset="0.40" stop-color="#ffffff" stop-opacity="0.04"/>'
-            f'<stop offset="0.60" stop-color="#000000" stop-opacity="0.06"/>'
-            f'<stop offset="1" stop-color="#000000" stop-opacity="0.20"/></linearGradient>'
+            f'<stop offset="0" stop-color="#000000" stop-opacity="0.08"/>'
+            f'<stop offset="0.42" stop-color="#ffffff" stop-opacity="0.04"/>'
+            f'<stop offset="0.49" stop-color="#ffffff" stop-opacity="0.30"/>'
+            f'<stop offset="0.53" stop-color="#000000" stop-opacity="0.12"/>'
+            f'<stop offset="0.60" stop-color="#000000" stop-opacity="0.28"/>'
+            f'<stop offset="1" stop-color="#000000" stop-opacity="0.36"/></linearGradient>'
         )
         body.append(f'<path d="{path_d(band(pts, t))}" fill="url(#{shade})"/>')
-        # Thin rim where this band meets the one above.
+        # Faint rim where this band meets the one above.
         body.append(
             f'<path d="{path_d(front_half(pts), close=False)}" fill="none" stroke="#ffffff" '
-            f'stroke-opacity="0.30" stroke-width="{size * 0.0035:.2f}"/>'
+            f'stroke-opacity="0.14" stroke-width="{size * 0.0025:.2f}"/>'
         )
 
     # Top face.
@@ -731,11 +751,11 @@ def _slab_group(spec: Spec, pal: Palette, cx: float, cy: float, size: float, uid
         body.append(f'<g clip-path="url(#{uid}-clip)" opacity="{_setting(spec, "texture_opacity")}"><g transform="{iso} scale({scale:.2f})">{tex}</g></g>')
     defs.append(
         f'<radialGradient id="{uid}-sheen" gradientUnits="userSpaceOnUse" cx="{cx - half_w * 0.30:.1f}" cy="{top_y - face_h * 0.35:.1f}" r="{half_w:.1f}">'
-        f'<stop offset="0" stop-color="#ffffff" stop-opacity="0.28"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>'
+        f'<stop offset="0" stop-color="#ffffff" stop-opacity="0.12"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>'
     )
     body.append(f'<path d="{path_d(face)}" fill="url(#{uid}-sheen)"/>')
     body.append(
-        f'<path d="{path_d(face)}" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="{size * 0.004:.2f}" clip-path="url(#{uid}-clip)"/>'
+        f'<path d="{path_d(face)}" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="{size * 0.003:.2f}" clip-path="url(#{uid}-clip)"/>'
     )
 
     # Glyph lying on the face, optionally raised into a thin slab.
@@ -765,7 +785,7 @@ def _slab_group(spec: Spec, pal: Palette, cx: float, cy: float, size: float, uid
             elif spec.face == "graphite":
                 side = oklch(0.68, 0.01, 260)
             else:
-                side = oklch(0.80, 0.08, spec.hue)
+                side = oklch(0.90, 0.03, spec.hue)
             side_fills = [oklch(spec.fill_lightness - 0.22, 0.14, h) for h in spec.glyph_fills] or None
             defs.append(
                 f'<filter id="{uid}-gblur" x="-30%" y="-30%" width="160%" height="160%">'

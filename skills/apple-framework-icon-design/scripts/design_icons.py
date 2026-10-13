@@ -7,6 +7,7 @@ Usage:
   design_icons.py DESIGN.md --check NAME=FILE [NAME=FILE ...]
   design_icons.py DESIGN.md --tints
   design_icons.py DESIGN.md --sheet sheet.svg [--name NAME ...]
+  design_icons.py DESIGN.md --lint
   design_icons.py --fidelity REFDIR
 
 The Iconography section holds one fenced ```json block:
@@ -15,8 +16,10 @@ Colors may be written as "oklch(L C h)", hex strings, or [L, C, h] lists.
 
 --check regenerates each icon and compares it byte for byte with FILE;
 exit 1 on any difference. --tints prints each icon's hue and a light glow
-color for social cards. --fidelity compares each style's silhouette and
-lightness ramp with reference PNGs named icon-<name>.png in REFDIR.
+color for social cards. --lint reports slab palettes that read as two objects
+or turn pastel; exit 1 on any finding. --fidelity compares each style's
+silhouette, ramp lightness and chroma, and slab side contrast with reference
+PNGs named icon-<name>.png in REFDIR.
 """
 
 from __future__ import annotations
@@ -34,7 +37,7 @@ import tempfile
 import zlib
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from stack_logo import DEPTH, Spec, icon_group, icon_svg, oklch  # noqa: E402
+from stack_logo import DEPTH, Spec, _palette, icon_group, icon_svg, oklch  # noqa: E402
 
 SHEET_BACKGROUNDS = ("#ffffff", "#0d1117")
 SHEET_LARGE, SHEET_SMALL, SHEET_CELL = 160, 40, 190
@@ -182,6 +185,45 @@ def oklab(r: int, g: int, b: int) -> tuple[float, float, float]:
             0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s)
 
 
+# Slab palette limits, measured on Apple's stacked framework icons. The first
+# band continues the face material (CloudKit 0.79 to 0.77, Core ML 0.73 to
+# 0.70); a dark face only sits over bands that stay dark (ARKit graphite glow
+# tops out near 0.57); light colors keep chroma (CloudKit face 0.79/0.12,
+# Core ML bottom 0.86/0.16). Neutral whites and graphites are exempt.
+SEAM_DL = 0.10
+DARK_FACE_L, DARK_FACE_RISE = 0.45, 0.30
+PASTEL_L, PASTEL_C, NEUTRAL_C = 0.80, 0.11, 0.03
+
+
+def hex_oklch(color: str) -> tuple[float, float] | None:
+    """OKLCH lightness and chroma of a #rrggbb color; None for other paints."""
+    if not re.fullmatch(r"#[0-9a-fA-F]{6}", color):
+        return None
+    lab = oklab(*(int(color[i:i + 2], 16) for i in (1, 3, 5)))
+    return lab[0], math.hypot(lab[1], lab[2])
+
+
+def lint(table: dict[str, Spec]) -> list[str]:
+    """Slab palettes that read as two objects or turn pastel."""
+    findings = []
+    for name, spec in table.items():
+        if spec.style != "stacked":
+            continue
+        pal = _palette(spec)
+        face = hex_oklch(pal.face_front)
+        bands = [hex_oklch(c) for c in pal.bands]
+        if face and bands[0] and abs(bands[0][0] - face[0]) > SEAM_DL:
+            findings.append(f"{name}\tseam\tface front L {face[0]:.2f}, first band L {bands[0][0]:.2f}")
+        lit = [b[0] for b in bands if b]
+        if face and lit and face[0] < DARK_FACE_L and max(lit) - face[0] > DARK_FACE_RISE:
+            findings.append(f"{name}\tdark face\tface front L {face[0]:.2f} over bands up to L {max(lit):.2f}")
+        for label, value in [("face back", hex_oklch(pal.face_back)), ("face front", face)] + [
+                (f"band {i + 1}", b) for i, b in enumerate(bands)]:
+            if value and value[0] >= PASTEL_L and NEUTRAL_C <= value[1] < PASTEL_C:
+                findings.append(f"{name}\tpastel\t{label} L {value[0]:.2f} C {value[1]:.3f}")
+    return findings
+
+
 def ramp(style: str, size: int, pixels) -> list[tuple[float, float, float]]:
     """OKLab samples down the sides of a slab, or down a tile's left margin."""
     opaque = [i for i, p in enumerate(pixels) if p[3] > 0]
@@ -201,6 +243,17 @@ def ramp(style: str, size: int, pixels) -> list[tuple[float, float, float]]:
     return out
 
 
+def side_contrast(size: int, pixels) -> float:
+    """Lightness of the bottom band's left plane minus its right plane."""
+    opaque = [i % size for i, p in enumerate(pixels) if p[3] > 0]
+    left, right = min(opaque), max(opaque)
+    values = []
+    for x in (left + round(0.2 * (right - left)), right - round(0.2 * (right - left))):
+        y = max(y for y in range(size) if pixels[y * size + x][3] > 0) - round(0.025 * size)
+        values.append(oklab(*pixels[y * size + x][:3])[0])
+    return values[0] - values[1]
+
+
 def render(spec: Spec, size: int, work: pathlib.Path) -> list:
     svg, png = work / "icon.svg", work / "icon.png"
     svg.write_text(icon_svg(spec, size))
@@ -215,7 +268,7 @@ def fidelity(refdir: pathlib.Path) -> None:
         raise SystemExit("error: rsvg-convert not found")
     candidates = {"stacked": ({"mode": "deepen"}, {"mode": "glow"}),
                   "tile": ({"mode": "deepen"}, {"mode": "glow"}, {"face": "light"}, {"face": "graphite"})}
-    print("style\treference\tsilhouette_iou\tramp_dL\tramp_match")
+    print("style\treference\tsilhouette_iou\tramp_dL\tramp_dC\tside_dL\tramp_match")
     incomplete = []
     with tempfile.TemporaryDirectory() as tmp:
         work = pathlib.Path(tmp)
@@ -239,11 +292,18 @@ def fidelity(refdir: pathlib.Path) -> None:
                 hue = math.degrees(math.atan2(sum(s[2] for s in target), sum(s[1] for s in target))) % 360
                 best = None
                 for extra in candidates["stacked" if style == "stacked" else "tile"]:
-                    mine = ramp(style, FIDELITY_SIZE, render(Spec(style=style, hue=hue, **extra), FIDELITY_SIZE, work))
+                    pixels = render(Spec(style=style, hue=hue, **extra), FIDELITY_SIZE, work)
+                    mine = ramp(style, FIDELITY_SIZE, pixels)
                     dl = sum(abs(a[0] - b[0]) for a, b in zip(target, mine)) / RAMP_SAMPLES
+                    dc = sum(abs(math.hypot(a[1], a[2]) - math.hypot(b[1], b[2]))
+                             for a, b in zip(target, mine)) / RAMP_SAMPLES
                     if best is None or dl < best[0]:
-                        best = (dl, next(iter(extra.values())))
-                print(f"{style}\t{name}\t{ious[-1]:.4f}\t{best[0]:.3f}\t{best[1]}")
+                        best = (dl, dc, next(iter(extra.values())), pixels)
+                sides = "-"
+                if style == "stacked":
+                    sides = (f"{side_contrast(FIDELITY_SIZE, ref):.2f}/"
+                             f"{side_contrast(FIDELITY_SIZE, best[3]):.2f}")
+                print(f"{style}\t{name}\t{ious[-1]:.4f}\t{best[0]:.3f}\t{best[1]:.3f}\t{sides}\t{best[2]}")
             if ious:
                 print(f"{style}\tmean\t{sum(ious) / len(ious):.4f}")
             else:
@@ -261,6 +321,7 @@ def main(argv):
     mode.add_argument("--check", nargs="+", metavar="NAME=FILE", help="compare regenerated icons with files")
     mode.add_argument("--tints", action="store_true", help="print hue and glow color per icon")
     mode.add_argument("--sheet", type=pathlib.Path, help="write a light and dark contact sheet SVG")
+    mode.add_argument("--lint", action="store_true", help="report slab palettes that read as two objects or pastel")
     mode.add_argument("--fidelity", type=pathlib.Path, metavar="REFDIR",
                       help="compare each style with reference PNGs in REFDIR")
     parser.add_argument("--name", action="append", default=[], help="only these icons (with --out or --sheet)")
@@ -280,6 +341,10 @@ def main(argv):
     if args.tints:
         print(json.dumps({n: {"hue": s.hue, "glow": oklch(0.93, 0.03, s.hue)} for n, s in table.items()}, indent=2))
         return
+    if args.lint:
+        findings = lint(table)
+        print("\n".join(findings) if findings else f"clean\t{len(table)} icons")
+        sys.exit(1 if findings else 0)
     if args.check:
         drift = 0
         for item in args.check:

@@ -56,7 +56,7 @@ fit.
 | `glyph_fills` | none | Hues for multi-part glyph rectangles. |
 | `fill_lightness` | 0.80 | Lightness of `glyph_fills` parts. |
 | `texture` | `none` | `dots`, `grid`, `lines`, `rings`, or `constellation`. On a tile, `grid` is the grid backdrop. |
-| `texture_opacity` | per style | Texture opacity: 0.30 on the slab, 0.18 on a tile. |
+| `texture_opacity` | per style | Texture opacity: 0.14 on the slab, 0.18 on a tile. |
 | `texture_color` | white | Texture color. |
 | `objects` | none | Slab: standing 3D objects. Tile: panels. Both below. |
 | `blocks` | none | Shorthand for tinted cubes: `[x, y, height, half-size?]` (stacked). |

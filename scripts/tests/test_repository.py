@@ -1,4 +1,3 @@
-import copy
 import os
 from pathlib import Path
 import subprocess
@@ -7,7 +6,6 @@ import tempfile
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-import check_policy as policy
 import check_repository as repository
 
 
@@ -53,49 +51,6 @@ class PublicationTests(unittest.TestCase):
             findings = repository.publication_findings(root, tree)
             self.assertIn("文档.md: workstation path", findings)
             self.assertIn("private/config: tracked despite publication exclusion", findings)
-
-
-class PolicyTests(unittest.TestCase):
-    def record(self):
-        return {"author": {"login": "showxu"}, "committer": {"login": "showxu"},
-                "commit": {"author": {"email": policy.OWNER_EMAIL},
-                           "committer": {"email": policy.OWNER_EMAIL},
-                           "message": "feat: publish skills", "verification": {"verified": True}}}
-
-    def test_verified_owner_and_github_squash_pass(self):
-        record = self.record()
-        self.assertEqual(policy.commit_findings("sha", record), [])
-        record["commit"]["committer"]["email"] = "noreply@github.com"
-        self.assertEqual(policy.commit_findings("sha", record), [])
-
-    def test_signature_identity_and_attribution_fail_independently(self):
-        base = self.record()
-        cases = [("verification", "verified", False), ("author", "email", "other@example.com"),
-                 ("committer", "email", "other@example.com")]
-        for group, key, value in cases:
-            record = copy.deepcopy(base)
-            record["commit"][group][key] = value
-            self.assertTrue(policy.commit_findings("sha", record))
-        record = copy.deepcopy(base)
-        record["commit"]["message"] += "\n\nCo-authored-by: Example <example@example.com>"
-        self.assertTrue(policy.commit_findings("sha", record))
-
-    def test_allowed_automation_still_requires_a_verified_commit(self):
-        record = self.record()
-        record["author"]["login"] = "dependabot[bot]"
-        record["commit"]["author"]["email"] = "automation@example.com"
-        self.assertEqual(policy.commit_findings("sha", record), [])
-        record["commit"]["verification"]["verified"] = False
-        self.assertTrue(policy.commit_findings("sha", record))
-
-    def test_event_uses_pr_head_and_handles_initial_push(self):
-        base, head = "a" * 40, "b" * 40
-        self.assertEqual(policy.source_range({"pull_request": {"base": {"sha": base}, "head": {"sha": head}}}, "pull_request"), (base, head))
-        self.assertEqual(policy.source_range({"before": policy.ZERO_SHA, "after": head}, "push"), (policy.ZERO_SHA, head))
-        for event in ({"before": base, "after": head, "deleted": True},
-                      {"before": base, "after": policy.ZERO_SHA}, {"before": base, "after": "--all"}):
-            with self.assertRaises(ValueError):
-                policy.source_range(event, "push")
 
 
 if __name__ == "__main__":
