@@ -200,11 +200,17 @@ def run(args):
     return result.stdout.strip()
 
 
-def png_payload(path):
+def png_payload(path, expected_size=None):
     """Ignore ancillary metadata while comparing the lossless encoded image data."""
     data = path.read_bytes()
     if data[:8] != b"\x89PNG\r\n\x1a\n":
         fail(f"renderer did not produce PNG: {path.name}")
+    if len(data) < 33 or data[12:16] != b"IHDR":
+        fail(f"PNG is missing its image header: {path.name}")
+    dimensions = struct.unpack(">II", data[16:24])
+    if expected_size is not None and dimensions != (expected_size, expected_size):
+        fail(f"PNG dimensions for {path.name}: expected {expected_size}x{expected_size}, "
+             f"got {dimensions[0]}x{dimensions[1]}")
     pos, header, compressed = 8, b"", bytearray()
     while pos + 12 <= len(data):
         size, kind = struct.unpack(">I4s", data[pos:pos + 8])
@@ -219,6 +225,7 @@ def png_payload(path):
 
 def render_png(svg, target, size):
     run(["rsvg-convert", "-w", size, "-h", size, svg, "-o", target])
+    png_payload(target, size)
 
 
 def contact_sheet(files):
@@ -261,7 +268,7 @@ def build(name, spec, base, out, ictool=None, document_only=False, generation=No
             if generation is not None:
                 args.extend(["--design-generation", generation])
             run(args)
-            png_payload(path)
+            png_payload(path, size)
             files[(platform, rendition)] = path
     web = out / "web"
     web.mkdir()
