@@ -222,7 +222,7 @@ The repository publishes skills through these manifests:
   overlapping plugin groups. Each entry selects real directories under
   `skills/`.
 - `.agents/plugins/marketplace.json`: the `showxu-skills` Codex marketplace.
-  Its single plugin uses the `showxu/skills` Git repository at `main` as its
+  Its single plugin uses the `showxu/skills` Git repository at `master` as its
   source root.
 - `.codex-plugin/plugin.json`: the root `showxu-skills` Codex plugin, which
   exposes `./skills/`.

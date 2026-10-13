@@ -100,7 +100,7 @@ def collection_findings(root):
     if (len(marketplace["plugins"]) != 1
             or marketplace["plugins"][0]["name"] != codex["name"]
             or marketplace["plugins"][0]["source"] != {
-                "source": "url", "url": "https://github.com/showxu/skills.git", "ref": "main"}):
+                "source": "url", "url": "https://github.com/showxu/skills.git", "ref": "master"}):
         findings.append("Codex marketplace does not identify this repository's main plugin")
     names = [entry["name"] for entry in claude["plugins"]]
     if len(names) != len(set(names)):

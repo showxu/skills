@@ -9,7 +9,7 @@
       "source": {
         "source": "url",
         "url": "https://github.com/showxu/skills.git",
-        "ref": "main"
+        "ref": "master"
       },
       "policy": {
         "installation": "AVAILABLE",
