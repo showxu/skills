@@ -11,7 +11,8 @@ It checks the tool's advertised export command before invoking it.
 The renderer owns platform geometry and material effects. Export Default,
 Dark, ClearLight, ClearDark, TintedLight, and TintedDark for iOS, macOS, and
 watchOS. The output canvas is 1024 px for iOS/macOS and 1088 px for watchOS.
-Inspect the circular composition at small size. The same artwork and some
+The generator verifies the dimensions of every native and web PNG before
+publishing the candidate. Inspect the circular composition at small size. The same artwork and some
 appearance labels may produce identical exports on a platform; preserve
 the native result and do not invent differences.
 

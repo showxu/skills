@@ -77,3 +77,14 @@ invocation, not automatic trigger quality.
 - Failure: The native export shows red while the web export shows green.
 - Acceptance: Inspect the native renderer's center pixel for both cases and
   run the document-order regression.
+
+## AI-08 — Renderer returns the wrong dimensions
+
+- Prompt: Export the native and web icon set with the selected renderer.
+- Input: A renderer returns a readable PNG whose canvas differs from the
+  requested platform or web size.
+- Expected: A non-zero exit naming the file and expected and actual dimensions.
+- Preserve: Existing target assets; the candidate stays unpublished.
+- Failure: Treating valid PNG encoding as proof of the requested dimensions.
+- Acceptance: Native and web dimension regressions reject the mismatched image;
+  a complete native example exports all 18 requested platform canvases.
