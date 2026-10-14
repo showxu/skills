@@ -14,10 +14,11 @@ group. The collection's own taxonomy or authoring docs own that choice.
 - Direct skill installs (copy, link, or edit mode) suit the author's own daily
   use: edits apply in place, and one directory serves every agent that reads
   it.
-- Plugins suit distribution: each host installs a versioned copy from a
-  marketplace, so edits reach users only through an update.
-- Do not install the plugin on a machine that already installs the same skills
-  directly. Each skill would load twice.
+- Plugins publish a collection under one identity. Remote marketplace
+  installations use versioned copies; Claude relative-path plugins from a
+  local-directory marketplace load directly from the checkout.
+- In each host, choose either the plugin or direct installation for the same
+  skills so each skill loads once.
 - Plugins can also carry hooks or MCP servers. Declare only what the plugin
   actually ships.
 
@@ -25,20 +26,25 @@ group. The collection's own taxonomy or authoring docs own that choice.
 
 - Marketplace file: `.claude-plugin/marketplace.json` with `name`, `owner`,
   `metadata`, and `plugins`.
-- One source tree can publish per-skill or grouped plugins: each entry uses
-  `"source": "./"`, `"strict": false`, and a `skills` list of skill folders.
-- Each installed plugin gets its own copy of the whole source tree, without
-  `.git`. Symlinks are copied as links, so a link that points outside the
-  repository breaks on any other machine. Keep published skills as real
-  folders.
-- Version label: the entry's `version` when set, otherwise the source
-  repository commit. `metadata.version` does not label plugins.
-- A pinned entry `version` blocks updates until it changes: `claude plugin
-  update` reports the plugin as current and keeps stale content. Pin only when
-  every release bumps it; otherwise leave it unset so each commit is a new
-  version.
-- Users update with `claude plugin marketplace update <marketplace>`, then
-  `claude plugin update <plugin>@<marketplace>`, then restart.
+- For a collection plugin, define its identity in
+  `.claude-plugin/plugin.json`: `name`, `version`, `description`, and any
+  supported author, homepage, repository, license, or keyword fields.
+- Publish one marketplace entry with the plugin's `name`, `description`, and
+  `"source": "./"`. Claude discovers `skills/<name>/SKILL.md` automatically.
+  Keep the version in the plugin manifest.
+- Add a local checkout with `claude plugin marketplace add <repo-path>`, then
+  `claude plugin install <plugin>@<marketplace>`. Relative-path plugins in
+  local-directory marketplaces load in place. Source edits take effect at the
+  next session start or `/reload-plugins`.
+- Other marketplace origins copy plugins into the cache. Keep distributed
+  skills and supporting resources inside the plugin root.
+- Remote users update with `claude plugin marketplace update <marketplace>`,
+  then `claude plugin update <plugin>@<marketplace>`, then restart or reload.
+  Bump the manifest version for a new published release.
+- The [manifest reference](https://code.claude.com/docs/en/plugins-reference)
+  defines identity and component fields; the
+  [loading reference](https://code.claude.com/docs/en/plugins/loading#in-place-and-copied-plugins)
+  defines when source files load in place.
 
 ## Codex
 
@@ -67,8 +73,8 @@ group. The collection's own taxonomy or authoring docs own that choice.
 
 ## Versions And Docs
 
-- Use one release version across hosts: the Codex `plugin.json` `version`, the
-  Claude `metadata.version`, and any pinned Claude entry `version`.
+- Use one release version across hosts: the Claude and Codex `plugin.json`
+  `version` fields and the Claude marketplace `metadata.version`.
 - Give each host a README install section with the exact marketplace and plugin
   names, a local-testing command, and the "plugin or direct install, not both"
   note. Keep direct-install instructions in their own section.
@@ -83,8 +89,9 @@ group. The collection's own taxonomy or authoring docs own that choice.
 4. Install into throwaway host homes: point `CLAUDE_CONFIG_DIR` and
    `CODEX_HOME` at temporary directories, add the marketplace from the
    repository path, and install each plugin.
-5. Compare the cached skill folders with the published ones: every expected
-   `SKILL.md` is present, and none is a dropped or dangling link.
+5. Check the installed version with `claude plugin list --json` and the skill
+   inventory with `claude plugin details <plugin>@<marketplace>`: every
+   expected skill is listed once.
 6. Delete the temporary homes and confirm the real configuration checksums are
    unchanged.
 

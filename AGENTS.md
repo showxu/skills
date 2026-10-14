@@ -95,8 +95,9 @@ inside the edited artifact. Recompute the accepted result before finalizing.
 
 ## Authority
 
-- Root `.claude-plugin/marketplace.json` owns local plugin groups. Groups are
-  discovery and install views, not ownership boundaries.
+- Root `.claude-plugin/plugin.json` defines the `showxu-skills` Claude plugin.
+  `.claude-plugin/marketplace.json` publishes that plugin from the repository
+  root; Claude discovers skills from `skills/`.
 - `upstreams.yaml` owns upstream/source tracking metadata.
 - `docs/repo-architecture/` owns current repository-shape and placement
   policy. Historical migration records under `docs/provenance/` are not active

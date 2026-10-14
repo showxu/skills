@@ -39,36 +39,30 @@ tree installation checks use an isolated local marketplace as described in
 
 ## Claude Code
 
-The `skills` marketplace publishes six plugin groups. Choose the group that
-fits the task:
+The `showxu-skills` marketplace publishes one `showxu-skills` plugin containing
+the repository's `skills/` directory.
 
 ```bash
 claude plugin marketplace add showxu/skills
-claude plugin install product-management@skills
-claude plugin install design-and-user-experience@skills
-claude plugin install build-webapp@skills
-claude plugin install go-to-market@skills
-claude plugin install software-engineering@skills
-claude plugin install skill-toolkit@skills
+claude plugin install showxu-skills@showxu-skills
 ```
 
-These are individual choices; groups overlap and installing several can expose
-the same skill through several plugins. Restart Claude Code after installation.
-To update an installed group, for example:
+Restart Claude Code after installation. To refresh the marketplace and the
+installed plugin:
 
 ```bash
-claude plugin marketplace update skills
-claude plugin update skill-toolkit@skills
+claude plugin marketplace update showxu-skills
+claude plugin update showxu-skills@showxu-skills
 ```
 
-For local testing from this checkout:
+For a local check from this checkout:
 
 ```bash
 claude_test_home="$PWD/.build/plugin-check/claude"
 mkdir -p "$claude_test_home"
 CLAUDE_CONFIG_DIR="$claude_test_home" claude plugin validate .
 CLAUDE_CONFIG_DIR="$claude_test_home" claude plugin marketplace add "$PWD"
-CLAUDE_CONFIG_DIR="$claude_test_home" claude plugin install skill-toolkit@skills
+CLAUDE_CONFIG_DIR="$claude_test_home" claude plugin install showxu-skills@showxu-skills
 ```
 
 ## Direct skill installation
@@ -100,7 +94,7 @@ by skill; consult its `SKILL.md` before using bundled helpers.
   placement.
 - [Skill authoring](docs/skill-authoring.md): trigger contracts, maintenance,
   package validation, and plugin versions.
-- [Marketplace groups](docs/collection-taxonomy.md): capability routing.
+- [Capability routing](docs/collection-taxonomy.md): capability areas and skill placement.
 - [Agent guide](AGENTS.md): editing routes and guardrails.
 - [upstreams.yaml](upstreams.yaml): upstream sources and review provenance.
 - `skills/`: skill instructions, references, scripts, templates, and assets.

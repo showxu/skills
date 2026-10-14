@@ -59,12 +59,13 @@ they are not mandatory product prototype stages.
 | Real Web app implementation | `webapp-builder` | Separate downstream implementation workflow, not part of the product prototype endpoint. |
 | Figma prototype or design artifact | Figma plugin skills / future design owner | Figma output is a projection, not product truth. |
 | Native app implementation | Swift/iOS/macOS engineering skills | Source-level implementation and platform API work remain engineering-owned. |
-| Store launch and growth | `go-to-market` marketplace group skills | Separate market lifecycle, not part of the product prototype chain. |
+| Store launch and growth | Go-to-market skills | Separate market lifecycle, not part of the product prototype chain. |
 
 ## Maintenance Domains
 
-All local skills in this lifecycle live under root `skills/*`. Marketplace
-plugin groups provide discovery views only; they do not change ownership.
+All local skills in this lifecycle live under root `skills/*` and are
+distributed through the `showxu-skills` plugin. Each skill owns its workflow
+and resources.
 
 The external Swift skill family remains source-owned in its own checkout.
 Native implementation can participate in the lifecycle, but that linked

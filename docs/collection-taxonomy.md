@@ -1,8 +1,8 @@
 # Routing Taxonomy
 
 This repository is de-collectionized for local skills: root `skills/*` is the
-active local public skill directory. Use marketplace plugin groups and docs to
-express capability areas and lifecycle overlays.
+active local public skill directory. Use this taxonomy and lifecycle docs to
+route work across capability areas.
 
 ## Active Skill Homes
 
@@ -11,19 +11,15 @@ express capability areas and lifecycle overlays.
 | Root `skills/*` | All local product, design, Web, go-to-market, software-engineering, and skill-toolkit skills. | Add new local skills here. |
 | External Swift checkout | Swift, SwiftUI, UIKit/AppKit, Xcode, Simulator, Instruments, Apple frameworks, and SwiftPM skills. | Source-owned in its own checkout; do not flatten into root. |
 
-## Marketplace Groups
+## Plugin Distribution
 
-Marketplace plugin groups are discovery and install groupings. They may
-overlap and are not ownership boundaries.
+The `showxu-skills` marketplace publishes one `showxu-skills` Claude plugin
+from the repository root. Claude discovers each skill under `skills/`.
+Codex publishes the same collection as one `showxu-skills` plugin.
 
-| Group | Purpose |
-| --- | --- |
-| `product-management` | Discovery, requirements, interaction design, and product prototype artifact generation. |
-| `design-and-user-experience` | UX, Apple platform guidance, official Apple design resources, design-system files, SF Symbols, framework icon families, app icons, interface copy, and Web UI expression. |
-| `build-webapp` | Web UI projection, shareable HTML artifacts, real Web app implementation, and browser QA. |
-| `go-to-market` | Store readiness, launch copy, ASO, growth, search, paid acquisition, and market performance. |
-| `software-engineering` | Planning, architecture, repository documentation, GitHub product organizations, deeplinks, and MCP/tool backends. |
-| `skill-toolkit` | Upstream intake, distillation, skill creation, skill evolution, and Codex memory evolution. |
+Capability areas such as product, design, Web development, go-to-market,
+software engineering, and skill authoring guide task routing. Each skill owns
+its workflow and resources.
 
 ## Routing Rules
 
@@ -49,8 +45,8 @@ When adding or absorbing a local skill:
    nouns: discover, decide, model, write, review, launch, market, implement,
    validate, debug, operate, audit, or evolve.
 3. Add the skill directly under root `skills/<skill-name>/`.
-4. Register it in root `.claude-plugin/marketplace.json` under one or more
-   meaningful plugin groups.
+4. Include `SKILL.md` in the skill directory so both collection plugins can
+   discover it.
 5. Update root docs only when the lifecycle or capability map changes.
 6. Run the relevant `skill-creator` validation and `git diff --check`.
 
