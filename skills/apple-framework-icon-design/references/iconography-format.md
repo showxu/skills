@@ -87,7 +87,9 @@ python3 -c "import sys; sys.path.insert(0, 'scripts'); import stack_logo; print(
 ## Custom Glyphs
 
 Glyph coordinates span about -1 to 1 on each axis, y pointing down before
-rotation.
+rotation. Write custom shapes, stroke widths, dashes and transforms in these
+unit coordinates. The generator emits browser-safe geometry; keep rendering
+corrections in the generator, not in `DESIGN.md` glyph definitions.
 
 ```json
 "custom_glyph": {

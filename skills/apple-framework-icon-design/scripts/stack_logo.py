@@ -20,6 +20,7 @@ import argparse
 import json
 import math
 import random
+import re
 import sys
 from dataclasses import dataclass, field
 
@@ -449,25 +450,74 @@ def _rrect(x: float, y: float, w: float, h: float, r: float) -> str:
     )
 
 
+def _scale_path(d: str, scale: float) -> str:
+    """Scale SVG path lengths, preserving arc rotations and flags."""
+    arity = {"M": 2, "L": 2, "H": 1, "V": 1, "C": 6, "S": 4, "Q": 4, "T": 2, "A": 7}
+    number = re.compile(r"[-+]?(?:\d*\.\d+|\d+\.?\d*)(?:[eE][-+]?\d+)?")
+    output, command, argument, offset = [], None, 0, 0
+    while offset < len(d):
+        token = d[offset]
+        if token in " ,\t\r\n":
+            offset += 1
+            continue
+        if token.upper() in {*arity, "Z"}:
+            if command and argument % arity[command]:
+                raise ValueError("Incomplete glyph path command")
+            output.append(token)
+            command, argument = (None if token.upper() == "Z" else token.upper()), 0
+            offset += 1
+            continue
+        if command is None:
+            raise ValueError("Glyph path must start with a command")
+        index = argument % arity[command]
+        if command == "A" and index in (3, 4):
+            if token not in "01":
+                raise ValueError("Glyph arc flags must be 0 or 1")
+            output.append(token)
+            offset += 1
+        else:
+            match = number.match(d, offset)
+            if not match:
+                raise ValueError("Invalid glyph path number")
+            value = float(match.group())
+            output.append(format(value if command == "A" and index == 2 else value * scale, ".15g"))
+            offset = match.end()
+        argument += 1
+    if command and argument % arity[command]:
+        raise ValueError("Incomplete glyph path command")
+    return " ".join(output)
+
+
+def _glyph_units(g: dict) -> int:
+    # WebKit loses small stroke and dash geometry before an enlarging transform.
+    return 100 if (g.get("d") and g.get("style") == "stroke") or g.get("extra") else 1
+
+
 def glyph_markup(g: dict, color: str, opacity: float, fills: list[str] | None = None, accent: str | None = None) -> str:
     parts = []
-    stroke = f'fill="none" stroke="{color}" stroke-width="{g.get("width", 0.16)}" stroke-linecap="round" stroke-linejoin="round"'
+    units = _glyph_units(g)
+    path = lambda d: _scale_path(d, units) if units != 1 else d
+    length = lambda n: format(n * units, ".15g") if units != 1 else str(n)
+    stroke = f'fill="none" stroke="{color}" stroke-width="{length(g.get("width", 0.16))}" stroke-linecap="round" stroke-linejoin="round"'
     if g.get("d"):
         if g["style"] == "stroke":
-            dash = f' stroke-dasharray="{g["dash"]}"' if g.get("dash") else ""
-            parts.append(f'<path d="{g["d"]}" {stroke}{dash}/>')
+            dash = " ".join(length(float(n)) for n in re.split(r"[\s,]+", g["dash"].strip())) if g.get("dash") else ""
+            dash = f' stroke-dasharray="{dash}"' if dash else ""
+            parts.append(f'<path d="{path(g["d"])}" {stroke}{dash}/>')
         else:
-            parts.append(f'<path d="{g["d"]}" fill="{color}"/>')
+            parts.append(f'<path d="{path(g["d"])}" fill="{color}"/>')
     if g.get("extra"):
-        parts.append(f'<path d="{g["extra"]}" {stroke}/>')
+        parts.append(f'<path d="{path(g["extra"])}" {stroke}/>')
     for i, (x, y, w, h) in enumerate(g.get("rects", [])):
         fill = fills[i % len(fills)] if fills else color
-        parts.append(f'<path d="{_rrect(x, y, w, h, g.get("round", 0.1))}" fill="{fill}"/>')
+        parts.append(f'<path d="{path(_rrect(x, y, w, h, g.get("round", 0.1)))}" fill="{fill}"/>')
     for x, y, r in g.get("dots", []):
-        parts.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{color}"/>')
+        parts.append(f'<circle cx="{length(x)}" cy="{length(y)}" r="{length(r)}" fill="{color}"/>')
     for x, y, r in g.get("knock", []):
-        parts.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{accent or color}"/>')
+        parts.append(f'<circle cx="{length(x)}" cy="{length(y)}" r="{length(r)}" fill="{accent or color}"/>')
     inner = "".join(parts)
+    if units != 1:
+        inner = f'<g transform="scale({1 / units})">{inner}</g>'
     if g.get("transform"):
         inner = f'<g transform="{g["transform"]}">{inner}</g>'
     return f'<g opacity="{opacity}">{inner}</g>'
@@ -768,7 +818,7 @@ def _slab_group(spec: Spec, pal: Palette, cx: float, cy: float, size: float, uid
         color = pal.glyph
         if spec.glyph_gradient:
             defs.append(
-                f'<linearGradient id="{uid}-gg" gradientUnits="userSpaceOnUse" x1="-1" y1="-1" x2="1" y2="1">'
+                f'<linearGradient id="{uid}-gg" gradientUnits="userSpaceOnUse" x1="{-_glyph_units(g)}" y1="{-_glyph_units(g)}" x2="{_glyph_units(g)}" y2="{_glyph_units(g)}">'
                 f'<stop offset="0" stop-color="{spec.glyph_gradient[0]}"/><stop offset="1" stop-color="{spec.glyph_gradient[1]}"/></linearGradient>'
             )
             color = f"url(#{uid}-gg)"
@@ -910,7 +960,7 @@ def _tile_group(spec: Spec, pal: Palette, cx: float, cy: float, size: float, uid
         color = pal.glyph
         if spec.glyph_gradient:
             defs.append(
-                f'<linearGradient id="{uid}-gg" gradientUnits="userSpaceOnUse" x1="-1" y1="-1" x2="1" y2="1">'
+                f'<linearGradient id="{uid}-gg" gradientUnits="userSpaceOnUse" x1="{-_glyph_units(g)}" y1="{-_glyph_units(g)}" x2="{_glyph_units(g)}" y2="{_glyph_units(g)}">'
                 f'<stop offset="0" stop-color="{spec.glyph_gradient[0]}"/><stop offset="1" stop-color="{spec.glyph_gradient[1]}"/></linearGradient>'
             )
             color = f"url(#{uid}-gg)"
@@ -952,7 +1002,7 @@ def _tile_group(spec: Spec, pal: Palette, cx: float, cy: float, size: float, uid
                 else:
                     front_end = oklch(0.90, 0.045, spec.hue)
                 defs.append(
-                    f'<linearGradient id="{uid}-gf" gradientUnits="userSpaceOnUse" x1="-1" y1="-1" x2="1" y2="1">'
+                    f'<linearGradient id="{uid}-gf" gradientUnits="userSpaceOnUse" x1="{-_glyph_units(g)}" y1="{-_glyph_units(g)}" x2="{_glyph_units(g)}" y2="{_glyph_units(g)}">'
                     f'<stop offset="0" stop-color="{color}"/><stop offset="1" stop-color="{front_end}"/></linearGradient>'
                 )
                 color = f"url(#{uid}-gf)"

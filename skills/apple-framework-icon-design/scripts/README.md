@@ -8,8 +8,10 @@
 | `stack_logo.py --spec JSON --out FILE` | The generator: the three styles, palette and tile ramps, geometry including the continuous corner (`continuous_square`, `tile_path`), glyph library, textures, standing objects, and panels. Renders one icon from a JSON spec. | 0 |
 
 Run `python3 -B scripts/test_design_icons.py` from this skill directory for
-palette regression checks, including seam/pastel rejection, the explicit rose
-ramp and bounded chroma preservation.
+palette and glyph regression checks, including seam/pastel rejection, the
+explicit rose ramp, bounded chroma preservation, and browser-safe path,
+stroke, dash, transform and gradient coordinates. Glyph definitions stay in
+unit coordinates; the renderer scales their emitted geometry for WebKit.
 
 The generators use only the Python standard library. `--png`, previews, and
 `--fidelity` need `rsvg-convert` (librsvg).
