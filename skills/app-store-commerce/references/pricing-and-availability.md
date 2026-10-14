@@ -45,8 +45,13 @@ mutation planning.
 - Keep a territory matrix with current price, target price, currency, start
   date, end date, and preservation behavior.
 - Treat existing future price schedules as conflicts until reviewed.
+- [Apple's subscription pricing rules](https://developer.apple.com/help/app-store-connect/manage-subscriptions/manage-pricing-for-auto-renewable-subscriptions/)
+  allow one scheduled future price change per storefront and billing plan
+  type; scheduling another overwrites the existing scheduled change.
 - For subscriptions, call out whether existing subscribers keep their current
   price or receive a price change according to Apple's current flow.
+- A subscription price decrease applies to existing subscribers at renewal;
+  Apple offers no option to preserve their higher price for a decrease.
 - Price changes can have propagation delay. Verify after the selected backend
   reports success.
 - Do not present PPP, equalization, or regional tiering as business advice
