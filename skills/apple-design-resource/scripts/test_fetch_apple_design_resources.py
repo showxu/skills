@@ -75,6 +75,48 @@ class PreviousReleaseTests(unittest.TestCase):
         self.assertEqual(stats["candidates"], 4)
         self.assertTrue(all(r.link_kind == "apple-cdn-download" for r in records))
 
+    def test_sketch_library_feeds_add_their_disk_images(self):
+        feed = ('<?xml version="1.0"?><rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">'
+                '<channel><title>Apple tvOS UI</title><item><title>Apple tvOS UI</title>'
+                f'<enclosure url="{CDN}Apple-Sketch-Library-tvOS-18.dmg" sparkle:version="12" length="8292110"/>'
+                '</item></channel></rss>')
+        library = adr.LinkRecord(
+            label="Sketch", sections=["Apple Design Resources", "tvOS", "tvOS 18", "UI Kit"],
+            url="sketch://add-library?url=https%3A%2F%2Fdeveloper.apple.com%2Fdesign%2Fdownloads%2Fsketch-tvOS.rss")
+        adr.classify(library)
+        listed = adr.LinkRecord(label="Sketch", url=CDN + "Other.dmg", sections=[])
+        with patch.object(adr, "fetch_text", return_value=feed) as fetch:
+            records = adr.library_records([library, listed], 10)
+        fetch.assert_called_once_with(LEGACY + "sketch-tvOS.rss", 10)
+        self.assertEqual([(r.url, r.label, r.sections[-1], r.link_kind, r.resource_family) for r in records],
+                         [(CDN + "Apple-Sketch-Library-tvOS-18.dmg", "Apple tvOS UI Sketch Library 12", "UI Kit",
+                           "apple-cdn-download", "ui-kit")])
+
+    def test_previous_releases_follow_former_library_feeds(self):
+        feed = ('<rss><channel><title>Apple iOS UI</title><item>'
+                f'<enclosure url="{CDN}Apple-Sketch-Library-iOS-18.dmg"/></item></channel></rss>')
+        pages = {"devimages": "", "developer": LEGACY + "sketch.rss", "sketch.rss": feed}
+
+        def fetch(url, timeout):
+            return next(v for k, v in sorted(pages.items(), key=lambda kv: -len(kv[0])) if k in url)
+        with patch.object(adr, "fetch_text", side_effect=fetch), \
+                patch.object(adr, "probe_link", side_effect=lambda r, t: {"reachable": True, "status": 200}):
+            records, _ = adr.previous_records([], 10, 2)
+        self.assertEqual([r.url for r in records], [CDN + "Apple-Sketch-Library-iOS-18.dmg"])
+
+    def test_files_on_other_apple_hosts_are_direct_downloads(self):
+        apple = adr.LinkRecord(label="Download version 2 for macOS", sections=["Apple Design Resources"],
+                               url="https://itunespartner.apple.com/assets/downloads/Parallax%20Previewer.dmg")
+        page = adr.LinkRecord(label="User Guide", sections=["Apple Design Resources"],
+                              url="https://help.apple.com/itc/parallaxpreviewer/")
+        other = adr.LinkRecord(label="Mirror", sections=["Apple Design Resources"], url="https://example.com/A.dmg")
+        for record in (apple, page, other):
+            adr.classify(record)
+        self.assertEqual([apple.link_kind, page.link_kind, other.link_kind],
+                         ["apple-cdn-download", "external", "external"])
+        self.assertEqual(adr.archive_path(apple.url),
+                         Path("itunespartner.apple.com/assets/downloads/Parallax-Previewer.dmg"))
+
     def test_archive_path_mirrors_apple_folders_without_traversal(self):
         self.assertEqual(adr.archive_path(CDN + "app-store/creative_assets-templates.fig"),
                          Path("app-store/creative_assets-templates.fig"))

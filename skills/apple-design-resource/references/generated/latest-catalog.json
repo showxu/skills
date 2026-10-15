@@ -1,16 +1,17 @@
 {
   "counts": {
     "by_link_kind": {
-      "apple-cdn-download": 112,
+      "apple-cdn-download": 117,
       "apple-developer-page": 10,
-      "external": 3,
+      "external": 1,
       "figma": 15,
       "sketch-cloud-share": 15,
       "sketch-library": 2
     },
     "by_reachability": {
+      "False": 6,
       "None": 2,
-      "True": 155
+      "True": 152
     },
     "by_resource_family": {
       "app-icon-template": 4,
@@ -23,12 +24,12 @@
       "resource-link": 7,
       "sf-symbols": 5,
       "technology-template": 32,
-      "ui-kit": 12
+      "ui-kit": 15
     },
-    "direct_download_candidates": 112,
-    "total": 157
+    "direct_download_candidates": 117,
+    "total": 160
   },
-  "fetched_at": "2026-10-15T05:22:02+00:00",
+  "fetched_at": "2026-10-15T10:22:55+00:00",
   "filters": {
     "label_contains": [],
     "link_kind": [],
@@ -36,12 +37,12 @@
     "section_contains": []
   },
   "previous": {
-    "candidates": 219,
+    "candidates": 220,
     "index": [
       "https://web.archive.org/cdx/search/cdx?url=devimages-cdn.apple.com/design/resources/download/*&collapse=urlkey&fl=original&filter=statuscode:200",
       "https://web.archive.org/cdx/search/cdx?url=developer.apple.com/design/downloads/*&collapse=urlkey&fl=original&filter=statuscode:200"
     ],
-    "reachable": 72
+    "reachable": 73
   },
   "resources": [
     {
@@ -51,15 +52,12 @@
       "label": "Figma",
       "link_kind": "figma",
       "probe": {
-        "accept_ranges": null,
-        "content_length": "0",
-        "content_type": "text/html; charset=UTF-8",
-        "etag": null,
-        "final_url": "https://www.figma.com/community/file/1651309003795292092/ios-and-ipados-27",
-        "last_modified": null,
+        "content_length": "679915",
+        "content_type": "text/html;charset=utf-8",
+        "error": "HTTP Error 404: Not Found",
         "method": "HEAD",
-        "reachable": true,
-        "status": 202
+        "reachable": false,
+        "status": 404
       },
       "resource_family": "ui-kit",
       "sections": [
@@ -105,15 +103,12 @@
       "label": "Figma",
       "link_kind": "figma",
       "probe": {
-        "accept_ranges": null,
-        "content_length": "0",
-        "content_type": "text/html; charset=UTF-8",
-        "etag": null,
-        "final_url": "https://www.figma.com/community/file/1645923469870515372/app-icon-template-ios-ipados-and-watchos-27",
-        "last_modified": null,
+        "content_length": "679885",
+        "content_type": "text/html;charset=utf-8",
+        "error": "HTTP Error 404: Not Found",
         "method": "HEAD",
-        "reachable": true,
-        "status": 202
+        "reachable": false,
+        "status": 404
       },
       "resource_family": "app-icon-template",
       "sections": [
@@ -186,15 +181,12 @@
       "label": "Figma",
       "link_kind": "figma",
       "probe": {
-        "accept_ranges": null,
-        "content_length": "0",
-        "content_type": "text/html; charset=UTF-8",
-        "etag": null,
-        "final_url": "https://www.figma.com/community/file/1651309434229735362/macos-27",
-        "last_modified": null,
+        "content_length": "679895",
+        "content_type": "text/html;charset=utf-8",
+        "error": "HTTP Error 404: Not Found",
         "method": "HEAD",
-        "reachable": true,
-        "status": 202
+        "reachable": false,
+        "status": 404
       },
       "resource_family": "ui-kit",
       "sections": [
@@ -342,15 +334,12 @@
       "label": "Figma",
       "link_kind": "figma",
       "probe": {
-        "accept_ranges": null,
-        "content_length": "0",
-        "content_type": "text/html; charset=UTF-8",
-        "etag": null,
-        "final_url": "https://www.figma.com/community/file/1540060090060216489/watchos-26",
-        "last_modified": null,
+        "content_length": "679915",
+        "content_type": "text/html;charset=utf-8",
+        "error": "HTTP Error 404: Not Found",
         "method": "HEAD",
-        "reachable": true,
-        "status": 202
+        "reachable": false,
+        "status": 404
       },
       "resource_family": "ui-kit",
       "sections": [
@@ -396,15 +385,12 @@
       "label": "Figma",
       "link_kind": "figma",
       "probe": {
-        "accept_ranges": null,
-        "content_length": "0",
-        "content_type": "text/html; charset=UTF-8",
-        "etag": null,
-        "final_url": "https://www.figma.com/community/file/1540071341298017505/visionos-26",
-        "last_modified": null,
+        "content_length": "679869",
+        "content_type": "text/html;charset=utf-8",
+        "error": "HTTP Error 404: Not Found",
         "method": "HEAD",
-        "reachable": true,
-        "status": 202
+        "reachable": false,
+        "status": 404
       },
       "resource_family": "ui-kit",
       "sections": [
@@ -471,15 +457,12 @@
       "label": "Figma",
       "link_kind": "figma",
       "probe": {
-        "accept_ranges": null,
-        "content_length": "0",
-        "content_type": "text/html; charset=UTF-8",
-        "etag": null,
-        "final_url": "https://www.figma.com/community/file/1253443272911187215/apple-design-resources-visionos",
-        "last_modified": null,
+        "content_length": "679857",
+        "content_type": "text/html;charset=utf-8",
+        "error": "HTTP Error 404: Not Found",
         "method": "HEAD",
-        "reachable": true,
-        "status": 202
+        "reachable": false,
+        "status": 404
       },
       "resource_family": "ui-kit",
       "sections": [
@@ -682,7 +665,7 @@
       "link_kind": "apple-developer-page",
       "probe": {
         "accept_ranges": "bytes",
-        "content_length": "17957",
+        "content_length": "6514",
         "content_type": "text/html",
         "etag": "\"4625-65dccea5ed419\"",
         "final_url": "https://developer.apple.com/design/human-interface-guidelines/healthkit/",
@@ -1566,7 +1549,7 @@
       "link_kind": "apple-developer-page",
       "probe": {
         "accept_ranges": "bytes",
-        "content_length": null,
+        "content_length": "115215",
         "content_type": "text/html",
         "etag": null,
         "final_url": "https://developer.apple.com/sf-symbols/",
@@ -1663,7 +1646,7 @@
       "download": {},
       "file_extension": ".dmg",
       "label": "Download version 2 for macOS",
-      "link_kind": "external",
+      "link_kind": "apple-cdn-download",
       "probe": {
         "accept_ranges": "bytes",
         "content_length": "6444470",
@@ -1689,7 +1672,7 @@
       "download": {},
       "file_extension": ".dmg",
       "label": "Download version 1 for macOS",
-      "link_kind": "external",
+      "link_kind": "apple-cdn-download",
       "probe": {
         "accept_ranges": "bytes",
         "content_length": "7380206",
@@ -2258,6 +2241,60 @@
       "direct_download": true,
       "download": {},
       "file_extension": ".dmg",
+      "label": "Apple tvOS UI Sketch Library 12",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "8292110",
+        "content_type": "application/x-apple-diskimage",
+        "etag": "\"970690cbe10dc7f57e0d336d86774381\"",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Apple-Sketch-Library-tvOS-18.dmg",
+        "last_modified": "Sat, 04 Jan 2025 02:02:48 GMT",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "ui-kit",
+      "sections": [
+        "Apple Design Resources",
+        "tvOS",
+        "tvOS 18",
+        "UI Kit"
+      ],
+      "source_line": null,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Apple-Sketch-Library-tvOS-18.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Apple visionOS UI Sketch Library 7",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "87327377",
+        "content_type": "application/x-apple-diskimage",
+        "etag": "\"bd8a46cd7cdd3f3e5e1f95798aa1247e-6\"",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Apple-Sketch-Library-visionOS-2.dmg",
+        "last_modified": "Tue, 21 Jan 2025 20:30:32 GMT",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "ui-kit",
+      "sections": [
+        "Apple Design Resources",
+        "visionOS",
+        "visionOS 2",
+        "UI Kit"
+      ],
+      "source_line": null,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Apple-Sketch-Library-visionOS-2.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
       "label": "Apple iOS 14 Sketch Library",
       "link_kind": "apple-cdn-download",
       "probe": {
@@ -2328,6 +2365,31 @@
       ],
       "source_line": null,
       "url": "https://devimages-cdn.apple.com/design/resources/download/Apple-Sketch-Library-Product-Bezels.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "Apple Sketch Library iOS 18",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "42328196",
+        "content_type": "application/x-apple-diskimage",
+        "etag": "\"4b3c9fdbd71743cde5823ff2bbfc8073-3\"",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/Apple-Sketch-Library-iOS-18.dmg",
+        "last_modified": "Sat, 01 Feb 2025 19:50:43 GMT",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "ui-kit",
+      "sections": [
+        "Apple Design Resources",
+        "Previous releases"
+      ],
+      "source_line": null,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/Apple-Sketch-Library-iOS-18.dmg"
     },
     {
       "direct_download": true,
@@ -4055,7 +4117,7 @@
       "url": "https://devimages-cdn.apple.com/design/resources/download/watchOS-9-Production-Templates-Sketch.dmg"
     }
   ],
-  "snapshot_dir": "Apple-Design-Resources-20261015-legacy",
-  "source_sha256": "1236a4564b0b6ff64c7d635e579aa2866783cdcd3670077ed59ebd13d9114c65",
+  "snapshot_dir": "Apple-Design-Resources-20261015-feeds",
+  "source_sha256": "e37087cadef4d7492a1fd0f74144bd46d908bc0e788d23e02a582f66c2a75c67",
   "source_url": "https://developer.apple.com/design/resources/"
 }

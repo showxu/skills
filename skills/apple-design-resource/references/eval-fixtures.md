@@ -25,12 +25,15 @@ Use these prompts to check routing and output boundaries.
 - The catalog should include source URL, fetch timestamp, resource rows, counts,
   generated snapshot path, and probe/download metadata when requested.
 - Rows should keep section context and classify link kind plus resource family.
-- Direct downloads should be limited to Apple CDN resources and skipped unless
+- Direct downloads should be limited to files on Apple-owned hosts and skipped unless
   `--download-direct` is passed.
 - Earlier releases appear only with `--include-previous`, under
   `Previous releases`, and only while Apple still serves them, from the CDN or
   the developer site's former download path; a redirected file appears once,
   at its current location, and nothing is downloaded from the Web Archive.
+- Sketch library rows (`sketch://add-library`) gain a downloadable row for the
+  disk image their feed publishes, in the same section; files on other
+  Apple-owned hosts are downloads, while their help pages stay links.
 - An archive run with `--downloads-dir` keeps Apple's file names, writes a
   merged `manifest.json` with SHA-256, ETag, and Last-Modified, and reuses
   unchanged files on the next run.
