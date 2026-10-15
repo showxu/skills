@@ -8,7 +8,8 @@ trigger hardening, and multi-skill review, use `skills/skill-creator/`.
 - each skill directory has `SKILL.md`
 - `SKILL.md` frontmatter has `name` and `description`
 - frontmatter `name` matches directory name
-- marketplace skill paths point to existing skill directories
+- the Claude marketplace publishes one root plugin with the same identity as Codex
+- Claude and Codex plugin versions equal Claude marketplace `metadata.version`
 - published skills have manual entry metadata when the repo expects it
 - README, AGENTS, and docs do not point to stale paths
 
@@ -20,7 +21,7 @@ git diff --check
 ```
 
 The repository check validates the committed publication surface, skill
-packages, marketplace paths and shared versions. Run it from a clean candidate
+packages, plugin manifests and shared versions. Run it from a clean candidate
 checkout. `--commit <revision>` checks only the publication surface of a
 specific commit, including files that Git would otherwise ignore.
 

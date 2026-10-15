@@ -11,8 +11,9 @@ public skill directory.
 - Monorepo root owns shared upstream manifests.
 - Repository-local Codex configuration in `.codex/config.toml` is ignored
   machine state for automations or commands launched from this repository.
-- Root `.claude-plugin/marketplace.json` owns local plugin groups. Groups are
-  discovery and install views, may overlap, and are not ownership boundaries.
+- Root `.claude-plugin/plugin.json` owns the `showxu-skills` Claude plugin
+  identity. `.claude-plugin/marketplace.json` publishes the root plugin, whose
+  skills are discovered from `skills/`.
 - For separately owned linked checkouts, source manifests should point at the
   real checkout root. Do not create wrapper marketplace metadata in this
   monorepo for an external repository that already owns its own metadata.
@@ -34,11 +35,10 @@ public skill directory.
 
 ## Placement Rules
 
-- Use `collection-taxonomy.md` before adding or moving local skills. It now
-  defines marketplace group routing and linked external source policy, not
-  local child-collection placement.
+- Use `collection-taxonomy.md` before adding or moving local skills. It
+  defines capability routing and linked external source policy.
 - Put root-level artifacts in root docs only when they describe the shared
-  repository model, lifecycle overlays, marketplace grouping, or upstream
+  repository model, lifecycle overlays, plugin distribution, or upstream
   intake.
 - Put domain-specific workflow detail inside the owning skill unless it is a
   cross-skill lifecycle overlay.
@@ -64,7 +64,7 @@ public skill directory.
 - When an external linked source exposes skills from a separately owned
   checkout, document the source owner and keep the manifest pointed at the real
   checkout root. Do not copy, move, or wrap the source tree's repository
-  metadata just to satisfy this repo's marketplace grouping.
+  metadata just to satisfy this repo's plugin distribution.
 
 ## Scripts
 

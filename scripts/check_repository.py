@@ -89,10 +89,16 @@ def collection_findings(root):
         findings.extend(f"{name}: {value}" for value in result["errors"])
         warnings.extend(f"{name}: {value}" for value in result["warnings"])
     claude = json.loads((root / ".claude-plugin/marketplace.json").read_text())
+    claude_plugin = json.loads((root / ".claude-plugin/plugin.json").read_text())
     codex = json.loads((root / ".codex-plugin/plugin.json").read_text())
     marketplace = json.loads((root / ".agents/plugins/marketplace.json").read_text())
-    if codex["version"] != claude["metadata"]["version"]:
-        findings.append("Codex and Claude marketplace versions differ")
+    if not (codex["version"] == claude_plugin["version"] == claude["metadata"]["version"]):
+        findings.append("Claude plugin, Codex plugin and Claude marketplace versions differ")
+    identity_fields = ("name", "version", "description", "author", "homepage",
+                       "repository", "license", "keywords")
+    identity = {key: codex[key] for key in identity_fields if key in codex}
+    if claude_plugin != identity:
+        findings.append("Claude plugin must mirror the supported Codex identity fields")
     if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", codex["version"]):
         findings.append("Plugin version must have three numeric components")
     if codex["skills"] != "./skills/":
@@ -102,20 +108,11 @@ def collection_findings(root):
             or marketplace["plugins"][0]["source"] != {
                 "source": "url", "url": "https://github.com/showxu/skills.git", "ref": "master"}):
         findings.append("Codex marketplace does not identify this repository's main plugin")
-    names = [entry["name"] for entry in claude["plugins"]]
-    if len(names) != len(set(names)):
-        findings.append("Claude marketplace has duplicate plugin names")
-    for entry in claude["plugins"]:
-        if entry["source"] != "./":
-            findings.append(f"{entry['name']}: marketplace source must be the repository root")
-        if entry.get("version", codex["version"]) != codex["version"]:
-            findings.append(f"{entry['name']}: explicit plugin version differs")
-        selected = entry["skills"]
-        if not selected or len(selected) != len(set(selected)):
-            findings.append(f"{entry['name']}: skill selection is empty or duplicated")
-        for value in selected:
-            if value not in {f"./skills/{name}" for name in skills}:
-                findings.append(f"{entry['name']}: unknown skill path {value}")
+    if (claude["name"] != codex["name"]
+            or claude["plugins"] != [{
+                "name": codex["name"], "source": "./",
+                "description": codex["description"]}]):
+        findings.append("Claude marketplace must publish the single root collection plugin")
     print(f"Checked {len(skills)} skill packages and both marketplaces")
     for warning in warnings:
         print(f"REVIEW {warning}")

@@ -8,7 +8,7 @@ provenance only.
 
 - `repository-layout.md`: ownership boundaries for root, linked external
   sources, and skill artifacts.
-- `collection-taxonomy.md`: marketplace group taxonomy, external linked source
+- `collection-taxonomy.md`: capability taxonomy, external linked source
   model, and routing rules for placing new skills.
 - `product-build-lifecycle.md`: product build lifecycle overlay from product
   facts to prototype projection, optional verification, and downstream build
@@ -27,5 +27,5 @@ provenance only.
 ## Root Scope
 
 Keep this directory focused on root rules, lifecycle overlays, marketplace
-groups, repository architecture, and provenance. Put single-skill policy,
+distribution, repository architecture, and provenance. Put single-skill policy,
 examples, templates, and workflow-specific notes inside the owning skill.

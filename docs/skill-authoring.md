@@ -218,18 +218,18 @@ Use these questions when reviewing a skill:
 
 The repository publishes skills through these manifests:
 
-- `.claude-plugin/marketplace.json`: the `skills` marketplace and its six
-  overlapping plugin groups. Each entry selects real directories under
-  `skills/`.
+- `.claude-plugin/plugin.json`: the root `showxu-skills` Claude plugin.
+  Claude discovers its skills from `skills/`.
+- `.claude-plugin/marketplace.json`: the `showxu-skills` marketplace with one
+  `showxu-skills` entry containing its name, description, and `source: "./"`.
 - `.agents/plugins/marketplace.json`: the `showxu-skills` Codex marketplace.
   Its single plugin uses the `showxu/skills` Git repository at `master` as its
   source root.
 - `.codex-plugin/plugin.json`: the root `showxu-skills` Codex plugin, which
   exposes `./skills/`.
 
-The Codex manifest version equals Claude marketplace `metadata.version`.
-Claude entries use commit-based versions while their entry `version` is unset;
-if an entry is pinned, its version must also follow the shared release version.
+The Claude and Codex plugin manifest versions equal Claude marketplace
+`metadata.version`. The Claude plugin manifest owns its installation version.
 
 Codex CLI 0.139.0 requires a local source to name a nonempty normal subdirectory
 under its marketplace root. A Git URL source supports a plugin at the repository
@@ -238,9 +238,11 @@ files into `release/` under a temporary marketplace and point its local source
 at `./release`. This fixture checks the plugin content; Git source installation
 and marketplace refresh require a separately published revision.
 
-Run package validation per skill and `claude plugin validate .`. Keep install
-checks in throwaway `CLAUDE_CONFIG_DIR` and `CODEX_HOME` directories, compare
-cached skills with the manifests, and compare checksums of the real host
-configuration before and after. Use a clean release export so ignored private
-assets and build output do not enter local plugin caches. Each host's install
-and local manifest-check commands are in root `README.md`.
+Run package validation per skill and `claude plugin validate .`. For isolated
+install checks, use temporary `CLAUDE_CONFIG_DIR` and `CODEX_HOME` directories
+under `.build/` and compare the real host configuration before and after.
+Verify the installed version and skill inventory with
+`claude plugin list --json` and `claude plugin details showxu-skills@showxu-skills`.
+For distribution checks that copy files, use a clean release export so ignored
+private assets and build output do not enter caches. Each host's install and
+local manifest-check commands are in root `README.md`.
