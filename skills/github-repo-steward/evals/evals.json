@@ -1,0 +1,59 @@
+{
+  "skill_name": "github-repo-steward",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Set up the GitHub side of my personal repository, example-owner/parcel. It has no organization and no standard yet.",
+      "expected_output": "A personal repository uses explicit overridable defaults, records choices and creates repository-owned community files without inventing an organization.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Bring example-team/parcel into line with our shared standard. The repository currently uses main.",
+      "expected_output": "Read example-team/.github at its default branch and accepted revision; apply its declared trunk branch and review policy instead of personal defaults.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Render a social card for sample-appstoreconnect. Keep its full name and summary readable.",
+      "expected_output": "Try a single-line title from maximum down to the stated minimum; use balanced separator boundaries only when necessary. Never leave a dangling hyphen or split arbitrary letters.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Audit this repository against the attached standard; do not change anything.",
+      "expected_output": "Return evidence-backed expected/observed differences and unknowns while keeping all local and remote state unchanged.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Our PR title edit reruns the compiler matrix. Fix the baseline workflow pattern.",
+      "expected_output": "Separate policy events including edited from validation events excluding edited; retain exact required contexts and safe concurrency.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "The published release tag contains a typo. Can we move it and replace its asset?",
+      "expected_output": "Preserve the immutable tag and published bytes; prepare the next patch or policy-required larger version through the ecosystem release owner.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "The chooser cannot select the accepted preview PNG in my signed-in macOS browser. Complete the upload.",
+      "expected_output": "Prepare page-context File/DataTransfer on the exact trusted settings tab after the owner temporarily enables Apple Events JavaScript; verify GraphQL, served dimensions, bytes and RGBA pixels; hand back turn-off.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "Reorganize the architecture and reference documents in this repository.",
+      "expected_output": "Route document roles to repository-docs with relevant repository context; do not expand the repository steward into a documentation architecture owner.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "Audit example-team/parcel. Access to example-team/.github currently returns a permissions error.",
+      "expected_output": "Report authority unknown and continue independent observations without substituting personal defaults.",
+      "files": []
+    }
+  ]
+}
