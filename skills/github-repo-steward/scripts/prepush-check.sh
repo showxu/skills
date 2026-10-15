@@ -8,7 +8,7 @@ set -u
 name=$(git config user.name)
 email=$(git config user.email)
 zero=0000000000000000000000000000000000000000
-trailer='^(Co-authored-by|Made-with|Generated-by|Generated-with|Assisted-by|Signed-off-by):|Generated with|cursor\.com|anthropic\.com|claude\.ai|openai\.com'
+trailer='^(Co-authored-by|Made-with|Generated-by|Generated-with|Assisted-by|Signed-off-by):|Generated[[:space:]]with|cursor\.com|anthropic\.com|claude\.ai|openai\.com'
 status=0
 new_commits=
 has_candidate=0
