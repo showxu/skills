@@ -41,6 +41,12 @@ With Icon Composer 27 and design generations 26 and 27, the measured iOS
 and macOS exports share the same mask. The outline achieves alpha IoU
 0.999767 and bidirectional contour deviation 0.3491 px at 1024 px, measured
 on the 50% alpha contour using marching squares and point-to-segment distance.
+Apple's iOS 27 App Icon Template draws its mask with 10 cubics per corner;
+that path is within 1.06 px of the Icon Composer mask, and this outline is
+within 0.89 px of it.
+
+`apple-framework-icon-design` draws its framework tiles with the same
+`CORNER` values and relies on this measurement; change both skills together.
 
 ## Style Renderings
 

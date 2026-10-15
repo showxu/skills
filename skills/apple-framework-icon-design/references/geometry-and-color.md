@@ -37,27 +37,19 @@ each edge. Curvature is continuous along the whole outline.
 `continuous_square()` returns the outline as points for the slab projection,
 and `tile_path()` returns it as an SVG path for front-facing tiles.
 
-At scale 1.0 the outline is the app icon mask:
+At scale 1.0 the outline is the Liquid Glass app icon mask. `CORNER` equals
+`CORNER` in `apple-app-icon-design`, whose `references/rendering.md` owns the
+measurement against Icon Composer and Apple's App Icon Template; change both
+skills together.
 
-- Ground truth is a full-bleed solid `.icon` exported by `ictool` 27.0 at
-  1024 px, for iOS and macOS, design generations 26 and 27. All four masks
-  are identical.
-- The `tile_path()` outline rendered at 1024 px has IoU 0.99977 with that
-  mask and at most 0.35 px bidirectional contour deviation, measured on the
-  50% alpha contour with marching squares. Acceptance is IoU of at least
-  0.999 and deviation of at most 0.5 px.
-- Apple's iOS 27 App Icon Template draws its mask with 10 cubics per corner.
-  That path is within 1.06 px of the `ictool` mask, and this outline is
-  within 0.89 px of it.
 - Front-facing framework tiles (SwiftUI, Create ML) fit best at scale 1.005,
   so tiles use 1.0.
 - Stacked slab silhouettes (CloudKit, Core ML, ARKit, SceneKit, WidgetKit)
   fit best between 0.56 and 0.83; 0.70 gives the highest mean silhouette IoU,
   above the circular corner it replaced.
 
-Re-measure when Xcode changes the icon mask: export a solid `.icon` with
-`ictool --export-image` and compare its alpha with `tile_path()` at the same
-size.
+When Xcode changes the icon mask, re-measure as `apple-app-icon-design`
+describes, then refit the tile and slab scales here.
 
 ## Styles
 
