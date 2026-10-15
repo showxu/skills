@@ -9,6 +9,8 @@ Use these prompts to check routing and output boundaries.
 - "Refresh the Apple UI kit and app icon template catalog for iOS/macOS."
 - "Probe whether the SF Pro, SF Symbols, Figma, and Sketch resource links are alive."
 - "Download the direct Apple CDN design-resource archives with a 500 MB cap."
+- "Archive every Apple design resource we can still download, including earlier
+  production templates, with checksums."
 
 ## Should Not Trigger Alone
 
@@ -25,3 +27,11 @@ Use these prompts to check routing and output boundaries.
 - Rows should keep section context and classify link kind plus resource family.
 - Direct downloads should be limited to Apple CDN resources and skipped unless
   `--download-direct` is passed.
+- Earlier releases appear only with `--include-previous`, under
+  `Previous releases`, and only while Apple's CDN still serves them; nothing
+  is downloaded from the Web Archive.
+- An archive run with `--downloads-dir` keeps Apple's file names, writes a
+  merged `manifest.json` with SHA-256, ETag, and Last-Modified, and reuses
+  unchanged files on the next run.
+- `--extract-dmg` without `--accept-license` fails before any network access;
+  accepted extractions record the license agreement's title and SHA-256.

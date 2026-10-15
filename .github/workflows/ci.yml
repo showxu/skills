@@ -55,6 +55,8 @@ jobs:
         run: |
           mkdir -p .build/app-icon-tests
           TMPDIR="$PWD/.build/app-icon-tests" python3 -B skills/apple-app-icon-design/scripts/test_app_icons.py
+      - name: Exercise design resource archive
+        run: python3 -B skills/apple-design-resource/scripts/test_fetch_apple_design_resources.py
       - name: Check documentation adapters
         run: python3 -B skills/repository-docs/scripts/derive_rules.py skills/pyproject-docs --check
       - name: Exercise repository policy
