@@ -59,13 +59,15 @@ handoff artifacts.
    links with bounded concurrency and records status, content type, content
    length, ETag, Last-Modified, and errors.
 3. Add `--include-previous` when earlier releases matter, such as production
-   templates for an earlier OS. The Web Archive index supplies file names Apple's
-   CDN has served; only files Apple still serves are added, under
-   `Previous releases`.
+   templates for an earlier OS. The Web Archive index supplies file names that
+   Apple's CDN and the developer site's former `design/downloads/` path have
+   served; only files Apple still serves are added, under `Previous releases`,
+   at their current location after redirects.
 4. Add `--download-direct` only when the user explicitly asks for local copies.
    The script downloads only direct Apple CDN resources and respects
    `--max-download-bytes`. `--downloads-dir` points at a durable archive;
-   files keep Apple's names and folders, `manifest.json` records each file's
+   files keep Apple's names and folders, with former developer-site downloads
+   under `design-downloads/`, `manifest.json` records each file's
    URL, size, SHA-256, ETag, Last-Modified, and download time, and later runs
    reuse files that still match their manifest entries.
 5. Add `--extract-dmg --accept-license` only when the user asks to unpack

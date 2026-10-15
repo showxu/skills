@@ -12,6 +12,7 @@ from unittest.mock import patch
 import fetch_apple_design_resources as adr
 
 CDN = "https://devimages-cdn.apple.com/design/resources/download/"
+LEGACY = "https://developer.apple.com/design/downloads/"
 
 
 class FakeResponse(io.BytesIO):
@@ -30,8 +31,10 @@ class PreviousReleaseTests(unittest.TestCase):
     def test_canonical_download_keeps_only_cdn_files(self):
         self.assertEqual(adr.canonical_download("http://devimages-cdn.apple.com/design/resources/download/A.dmg?x=1"),
                          CDN + "A.dmg")
+        self.assertEqual(adr.canonical_download("http://developer.apple.com:80/design/downloads/A.dmg"),
+                         LEGACY + "A.dmg")
         for url in ("https://example.com/design/resources/download/A.dmg",
-                    "https://devimages-cdn.apple.com/other/A.dmg", CDN):
+                    "https://devimages-cdn.apple.com/other/A.dmg", CDN, LEGACY + "sketch.rss"):
             self.assertIsNone(adr.canonical_download(url))
 
     def test_previous_releases_exclude_listed_and_unserved_files(self):
@@ -41,7 +44,7 @@ class PreviousReleaseTests(unittest.TestCase):
             "SF-Symbols-7.dmg", "iOS-26-Icon-Templates-Photoshop-Illustrator.dmg", "Bezel-iPhone-15.dmg",
             "iOS-15-Production-Templates-Sketch.dmg"))
         gone = CDN + "iOS-15-Production-Templates-Sketch.dmg"
-        with patch.object(adr, "fetch_text", return_value=index), \
+        with patch.object(adr, "fetch_text", side_effect=lambda url, timeout: index if "devimages" in url else ""), \
                 patch.object(adr, "probe_link", side_effect=lambda r, t: {"reachable": r.url != gone, "status": 200}):
             records, stats = adr.previous_records([listed], 10, 2)
         self.assertEqual(stats["candidates"], 5)
@@ -54,10 +57,30 @@ class PreviousReleaseTests(unittest.TestCase):
         self.assertTrue(all(r.sections == adr.PREVIOUS_SECTIONS and r.link_kind == "apple-cdn-download"
                             for r in records))
 
+    def test_former_download_path_resolves_to_current_location_once(self):
+        listed = adr.LinkRecord(label="Keynote", url=CDN + "iOS-13-Keynote.dmg", sections=[])
+        indexes = {"devimages": CDN + "Glyph-ARKit.dmg",
+                   "developer": "\n".join(LEGACY + n for n in ("iOS-13-Keynote.dmg", "Glyph-ARKit.dmg",
+                                                               "Apple-iOS-14-Sketch-Library.dmg", "sketch.rss"))}
+        redirects = {LEGACY + "iOS-13-Keynote.dmg": CDN + "iOS-13-Keynote.dmg",
+                     LEGACY + "Glyph-ARKit.dmg": CDN + "Glyph-ARKit.dmg"}
+
+        def probe(record, timeout):
+            return {"reachable": True, "status": 200, "final_url": redirects.get(record.url, record.url)}
+        with patch.object(adr, "fetch_text", side_effect=lambda url, t: next(v for k, v in indexes.items() if k in url)), \
+                patch.object(adr, "probe_link", side_effect=probe):
+            records, stats = adr.previous_records([listed], 10, 2)
+        self.assertEqual(sorted(r.url for r in records),
+                         sorted([CDN + "Glyph-ARKit.dmg", LEGACY + "Apple-iOS-14-Sketch-Library.dmg"]))
+        self.assertEqual(stats["candidates"], 4)
+        self.assertTrue(all(r.link_kind == "apple-cdn-download" for r in records))
+
     def test_archive_path_mirrors_apple_folders_without_traversal(self):
         self.assertEqual(adr.archive_path(CDN + "app-store/creative_assets-templates.fig"),
                          Path("app-store/creative_assets-templates.fig"))
         self.assertEqual(adr.archive_path(CDN + "../x/a b.dmg"), Path("x/a-b.dmg"))
+        self.assertEqual(adr.archive_path(LEGACY + "Apple-iOS-14-Sketch-Library.dmg"),
+                         Path("design-downloads/Apple-iOS-14-Sketch-Library.dmg"))
 
 
 class ArchiveDownloadTests(unittest.TestCase):
