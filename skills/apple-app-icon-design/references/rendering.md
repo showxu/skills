@@ -57,8 +57,26 @@ path on macOS 27.0.1. Per unit radius, the corner departs each edge at
 | `mac-tile` | Continuous radius 185.4 px on an 824 px tile inset 100 px | Black shadow: 10 px down, Gaussian deviation 10 px, opacity 0.30 | macOS 15 production template |
 | `gloss` | Circular radius 10/57 of the side | White highlight, path `M0 0H1024V400Q512 620 0 400Z`, opacity 0.5 at the top to 0.1 at the bottom | Approximation |
 
-Measurements used Apple's iOS 18 and macOS Sequoia production templates for
-Sketch, compared at 1024 px with `rsvg-convert` 2.63.2:
+Measurements used Apple's production templates for Sketch, compared at
+1024 px with `rsvg-convert` 2.63.2:
+
+- `https://devimages-cdn.apple.com/design/resources/download/iOS-18-Production-Templates-Sketch.dmg`
+  (`Template - App Icon.sketch`)
+- `https://devimages-cdn.apple.com/design/resources/download/macOS-Sequoia-Production-Templates-Sketch.dmg`
+  (`Template - Icon - App.sketch`)
+
+`apple-design-resource` catalogs both under `Previous releases` while Apple
+serves them. To fetch them, with the other production templates for Sketch,
+into an archive and unpack the Sketch files:
+
+```sh
+python3 skills/apple-design-resource/scripts/fetch_apple_design_resources.py \
+  --include-previous --label-contains "Production Templates Sketch" \
+  --download-direct --downloads-dir ARCHIVE \
+  --extract-dmg --accept-license --extract-extension .sketch
+```
+
+Results:
 
 - **flat**: the template's 1024 px mask is a smooth-corner rectangle with
   radius 229. Against it, the continuous outline with radius 229 has alpha
@@ -77,7 +95,7 @@ Sketch, compared at 1024 px with `rsvg-convert` 2.63.2:
 
 Apple's templates are licensed Apple Design Resources. This skill records
 measured values only and does not redistribute template content; repeating a
-measurement requires obtaining the templates under Apple's license.
+measurement requires accepting the license agreement in each disk image.
 
 ## Web Icons
 

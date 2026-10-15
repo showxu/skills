@@ -8,6 +8,7 @@ import csv
 import hashlib
 import html
 import json
+import plistlib
 import re
 import shutil
 import subprocess
@@ -26,6 +27,15 @@ from urllib.request import Request, urlopen
 
 
 DEFAULT_SOURCE_URL = "https://developer.apple.com/design/resources/"
+DOWNLOAD_HOST = "devimages-cdn.apple.com"
+DOWNLOAD_PREFIX = "/design/resources/download/"
+# The Web Archive index lists file names Apple's CDN served for earlier releases;
+# only files Apple still serves are cataloged or downloaded.
+PREVIOUS_INDEX_URL = (
+    "https://web.archive.org/cdx/search/cdx?url=devimages-cdn.apple.com/design/resources/download/*"
+    "&collapse=urlkey&fl=original&filter=statuscode:200"
+)
+PREVIOUS_SECTIONS = ["Apple Design Resources", "Previous releases"]
 USER_AGENT = "Mozilla/5.0 (compatible; AppleDesignResourceSkill/1.0)"
 DIRECT_EXTENSIONS = {
     ".ai",
@@ -208,9 +218,9 @@ def classify(link: LinkRecord) -> None:
         family = "sf-symbols"
     elif "icon composer" in text:
         family = "icon-composer"
-    elif "app icon" in text:
+    elif "app icon" in text or "icon template" in text:
         family = "app-icon-template"
-    elif "technology" in text or any(term in text for term in ("apple pay", "app clips", "wallet", "siri", "tipkit", "airplay", "homekit", "arkit", "live activities", "messages", "tap to pay")):
+    elif "technology" in text or "tech design template" in text or any(term in text for term in ("apple pay", "app clips", "wallet", "siri", "tipkit", "airplay", "homekit", "arkit", "live activities", "messages", "tap to pay")):
         family = "technology-template"
     elif "ui kit" in text:
         family = "ui-kit"
@@ -246,6 +256,8 @@ def probe_link(link: LinkRecord, timeout: int) -> dict[str, Any]:
                     "content_type": response.headers.get("content-type"),
                     "content_length": response.headers.get("content-length"),
                     "accept_ranges": response.headers.get("accept-ranges"),
+                    "etag": response.headers.get("etag"),
+                    "last_modified": response.headers.get("last-modified"),
                 }
         except HTTPError as exc:
             if method == "HEAD" and exc.code in {403, 405, 501}:
@@ -273,6 +285,43 @@ def probe_links(records: list[LinkRecord], timeout: int, max_workers: int) -> No
             records[future_to_index[future]].probe = future.result()
 
 
+def canonical_download(url: str) -> str | None:
+    """The https URL of an Apple CDN design-resource file, or None for other URLs."""
+    parts = urlsplit(url.strip())
+    if parts.netloc.lower() != DOWNLOAD_HOST or not parts.path.startswith(DOWNLOAD_PREFIX):
+        return None
+    if parts.path.endswith("/"):
+        return None
+    return f"https://{DOWNLOAD_HOST}{parts.path}"
+
+
+def previous_records(
+    current: list[LinkRecord], timeout: int, max_workers: int
+) -> tuple[list[LinkRecord], dict[str, Any]]:
+    """Earlier-release files that Apple's CDN still serves but the live page no longer lists."""
+    listed = {canonical_download(record.url) for record in current}
+    candidates = sorted({canonical_download(line) for line in fetch_text(PREVIOUS_INDEX_URL, timeout).split()}
+                        - listed - {None})
+    records = []
+    for url in candidates:
+        stem = Path(urlsplit(url).path).stem
+        record = LinkRecord(label=re.sub(r"[-_]+", " ", stem).strip(), url=url, sections=list(PREVIOUS_SECTIONS))
+        classify(record)
+        records.append(record)
+    probe_links(records, timeout, max_workers)
+    live = [record for record in records if record.probe.get("reachable")]
+    return live, {"index": PREVIOUS_INDEX_URL, "candidates": len(records), "reachable": len(live)}
+
+
+def archive_path(url: str) -> Path:
+    """The file's place in an archive: its path below Apple's download folder."""
+    path = urlsplit(url).path
+    relative = path[len(DOWNLOAD_PREFIX):] if path.startswith(DOWNLOAD_PREFIX) else Path(path).name
+    parts = [re.sub(r"[^A-Za-z0-9._-]+", "-", part).strip("-") for part in relative.split("/")]
+    parts = [part for part in parts if part and part not in {".", ".."}]
+    return Path(*parts) if parts else Path("resource")
+
+
 def contains_all(value: str, needles: list[str] | None) -> bool:
     if not needles:
         return True
@@ -297,69 +346,101 @@ def filter_records(records: list[LinkRecord], args: argparse.Namespace) -> list[
     return filtered
 
 
-def safe_filename(link: LinkRecord, index: int) -> str:
-    parsed = urlsplit(link.url)
-    name = Path(parsed.path).name or f"resource-{index}"
-    name = re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-._")
-    if not name:
-        name = f"resource-{index}"
-    if index:
-        stem = Path(name).stem
-        suffix = Path(name).suffix
-        return f"{index:03d}-{stem}{suffix}"
-    return name
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def read_manifest(downloads_dir: Path) -> dict[str, dict[str, Any]]:
+    path = downloads_dir / "manifest.json"
+    if not path.exists():
+        return {}
+    return {entry["url"]: entry for entry in json.loads(path.read_text(encoding="utf-8"))["files"]}
+
+
+def write_manifest(downloads_dir: Path, records: list[LinkRecord]) -> None:
+    """Merge this run's downloads into the archive manifest that travels with the files."""
+    entries = read_manifest(downloads_dir)
+    for record in records:
+        if record.download.get("downloaded"):
+            entries[record.url] = {
+                "url": record.url,
+                "label": record.label,
+                "sections": record.sections,
+                "resource_family": record.resource_family,
+                **{key: record.download.get(key) for key in ("file", "bytes", "sha256", "etag", "last_modified", "downloaded_at")},
+            }
+    data = {"files": sorted(entries.values(), key=lambda entry: entry["file"])}
+    write_json(downloads_dir / "manifest.json", data)
 
 
 def download_direct(records: list[LinkRecord], downloads_dir: Path, max_bytes: int, timeout: int) -> None:
+    """Download Apple CDN files into an archive, reusing files that still match the manifest."""
     downloads_dir.mkdir(parents=True, exist_ok=True)
-    for index, record in enumerate(records, start=1):
+    manifest = read_manifest(downloads_dir)
+    for record in records:
         if record.link_kind != "apple-cdn-download":
             continue
         status = record.probe or probe_link(record, timeout)
         length_value = status.get("content_length")
-        if length_value and str(length_value).isdigit() and int(length_value) > max_bytes:
+        length = int(length_value) if length_value and str(length_value).isdigit() else None
+        if length is not None and length > max_bytes:
             record.download = {
                 "downloaded": False,
                 "reason": "content length exceeds max-download-bytes",
-                "content_length": int(length_value),
+                "content_length": length,
                 "max_download_bytes": max_bytes,
             }
             continue
 
-        filename = safe_filename(record, index)
-        output_path = downloads_dir / filename
+        relative = archive_path(record.url)
+        target = downloads_dir / relative
+        known = manifest.get(record.url)
+        if (known and target.exists() and known.get("file") == str(relative)
+                and target.stat().st_size == known.get("bytes") and length in (None, known.get("bytes"))
+                and status.get("etag") in (None, known.get("etag"))
+                and file_sha256(target) == known.get("sha256")):
+            record.download = {**{key: known.get(key) for key in ("file", "bytes", "sha256", "etag", "last_modified", "downloaded_at")},
+                               "downloaded": True, "reused": True}
+            continue
+
+        target.parent.mkdir(parents=True, exist_ok=True)
+        partial = target.with_name(target.name + ".part")
         request = Request(record.url, headers={"User-Agent": USER_AGENT})
         digest = hashlib.sha256()
         total = 0
         try:
-            with urlopen(request, timeout=timeout) as response, output_path.open("wb") as handle:
-                while True:
-                    chunk = response.read(1024 * 1024)
-                    if not chunk:
-                        break
+            with urlopen(request, timeout=timeout) as response, partial.open("wb") as handle:
+                headers = response.headers
+                for chunk in iter(lambda: response.read(1024 * 1024), b""):
                     total += len(chunk)
                     if total > max_bytes:
-                        handle.close()
-                        output_path.unlink(missing_ok=True)
-                        record.download = {
-                            "downloaded": False,
-                            "reason": "download exceeded max-download-bytes",
-                            "max_download_bytes": max_bytes,
-                        }
                         break
                     digest.update(chunk)
                     handle.write(chunk)
-                else:
-                    pass
-            if not record.download:
+            if total > max_bytes:
+                partial.unlink(missing_ok=True)
                 record.download = {
-                    "downloaded": True,
-                    "path": str(output_path),
-                    "bytes": total,
-                    "sha256": digest.hexdigest(),
+                    "downloaded": False,
+                    "reason": "download exceeded max-download-bytes",
+                    "max_download_bytes": max_bytes,
                 }
+                continue
+            partial.replace(target)
+            record.download = {
+                "downloaded": True,
+                "file": str(relative),
+                "bytes": total,
+                "sha256": digest.hexdigest(),
+                "etag": headers.get("etag"),
+                "last_modified": headers.get("last-modified"),
+                "downloaded_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+            }
         except (HTTPError, URLError, OSError, TimeoutError) as exc:
-            output_path.unlink(missing_ok=True)
+            partial.unlink(missing_ok=True)
             record.download = {"downloaded": False, "error": repr(exc)}
 
 
@@ -376,11 +457,31 @@ def normalize_extensions(values: list[str] | None) -> set[str]:
     return extensions or {".png"}
 
 
+def dmg_license(dmg_path: Path) -> dict[str, str] | None:
+    """Title and SHA-256 of the license agreement embedded in a disk image, if any."""
+    result = subprocess.run(["hdiutil", "udifderez", "-xml", str(dmg_path)], capture_output=True)
+    if result.returncode or not result.stdout.strip():
+        return None
+    try:
+        resources = plistlib.loads(result.stdout)
+    except (plistlib.InvalidFileException, ValueError):
+        return None
+    for item in resources.get("TEXT", []):
+        data = item.get("Data", b"")
+        lines = [line.strip() for line in data.decode("mac_roman", "replace").replace("\r", "\n").splitlines()]
+        lines = [line for line in lines if line]
+        if len(data) > 200 and lines:
+            return {"title": " ".join(lines[:2]), "sha256": hashlib.sha256(data).hexdigest()}
+    return None
+
+
 def extract_downloaded_dmgs(
     records: list[LinkRecord],
+    downloads_dir: Path,
     extract_dir: Path,
     extensions: set[str],
 ) -> None:
+    """Mount downloaded disk images and copy matching files; the caller has accepted their licenses."""
     extract_dir.mkdir(parents=True, exist_ok=True)
     mount_root = extract_dir / ".mounts"
     mount_root.mkdir(parents=True, exist_ok=True)
@@ -389,7 +490,7 @@ def extract_downloaded_dmgs(
         download = record.download
         if not download.get("downloaded"):
             continue
-        dmg_path = Path(str(download.get("path", "")))
+        dmg_path = downloads_dir / str(download.get("file", ""))
         if dmg_path.suffix.lower() != ".dmg" or not dmg_path.exists():
             continue
 
@@ -402,6 +503,7 @@ def extract_downloaded_dmgs(
             "extensions": sorted(extensions),
             "path": str(destination),
             "files": 0,
+            "license": dmg_license(dmg_path),
         }
 
         attach = subprocess.run(
@@ -494,7 +596,7 @@ def write_csv(path: Path, records: list[LinkRecord]) -> None:
                 "content_type",
                 "content_length",
                 "downloaded",
-                "download_path",
+                "download_file",
             ],
             lineterminator="\n",
         )
@@ -514,7 +616,7 @@ def write_csv(path: Path, records: list[LinkRecord]) -> None:
                     "content_type": record.probe.get("content_type", ""),
                     "content_length": record.probe.get("content_length", ""),
                     "downloaded": record.download.get("downloaded", ""),
-                    "download_path": record.download.get("path", ""),
+                    "download_file": record.download.get("file", ""),
                 }
             )
 
@@ -541,6 +643,8 @@ def write_readme(path: Path, catalog: dict[str, Any]) -> None:
         f"- Filters: `{json.dumps(catalog.get('filters', {}), sort_keys=True)}`",
         f"- Resources: {counts['total']}",
         f"- Direct Apple CDN candidates: {counts['direct_download_candidates']}",
+        *([f"- Previous releases: {catalog['previous']['reachable']} still served by Apple "
+           f"of {catalog['previous']['candidates']} indexed"] if catalog.get("previous") else []),
         "",
         "## Link Kinds",
         "",
@@ -584,15 +688,27 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--link-kind", action="append", help="Include only this link kind; repeat for more.")
     parser.add_argument("--section-contains", action="append", help="Include only rows whose section path contains this text.")
     parser.add_argument("--label-contains", action="append", help="Include only rows whose label contains this text.")
+    parser.add_argument("--include-previous", action="store_true",
+                        help="Add earlier-release files that Apple's CDN still serves.")
     parser.add_argument("--download-direct", action="store_true")
+    parser.add_argument("--downloads-dir", type=Path,
+                        help="Archive directory for downloads; defaults to the snapshot's downloads folder.")
     parser.add_argument("--max-download-bytes", type=int, default=500 * 1024 * 1024)
     parser.add_argument("--extract-dmg", action="store_true", help="Extract matching files from downloaded DMGs.")
+    parser.add_argument("--accept-license", action="store_true",
+                        help="Accept the license agreements of the disk images that --extract-dmg mounts.")
     parser.add_argument(
         "--extract-extension",
         action="append",
         help="Extension to extract from DMGs; repeat for more. Defaults to .png.",
     )
-    return parser.parse_args(argv)
+    args = parser.parse_args(argv)
+    if args.extract_dmg and not args.download_direct:
+        parser.error("--extract-dmg requires --download-direct")
+    if args.extract_dmg and not args.accept_license:
+        parser.error("--extract-dmg mounts disk images whose license agreements must be accepted; "
+                     "pass --accept-license after reviewing them")
+    return args
 
 
 def main(argv: list[str]) -> int:
@@ -605,6 +721,10 @@ def main(argv: list[str]) -> int:
     page_html = fetch_text(args.source_url, args.timeout)
     source_sha256 = hashlib.sha256(page_html.encode("utf-8")).hexdigest()
     records = parse_links(page_html, args.source_url)
+    previous = None
+    if args.include_previous:
+        earlier, previous = previous_records(records, args.timeout, max(1, args.max_workers))
+        records += earlier
     records = filter_records(records, args)
     if not records:
         print("No resource links found after filters.", file=sys.stderr)
@@ -613,23 +733,25 @@ def main(argv: list[str]) -> int:
     if args.probe:
         probe_links(records, args.timeout, max(1, args.max_workers))
 
+    downloads_dir = args.downloads_dir or snapshot_dir / "downloads"
     if args.download_direct:
-        download_direct(records, snapshot_dir / "downloads", args.max_download_bytes, args.timeout)
+        download_direct(records, downloads_dir, args.max_download_bytes, args.timeout)
+        write_manifest(downloads_dir, records)
 
     if args.extract_dmg:
-        if not args.download_direct:
-            raise SystemExit("--extract-dmg requires --download-direct")
         extract_downloaded_dmgs(
             records,
+            downloads_dir,
             snapshot_dir / "extracted",
             normalize_extensions(args.extract_extension),
         )
 
-    # Catalog paths resolve against the output root when shared between machines.
+    # Download files are relative to the archive and extraction paths to the output
+    # root, so a catalog never records a machine's absolute paths.
     for record in records:
-        for detail in (record.download, record.download.get("extract", {})):
-            if detail.get("path"):
-                detail["path"] = str(Path(detail["path"]).relative_to(args.output_dir))
+        extract = record.download.get("extract", {})
+        if extract.get("path"):
+            extract["path"] = str(Path(extract["path"]).relative_to(args.output_dir))
 
     catalog = {
         "source_url": args.source_url,
@@ -645,6 +767,8 @@ def main(argv: list[str]) -> int:
         "resources": [record_to_dict(record) for record in records],
         "counts": build_counts(records),
     }
+    if previous:
+        catalog["previous"] = previous
 
     catalog_path = snapshot_dir / "catalog.json"
     links_path = snapshot_dir / "links.csv"
