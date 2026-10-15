@@ -86,7 +86,7 @@ rendering/upload evidence. It does not own the following artifacts or decisions:
 | Documentation roles, architecture and review-rule format | `repository-docs` |
 | Issue triage, implementation and PR lifecycle | `github-issue-workflow` |
 | Framework icon family or app icons | `apple-framework-icon-design`, `apple-app-icon-design` |
-| Ecosystem release mechanics | That ecosystem's release skill, e.g. `swiftpm-github-release` for Swift packages |
+| Ecosystem release mechanics | The ecosystem's release skill (for SwiftPM, `swiftpm-github-release` when installed) |
 
 Hand over the repository, applicable standard revision, accepted source, scoped
 change and evidence. Do not implement another owner's policy by copying it here.

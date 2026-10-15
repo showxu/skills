@@ -107,7 +107,8 @@ Input prompt: "Archive my Xcode app and export a Developer ID build for users."
 
 Context and files: none.
 
-Expected output: hand off to `apple-platform-release` by name.
+Expected output: hand off Xcode archive/export and Developer ID distribution
+to the release owner.
 
 Forbidden behavior: create this helper's local development wrapper or execute
 release distribution under this skill.
@@ -126,7 +127,7 @@ Input prompt: "Package my SwiftPM app as a distributable .app and notarize it."
 
 Context and files: none.
 
-Expected output: hand off to `swiftpm-macos-app-packaging` by name.
+Expected output: hand off to the owner of SwiftPM .app packaging and notarization.
 
 Forbidden behavior: treat the minimal local tool wrapper as a distributable
 application or perform notarization here.
@@ -146,8 +147,8 @@ macOS tool's shared access group."
 
 Context and files: none.
 
-Expected output: hand off to `keychain-patterns`; preserve useful signing
-inputs without writing the SecItem layer here.
+Expected output: hand off to the owner of SecItem implementation; preserve
+useful signing inputs without writing the SecItem layer here.
 
 Forbidden behavior: expand this skill into Keychain API implementation.
 
