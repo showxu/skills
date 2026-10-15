@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import csv
 import hashlib
 import html
@@ -21,7 +22,7 @@ from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, unquote, urljoin, urlparse, urlsplit
 from urllib.request import Request, urlopen
@@ -33,14 +34,19 @@ DOWNLOAD_HOST = "devimages-cdn.apple.com"
 DOWNLOAD_PREFIX = "/design/resources/download/"
 LEGACY_HOST = "developer.apple.com"
 LEGACY_PREFIX = "/design/downloads/"
-# The Web Archive index lists file names Apple served for earlier releases, on the
-# CDN and on the developer site's former download path; only files Apple still
-# serves are cataloged or downloaded.
+# The Web Archive index lists the files Apple served for earlier releases, on the
+# CDN and on the developer site's former download path, with each capture's time,
+# media type and SHA-1 digest (base32). Files Apple still serves come from Apple;
+# a discontinued file comes from its newest capture, accepted only when its bytes
+# match that capture's digest.
 PREVIOUS_INDEX_URLS = tuple(
-    f"https://web.archive.org/cdx/search/cdx?url={location}*&collapse=urlkey&fl=original&filter=statuscode:200"
+    f"https://web.archive.org/cdx/search/cdx?url={location}*&fl=original,timestamp,mimetype,digest"
+    "&filter=statuscode:200"
     for location in (DOWNLOAD_HOST + DOWNLOAD_PREFIX, LEGACY_HOST + LEGACY_PREFIX)
 )
 PREVIOUS_SECTIONS = ["Apple Design Resources", "Previous releases"]
+DISCONTINUED_SECTIONS = ["Apple Design Resources", "Discontinued"]
+WEB_ARCHIVE_ATTEMPTS = 3
 SPARKLE = "http://www.andymatuschak.org/xml-namespaces/sparkle"
 USER_AGENT = "Mozilla/5.0 (compatible; AppleDesignResourceSkill/1.0)"
 DIRECT_EXTENSIONS = {
@@ -71,6 +77,8 @@ class LinkRecord:
     direct_download: bool = False
     probe: dict[str, Any] = field(default_factory=dict)
     download: dict[str, Any] = field(default_factory=dict)
+    # Web Archive capture of a discontinued file: `timestamp`, raw-bytes `url` and `sha1`.
+    capture: dict[str, Any] = field(default_factory=dict)
 
 
 class DesignResourcesParser(HTMLParser):
@@ -359,18 +367,48 @@ def legacy_feed(url: str) -> str | None:
     return None
 
 
-def previous_records(
-    current: list[LinkRecord], timeout: int, max_workers: int
-) -> tuple[list[LinkRecord], dict[str, Any]]:
-    """Earlier-release files that Apple still serves but the live page no longer lists.
+def transient(exc: Exception) -> bool:
+    """Worth retrying: rate limits, server errors and network failures."""
+    return exc.code == 429 or exc.code >= 500 if isinstance(exc, HTTPError) else True
 
-    A former download URL that now redirects is cataloged at its current location,
-    once, and dropped when the live page already lists that location.
+
+def retrying(action: Callable[[], Any], attempts: int) -> Any:
+    """Run `action`, retrying transient failures with a growing pause."""
+    for attempt in range(1, attempts + 1):
+        try:
+            return action()
+        except (HTTPError, URLError, OSError, TimeoutError) as exc:
+            if attempt == attempts or not transient(exc):
+                raise
+            time.sleep(5 * attempt)
+
+
+def previous_records(
+    current: list[LinkRecord], timeout: int, max_workers: int, discontinued: bool = False
+) -> tuple[list[LinkRecord], dict[str, Any]]:
+    """Earlier-release files that the live page no longer lists.
+
+    Files Apple still serves are listed under `Previous releases`. A former download
+    URL that now redirects is cataloged at its current location, once, and dropped
+    when the live page already lists that location. With `discontinued`, files Apple
+    no longer serves are listed under `Discontinued` with their newest capture.
     """
     listed = {canonical_download(record.url) for record in current}
-    lines = [line for index in PREVIOUS_INDEX_URLS for line in fetch_text(index, timeout).split()]
-    names = {canonical_download(line) for line in lines}
-    for feed in sorted({legacy_feed(line) for line in lines} - {None}):
+    names, feeds, captures = set(), set(), {}
+    for index in PREVIOUS_INDEX_URLS:
+        for line in retrying(lambda: fetch_text(index, timeout), WEB_ARCHIVE_ATTEMPTS).splitlines():
+            fields = line.split()
+            if len(fields) != 4:
+                continue
+            original, timestamp, mimetype, digest = fields
+            url = canonical_download(original)
+            names.add(url)
+            feeds.add(legacy_feed(original))
+            # An HTML body under a file URL is an error page, not the file.
+            if url and mimetype != "text/html" and timestamp > captures.get(url, {}).get("timestamp", ""):
+                captures[url] = {"timestamp": timestamp, "url": f"https://web.archive.org/web/{timestamp}id_/{original}",
+                                 "sha1": digest}
+    for feed in sorted(feeds - {None}):
         try:
             names |= {canonical_download(item.url) for item in feed_records(feed, PREVIOUS_SECTIONS, timeout)}
         except (HTTPError, URLError, OSError, ET.ParseError):
@@ -382,9 +420,13 @@ def previous_records(
         classify(record)
         records.append(record)
     probe_links(records, timeout, max_workers)
-    live, seen = [], set(listed)
+    live, gone, seen = [], [], set(listed)
     for record in records:
         if not record.probe.get("reachable"):
+            if discontinued and record.url in captures:
+                record.sections = list(DISCONTINUED_SECTIONS)
+                record.capture = captures[record.url]
+                gone.append(record)
             continue
         location = canonical_download(record.probe.get("final_url") or "") or record.url
         if location in seen:
@@ -393,7 +435,11 @@ def previous_records(
         record.url = location
         classify(record)
         live.append(record)
-    return live, {"index": list(PREVIOUS_INDEX_URLS), "candidates": len(records), "reachable": len(live)}
+    gone = [record for record in gone if record.url not in seen]
+    stats = {"index": list(PREVIOUS_INDEX_URLS), "candidates": len(records), "reachable": len(live)}
+    if discontinued:
+        stats["discontinued"] = len(gone)
+    return live + gone, stats
 
 
 def archive_path(url: str) -> Path:
@@ -454,7 +500,15 @@ def read_manifest(downloads_dir: Path) -> dict[str, dict[str, Any]]:
     return {entry["url"]: entry for entry in json.loads(path.read_text(encoding="utf-8"))["files"]}
 
 
-VERSION_FIELDS = ("file", "bytes", "sha256", "etag", "last_modified", "downloaded_at")
+VERSION_FIELDS = ("file", "bytes", "sha256", "etag", "last_modified", "downloaded_at", "capture")
+
+
+def version_of(values: dict[str, Any]) -> dict[str, Any]:
+    """The fields of one retained version; `capture` only for a Web Archive copy."""
+    version = {key: values.get(key) for key in VERSION_FIELDS}
+    if version["capture"] is None:
+        del version["capture"]
+    return version
 
 
 def write_manifest(downloads_dir: Path, records: list[LinkRecord]) -> None:
@@ -467,12 +521,12 @@ def write_manifest(downloads_dir: Path, records: list[LinkRecord]) -> None:
     for record in records:
         if record.download.get("downloaded"):
             entry = {
-                **entries.get(record.url, {}),
+                **{key: value for key, value in entries.get(record.url, {}).items() if key != "capture"},
                 "url": record.url,
                 "label": record.label,
                 "sections": record.sections,
                 "resource_family": record.resource_family,
-                **{key: record.download.get(key) for key in VERSION_FIELDS},
+                **version_of(record.download),
             }
             if record.download.get("earlier_versions"):
                 entry["earlier_versions"] = record.download["earlier_versions"]
@@ -495,19 +549,41 @@ def version_path(relative: Path, last_modified: str | None, sha256: str, downloa
     return candidate
 
 
+def fetch_file(url: str, partial: Path, max_bytes: int, timeout: int) -> tuple[int, str, str, Any] | None:
+    """Stream a file into `partial`: its size, SHA-256, base32 SHA-1 and headers, or None past `max_bytes`."""
+    request = Request(url, headers={"User-Agent": USER_AGENT})
+    sha256, sha1, total = hashlib.sha256(), hashlib.sha1(), 0
+    with urlopen(request, timeout=timeout) as response, partial.open("wb") as handle:
+        headers = response.headers
+        for chunk in iter(lambda: response.read(1024 * 1024), b""):
+            total += len(chunk)
+            if total > max_bytes:
+                break
+            sha256.update(chunk)
+            sha1.update(chunk)
+            handle.write(chunk)
+    if total > max_bytes:
+        partial.unlink(missing_ok=True)
+        return None
+    return total, sha256.hexdigest(), base64.b32encode(sha1.digest()).decode(), headers
+
+
 def download_direct(records: list[LinkRecord], downloads_dir: Path, max_bytes: int, timeout: int) -> None:
     """Download Apple files into an archive without replacing retained versions.
 
     A file that still matches its manifest entry is reused. When Apple serves new
     content, the earlier file stays where it is and the new version is saved beside
     it; a file that no longer matches the content its entry records is restored.
+    A discontinued file is fetched from its Web Archive capture and kept only when
+    its bytes match the capture's SHA-1 digest.
     """
     downloads_dir.mkdir(parents=True, exist_ok=True)
     manifest = read_manifest(downloads_dir)
     for record in records:
         if record.link_kind != "apple-cdn-download":
             continue
-        status = record.probe or probe_link(record, timeout)
+        # Apple's own response describes a served file; a discontinued file has none.
+        status = {} if record.capture else record.probe or probe_link(record, timeout)
         length_value = status.get("content_length")
         length = int(length_value) if length_value and str(length_value).isdigit() else None
         if length is not None and length > max_bytes:
@@ -525,59 +601,64 @@ def download_direct(records: list[LinkRecord], downloads_dir: Path, max_bytes: i
         if (current and current.exists() and current.stat().st_size == known.get("bytes")
                 and length in (None, known.get("bytes"))
                 and status.get("etag") in (None, known.get("etag"))
+                and (known.get("capture") or {}).get("sha1") == record.capture.get("sha1")
                 and file_sha256(current) == known.get("sha256")):
-            record.download = {**{key: known.get(key) for key in VERSION_FIELDS},
-                               "downloaded": True, "reused": True, "earlier_versions": earlier}
+            record.download = {**version_of(known), "downloaded": True, "reused": True, "earlier_versions": earlier}
             continue
 
         relative = Path(known["file"]) if known.get("file") else archive_path(record.url)
         target = downloads_dir / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         partial = target.with_name(target.name + ".part")
-        request = Request(record.url, headers={"User-Agent": USER_AGENT})
-        digest = hashlib.sha256()
-        total = 0
+        source = record.capture.get("url") or record.url
         try:
-            with urlopen(request, timeout=timeout) as response, partial.open("wb") as handle:
-                headers = response.headers
-                for chunk in iter(lambda: response.read(1024 * 1024), b""):
-                    total += len(chunk)
-                    if total > max_bytes:
-                        break
-                    digest.update(chunk)
-                    handle.write(chunk)
-            if total > max_bytes:
-                partial.unlink(missing_ok=True)
-                record.download = {
-                    "downloaded": False,
-                    "reason": "download exceeded max-download-bytes",
-                    "max_download_bytes": max_bytes,
-                }
-                continue
-            sha256 = digest.hexdigest()
-            if target.exists() and sha256 != known.get("sha256") and file_sha256(target) != sha256:
-                # Different retained content keeps its place; the new version goes beside it.
-                if known.get("sha256"):
-                    earlier.append({key: known.get(key) for key in VERSION_FIELDS})
-                else:
-                    earlier.append({"file": str(relative), "bytes": target.stat().st_size,
-                                    "sha256": file_sha256(target)})
-                relative = version_path(relative, headers.get("last-modified"), sha256, downloads_dir)
-                target = downloads_dir / relative
-            partial.replace(target)
-            record.download = {
-                "downloaded": True,
-                "file": str(relative),
-                "bytes": total,
-                "sha256": sha256,
-                "etag": headers.get("etag"),
-                "last_modified": headers.get("last-modified"),
-                "downloaded_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
-                "earlier_versions": earlier,
-            }
+            fetched = retrying(lambda: fetch_file(source, partial, max_bytes, timeout),
+                               WEB_ARCHIVE_ATTEMPTS if record.capture else 1)
         except (HTTPError, URLError, OSError, TimeoutError) as exc:
             partial.unlink(missing_ok=True)
             record.download = {"downloaded": False, "error": repr(exc)}
+            continue
+        if fetched is None:
+            record.download = {
+                "downloaded": False,
+                "reason": "download exceeded max-download-bytes",
+                "max_download_bytes": max_bytes,
+            }
+            continue
+        total, sha256, sha1, headers = fetched
+        if record.capture and sha1 != record.capture["sha1"]:
+            partial.unlink(missing_ok=True)
+            record.download = {"downloaded": False, "error": "bytes do not match the capture's SHA-1 digest"}
+            continue
+        # A Web Archive capture returns Apple's original headers with an x-archive-orig- prefix.
+        prefix = "x-archive-orig-" if record.capture else ""
+        last_modified = headers.get(prefix + "last-modified")
+        try:
+            if target.exists() and sha256 != known.get("sha256") and file_sha256(target) != sha256:
+                # Different retained content keeps its place; the new version goes beside it.
+                if known.get("sha256"):
+                    earlier.append(version_of(known))
+                else:
+                    earlier.append({"file": str(relative), "bytes": target.stat().st_size,
+                                    "sha256": file_sha256(target)})
+                relative = version_path(relative, last_modified, sha256, downloads_dir)
+                target = downloads_dir / relative
+            partial.replace(target)
+        except OSError as exc:
+            partial.unlink(missing_ok=True)
+            record.download = {"downloaded": False, "error": repr(exc)}
+            continue
+        record.download = {
+            "downloaded": True,
+            "file": str(relative),
+            "bytes": total,
+            "sha256": sha256,
+            "etag": headers.get(prefix + "etag"),
+            "last_modified": last_modified,
+            "downloaded_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+            **({"capture": record.capture} if record.capture else {}),
+            "earlier_versions": earlier,
+        }
 
 
 def normalize_extensions(values: list[str] | None) -> set[str]:
@@ -694,6 +775,7 @@ def record_to_dict(record: LinkRecord) -> dict[str, Any]:
         "source_line": record.source_line,
         "probe": record.probe,
         "download": record.download,
+        "capture": record.capture,
     }
 
 
@@ -733,6 +815,7 @@ def write_csv(path: Path, records: list[LinkRecord]) -> None:
                 "content_length",
                 "downloaded",
                 "download_file",
+                "capture_url",
             ],
             lineterminator="\n",
         )
@@ -753,6 +836,7 @@ def write_csv(path: Path, records: list[LinkRecord]) -> None:
                     "content_length": record.probe.get("content_length", ""),
                     "downloaded": record.download.get("downloaded", ""),
                     "download_file": record.download.get("file", ""),
+                    "capture_url": record.capture.get("url", ""),
                 }
             )
 
@@ -781,6 +865,8 @@ def write_readme(path: Path, catalog: dict[str, Any]) -> None:
         f"- Direct Apple CDN candidates: {counts['direct_download_candidates']}",
         *([f"- Previous releases: {catalog['previous']['reachable']} still served by Apple "
            f"of {catalog['previous']['candidates']} indexed"] if catalog.get("previous") else []),
+        *([f"- Discontinued: {catalog['previous']['discontinued']} from Web Archive captures"]
+          if "discontinued" in catalog.get("previous", {}) else []),
         "",
         "## Link Kinds",
         "",
@@ -826,6 +912,10 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--label-contains", action="append", help="Include only rows whose label contains this text.")
     parser.add_argument("--include-previous", action="store_true",
                         help="Add earlier-release files that Apple's CDN still serves.")
+    parser.add_argument("--include-discontinued", action="store_true",
+                        help="Also add earlier-release files Apple no longer serves, from their newest Web Archive "
+                             "capture; downloads keep only bytes that match the capture's SHA-1. "
+                             "Implies --include-previous.")
     parser.add_argument("--download-direct", action="store_true")
     parser.add_argument("--downloads-dir", type=Path,
                         help="Archive directory for downloads; defaults to the snapshot's downloads folder.")
@@ -859,8 +949,9 @@ def main(argv: list[str]) -> int:
     records = parse_links(page_html, args.source_url)
     records += library_records(records, args.timeout)
     previous = None
-    if args.include_previous:
-        earlier, previous = previous_records(records, args.timeout, max(1, args.max_workers))
+    if args.include_previous or args.include_discontinued:
+        earlier, previous = previous_records(records, args.timeout, max(1, args.max_workers),
+                                             discontinued=args.include_discontinued)
         records += earlier
     records = filter_records(records, args)
     if not records:

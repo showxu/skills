@@ -1,6 +1,6 @@
 ---
 name: apple-design-resource
-description: Fetch, index, probe, summarize, or optionally download and archive reachable official Apple Design Resources, including earlier-release files Apple still serves, for other skills. Use when Codex needs Apple UI kits, design templates, app icon templates, product bezels, fonts, SF Symbols, Icon Composer, badges, logos, technology templates, or direct Apple design-resource asset links from developer.apple.com/design/resources. Do not use for HIG rule interpretation, SwiftUI/UIKit/AppKit implementation, SF Symbols glyph export, App Store screenshot production, DESIGN.md template selection, or unofficial brand scraping.
+description: Fetch, index, probe, summarize, or optionally download and archive official Apple Design Resources, including earlier-release files Apple still serves and, on request, discontinued files recovered from digest-verified Web Archive captures, for other skills. Use when Codex needs Apple UI kits, design templates, app icon templates, product bezels, fonts, SF Symbols, Icon Composer, badges, logos, technology templates, or direct Apple design-resource asset links from developer.apple.com/design/resources. Do not use for HIG rule interpretation, SwiftUI/UIKit/AppKit implementation, SF Symbols glyph export, App Store screenshot production, DESIGN.md template selection, or unofficial brand scraping.
 ---
 
 # Apple Design Resource
@@ -28,7 +28,7 @@ handoff artifacts.
   currently reachable.
 - Download direct Apple CDN design-resource archives when the user explicitly
   wants local assets, or keep an archive of current and earlier releases with
-  a verifiable manifest.
+  a verifiable manifest, including files Apple no longer serves.
 - Provide another skill with a compact resource catalog instead of making it
   scrape the Apple page directly.
 - Hand official Sketch links, including `sketch.com/s/...` shares, to
@@ -66,9 +66,11 @@ handoff artifacts.
 3. Add `--include-previous` when earlier releases matter, such as production
    templates for an earlier OS. The Web Archive index supplies file names that
    Apple's CDN and the developer site's former `design/downloads/` path have
-   served, including disk images from former Sketch library feeds; only files
-   Apple still serves are added, under `Previous releases`, at their current
-   location after redirects.
+   served, including disk images from former Sketch library feeds; files Apple
+   still serves are added, under `Previous releases`, at their current location
+   after redirects. Add `--include-discontinued` when files Apple no longer
+   serves matter too: they are added under `Discontinued` with their newest
+   Web Archive capture of the file itself, never an HTML page.
 4. Add `--download-direct` only when the user explicitly asks for local copies.
    The script downloads only direct files from Apple-owned hosts and respects
    `--max-download-bytes`. `--downloads-dir` points at a durable archive.
@@ -76,7 +78,10 @@ handoff artifacts.
    under `design-downloads/` and other Apple hosts' files under their host;
    `manifest.json` records each file's URL, size, SHA-256, ETag,
    Last-Modified, and download time, and later runs reuse files that still
-   match their manifest entries. A run never replaces a retained file: when
+   match their manifest entries. A discontinued file is fetched from its
+   capture's raw bytes and kept only when they match the capture's SHA-1; its
+   entry keeps Apple's URL, Apple's original ETag and Last-Modified, and a
+   `capture` with the capture time, URL, and SHA-1. A run never replaces a retained file: when
    Apple serves new content, the new version is saved beside it as
    `<name> (<date>)` and the entry lists the earlier one in
    `earlier_versions`.
@@ -107,6 +112,8 @@ handoff artifacts.
 - `--section-contains`: include only rows whose section path contains text.
 - `--label-contains`: include only rows whose label contains text.
 - `--include-previous`: add earlier-release files Apple's CDN still serves.
+- `--include-discontinued`: also add earlier-release files Apple no longer
+  serves, from their newest Web Archive capture; implies `--include-previous`.
 - `--download-direct`: download direct Apple CDN resource files.
 - `--downloads-dir`: archive directory for downloads and their `manifest.json`;
   defaults to the snapshot's `downloads/` folder.
@@ -134,8 +141,10 @@ three `latest-*` catalog files.
 
 - Treat Apple Design Resources as asset/source-link authority, not HIG rule
   authority.
-- Prefer official Apple URLs over third-party mirrors. The Web Archive index
-  only names candidate files; never download from it. Keep Figma and Sketch
+- Prefer official Apple URLs over third-party mirrors. Download from the Web
+  Archive only files Apple no longer serves, only with
+  `--include-discontinued`, and keep only bytes whose SHA-1 matches the
+  capture's digest; no other mirror stands in for Apple. Keep Figma and Sketch
   links as external official-page links, not as local source copies.
 - Treat `sketch-cloud-share`, `sketch://`, and local `.sketch` assets as
   handoff inputs for `sketch-design`; do not perform Sketch Cloud GraphQL

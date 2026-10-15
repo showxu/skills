@@ -1,5 +1,6 @@
 """Regressions for previous-release discovery, archive downloads and the license gate, without network."""
 
+import base64
 import contextlib
 import hashlib
 import io
@@ -13,6 +14,15 @@ import fetch_apple_design_resources as adr
 
 CDN = "https://devimages-cdn.apple.com/design/resources/download/"
 LEGACY = "https://developer.apple.com/design/downloads/"
+
+
+def index(*urls, timestamp="20240101000000", mimetype="application/octet-stream", digest="DIGEST"):
+    """Web Archive index rows: original URL, capture time, media type and SHA-1 digest."""
+    return "\n".join(f"{url} {timestamp} {mimetype} {digest}" for url in urls)
+
+
+def sha1_base32(data):
+    return base64.b32encode(hashlib.sha1(data).digest()).decode()
 
 
 class FakeResponse(io.BytesIO):
@@ -39,12 +49,12 @@ class PreviousReleaseTests(unittest.TestCase):
 
     def test_previous_releases_exclude_listed_and_unserved_files(self):
         listed = adr.LinkRecord(label="Sketch", url=CDN + "iOS-27-Design-Templates-Sketch.dmg", sections=[])
-        index = "\n".join(CDN + name for name in (
+        rows = index(*(CDN + name for name in (
             "iOS-27-Design-Templates-Sketch.dmg", "iOS-18-Production-Templates-Sketch.dmg",
             "SF-Symbols-7.dmg", "iOS-26-Icon-Templates-Photoshop-Illustrator.dmg", "Bezel-iPhone-15.dmg",
-            "iOS-15-Production-Templates-Sketch.dmg"))
+            "iOS-15-Production-Templates-Sketch.dmg")))
         gone = CDN + "iOS-15-Production-Templates-Sketch.dmg"
-        with patch.object(adr, "fetch_text", side_effect=lambda url, timeout: index if "devimages" in url else ""), \
+        with patch.object(adr, "fetch_text", side_effect=lambda url, timeout: rows if "devimages" in url else ""), \
                 patch.object(adr, "probe_link", side_effect=lambda r, t: {"reachable": r.url != gone, "status": 200}):
             records, stats = adr.previous_records([listed], 10, 2)
         self.assertEqual(stats["candidates"], 5)
@@ -59,9 +69,9 @@ class PreviousReleaseTests(unittest.TestCase):
 
     def test_former_download_path_resolves_to_current_location_once(self):
         listed = adr.LinkRecord(label="Keynote", url=CDN + "iOS-13-Keynote.dmg", sections=[])
-        indexes = {"devimages": CDN + "Glyph-ARKit.dmg",
-                   "developer": "\n".join(LEGACY + n for n in ("iOS-13-Keynote.dmg", "Glyph-ARKit.dmg",
-                                                               "Apple-iOS-14-Sketch-Library.dmg", "sketch.rss"))}
+        indexes = {"devimages": index(CDN + "Glyph-ARKit.dmg"),
+                   "developer": index(*(LEGACY + n for n in ("iOS-13-Keynote.dmg", "Glyph-ARKit.dmg",
+                                                             "Apple-iOS-14-Sketch-Library.dmg", "sketch.rss")))}
         redirects = {LEGACY + "iOS-13-Keynote.dmg": CDN + "iOS-13-Keynote.dmg",
                      LEGACY + "Glyph-ARKit.dmg": CDN + "Glyph-ARKit.dmg"}
 
@@ -95,7 +105,7 @@ class PreviousReleaseTests(unittest.TestCase):
     def test_previous_releases_follow_former_library_feeds(self):
         feed = ('<rss><channel><title>Apple iOS UI</title><item>'
                 f'<enclosure url="{CDN}Apple-Sketch-Library-iOS-18.dmg"/></item></channel></rss>')
-        pages = {"devimages": "", "developer": LEGACY + "sketch.rss", "sketch.rss": feed}
+        pages = {"devimages": "", "developer": index(LEGACY + "sketch.rss"), "sketch.rss": feed}
 
         def fetch(url, timeout):
             return next(v for k, v in sorted(pages.items(), key=lambda kv: -len(kv[0])) if k in url)
@@ -103,6 +113,43 @@ class PreviousReleaseTests(unittest.TestCase):
                 patch.object(adr, "probe_link", side_effect=lambda r, t: {"reachable": True, "status": 200}):
             records, _ = adr.previous_records([], 10, 2)
         self.assertEqual([r.url for r in records], [CDN + "Apple-Sketch-Library-iOS-18.dmg"])
+
+    def test_discontinued_files_keep_their_newest_file_capture(self):
+        served, gone, html_only = CDN + "SF-Symbols-7.dmg", CDN + "iOS-15-Production-Templates-Sketch.dmg", CDN + "Gone.dmg"
+        rows = "\n".join([index(served), index(gone, timestamp="20210101000000", digest="OLD"),
+                          index("http://devimages-cdn.apple.com:80/design/resources/download/"
+                                "iOS-15-Production-Templates-Sketch.dmg", timestamp="20220101000000", digest="NEW"),
+                          index(gone, timestamp="20230101000000", mimetype="text/html", digest="PAGE"),
+                          index(html_only, mimetype="text/html")])
+
+        def run(discontinued):
+            with patch.object(adr, "fetch_text", side_effect=lambda url, t: rows if "devimages" in url else ""), \
+                    patch.object(adr, "probe_link", side_effect=lambda r, t: {"reachable": r.url == served}):
+                return adr.previous_records([], 10, 2, discontinued=discontinued)
+        records, stats = run(False)
+        self.assertEqual(([r.url for r in records], "discontinued" in stats), ([served], False))
+        records, stats = run(True)
+        self.assertEqual(stats["discontinued"], 1)
+        record = records[-1]
+        self.assertEqual((record.url, record.sections, record.link_kind),
+                         (gone, adr.DISCONTINUED_SECTIONS, "apple-cdn-download"))
+        self.assertEqual(record.capture, {
+            "timestamp": "20220101000000", "sha1": "NEW",
+            "url": "https://web.archive.org/web/20220101000000id_/http://devimages-cdn.apple.com:80/design/resources/"
+                   "download/iOS-15-Production-Templates-Sketch.dmg"})
+
+    def test_index_fetch_retries_a_timeout(self):
+        replies = iter([TimeoutError("The read operation timed out"), index(CDN + "SF-Symbols-7.dmg"), ""])
+
+        def fetch(url, timeout):
+            reply = next(replies)
+            if isinstance(reply, Exception):
+                raise reply
+            return reply
+        with patch.object(adr, "fetch_text", side_effect=fetch), patch.object(adr.time, "sleep"), \
+                patch.object(adr, "probe_link", side_effect=lambda r, t: {"reachable": True}):
+            records, _ = adr.previous_records([], 10, 2)
+        self.assertEqual([r.url for r in records], [CDN + "SF-Symbols-7.dmg"])
 
     def test_files_on_other_apple_hosts_are_direct_downloads(self):
         apple = adr.LinkRecord(label="Download version 2 for macOS", sections=["Apple Design Resources"],
@@ -207,6 +254,52 @@ class ArchiveDownloadTests(unittest.TestCase):
         path.write_text(json.dumps(data))
         self.download([self.record()])
         self.assertEqual(json.loads(path.read_text())["files"][0]["source"], "archived elsewhere")
+
+    def captured(self, digest=None):
+        name = "iOS-15-Production-Templates-Sketch.dmg"
+        return adr.LinkRecord(label=name, url=CDN + name, sections=adr.DISCONTINUED_SECTIONS,
+                              link_kind="apple-cdn-download", probe={"reachable": False, "status": 404},
+                              capture={"timestamp": "20220101000000", "sha1": digest or sha1_base32(self.data),
+                                       "url": "https://web.archive.org/web/20220101000000id_/" + CDN + name})
+
+    def test_discontinued_files_come_from_matching_captures(self):
+        self.headers = {"etag": '"archive"', "x-archive-orig-etag": '"apple"',
+                        "x-archive-orig-last-modified": "Mon, 13 Jun 2016 16:51:54 GMT"}
+        record = self.captured()
+        with patch.object(adr, "urlopen", side_effect=lambda *a, **k: FakeResponse(self.data, self.headers)) as fetch:
+            adr.download_direct([record], self.archive, 1024, 10)
+            adr.write_manifest(self.archive, [record])
+        self.assertEqual(fetch.call_args.args[0].full_url, record.capture["url"])
+        entry = json.loads((self.archive / "manifest.json").read_text())["files"][0]
+        self.assertEqual((entry["url"], entry["etag"], entry["last_modified"], entry["capture"]),
+                         (record.url, '"apple"', "Mon, 13 Jun 2016 16:51:54 GMT", record.capture))
+        again = self.captured()
+        self.assertEqual(self.download([again]), 0)
+        self.assertTrue(again.download["reused"])
+
+    def test_captures_with_other_bytes_are_rejected(self):
+        record = self.captured(digest="NOTTHEDIGEST")
+        self.download([record])
+        self.assertFalse(record.download["downloaded"])
+        self.assertEqual(list(self.archive.rglob("*.dmg*")), [])
+
+    def test_transient_archive_errors_are_retried(self):
+        record, calls = self.captured(), []
+        unavailable = adr.HTTPError(record.capture["url"], 503, "Service Unavailable", {}, io.BytesIO())
+        self.addCleanup(unavailable.close)
+
+        def flaky(*args, **kwargs):
+            calls.append(1)
+            if len(calls) == 1:
+                raise unavailable
+            return FakeResponse(self.data, self.headers)
+        with patch.object(adr, "urlopen", side_effect=flaky), patch.object(adr.time, "sleep"):
+            adr.download_direct([record], self.archive, 1024, 10)
+        self.assertEqual((len(calls), record.download["downloaded"]), (2, True))
+
+    def test_manifest_entries_of_apple_files_carry_no_capture(self):
+        self.download([self.record()])
+        self.assertNotIn("capture", json.loads((self.archive / "manifest.json").read_text())["files"][0])
 
     def test_oversized_files_are_skipped(self):
         record = self.record()
