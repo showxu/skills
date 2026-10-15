@@ -28,8 +28,9 @@ Use these prompts to check routing and output boundaries.
 - Direct downloads should be limited to Apple CDN resources and skipped unless
   `--download-direct` is passed.
 - Earlier releases appear only with `--include-previous`, under
-  `Previous releases`, and only while Apple's CDN still serves them; nothing
-  is downloaded from the Web Archive.
+  `Previous releases`, and only while Apple still serves them, from the CDN or
+  the developer site's former download path; a redirected file appears once,
+  at its current location, and nothing is downloaded from the Web Archive.
 - An archive run with `--downloads-dir` keeps Apple's file names, writes a
   merged `manifest.json` with SHA-256, ETag, and Last-Modified, and reuses
   unchanged files on the next run.

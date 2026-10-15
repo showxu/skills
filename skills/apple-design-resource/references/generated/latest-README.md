@@ -1,19 +1,19 @@
 # Apple Design Resources Catalog
 
 - Source: https://developer.apple.com/design/resources/
-- Source SHA-256: `42bec14c19835f395a099462f00a4d156656ae95d914cd3031cfd8c5ce0aa93c`
-- Fetched at: `2026-10-15T04:48:48+00:00`
-- Snapshot: `Apple-Design-Resources-20261015`
+- Source SHA-256: `1236a4564b0b6ff64c7d635e579aa2866783cdcd3670077ed59ebd13d9114c65`
+- Fetched at: `2026-10-15T05:22:02+00:00`
+- Snapshot: `Apple-Design-Resources-20261015-legacy`
 - Filters: `{"label_contains": [], "link_kind": [], "resource_family": [], "section_contains": []}`
-- Resources: 156
-- Direct Apple CDN candidates: 111
-- Previous releases: 71 still served by Apple of 175 indexed
+- Resources: 157
+- Direct Apple CDN candidates: 112
+- Previous releases: 72 still served by Apple of 219 indexed
 
 ## Link Kinds
 
 | Value | Count |
 | --- | ---: |
-| `apple-cdn-download` | 111 |
+| `apple-cdn-download` | 112 |
 | `figma` | 15 |
 | `sketch-cloud-share` | 15 |
 | `apple-developer-page` | 10 |
@@ -28,7 +28,7 @@
 | `technology-template` | 32 |
 | `design-template` | 26 |
 | `badge-logo-glyph` | 13 |
-| `ui-kit` | 11 |
+| `ui-kit` | 12 |
 | `font` | 8 |
 | `resource-link` | 7 |
 | `icon-composer` | 5 |
@@ -40,7 +40,7 @@
 
 | Value | Count |
 | --- | ---: |
-| `True` | 154 |
+| `True` | 155 |
 | `None` | 2 |
 
 ## Resources
@@ -215,6 +215,10 @@
   https://devimages-cdn.apple.com/design/resources/download/Keynote-Live-Video-Product-Bezel.dmg
 - `badge-logo-glyph` / `apple-developer-page`: View Apple Badges and Logos (Apple Design Resources > Badges and Logos) reachable=True status=200
   https://developer.apple.com/licensing-trademarks/
+- `ui-kit` / `apple-cdn-download`: Apple iOS 14 Sketch Library (Apple Design Resources > Previous releases) reachable=True status=200
+  https://developer.apple.com/design/downloads/Apple-iOS-14-Sketch-Library.dmg
+- `platform-resource` / `apple-cdn-download`: iOS 13 Keynote (Apple Design Resources > Previous releases) reachable=True status=200
+  https://devimages-cdn.apple.com/design/resources/download/iOS-13-Keynote.dmg
 - `product-bezel` / `apple-cdn-download`: Apple Sketch Library Product Bezels (Apple Design Resources > Previous releases) reachable=True status=200
   https://devimages-cdn.apple.com/design/resources/download/Apple-Sketch-Library-Product-Bezels.dmg
 - `product-bezel` / `apple-cdn-download`: Bezel Apple Watch Series 10 (Apple Design Resources > Previous releases) reachable=True status=200
@@ -323,8 +327,6 @@
   https://devimages-cdn.apple.com/design/resources/download/app-store/creative_assets-universal_asset_template-static.psd
 - `design-template` / `apple-cdn-download`: creative assets universal asset template static (Apple Design Resources > Previous releases) reachable=True status=200
   https://devimages-cdn.apple.com/design/resources/download/app-store/creative_assets-universal_asset_template-static.pxd
-- `platform-resource` / `apple-cdn-download`: iOS 13 Keynote (Apple Design Resources > Previous releases) reachable=True status=200
-  https://devimages-cdn.apple.com/design/resources/download/iOS-13-Keynote.dmg
 - `platform-resource` / `apple-cdn-download`: iOS 16 Keynote (Apple Design Resources > Previous releases) reachable=True status=200
   https://devimages-cdn.apple.com/design/resources/download/iOS-16-Keynote.dmg
 - `design-template` / `apple-cdn-download`: iOS 17 Design Templates Sketch (Apple Design Resources > Previous releases) reachable=True status=200

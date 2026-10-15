@@ -29,11 +29,14 @@ from urllib.request import Request, urlopen
 DEFAULT_SOURCE_URL = "https://developer.apple.com/design/resources/"
 DOWNLOAD_HOST = "devimages-cdn.apple.com"
 DOWNLOAD_PREFIX = "/design/resources/download/"
-# The Web Archive index lists file names Apple's CDN served for earlier releases;
-# only files Apple still serves are cataloged or downloaded.
-PREVIOUS_INDEX_URL = (
-    "https://web.archive.org/cdx/search/cdx?url=devimages-cdn.apple.com/design/resources/download/*"
-    "&collapse=urlkey&fl=original&filter=statuscode:200"
+LEGACY_HOST = "developer.apple.com"
+LEGACY_PREFIX = "/design/downloads/"
+# The Web Archive index lists file names Apple served for earlier releases, on the
+# CDN and on the developer site's former download path; only files Apple still
+# serves are cataloged or downloaded.
+PREVIOUS_INDEX_URLS = tuple(
+    f"https://web.archive.org/cdx/search/cdx?url={location}*&collapse=urlkey&fl=original&filter=statuscode:200"
+    for location in (DOWNLOAD_HOST + DOWNLOAD_PREFIX, LEGACY_HOST + LEGACY_PREFIX)
 )
 PREVIOUS_SECTIONS = ["Apple Design Resources", "Previous releases"]
 USER_AGENT = "Mozilla/5.0 (compatible; AppleDesignResourceSkill/1.0)"
@@ -195,7 +198,7 @@ def classify(link: LinkRecord) -> None:
 
     if parsed.scheme == "sketch":
         link.link_kind = "sketch-library"
-    elif "devimages-cdn.apple.com" in host:
+    elif "devimages-cdn.apple.com" in host or (host == LEGACY_HOST and path.startswith(LEGACY_PREFIX)):
         link.link_kind = "apple-cdn-download"
     elif "figma.com" in host:
         link.link_kind = "figma"
@@ -222,7 +225,7 @@ def classify(link: LinkRecord) -> None:
         family = "app-icon-template"
     elif "technology" in text or "tech design template" in text or any(term in text for term in ("apple pay", "app clips", "wallet", "siri", "tipkit", "airplay", "homekit", "arkit", "live activities", "messages", "tap to pay")):
         family = "technology-template"
-    elif "ui kit" in text:
+    elif "ui kit" in text or "sketch library" in text:
         family = "ui-kit"
     elif "template" in text:
         family = "design-template"
@@ -286,37 +289,62 @@ def probe_links(records: list[LinkRecord], timeout: int, max_workers: int) -> No
 
 
 def canonical_download(url: str) -> str | None:
-    """The https URL of an Apple CDN design-resource file, or None for other URLs."""
+    """The https URL of an Apple design-resource file, or None for other URLs."""
     parts = urlsplit(url.strip())
-    if parts.netloc.lower() != DOWNLOAD_HOST or not parts.path.startswith(DOWNLOAD_PREFIX):
+    host, path = parts.netloc.lower().removesuffix(":80"), parts.path
+    if path.endswith("/"):
         return None
-    if parts.path.endswith("/"):
-        return None
-    return f"https://{DOWNLOAD_HOST}{parts.path}"
+    if host == DOWNLOAD_HOST and path.startswith(DOWNLOAD_PREFIX):
+        return f"https://{DOWNLOAD_HOST}{path}"
+    if host == LEGACY_HOST and path.startswith(LEGACY_PREFIX) and Path(path).suffix.lower() in DIRECT_EXTENSIONS:
+        return f"https://{LEGACY_HOST}{path}"
+    return None
 
 
 def previous_records(
     current: list[LinkRecord], timeout: int, max_workers: int
 ) -> tuple[list[LinkRecord], dict[str, Any]]:
-    """Earlier-release files that Apple's CDN still serves but the live page no longer lists."""
+    """Earlier-release files that Apple still serves but the live page no longer lists.
+
+    A former download URL that now redirects is cataloged at its current location,
+    once, and dropped when the live page already lists that location.
+    """
     listed = {canonical_download(record.url) for record in current}
-    candidates = sorted({canonical_download(line) for line in fetch_text(PREVIOUS_INDEX_URL, timeout).split()}
-                        - listed - {None})
+    names = {canonical_download(line) for index in PREVIOUS_INDEX_URLS
+             for line in fetch_text(index, timeout).split()}
     records = []
-    for url in candidates:
+    for url in sorted(names - listed - {None}):
         stem = Path(urlsplit(url).path).stem
         record = LinkRecord(label=re.sub(r"[-_]+", " ", stem).strip(), url=url, sections=list(PREVIOUS_SECTIONS))
         classify(record)
         records.append(record)
     probe_links(records, timeout, max_workers)
-    live = [record for record in records if record.probe.get("reachable")]
-    return live, {"index": PREVIOUS_INDEX_URL, "candidates": len(records), "reachable": len(live)}
+    live, seen = [], set(listed)
+    for record in records:
+        if not record.probe.get("reachable"):
+            continue
+        location = canonical_download(record.probe.get("final_url") or "") or record.url
+        if location in seen:
+            continue
+        seen.add(location)
+        record.url = location
+        classify(record)
+        live.append(record)
+    return live, {"index": list(PREVIOUS_INDEX_URLS), "candidates": len(records), "reachable": len(live)}
 
 
 def archive_path(url: str) -> Path:
-    """The file's place in an archive: its path below Apple's download folder."""
+    """The file's place in an archive: its path below Apple's download folder.
+
+    Files from the developer site's former download path go under `design-downloads/`.
+    """
     path = urlsplit(url).path
-    relative = path[len(DOWNLOAD_PREFIX):] if path.startswith(DOWNLOAD_PREFIX) else Path(path).name
+    if path.startswith(DOWNLOAD_PREFIX):
+        relative = path[len(DOWNLOAD_PREFIX):]
+    elif path.startswith(LEGACY_PREFIX):
+        relative = "design-downloads/" + path[len(LEGACY_PREFIX):]
+    else:
+        relative = Path(path).name
     parts = [re.sub(r"[^A-Za-z0-9._-]+", "-", part).strip("-") for part in relative.split("/")]
     parts = [part for part in parts if part and part not in {".", ".."}]
     return Path(*parts) if parts else Path("resource")

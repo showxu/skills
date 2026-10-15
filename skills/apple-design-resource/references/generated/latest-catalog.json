@@ -1,7 +1,7 @@
 {
   "counts": {
     "by_link_kind": {
-      "apple-cdn-download": 111,
+      "apple-cdn-download": 112,
       "apple-developer-page": 10,
       "external": 3,
       "figma": 15,
@@ -10,7 +10,7 @@
     },
     "by_reachability": {
       "None": 2,
-      "True": 154
+      "True": 155
     },
     "by_resource_family": {
       "app-icon-template": 4,
@@ -23,12 +23,12 @@
       "resource-link": 7,
       "sf-symbols": 5,
       "technology-template": 32,
-      "ui-kit": 11
+      "ui-kit": 12
     },
-    "direct_download_candidates": 111,
-    "total": 156
+    "direct_download_candidates": 112,
+    "total": 157
   },
-  "fetched_at": "2026-10-15T04:48:48+00:00",
+  "fetched_at": "2026-10-15T05:22:02+00:00",
   "filters": {
     "label_contains": [],
     "link_kind": [],
@@ -36,9 +36,12 @@
     "section_contains": []
   },
   "previous": {
-    "candidates": 175,
-    "index": "https://web.archive.org/cdx/search/cdx?url=devimages-cdn.apple.com/design/resources/download/*&collapse=urlkey&fl=original&filter=statuscode:200",
-    "reachable": 71
+    "candidates": 219,
+    "index": [
+      "https://web.archive.org/cdx/search/cdx?url=devimages-cdn.apple.com/design/resources/download/*&collapse=urlkey&fl=original&filter=statuscode:200",
+      "https://web.archive.org/cdx/search/cdx?url=developer.apple.com/design/downloads/*&collapse=urlkey&fl=original&filter=statuscode:200"
+    ],
+    "reachable": 72
   },
   "resources": [
     {
@@ -2255,6 +2258,56 @@
       "direct_download": true,
       "download": {},
       "file_extension": ".dmg",
+      "label": "Apple iOS 14 Sketch Library",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "103047757",
+        "content_type": "application/octet-stream",
+        "etag": null,
+        "final_url": "https://developer.apple.com/design/downloads/Apple-iOS-14-Sketch-Library.dmg",
+        "last_modified": "Fri, 30 Jan 2026 23:09:31 GMT",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "ui-kit",
+      "sections": [
+        "Apple Design Resources",
+        "Previous releases"
+      ],
+      "source_line": null,
+      "url": "https://developer.apple.com/design/downloads/Apple-iOS-14-Sketch-Library.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
+      "label": "iOS 13 Keynote",
+      "link_kind": "apple-cdn-download",
+      "probe": {
+        "accept_ranges": "bytes",
+        "content_length": "11410516",
+        "content_type": "binary/octet-stream",
+        "etag": "\"950412194de1cb3e4ae76c642ce28df4\"",
+        "final_url": "https://devimages-cdn.apple.com/design/resources/download/iOS-13-Keynote.dmg",
+        "last_modified": "Wed, 17 Jan 2024 22:22:40 GMT",
+        "method": "HEAD",
+        "reachable": true,
+        "status": 200
+      },
+      "resource_family": "platform-resource",
+      "sections": [
+        "Apple Design Resources",
+        "Previous releases"
+      ],
+      "source_line": null,
+      "url": "https://devimages-cdn.apple.com/design/resources/download/iOS-13-Keynote.dmg"
+    },
+    {
+      "direct_download": true,
+      "download": {},
+      "file_extension": ".dmg",
       "label": "Apple Sketch Library Product Bezels",
       "link_kind": "apple-cdn-download",
       "probe": {
@@ -3605,31 +3658,6 @@
       "direct_download": true,
       "download": {},
       "file_extension": ".dmg",
-      "label": "iOS 13 Keynote",
-      "link_kind": "apple-cdn-download",
-      "probe": {
-        "accept_ranges": "bytes",
-        "content_length": "11410516",
-        "content_type": "binary/octet-stream",
-        "etag": "\"950412194de1cb3e4ae76c642ce28df4\"",
-        "final_url": "https://devimages-cdn.apple.com/design/resources/download/iOS-13-Keynote.dmg",
-        "last_modified": "Wed, 17 Jan 2024 22:22:40 GMT",
-        "method": "HEAD",
-        "reachable": true,
-        "status": 200
-      },
-      "resource_family": "platform-resource",
-      "sections": [
-        "Apple Design Resources",
-        "Previous releases"
-      ],
-      "source_line": null,
-      "url": "https://devimages-cdn.apple.com/design/resources/download/iOS-13-Keynote.dmg"
-    },
-    {
-      "direct_download": true,
-      "download": {},
-      "file_extension": ".dmg",
       "label": "iOS 16 Keynote",
       "link_kind": "apple-cdn-download",
       "probe": {
@@ -4027,7 +4055,7 @@
       "url": "https://devimages-cdn.apple.com/design/resources/download/watchOS-9-Production-Templates-Sketch.dmg"
     }
   ],
-  "snapshot_dir": "Apple-Design-Resources-20261015",
-  "source_sha256": "42bec14c19835f395a099462f00a4d156656ae95d914cd3031cfd8c5ce0aa93c",
+  "snapshot_dir": "Apple-Design-Resources-20261015-legacy",
+  "source_sha256": "1236a4564b0b6ff64c7d635e579aa2866783cdcd3670077ed59ebd13d9114c65",
   "source_url": "https://developer.apple.com/design/resources/"
 }
