@@ -37,6 +37,7 @@ jobs:
     timeout-minutes: 10
     env:
       PYTHONDONTWRITEBYTECODE: '1'
+      OVERLAP_TEST_OUTPUT: ${{ github.workspace }}/.build/fork-dog-tests
       ORG_TEST_OUTPUT: ${{ github.workspace }}/.build/governance-tests
       REPO_STEWARD_TEST_OUTPUT: ${{ github.workspace }}/.build/repo-steward-tests
       REPOSITORY_TEST_OUTPUT: ${{ github.workspace }}/.build/repository-tests
@@ -62,6 +63,8 @@ jobs:
         run: python3 -B skills/repository-docs/scripts/derive_rules.py skills/pyproject-docs --check
       - name: Exercise repository policy
         run: python3 -B -m unittest discover -s scripts/tests -v
+      - name: Exercise clean-room overlap audit
+        run: python3 -B -m unittest discover -s skills/fork-dog/tests -v
       - name: Exercise repository stewardship
         run: python3 -B -m unittest discover -s skills/github-repo-steward/tests -v
       - name: Exercise organization governance
