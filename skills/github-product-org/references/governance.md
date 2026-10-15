@@ -9,9 +9,10 @@
   as the pre-push hook. Run it on every fresh clone before the first commit.
   A task worktree gets the same values through `git config --worktree`
   (`references/operations.md`), so the owner's shared config stays unchanged.
-- The gate checks only commits not yet on a remote. Commits GitHub creates
-  (squash merges, API commits from Apps) are signed by GitHub and show as
-  Verified.
+- The gate checks only commits not yet on a remote. GitHub signs the final
+  squash-merge commit, but a [required-signature rule](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets)
+  still checks the commits on the pull request head: an unsigned head commit
+  can block the squash merge.
 - GitHub shows the account linked to a commit email, not the commit's author
   name. Variant author names under the same email are cosmetic; fix the local
   display with a mailmap, never by rewriting history.
@@ -62,8 +63,11 @@ write or trigger another workflow:
 
 - A pull request opened with the workflow token does not trigger checks without
   manual approval, and `git commit` in a workflow is unsigned. An App token
-  opens pull requests whose checks run, and commits created through the API
-  with it are signed by GitHub.
+  opens pull requests whose checks run. GitHub
+  [verifies an App's API commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification)
+  only when the request authenticates as the App and supplies no custom
+  author, committer or signature information; check `verification.verified`
+  and `reason` on each created commit.
 - One App per capability. Typical pair: a Release Notifier with
   `actions: write` installed only on the website, used by plugins to dispatch
   the website's deploy workflow; an Updater with `contents: write` and
