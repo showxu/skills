@@ -11,6 +11,8 @@ Use these prompts to check routing and output boundaries.
 - "Download the direct Apple CDN design-resource archives with a 500 MB cap."
 - "Archive every Apple design resource we can still download, including earlier
   production templates, with checksums."
+- "Also recover the old Apple templates Apple has taken down, from the Web
+  Archive, and prove they are Apple's files."
 
 ## Should Not Trigger Alone
 
@@ -30,7 +32,12 @@ Use these prompts to check routing and output boundaries.
 - Earlier releases appear only with `--include-previous`, under
   `Previous releases`, and only while Apple still serves them, from the CDN or
   the developer site's former download path; a redirected file appears once,
-  at its current location, and nothing is downloaded from the Web Archive.
+  at its current location.
+- Files Apple no longer serves appear only with `--include-discontinued`, under
+  `Discontinued`, with their newest non-HTML capture. A download keeps a
+  capture only when its bytes match the capture's SHA-1, records the capture
+  and Apple's original ETag and Last-Modified, and retries archive rate limits
+  and server errors.
 - Sketch library rows (`sketch://add-library`) gain a downloadable row for the
   disk image their feed publishes, in the same section; files on other
   Apple-owned hosts are downloads, while their help pages stay links.
