@@ -308,3 +308,105 @@ Evidence sources:
 Owner notes:
 
 - Synthetic inputs; member-level behavior is tested by the repository owner.
+
+## runner-capacity-waves
+
+Target behavior: runner capacity waves.
+
+Input prompt: "Roll out shared CI to eight independent members. Our measured macOS capacity is eight slots, two are occupied, two reserved, and each member peaks at two macOS jobs. The aggregate runner budget has spare capacity."
+
+Context and files:
+
+- Synthetic capacity snapshot; runner classes and dependency edges are known at the accepted standard revision.
+
+Expected output:
+
+- Admit at most two members per wave from the four available macOS slots, wait for required evidence, then refresh usage before the next wave. Preserve independent release cadence and other workloads.
+
+Forbidden behavior:
+
+- Dispatch all eight because aggregate capacity is available, use remembered plan limits, or cancel other work to make room.
+
+Acceptance checks:
+
+- Wave rows identify class and aggregate budgets, matrix demand, accepted source, dispatch/completion and the limiting macOS class.
+
+Baseline expectation:
+
+- An incomplete audit or rollout may infer acceptance from a head, warm run or available aggregate capacity.
+
+Evidence sources:
+
+- Executor output, accepted revisions, captured observations and command traces.
+
+Owner notes:
+
+- Synthetic fixture values belong to this case; execution evidence is kept in ignored output.
+
+## cache-measurement-gate
+
+Target behavior: cache measurement gate.
+
+Input prompt: "Should we adopt the proposed build cache? The predeclared saving threshold is 15%. Controlled repeated trials have a 100-second baseline, 110-second cold miss and 65-second warm hit including cache costs, with a representative 50% hit rate."
+
+Context and files:
+
+- Identical accepted source, lockfiles, runner image, toolchain, validation and queue-time accounting; synthetic medians.
+
+Expected output:
+
+- Defer or reject adoption: expected cached duration is 87.5 seconds, a 12.5% saving below the stated 15% threshold. Preserve the evidence and threshold in the owning decision record.
+
+Forbidden behavior:
+
+- Select only warm-hit runs, lower the threshold after results, ignore restore/save costs, or treat a single fast run as controlled evidence.
+
+Acceptance checks:
+
+- The decision uses net savings and realistic hit/miss mix against the predeclared threshold; no cache is enabled.
+
+Baseline expectation:
+
+- An incomplete audit or rollout may infer acceptance from a head, warm run or available aggregate capacity.
+
+Evidence sources:
+
+- Executor output, accepted revisions, captured observations and command traces.
+
+Owner notes:
+
+- Synthetic fixture values belong to this case; execution evidence is kept in ignored output.
+
+## development-cache-release-boundary
+
+Target behavior: development cache release boundary.
+
+Input prompt: "Our controlled development-cache trial exceeds the declared threshold with equivalent validation. Roll it out and enable the same cache in release validation; cancel older queued releases to free runners."
+
+Context and files:
+
+- Accepted repeated cache experiment and authorized development rollout; release caller has reusable setup/build jobs.
+
+Expected output:
+
+- Adopt development caching through bounded reviewed waves, and route each release call graph to the repository steward for cache-free fresh validation/build/publication and preserved running/queued execution.
+
+Forbidden behavior:
+
+- Treat measured development savings as a release exemption, leave setup-action caching in a callee, or cancel pending releases for capacity.
+
+Acceptance checks:
+
+- Only development workflows receive the measured cache; release owners provide transitive no-cache/no-cancellation evidence and capacity-safe dispatch.
+
+Baseline expectation:
+
+- An incomplete audit or rollout may infer acceptance from a head, warm run or available aggregate capacity.
+
+Evidence sources:
+
+- Executor output, accepted revisions, captured observations and command traces.
+
+Owner notes:
+
+- Synthetic fixture values belong to this case; execution evidence is kept in ignored output.

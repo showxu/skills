@@ -50,8 +50,9 @@ permission to spawn agents or message other sessions.
    Organization settings/App changes update its MAINTENANCE declaration in the
    same reviewed change, using [governance](references/governance.md). Shared
    workflow changes require syntax validation and an accepted consumer run at
-   the proposed pin before a broad rollout. Version rules stay in VERSIONING;
-   visual tokens stay in DESIGN.
+   the proposed pin before a broad rollout. Plan capacity-bound waves and the
+   measured cache-adoption gate in [coordinated publication](references/release.md)
+   before dispatch. Version rules stay in VERSIONING; visual tokens stay in DESIGN.
 4. **Apply per repository.** Invoke `github-repo-steward` with the repository,
    standard revision, accepted source and scope. It owns settings, inherited
    community health, CI patterns, release hygiene, headers, Quick looks, social
@@ -115,6 +116,10 @@ artifacts; an empty word search is not an ownership proof.
 
 - Shared standard: its declared checks, plus a pinned consumer run for shared
   automation changes; GitHub settings declarations match live state.
+- Coordination: size rollout waves from current total and runner-class
+  capacity, measure development build caches against a threshold set before
+  the trial, and require cache-free release workflows that preserve running
+  and queued releases. Use [coordinated publication](references/release.md).
 - Each repository: invoke `github-repo-steward`; aggregate its report rather
   than treating the organization scanner as a complete conformance audit.
 - Remote observation: `python3 scripts/scan_org.py remote --org <org>

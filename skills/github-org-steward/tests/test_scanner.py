@@ -97,6 +97,21 @@ class ScannerTests(unittest.TestCase):
             with self.assertRaisesRegex(SystemExit, "Install github-repo-steward"):
                 SCAN.load_repo_steward(Path(folder))
 
+    def test_member_unknown_evidence_propagates_and_shared_type_policy_is_forwarded(self):
+        with tempfile.TemporaryDirectory(dir=OUTPUT) as folder:
+            root = Path(folder)
+            def observe(owner, repository, workdir, identities, signers, report, **options):
+                self.assertEqual(options, {"commit_types": ["feat", "fix"]})
+                report("UNKNOWN", repository["name"], "signature verification unavailable")
+                report("FAIL", repository["name"], "current policy mismatch")
+                return {"license_digest": "none", "source_commit": "accepted", "default_branch": "trunk"}
+            steward = SimpleNamespace(inspect_repository=Mock(side_effect=observe))
+            args = SimpleNamespace(org="example", work_dir=root, identity=[], allowed_signers=None,
+                                   commit_type=["feat", "fix"])
+            pages = [[{"name": "member", "archived": False, "fork": False, "default_branch": "trunk"}]]
+            with patch.object(SCAN, "load_repo_steward", return_value=steward), patch.object(SCAN, "run", return_value=json.dumps(pages)), patch("builtins.print"):
+                self.assertEqual(SCAN.remote(args), 2)
+
 
 if __name__ == "__main__":
     unittest.main()

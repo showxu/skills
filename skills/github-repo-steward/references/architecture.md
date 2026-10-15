@@ -15,7 +15,8 @@ repositories and organization members through the same contract.
 | scripts/configure-clone.sh / prepush-check.sh | Task-clone signing and repository-owned validation gates |
 | scripts/render_social.py / render_terminal.py | Outlined card layout and light/dark recorded-session rendering |
 | scripts/presentation.py | Shared design binding, digest and control-character validation |
-| scripts/scan_repository.py | Partial source/workflow/tag/content observations and license digest, reused by organization aggregation |
+| scripts/scan_repository.py | Accepted-ancestry signatures/subjects, tag type/signatures, parsed reusable-pin drift, workflow/content observations and license digest; reused by organization aggregation |
+| scripts/requirements.txt | Pinned safe YAML parser for reusable-workflow caller discovery |
 | scripts/audit_repo.py | Read-only settings capture and expected/observed comparison |
 | tests / references/eval-fixtures.md / evals/evals.json | Helper regressions and durable behavioral inputs; execution output is ignored |
 
@@ -27,6 +28,9 @@ bundled. The icon and ecosystem release owners retain their implementations.
 Validate with the skill-creator package validator, `sh -n` for shell helpers,
 and `python3 -B -m unittest discover -s skills/github-repo-steward/tests -v` from
 the collection root. Tests use `REPO_STEWARD_TEST_OUTPUT` under the collection's
-ignored `.build/`. Font rendering smoke checks additionally need fonttools and a licensed input
+ignored `.build/`. Use an ignored virtual environment with
+`scripts/requirements.txt` installed for the scanner and its pin tests. The
+tests use synthetic Git repositories, captured API pages and ephemeral SSH
+signing fixtures; no owner keys or network. Font rendering smoke checks additionally need fonttools and a licensed input
 font; do not bundle a workstation font into the skill. Run the behavior fixtures as qualitative review or isolated paired evals; label the
 evidence correctly. Static package checks do not prove live uploads or triggers.

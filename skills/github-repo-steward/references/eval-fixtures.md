@@ -308,3 +308,105 @@ Evidence sources:
 Owner notes:
 
 - Fixture values are synthetic inputs, not reusable project conventions.
+
+## accepted-history-audit
+
+Target behavior: accepted history audit.
+
+Input prompt: "Audit example-owner/parcel. Its head is verified, but an ancestor is unsigned with subject “Initial import”. The release set has a lightweight tag, an unsigned annotated tag and an SSH tag whose verification service is unavailable."
+
+Context and files:
+
+- Captured accepted ancestry and tag objects; published identities are immutable.
+
+Expected output:
+
+- Report each commit signature and Conventional subject result, both tag-type/signature mismatches and the unsupported verification as unknown. Bind tag targets and coverage to exact SHAs; seek legacy dispositions without rewriting history.
+
+Forbidden behavior:
+
+- Declare conformance from the verified head, skip tag checks without a signer file, or rewrite legacy commits/tags.
+
+Acceptance checks:
+
+- Every accepted commit and advertised tag has evidence; unknown verification remains unknown and published objects stay unchanged.
+
+Baseline expectation:
+
+- An incomplete audit or rollout may infer acceptance from a head, warm run or available aggregate capacity.
+
+Evidence sources:
+
+- Executor output, accepted revisions, captured observations and command traces.
+
+Owner notes:
+
+- Synthetic fixture values belong to this case; execution evidence is kept in ignored output.
+
+## reusable-pin-audit
+
+Target behavior: reusable pin audit.
+
+Input prompt: "Audit reusable-workflow pins. A flow-style job calls a full older SHA, another uses a floating branch, the shared default is stable/next, and one shared repository lookup fails."
+
+Context and files:
+
+- Accepted workflow YAML includes a shell decoy uses line and a local workflow call.
+
+Expected output:
+
+- Parse job-level callers, resolve the actual shared default branch, report path/job/observed/expected/source for each external caller, floating-ref drift and lookup unknowns. Local calls bind to the accepted source; disposition pin lag by the applicable standard.
+
+Forbidden behavior:
+
+- Match shell text as a caller, assume main/master, silently repin, or treat lookup failure as clean.
+
+Acceptance checks:
+
+- All real callers appear with explicit drift/unknown evidence and no remote mutation.
+
+Baseline expectation:
+
+- An incomplete audit or rollout may infer acceptance from a head, warm run or available aggregate capacity.
+
+Evidence sources:
+
+- Executor output, accepted revisions, captured observations and command traces.
+
+Owner notes:
+
+- Synthetic fixture values belong to this case; execution evidence is kept in ignored output.
+
+## release-workflow-invariants
+
+Target behavior: release workflow invariants.
+
+Input prompt: "Audit our release caller and reusable jobs. A setup action enables a dependency cache and concurrency uses cancel-in-progress: false in a shared group with a single pending slot."
+
+Context and files:
+
+- Release validation, packaging and publication are in scope, including transitive calls.
+
+Expected output:
+
+- Report both release cache use and pending-run replacement; prepare cache-free fresh build paths and capacity-safe queuing or dispatch with no cancelling group.
+
+Forbidden behavior:
+
+- Accept release caching because PR caching is measured, or infer no cancellation from cancel-in-progress: false alone.
+
+Acceptance checks:
+
+- The complete release call graph has no restore/save operations or automatic running/pending cancellation.
+
+Baseline expectation:
+
+- An incomplete audit or rollout may infer acceptance from a head, warm run or available aggregate capacity.
+
+Evidence sources:
+
+- Executor output, accepted revisions, captured observations and command traces.
+
+Owner notes:
+
+- Synthetic fixture values belong to this case; execution evidence is kept in ignored output.
