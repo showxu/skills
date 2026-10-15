@@ -1,0 +1,15 @@
+{
+  "nameWithOwner": "example-team/parcel",
+  "owner": {
+    "type": "Organization"
+  },
+  "default_branch": "main",
+  "fork": false,
+  "organization_standard": {
+    "repository": "example-team/.github",
+    "default_branch": "policy",
+    "revision": "fixture-standard-v1",
+    "maintenance_file": "organization-MAINTENANCE.md"
+  },
+  "allow_merge_commit": true
+}

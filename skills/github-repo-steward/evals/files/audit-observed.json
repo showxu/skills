@@ -1,0 +1,18 @@
+{
+  "repository": "example-team/parcel",
+  "observed": {
+    "repository": {
+      "default_branch": "main",
+      "allow_merge_commit": true
+    },
+    "release_tag_rules": [
+      "deletion"
+    ]
+  },
+  "evidence": [
+    {
+      "endpoint": "captured-fixture-metadata-and-rulesets",
+      "available": true
+    }
+  ]
+}

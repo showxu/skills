@@ -1,0 +1,13 @@
+{
+  "authority": "example-team/.github at fixture-standard-v1",
+  "expected": {
+    "repository": {
+      "default_branch": "trunk",
+      "allow_merge_commit": false
+    },
+    "release_tag_rules": [
+      "deletion",
+      "update"
+    ]
+  }
+}

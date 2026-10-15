@@ -1,0 +1,59 @@
+{
+  "skill_name": "github-org-steward",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Set up our new organization for an app, CLI, plugins, website and tap.",
+      "expected_output": "Establish the shared .github standard and repository role map, choose organization settings and automation deliberately, then invoke the repository steward for each member.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Our organization hosts independent packages. Roll out the new shared validation convention.",
+      "expected_output": "Update the owning shared interface, validate syntax and a pinned consumer, update the template and existing members through repository-steward PRs, and retain independent release cadence.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Audit the GitHub settings and README of my personal repository.",
+      "expected_output": "Route the one-repository standard and presentation audit to github-repo-steward without inventing organization decisions.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Add the newly published member to our organization profile and website catalog.",
+      "expected_output": "Reconcile the generated catalog with authoritative public membership, preserve job groups and owning outcome copy, render profile and site from accepted shared identity, and verify links/pins.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Our protected tap cannot accept the scheduler\u2019s direct pushes. Tool releases are infrequent.",
+      "expected_output": "Prefer read-only detection plus a narrow deduplicated issue notice and normal signed PRs; route tap mechanics to homebrew. A scoped App needs a real authorized write requirement.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "Give our authorized updater App access to the new documentation repository.",
+      "expected_output": "Prepare the exact capability/permission/installation diff and declaration; reuse explicit authorization, and let the owner perform any required passkey/installation step.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "Delegate package preparation to two agents. I own design review; one publisher should finish after review.",
+      "expected_output": "Give shared rules and separate tasks with disjoint writes, accepted source and checks; keep design approval with its owner and use one coordinated publisher.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "The agent says all releases and site links are done, but the only evidence is a prepared branch and an earlier green run.",
+      "expected_output": "Retain incomplete status; reconcile member-steward reports with current accepted SHAs, immutable releases, downloaded artifacts, hosted URLs and organization profile/catalog/pins.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "We need to adopt an upstream fork and update my personal profile alongside the organization cleanup.",
+      "expected_output": "Keep organization placement/coordination; hand upstream adoption to fork-dog and the personal profile to github-profile-readme, carrying ownership constraints and accepted context.",
+      "files": []
+    }
+  ]
+}

@@ -11,7 +11,7 @@ Input prompt: "Set up the GitHub side of my personal repository, example-owner/p
 
 Context and files:
 
-- No organization .github exists; read-only metadata and an empty fixture repository.
+- `evals/files/personal.json`; no organization .github exists; empty fixture repository.
 
 Expected output:
 
@@ -45,7 +45,7 @@ Input prompt: "Bring example-team/parcel into line with our shared standard. The
 
 Context and files:
 
-- Fixture shared MAINTENANCE declares trunk, two approving reviews and named check contexts; the member has conflicting settings.
+- `evals/files/member.json` and `evals/files/organization-MAINTENANCE.md`; shared policy declares trunk, two reviews and named contexts while the member conflicts.
 
 Expected output:
 
@@ -113,7 +113,7 @@ Input prompt: "Audit this repository against the attached standard; do not chang
 
 Context and files:
 
-- Fixture expected squash-only and immutable tags; observed merge commits enabled and a tag update rule absent.
+- `evals/files/audit-standard.json` and `evals/files/audit-observed.json`; merge commits are enabled and a tag update rule is absent.
 
 Expected output:
 

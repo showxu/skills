@@ -5,13 +5,18 @@
       "id": 1,
       "prompt": "Set up the GitHub side of my personal repository, example-owner/parcel. It has no organization and no standard yet.",
       "expected_output": "A personal repository uses explicit overridable defaults, records choices and creates repository-owned community files without inventing an organization.",
-      "files": []
+      "files": [
+        "evals/files/personal.json"
+      ]
     },
     {
       "id": 2,
       "prompt": "Bring example-team/parcel into line with our shared standard. The repository currently uses main.",
       "expected_output": "Read example-team/.github at its default branch and accepted revision; apply its declared trunk branch and review policy instead of personal defaults.",
-      "files": []
+      "files": [
+        "evals/files/member.json",
+        "evals/files/organization-MAINTENANCE.md"
+      ]
     },
     {
       "id": 3,
@@ -23,7 +28,10 @@
       "id": 4,
       "prompt": "Audit this repository against the attached standard; do not change anything.",
       "expected_output": "Return evidence-backed expected/observed differences and unknowns while keeping all local and remote state unchanged.",
-      "files": []
+      "files": [
+        "evals/files/audit-standard.json",
+        "evals/files/audit-observed.json"
+      ]
     },
     {
       "id": 5,

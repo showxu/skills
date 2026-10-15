@@ -57,3 +57,19 @@ Do not erase history merely to empty a word search. Read local-only differences
 against the fetched remote by meaning; never reset another session's checkout.
 A file that is identical to origin is already accounted for, while unique useful
 content needs its own reviewed port.
+
+## Source and publication observations
+
+`scripts/scan_repository.py --repo <owner/repository> --identity <owner-email>
+--allowed-signers <file> --work-dir <ignored-empty-directory>` observes a fresh
+clone without mutating the remote. It records current default-head verification,
+latest workflow runs by workflow ID, tag signatures, tracked private state,
+content indicators and license digests. Exit 1 means a current FAIL; REVIEW items
+need semantic disposition. Historical names/trailers and existing lightweight
+tags are observations, not permission to rewrite history. Forks retain upstream
+history. API failures stop the scan, never prove conformance.
+
+The required empty output directory is reused and left empty after the clone
+is retired. This helper is partial evidence alongside the audit matrix and
+settings comparator. The organization owner calls this implementation instead
+of maintaining another copy.
