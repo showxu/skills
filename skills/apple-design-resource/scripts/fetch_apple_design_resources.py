@@ -18,6 +18,7 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
@@ -231,7 +232,7 @@ def classify(link: LinkRecord) -> None:
         family = "icon-composer"
     elif "app icon" in text or "icon template" in text:
         family = "app-icon-template"
-    elif "technology" in text or "tech design template" in text or any(term in text for term in ("apple pay", "app clips", "wallet", "siri", "tipkit", "airplay", "homekit", "arkit", "live activities", "messages", "tap to pay")):
+    elif "technolog" in text or "tech design template" in text or any(term in text for term in ("apple pay", "app clips", "wallet", "siri", "tipkit", "airplay", "homekit", "arkit", "live activities", "messages", "tap to pay")):
         family = "technology-template"
     elif "ui kit" in text or "sketch library" in text:
         family = "ui-kit"
@@ -453,24 +454,54 @@ def read_manifest(downloads_dir: Path) -> dict[str, dict[str, Any]]:
     return {entry["url"]: entry for entry in json.loads(path.read_text(encoding="utf-8"))["files"]}
 
 
+VERSION_FIELDS = ("file", "bytes", "sha256", "etag", "last_modified", "downloaded_at")
+
+
 def write_manifest(downloads_dir: Path, records: list[LinkRecord]) -> None:
-    """Merge this run's downloads into the archive manifest that travels with the files."""
+    """Merge this run's downloads into the archive manifest that travels with the files.
+
+    An entry describes the newest retained version; `earlier_versions` lists the
+    retained versions it superseded. Fields this script does not own are kept.
+    """
     entries = read_manifest(downloads_dir)
     for record in records:
         if record.download.get("downloaded"):
-            entries[record.url] = {
+            entry = {
+                **entries.get(record.url, {}),
                 "url": record.url,
                 "label": record.label,
                 "sections": record.sections,
                 "resource_family": record.resource_family,
-                **{key: record.download.get(key) for key in ("file", "bytes", "sha256", "etag", "last_modified", "downloaded_at")},
+                **{key: record.download.get(key) for key in VERSION_FIELDS},
             }
+            if record.download.get("earlier_versions"):
+                entry["earlier_versions"] = record.download["earlier_versions"]
+            entries[record.url] = entry
     data = {"files": sorted(entries.values(), key=lambda entry: entry["file"])}
     write_json(downloads_dir / "manifest.json", data)
 
 
+def version_path(relative: Path, last_modified: str | None, sha256: str, downloads_dir: Path) -> Path:
+    """A free sibling path for a newer version: `<name> (<date>)<suffix>`."""
+    tag = sha256[:12]
+    if last_modified:
+        try:
+            tag = parsedate_to_datetime(last_modified).date().isoformat()
+        except (TypeError, ValueError):
+            pass
+    candidate = relative.with_name(f"{relative.stem} ({tag}){relative.suffix}")
+    if (downloads_dir / candidate).exists():
+        candidate = relative.with_name(f"{relative.stem} ({tag} {sha256[:12]}){relative.suffix}")
+    return candidate
+
+
 def download_direct(records: list[LinkRecord], downloads_dir: Path, max_bytes: int, timeout: int) -> None:
-    """Download Apple CDN files into an archive, reusing files that still match the manifest."""
+    """Download Apple files into an archive without replacing retained versions.
+
+    A file that still matches its manifest entry is reused. When Apple serves new
+    content, the earlier file stays where it is and the new version is saved beside
+    it; a file that no longer matches the content its entry records is restored.
+    """
     downloads_dir.mkdir(parents=True, exist_ok=True)
     manifest = read_manifest(downloads_dir)
     for record in records:
@@ -488,17 +519,19 @@ def download_direct(records: list[LinkRecord], downloads_dir: Path, max_bytes: i
             }
             continue
 
-        relative = archive_path(record.url)
-        target = downloads_dir / relative
-        known = manifest.get(record.url)
-        if (known and target.exists() and known.get("file") == str(relative)
-                and target.stat().st_size == known.get("bytes") and length in (None, known.get("bytes"))
+        known = manifest.get(record.url) or {}
+        earlier = list(known.get("earlier_versions", []))
+        current = downloads_dir / known["file"] if known.get("file") else None
+        if (current and current.exists() and current.stat().st_size == known.get("bytes")
+                and length in (None, known.get("bytes"))
                 and status.get("etag") in (None, known.get("etag"))
-                and file_sha256(target) == known.get("sha256")):
-            record.download = {**{key: known.get(key) for key in ("file", "bytes", "sha256", "etag", "last_modified", "downloaded_at")},
-                               "downloaded": True, "reused": True}
+                and file_sha256(current) == known.get("sha256")):
+            record.download = {**{key: known.get(key) for key in VERSION_FIELDS},
+                               "downloaded": True, "reused": True, "earlier_versions": earlier}
             continue
 
+        relative = Path(known["file"]) if known.get("file") else archive_path(record.url)
+        target = downloads_dir / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         partial = target.with_name(target.name + ".part")
         request = Request(record.url, headers={"User-Agent": USER_AGENT})
@@ -521,15 +554,26 @@ def download_direct(records: list[LinkRecord], downloads_dir: Path, max_bytes: i
                     "max_download_bytes": max_bytes,
                 }
                 continue
+            sha256 = digest.hexdigest()
+            if target.exists() and sha256 != known.get("sha256") and file_sha256(target) != sha256:
+                # Different retained content keeps its place; the new version goes beside it.
+                if known.get("sha256"):
+                    earlier.append({key: known.get(key) for key in VERSION_FIELDS})
+                else:
+                    earlier.append({"file": str(relative), "bytes": target.stat().st_size,
+                                    "sha256": file_sha256(target)})
+                relative = version_path(relative, headers.get("last-modified"), sha256, downloads_dir)
+                target = downloads_dir / relative
             partial.replace(target)
             record.download = {
                 "downloaded": True,
                 "file": str(relative),
                 "bytes": total,
-                "sha256": digest.hexdigest(),
+                "sha256": sha256,
                 "etag": headers.get("etag"),
                 "last_modified": headers.get("last-modified"),
                 "downloaded_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+                "earlier_versions": earlier,
             }
         except (HTTPError, URLError, OSError, TimeoutError) as exc:
             partial.unlink(missing_ok=True)

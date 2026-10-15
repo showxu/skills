@@ -76,7 +76,10 @@ handoff artifacts.
    under `design-downloads/` and other Apple hosts' files under their host;
    `manifest.json` records each file's URL, size, SHA-256, ETag,
    Last-Modified, and download time, and later runs reuse files that still
-   match their manifest entries.
+   match their manifest entries. A run never replaces a retained file: when
+   Apple serves new content, the new version is saved beside it as
+   `<name> (<date>)` and the entry lists the earlier one in
+   `earlier_versions`.
 5. Add `--extract-dmg --accept-license` only when the user asks to unpack
    disk images and has reviewed the license agreements they carry; the
    extraction record names the accepted agreement and its SHA-256.
