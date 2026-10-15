@@ -17,3 +17,7 @@
 - Implementation Planning Gate:
 - Execution Gate:
 - Closeout Gate:
+
+## Adoption Path and Reader Roles
+
+## Clean-Room Allowed Inputs and Independent Auditor (when rebuilding)

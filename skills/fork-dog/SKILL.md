@@ -1,6 +1,6 @@
 ---
 name: fork-dog
-description: Orchestrate HITL-governed fork/adoption work from upstream and donor sources into a local product or repository. Use for upstream intake, reference governance, donor classification, capability and semantic matrices, local architecture mapping, accept/reject/defer decisions, local truth promotion, implementation handoff, validation closeout, and multi-skill coordination for fork/adoption projects. Do not use for shallow research, copy-only vendoring, one-off code review, generic implementation without donor evidence, generic docs normalization, or skill/package creation by itself.
+description: Orchestrate HITL-governed fork/adoption and clean-room reimplementation work from upstream and donor sources into a local product or repository. Use for upstream intake, reference governance, donor classification, capability and semantic matrices, local architecture mapping, accept/reject/defer decisions, local truth promotion, implementation handoff, validation closeout, independent pre-publication overlap audits, and multi-skill coordination for fork/adoption projects. Do not use for shallow research, copy-only vendoring, one-off code review, generic implementation outside an adoption decision, generic docs normalization, or skill/package creation by itself.
 ---
 
 # Fork Dog
@@ -52,6 +52,23 @@ skill authoring, or implementation planning.
 - Do not use for skill creation alone.
 - Do not use for release automation, CI design, or generic product strategy.
 
+## Choose the adoption path before source access
+
+At the Scope Gate, choose an adaptation path (fork or accepted source reuse) or
+clean-room reimplementation, and name each participant's reader role. For a
+rebuild, enter [Clean-room reimplementation](references/clean-room.md) **before**
+any donor scan. The implementer never reads donor sources, tests, docs, history,
+or renamed local copies. A participant already exposed to that material cannot
+be designated the clean-room implementer retroactively. Use an unexposed
+implementer or retain the adaptation path and its attribution obligations.
+
+The clean-room implementer reads only the approved requirements and allowed
+inputs recorded in the development log. A separate auditor owns donor access,
+full-history/local-copy overlap evidence and the mandatory gate before the
+first public push. Tool completion is not independent acceptance. Read-only
+auditor work, implementation, and publication remain separate responsibilities;
+delegation still requires authorization.
+
 ## Inputs To Inspect
 
 - User scope, target repository, explicit non-goals, and expected final product
@@ -61,7 +78,7 @@ skill authoring, or implementation planning.
   repository invariants.
 - Workspace or repo governance for upstream refs, cloned references,
   checked-in references, generated files, and temporary `.agent/*` artifacts.
-- Candidate donors: upstream repos, forks, official APIs, mature
+- For adaptation readers and independent auditors only: upstream repos, forks, official APIs, mature
   implementations, MCP servers, skills, docs, examples, tests, fixtures,
   package metadata, and operational evidence.
 - Existing local capability inventory, architecture mapping, docs truth, and
@@ -94,6 +111,11 @@ Default packet:
   validation-closeout.md
 ```
 
+For a clean-room run, the implementer receives only its sanitized handoff and
+development log. Keep donor findings, raw reports and the full audit record in
+the auditor’s separate restricted workspace; the shared state records only the
+accepted SHA and decision. Never hand the full donor packet to the implementer.
+
 Formal docs are updated only after the docs promotion decision. Do not put raw
 upstream wording, local paths, run notes, or donor comparisons into shipped
 docs. Rewrite internal analysis terms such as donor, upstream, superset, parity
@@ -102,19 +124,26 @@ or "exceeds upstream" into what the product does and supports.
 ## Workflow
 
 1. Scope Gate.
+   - Choose adaptation versus clean-room reimplementation and reader roles before
+     source access. Record allowed inputs and the independent auditor for a rebuild.
    - Identify target product, local repository, source set, non-goals, output
      mode, and expected closeout.
    - If scope is unclear, ask before broad collection.
 2. Local Truth Scan.
+   - A clean-room implementer inspects only approved independent local truth,
+     never donor-derived parts of a target or renamed copy.
    - Read local route files, README, architecture/reference docs, tests,
      generated metadata, public APIs, and current plans.
    - Record the local axes that adoption must respect.
 3. Source Intake.
+   - Clean-room implementers use the approved input log and rebuild handoff;
+     they do not perform donor intake or distillation. The independent auditor
+     owns the restricted source inventory and overlap report.
    - Register or inspect upstream refs according to local workspace governance.
    - Do not hand-edit governed refs metadata.
    - Record donor type, status, baseline, and reason for inclusion.
 4. Donor Distillation.
-   - For each donor, extract capabilities, semantics, tests, fixtures,
+   - In the adaptation path, for each donor extract capabilities, semantics, tests, fixtures,
      runtime behavior, docs patterns, and rejected baggage.
    - Use clean-context subagents for bounded independent donor scans when
      available and useful.
@@ -140,6 +169,10 @@ or "exceeds upstream" into what the product does and supports.
    - Do not write implementation plans directly unless the user explicitly
      asks for that workflow.
 10. Validation Closeout.
+    - For a clean-room rebuild, require independent acceptance of the exact
+      candidate commit/tree and complete audit inputs before any first public
+      branch/tag push or public PR publication. A changed candidate invalidates
+      that acceptance. Follow the clean-room reference; never self-approve it.
     - Record commands, checks, remaining external blockers, deferred donor
       rows, and next adoption slices.
 
@@ -153,6 +186,10 @@ or "exceeds upstream" into what the product does and supports.
 - Implementation Planning Gate: architecture truth is accepted and a coding
   plan should be written.
 - Execution Gate: implementation should start after planning.
+- Clean-room Publication Gate: someone other than the implementer reviews the
+  development log and full overlap evidence, and accepts the exact candidate
+  before its first public push. Missing reviewer, incomplete history or
+  unexplained overlap keeps publication blocked; local preparation may continue.
 - Closeout Gate: final status claims depend on live credentials, external
   services, or unrun validation.
 
@@ -175,6 +212,8 @@ other exists.
 
 ## Decision Rules
 
+- Never strip license attribution from a copy that remains, including a renamed
+  local copy or retained test suite. Overlap percentages do not waive notices.
 - Upstream is evidence, not truth.
 - Local product capability is the adoption contract.
 - Copy semantics only after local reconstruction. Do not copy route shape,
@@ -212,6 +251,8 @@ decision without pretending the full packet exists.
 
 At closeout, report:
 
+- chosen adoption path, reader roles and, for clean-room work, the development
+  log, source coverage, independent auditor decision and exact accepted SHA
 - refs validation or source access status
 - matrix row counts by decision
 - local architecture truth files changed or intentionally unchanged
@@ -224,9 +265,18 @@ At closeout, report:
 
 - If governed refs cannot be cloned or validated, keep the blocker in the
   adoption packet and do not silently replace it with ungoverned source.
-- If donor evidence conflicts, inspect source before synthesizing.
+- If donor evidence conflicts, an authorized adaptation reader or independent
+  auditor inspects it. The clean-room implementer does not cross the boundary.
 - If local truth and donor behavior conflict, stop at Boundary Gate unless the
   user already gave a clear decision rule.
 - If formal docs destination is unclear, keep output in `.agent/*`.
 - If implementation planning is requested, hand off to the planning workflow
   with concrete scope, paths, risks, validation, and deferred rows.
+
+## Maintenance
+
+Read [architecture](references/architecture.md) for the audit helper contract,
+source ownership and validation. Run its synthetic repository tests and the
+[behavior fixtures](references/eval-fixtures.md) when changing the boundary,
+audit coverage or publication gate. Raw reports remain private execution
+evidence; they can expose donor material and must not contaminate an implementer.
