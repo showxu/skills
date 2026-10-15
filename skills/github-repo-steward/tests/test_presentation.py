@@ -10,7 +10,7 @@ from xml.etree import ElementTree as ET
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from presentation import load_spec, sha256, write_or_check
-from render_social import fit_title, wrap_about
+from render_social import fit_title, icon_svg, wrap_about
 from render_terminal import cells, render
 
 OUTPUT = Path(os.environ["REPO_STEWARD_TEST_OUTPUT"])
@@ -63,6 +63,13 @@ class PresentationTests(unittest.TestCase):
             design.write_text("new tokens")
             with self.assertRaisesRegex(ValueError, "stale"):
                 load_spec(recipe)
+
+    def test_icon_lettering_cannot_reintroduce_font_lookup(self):
+        with tempfile.TemporaryDirectory(dir=OUTPUT) as folder:
+            icon = Path(folder) / "icon.svg"
+            icon.write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text>Logo</text></svg>')
+            with self.assertRaisesRegex(ValueError, "outlined lettering"):
+                icon_svg(icon, 0, 0, 100)
 
     def test_check_reports_drift_without_overwriting(self):
         with tempfile.TemporaryDirectory(dir=OUTPUT) as folder:

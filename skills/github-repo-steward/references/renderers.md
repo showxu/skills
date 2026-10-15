@@ -38,8 +38,10 @@ The literals above are example inputs only. Defaults: canvas 1280×640, padding
 72 down to 40 px in integer steps, title maximum two lines, About 32 px and at
 most three lines with a 44 px line height. Default background is white, title
 and owner black, summary dark gray. Override `background`, `ink`, `muted`,
-`title_max`, `title_min`, `text_x`, `text_width`, `icon_size` and `padding`
-with accepted DESIGN values. Canvas and About size remain the card contract.
+`title_max`, `title_min`, `font_owner`, `owner_size`, `text_x`, `text_width`, `icon_size` and `padding`
+with accepted DESIGN values. `font_owner` defaults to the body font; supply a
+distinct face when DESIGN specifies one. Icon lettering must already be
+outlined. Canvas and About size remain the card contract.
 Unbreakable overflow fails instead of clipping or silently reducing type.
 
 ```sh

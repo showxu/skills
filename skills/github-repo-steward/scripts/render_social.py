@@ -84,8 +84,8 @@ def icon_svg(path, x, y, size):
     if root.tag.rsplit("}", 1)[-1] != "svg":
         raise ValueError("Icon must be SVG")
     for node in root.iter():
-        if node.tag.rsplit("}", 1)[-1] in {"script", "foreignObject"}:
-            raise ValueError("Icon must be static SVG")
+        if node.tag.rsplit("}", 1)[-1] in {"script", "foreignObject", "text"}:
+            raise ValueError("Icon must be static SVG with outlined lettering")
         for key, value in node.attrib.items():
             if key.lower().startswith("on") or (key.rsplit("}", 1)[-1] == "href" and not value.startswith("#")):
                 raise ValueError("Icon must be self-contained SVG")
@@ -103,6 +103,10 @@ def render(spec, base):
             raise ValueError(f"{key} must be a six-digit hex color")
     title_font = Face(base / spec["font_title"])
     body_font = Face(base / spec["font_body"])
+    owner_font = Face(base / spec["font_owner"]) if "font_owner" in spec else body_font
+    owner_size = float(spec.get("owner_size", 28))
+    if owner_size <= 0:
+        raise ValueError("Owner font size must be positive")
     # This required receipt is not a determination of redistribution permission.
     license_path = base / spec["font_license"]
     if not license_path.is_file():
@@ -114,19 +118,19 @@ def render(spec, base):
     titles, size = fit_title(spec["title"], title_font.width, width,
                              int(spec.get("title_max", 72)), int(spec.get("title_min", 40)))
     about = wrap_about(spec["about"], body_font.width, width)
-    if body_font.width(spec["owner"], 28) > width:
+    if owner_font.width(spec["owner"], owner_size) > width:
         raise ValueError("Owner label exceeds the text area")
-    block_height = 28 + 24 + len(titles) * size * 1.15 + 24 + len(about) * 44
+    block_height = owner_size + 24 + len(titles) * size * 1.15 + 24 + len(about) * 44
     if block_height > 640 - 2 * padding:
         raise ValueError("Text block exceeds the card height")
-    y = (640 - block_height) / 2 + 28
+    y = (640 - block_height) / 2 + owner_size
     ink, muted = spec.get("ink", "#000000"), spec.get("muted", "#444444")
     svg = ['<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">',
            '<title id="title">' + escape(spec["title"]) + '</title>',
            '<desc id="desc">' + escape(spec["about"]) + '</desc>',
            '<rect width="1280" height="640" fill="' + spec.get("background", "#ffffff") + '"/>',
            icon_svg(base / spec["icon"], padding, (640 - icon_size) / 2, icon_size),
-           body_font.outline(spec["owner"], 28, x, y, ink)]
+           owner_font.outline(spec["owner"], owner_size, x, y, ink)]
     y += 24
     for line in titles:
         y += size * 1.15
@@ -141,6 +145,8 @@ def render(spec, base):
               "about_lines": about, "about_size": 32,
               "inputs": {key: sha256(base / spec[key]) for key in
                          ("icon", "font_title", "font_body", "font_license")}}
+    if "font_owner" in spec:
+        layout["inputs"]["font_owner"] = sha256(base / spec["font_owner"])
     if "design_sha256" in spec:
         layout["design_sha256"] = spec["design_sha256"]
     return "\n".join(svg), layout
