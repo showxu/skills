@@ -69,8 +69,8 @@ generic equality check against every plist entry cannot replace those rules.
 
 ## Validation boundary
 
-The fixture runner denies network, owner/system Keychain directories and the
-profile discovery directories. It generates certificates as files, imports
+The fixture runner denies network, securityd/trustd lookups, owner/system
+Keychain directories and the profile discovery directories. It generates certificates as files, imports
 none, and signs only ad-hoc test code. Pure model tests cover selection,
 certificate dates, prefix/team separation, group matching and renewal rules.
 CMS and signed-bundle fixtures exercise actual Security APIs; filesystem

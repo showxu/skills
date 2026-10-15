@@ -31,7 +31,12 @@ def main():
         temporary = OUTPUT / "tmp"
         temporary.mkdir(exist_ok=True)
         environment = dict(os.environ, TMPDIR=str(temporary))
-        profile = ['(version 1)', '(allow default)', '(deny network*)']
+        profile = [
+            '(version 1)', '(allow default)', '(deny network*)',
+            '(deny mach-lookup '
+            '(global-name-regex "^com[.]apple[.]securityd([.].*)?$") '
+            '(global-name-regex "^com[.]apple[.]trustd([.].*)?$"))',
+        ]
         for path in [Path.home() / "Library/Keychains", Path("/Library/Keychains"),
                      Path("/System/Library/Keychains"),
                      Path.home() / "Library/Developer/Xcode/UserData/Provisioning Profiles",
@@ -42,6 +47,7 @@ def main():
                        env=environment, check=True)
         return
 
+    assert SOURCE.read_text().splitlines()[0] == "#!/usr/bin/swift sh", "invalid executable shebang"
     binary = OUTPUT / "codesign"
     run("xcrun", "swiftc", "-module-cache-path", OUTPUT / "module-cache", SOURCE, "-o", binary)
     print(run(binary, "self-test"), end="")

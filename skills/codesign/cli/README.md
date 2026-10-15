@@ -131,7 +131,7 @@ python3 -B skills/codesign/cli/test_codesign.py
 
 The runner compiles with the local SDK, generates temporary OpenSSL certificates
 and CMS messages, signs only ad-hoc fixture code, and exercises the production
-inspection and replacement functions. Its sandbox denies network and reads or
+inspection and replacement functions. Its sandbox denies network, securityd/trustd lookups and reads or
 writes to the user's/system's Keychain and provisioning-profile directories.
 No certificate is imported and no Keychain search list is changed. All outputs
 reuse `.build/codesign-tests/`; remove that producer directory after recording

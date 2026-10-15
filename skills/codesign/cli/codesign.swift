@@ -1,23 +1,11 @@
-#!/usr/bin/swift sh  // Standard local macOS code signing for projects: choose the profile and identity for a  // bundle, sign a single-executable bundle from a project's build, verify a signed bundle
-// and audit identities, profiles and signed tools. `sign` writes the output and sibling
-// staging/backups; fixture self-tests write only their fixture directory. Nothing changes
-// Keychain items, profiles or certificates. Output
-// carries certificate fingerprints, names and dates, never device identifiers or key material.
-//
-// Usage:
-//   codesign.swift select-profile --bundle-id ID [--profile UUID] [--identity SHA1] [--json]
-//   codesign.swift sign --bundle-id ID --binary PATH --output PATH.app [--name NAME]
-//                       [--info KEY=VALUE]... [--access-group-key KEY] [--entitlements PLIST]
-//                       [--profile UUID] [--identity SHA1] [--json]
-//   codesign.swift verify --bundle PATH [--json]
-//   codesign.swift audit [--bundle PATH]... [--within-days N] [--json]
-//   codesign.swift self-test [--fixtures PATH]
-// Exit codes: 0 ok, 1 check failed or nothing usable, 2 the owner must choose between
-// candidates (select-profile, sign), 64 usage.
-
+#!/usr/bin/swift sh
 import CryptoKit
 import Foundation
 import Security
+
+// `sign` writes the output and sibling staging/backups; fixture self-tests write
+// only their fixture directory. Keychain items, profiles and certificates are
+// never modified. Results may include certificate metadata, never device IDs or keys.
 
 // MARK: - Model
 
@@ -959,9 +947,14 @@ func selfTest(fixtures: URL? = nil) -> Int32 {
     expect(
       decoded?.prefix == "PREFIX" && decoded?.team == "TEAM" && decoded?.coversThisMac == true,
       "decode signed CMS fixture with distinct App ID prefix")
+    let observed = Date()
+    let fixtureCertificate = decoded?.certificates.first
     expect(
-      decoded?.certificates.count == 1 && decoded?.certificates.first?.notAfter != nil,
-      "decode fixture certificate dates and fingerprint")
+      decoded?.certificates.count == 1 && fixtureCertificate?.isCurrent(at: observed) == true
+        && (fixtureCertificate?.notAfter ?? .distantPast) > observed.addingTimeInterval(86_400)
+        && (fixtureCertificate?.notAfter ?? .distantFuture)
+          < observed.addingTimeInterval(3 * 86_400),
+      "decode real certificate validity dates with the correct epoch")
     for name in [
       "empty.provisionprofile", "unsigned.provisionprofile", "corrupt.provisionprofile",
       "profile.plist",
