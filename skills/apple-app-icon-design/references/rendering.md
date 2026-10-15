@@ -20,12 +20,14 @@ Apple's design workflow uses flat foreground layers, with the background and
 materials applied by Icon Composer. Do not pre-mask layers or paint native
 specular effects into them. See [Apple's workflow](https://developer.apple.com/videos/play/wwdc2025/361/).
 
-## Web Geometry
+## Liquid Glass Outline
 
-The flat SVG uses two mirrored cubic segments per continuous corner. In
-fractions of a square's side, the edge departure and control values are
-`0.396305, 0.230261, 0.152117, 0.076058`. The native `.icon` document does not
-contain this outline; native masks always come from the renderer.
+The flat SVG approximation of a Liquid Glass icon, used for its
+`favicon.svg` and for lint, uses two mirrored cubic segments per continuous
+corner. In fractions of a square's side, the edge departure and control
+values are `0.396305, 0.230261, 0.152117, 0.076058`. The native `.icon`
+document does not contain this outline; native masks always come from the
+renderer.
 
 Validate these constants by rendering the SVG outline at 1024 px and
 comparing its alpha with a full-bleed solid `.icon` exported for iOS and
@@ -40,20 +42,89 @@ and macOS exports share the same mask. The outline achieves alpha IoU
 0.999767 and bidirectional contour deviation 0.3491 px at 1024 px, measured
 on the 50% alpha contour using marching squares and point-to-segment distance.
 
-The favicon has the continuous outline. The apple-touch-icon has no baked-in
-mask. The maskable image has an opaque full-bleed background and scales the
-foreground square by at most 0.56, placing it within a circle of radius 0.4
-times the canvas width. Inspect it with circular and rounded-square crops.
+## Style Renderings
+
+`flat`, `mac-tile`, and `gloss` are SVG compositions rendered with
+`rsvg-convert`. The continuous corner is Apple's: three cubic segments per
+corner, read from SwiftUI's `RoundedRectangle(cornerRadius:style: .continuous)`
+path on macOS 27.0.1. Per unit radius, the corner departs each edge at
+1.528665 and passes through (0.631494, 0.074911) and (0.074911, 0.631494);
+`CONTINUOUS` in the script holds every control point.
+
+| Style | Outline on 1024 px | Treatment | Source |
+| --- | --- | --- | --- |
+| `flat` | Continuous radius 229 px on the full canvas | Background, artwork | iOS 18 production template |
+| `mac-tile` | Continuous radius 185.4 px on an 824 px tile inset 100 px | Black shadow: 10 px down, Gaussian deviation 10 px, opacity 0.30 | macOS 15 production template |
+| `gloss` | Circular radius 10/57 of the side | White highlight, path `M0 0H1024V400Q512 620 0 400Z`, opacity 0.5 at the top to 0.1 at the bottom | Approximation |
+
+Measurements used Apple's iOS 18 and macOS Sequoia production templates for
+Sketch, compared at 1024 px with `rsvg-convert` 2.63.2:
+
+- **flat**: the template's 1024 px mask is a smooth-corner rectangle with
+  radius 229. Against it, the continuous outline with radius 229 has alpha
+  IoU 0.99935; radius 225 has 0.99861, radius 233 has 0.99805, a circular
+  radius 229 has 0.99798, and the Liquid Glass outline has 0.98322.
+- **mac-tile**: the template's 1024 px mask is an 824 px path inset 100 px.
+  The continuous outline with radius 185.4 has alpha IoU 0.99895; radius 185
+  has 0.99904, a circular corner 0.99780, and the Liquid Glass outline
+  0.98333. The template supplies its shadow as an image; the shadow above
+  reproduces it with mean absolute alpha error 0.00044 outside the tile at
+  256 px.
+- **gloss**: no Apple template for iOS 1 to 6 remains available. The corner
+  ratio is the 10 px radius of a 57 px icon reported by
+  [Hicks Design](https://hicks.design/journal/ios-icon-corner-radii); the
+  highlight shape and opacity are visual approximations.
+
+Apple's templates are licensed Apple Design Resources. This skill records
+measured values only and does not redistribute template content; repeating a
+measurement requires obtaining the templates under Apple's license.
+
+## Web Icons
+
+Every style writes the same web set:
+
+- **Masked images** come from the style's own rendering: `favicon-16.png`,
+  `favicon-32.png`, `icon-192.png`, and `icon-512.png` for a web manifest's
+  `any` purpose, and `avatar-1024.png`. Liquid Glass scales the native iOS
+  Default export.
+- **`favicon.svg`** is the style's SVG. For Liquid Glass it is the flat
+  approximation on the Liquid Glass outline, without native materials.
+- **Full-bleed images** have an opaque background and no mask or outer
+  shadow, because the platform applies its own: `apple-touch-icon.png` at
+  180 px and `maskable-512.png` for the `maskable` purpose. Gloss keeps its
+  highlight. The maskable image scales the artwork square by at most 0.56,
+  placing it within a circle of radius 0.4 times the canvas width. Inspect it
+  with circular and rounded-square crops.
+
+## Lint
+
+`--lint` renders each group alone at 256 px in artwork coordinates and
+reports:
+
+- artwork of a clipped group outside the style's outline, beyond 0.5% of the
+  group's coverage; groups covering 95% or more of the canvas are background
+  layers and are exempt, and `mac-tile` `unclipped` groups are not checked;
+- shapes narrower than 1 px when the icon is shown at 32 px, measured per
+  8-connected shape from the widest point of a chessboard distance transform;
+- mean OKLab lightness within 0.10 of the background, or of another group
+  covering at least 1% of the smaller group's area;
+- more than three groups.
+
+The thresholds are this skill's heuristics for the guidance in
+[design](design.md); a finding is fixed or recorded as an owner decision.
 
 ## Drift
 
-`--check` regenerates the selected icon into a temporary candidate and
+`--check` regenerates the selected style into a temporary candidate and
 compares the entire directory without writing into the target. It reports
-`same`, `drift`, `missing`, and `extra`. PNG comparison ignores ancillary
-metadata but includes dimensions and decompressed image payload. SVG,
-document, and manifest comparisons are exact.
+`same`, `drift`, `missing`, and `extra`. PNGs are the same when their
+decompressed payloads match, or when their decoded pixels have equal
+dimensions and differ by at most 1 in every channel: Icon Composer 27
+exports of one document can differ by 1/255 in a few pixels between runs.
+SVG, document, and manifest comparisons are exact.
 
-Use the same renderer and explicit `--design-generation` when maintaining a
-fixed appearance. A tool upgrade can legitimately change native rendering;
-review the new sheet before replacing published assets. Never mark a
-renderer failure, missing image, or unavailable native preview as verified.
+Record `design_generation` and use the same renderer when maintaining a fixed
+appearance. A tool upgrade can legitimately change native or style
+rendering; review the new sheet before replacing published assets. Never
+mark a renderer failure, missing image, or unavailable native preview as
+verified.

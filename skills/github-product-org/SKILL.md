@@ -164,7 +164,7 @@ This skill names owners because routing is part of its output.
 | Swift package or CLI release readiness | the Swift release skills (`swiftpm-github-release`) |
 | Design tokens file shape and templates | `design-md-template` |
 | Apple framework-style icon family | `apple-framework-icon-design` |
-| Native layered app icon and web renditions | `apple-app-icon-design` |
+| App icons in Apple's app icon styles, native and web renditions | `apple-app-icon-design` |
 | Documentation roles and review-rule format | `repository-docs` |
 | Swift package README, DocC and documentation templates | `swiftpm-docs` |
 | Website UI implementation and browser QA | `frontend-design`, `webapp-builder`, `webapp-testing` |

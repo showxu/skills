@@ -54,8 +54,9 @@ organizations.
 ## Icons
 
 - `apple-framework-icon-design` owns stacked, volumetric and flat member
-  icons. `apple-app-icon-design` owns native layered `.icon` documents, native
-  platform/appearance exports and web renditions. DESIGN owns parameters;
+  icons. `apple-app-icon-design` owns app icons in Apple's app icon styles:
+  native layered `.icon` documents and platform/appearance exports, style
+  renderings and web renditions. DESIGN owns parameters;
   renderers derive assets and drift checks verify every consumer.
 - Give members distinct hues with deliberate perceptual spacing. Review the
   family at header and table sizes on light and dark backgrounds. Use original
