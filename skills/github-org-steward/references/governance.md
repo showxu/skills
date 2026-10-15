@@ -61,7 +61,10 @@ For an authorized App:
   key into a transcript or disposable script.
 - When App-authenticated API commits are intended to be GitHub-verified, inspect
   `verification.verified` and `reason` for the actual commit; do not assume an
-  App token signs arbitrary local `git commit` output.
+  App token signs arbitrary local `git commit` output. GitHub’s
+  [bot-signature contract](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification#signature-verification-for-bots)
+  requires App/bot authentication without custom author, committer or signature
+  fields for that API verification path.
 
 Keep an App table with capability/name, permissions, installation selection,
 credential names and storage scope. Change it in the same reviewed operation as
