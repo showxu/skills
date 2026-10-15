@@ -1,9 +1,9 @@
 # Apple Design Resources Catalog
 
 - Source: https://developer.apple.com/design/resources/
-- Source SHA-256: `e37087cadef4d7492a1fd0f74144bd46d908bc0e788d23e02a582f66c2a75c67`
-- Fetched at: `2026-10-15T10:22:55+00:00`
-- Snapshot: `Apple-Design-Resources-20261015-feeds`
+- Source SHA-256: `bc34b6ec8b9f7fbc683645277504b20c9801001d2ebe3a418a2a535c36b5f632`
+- Fetched at: `2026-10-15T10:40:17+00:00`
+- Snapshot: `Apple-Design-Resources-20261015-history`
 - Filters: `{"label_contains": [], "link_kind": [], "resource_family": [], "section_contains": []}`
 - Resources: 160
 - Direct Apple CDN candidates: 117
@@ -25,16 +25,16 @@
 | Value | Count |
 | --- | ---: |
 | `product-bezel` | 41 |
-| `technology-template` | 32 |
+| `technology-template` | 38 |
 | `design-template` | 26 |
 | `ui-kit` | 15 |
 | `badge-logo-glyph` | 13 |
 | `font` | 8 |
-| `resource-link` | 7 |
 | `icon-composer` | 5 |
 | `sf-symbols` | 5 |
 | `app-icon-template` | 4 |
 | `platform-resource` | 4 |
+| `resource-link` | 1 |
 
 ## Reachability
 
@@ -92,9 +92,9 @@
   https://www.figma.com/community/file/1367914571662801866/app-clips
 - `technology-template` / `sketch-cloud-share`: Sketch (Apple Design Resources > Technologies > App Clips Design Template) reachable=True status=200
   https://sketch.com/s/e6ed1af0-508c-4fd5-bc6f-05f7ccb91c6e
-- `resource-link` / `apple-cdn-download`: PNG (Apple Design Resources > Technologies > Apple Health Icon) reachable=True status=200
+- `technology-template` / `apple-cdn-download`: PNG (Apple Design Resources > Technologies > Apple Health Icon) reachable=True status=200
   https://devimages-cdn.apple.com/design/resources/download/Icon-Apple-Health.dmg
-- `resource-link` / `apple-developer-page`: Design Guidelines (Apple Design Resources > Technologies > Apple Health Icon) reachable=True status=200
+- `technology-template` / `apple-developer-page`: Design Guidelines (Apple Design Resources > Technologies > Apple Health Icon) reachable=True status=200
   https://developer.apple.com/design/human-interface-guidelines/healthkit/
 - `technology-template` / `figma`: Figma (Apple Design Resources > Technologies > Apple Pay Design Template) reachable=True status=202
   https://www.figma.com/community/file/1367915141082663884/apple-pay
@@ -104,9 +104,9 @@
   https://devimages-cdn.apple.com/design/resources/download/Glyph-ARKit.dmg
 - `badge-logo-glyph` / `apple-developer-page`: Design Guidelines (Apple Design Resources > Technologies > ARKit Badge and Glyph) reachable=True status=200
   https://developer.apple.com/design/human-interface-guidelines/augmented-reality/
-- `resource-link` / `sketch-cloud-share`: Sketch (Apple Design Resources > Technologies > Camera Control) reachable=True status=200
+- `technology-template` / `sketch-cloud-share`: Sketch (Apple Design Resources > Technologies > Camera Control) reachable=True status=200
   https://sketch.com/s/85a0f9d2-d76c-42f9-b681-6225882d8024
-- `resource-link` / `apple-cdn-download`: PNG, PDF (Apple Design Resources > Technologies > Games and Game Center) reachable=True status=200
+- `technology-template` / `apple-cdn-download`: PNG, PDF (Apple Design Resources > Technologies > Games and Game Center) reachable=True status=200
   https://devimages-cdn.apple.com/design/resources/download/Icon-Game-Center.dmg
 - `badge-logo-glyph` / `apple-cdn-download`: PNG, PDF (Apple Design Resources > Technologies > HomeKit Icon and Glyph) reachable=True status=200
   https://devimages-cdn.apple.com/design/resources/download/Icon-HomeKit.dmg
@@ -124,9 +124,9 @@
   https://devimages-cdn.apple.com/design/resources/download/Logo-Sign-in-with-Apple.dmg
 - `badge-logo-glyph` / `apple-developer-page`: Design Guidelines (Apple Design Resources > Technologies > Sign in with Apple Logo) reachable=True status=200
   https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple/
-- `resource-link` / `figma`: Figma (Apple Design Resources > Technologies > Sign in with Apple Buttons) reachable=True status=202
+- `technology-template` / `figma`: Figma (Apple Design Resources > Technologies > Sign in with Apple Buttons) reachable=True status=202
   https://www.figma.com/community/file/1367916685468040146/sign-in-with-apple
-- `resource-link` / `sketch-cloud-share`: Sketch (Apple Design Resources > Technologies > Sign in with Apple Buttons) reachable=True status=200
+- `technology-template` / `sketch-cloud-share`: Sketch (Apple Design Resources > Technologies > Sign in with Apple Buttons) reachable=True status=200
   https://sketch.com/s/7cd7dbf4-41b2-4e90-bb00-2796ced3cf2b
 - `technology-template` / `figma`: Figma (Apple Design Resources > Technologies > Siri and App Shortcuts Template) reachable=True status=202
   https://www.figma.com/community/file/1367916969551216595/siri-app-shortcuts

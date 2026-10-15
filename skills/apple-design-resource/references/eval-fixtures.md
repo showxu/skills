@@ -36,6 +36,7 @@ Use these prompts to check routing and output boundaries.
   Apple-owned hosts are downloads, while their help pages stay links.
 - An archive run with `--downloads-dir` keeps Apple's file names, writes a
   merged `manifest.json` with SHA-256, ETag, and Last-Modified, and reuses
-  unchanged files on the next run.
+  unchanged files on the next run. Changed upstream content is saved beside
+  the retained file, never over it, and listed with its `earlier_versions`.
 - `--extract-dmg` without `--accept-license` fails before any network access;
   accepted extractions record the license agreement's title and SHA-256.

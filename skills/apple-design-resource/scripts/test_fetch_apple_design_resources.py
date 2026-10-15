@@ -173,12 +173,55 @@ class ArchiveDownloadTests(unittest.TestCase):
         self.assertEqual([entry["file"] for entry in manifest],
                          ["SF-Symbols-7.dmg", "iOS-18-Production-Templates-Sketch.dmg"])
 
+    def test_new_upstream_content_is_saved_beside_the_retained_version(self):
+        self.download([self.record()])
+        old = self.data
+        self.data = b"updated disk image bytes"
+        self.headers = {"etag": '"def"', "last-modified": "Wed, 01 Oct 2025 10:00:00 GMT"}
+        update = self.record()
+        update.probe.update({"content_length": str(len(self.data)), "etag": '"def"'})
+        self.assertEqual(self.download([update]), 1)
+        self.assertEqual((self.archive / "iOS-18-Production-Templates-Sketch.dmg").read_bytes(), old)
+        self.assertEqual((self.archive / "iOS-18-Production-Templates-Sketch (2025-10-01).dmg").read_bytes(), self.data)
+        entry = json.loads((self.archive / "manifest.json").read_text())["files"][0]
+        self.assertEqual(entry["file"], "iOS-18-Production-Templates-Sketch (2025-10-01).dmg")
+        self.assertEqual([v["sha256"] for v in entry["earlier_versions"]], [hashlib.sha256(old).hexdigest()])
+        again = self.record()
+        again.probe.update({"content_length": str(len(self.data)), "etag": '"def"'})
+        self.assertEqual(self.download([again]), 0)
+        self.assertTrue(again.download["reused"])
+        self.assertEqual(len(json.loads((self.archive / "manifest.json").read_text())["files"][0]["earlier_versions"]), 1)
+
+    def test_unknown_archive_files_are_never_replaced(self):
+        (self.archive / "iOS-18-Production-Templates-Sketch.dmg").write_bytes(b"someone else's file")
+        record = self.record()
+        self.assertEqual(self.download([record]), 1)
+        self.assertEqual((self.archive / "iOS-18-Production-Templates-Sketch.dmg").read_bytes(), b"someone else's file")
+        self.assertEqual(record.download["file"], "iOS-18-Production-Templates-Sketch (2024-07-16).dmg")
+
+    def test_manifest_keeps_fields_owned_by_other_tools(self):
+        self.download([self.record()])
+        path = self.archive / "manifest.json"
+        data = json.loads(path.read_text())
+        data["files"][0]["source"] = "archived elsewhere"
+        path.write_text(json.dumps(data))
+        self.download([self.record()])
+        self.assertEqual(json.loads(path.read_text())["files"][0]["source"], "archived elsewhere")
+
     def test_oversized_files_are_skipped(self):
         record = self.record()
         record.probe["content_length"] = "4096"
         self.assertEqual(self.download([record]), 0)
         self.assertFalse(record.download["downloaded"])
         self.assertFalse((self.archive / "iOS-18-Production-Templates-Sketch.dmg").exists())
+
+
+class ClassificationTests(unittest.TestCase):
+    def test_technologies_section_rows_are_technology_templates(self):
+        record = adr.LinkRecord(label="Sketch", sections=["Apple Design Resources", "Technologies", "Camera Control"],
+                                url="https://sketch.com/s/a443d962-d989-4c5b-b1db-fb7fb3946995")
+        adr.classify(record)
+        self.assertEqual((record.link_kind, record.resource_family), ("sketch-cloud-share", "technology-template"))
 
 
 class LicenseGateTests(unittest.TestCase):

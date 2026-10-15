@@ -21,15 +21,15 @@
       "icon-composer": 5,
       "platform-resource": 4,
       "product-bezel": 41,
-      "resource-link": 7,
+      "resource-link": 1,
       "sf-symbols": 5,
-      "technology-template": 32,
+      "technology-template": 38,
       "ui-kit": 15
     },
     "direct_download_candidates": 117,
     "total": 160
   },
-  "fetched_at": "2026-10-15T10:22:55+00:00",
+  "fetched_at": "2026-10-15T10:40:17+00:00",
   "filters": {
     "label_contains": [],
     "link_kind": [],
@@ -52,7 +52,7 @@
       "label": "Figma",
       "link_kind": "figma",
       "probe": {
-        "content_length": "679915",
+        "content_length": "679885",
         "content_type": "text/html;charset=utf-8",
         "error": "HTTP Error 404: Not Found",
         "method": "HEAD",
@@ -103,7 +103,7 @@
       "label": "Figma",
       "link_kind": "figma",
       "probe": {
-        "content_length": "679885",
+        "content_length": "679901",
         "content_type": "text/html;charset=utf-8",
         "error": "HTTP Error 404: Not Found",
         "method": "HEAD",
@@ -181,7 +181,7 @@
       "label": "Figma",
       "link_kind": "figma",
       "probe": {
-        "content_length": "679895",
+        "content_length": "679885",
         "content_type": "text/html;charset=utf-8",
         "error": "HTTP Error 404: Not Found",
         "method": "HEAD",
@@ -385,7 +385,7 @@
       "label": "Figma",
       "link_kind": "figma",
       "probe": {
-        "content_length": "679869",
+        "content_length": "679903",
         "content_type": "text/html;charset=utf-8",
         "error": "HTTP Error 404: Not Found",
         "method": "HEAD",
@@ -457,7 +457,7 @@
       "label": "Figma",
       "link_kind": "figma",
       "probe": {
-        "content_length": "679857",
+        "content_length": "679948",
         "content_type": "text/html;charset=utf-8",
         "error": "HTTP Error 404: Not Found",
         "method": "HEAD",
@@ -648,7 +648,7 @@
         "reachable": true,
         "status": 200
       },
-      "resource_family": "resource-link",
+      "resource_family": "technology-template",
       "sections": [
         "Apple Design Resources",
         "Technologies",
@@ -674,7 +674,7 @@
         "reachable": true,
         "status": 200
       },
-      "resource_family": "resource-link",
+      "resource_family": "technology-template",
       "sections": [
         "Apple Design Resources",
         "Technologies",
@@ -804,7 +804,7 @@
         "reachable": true,
         "status": 200
       },
-      "resource_family": "resource-link",
+      "resource_family": "technology-template",
       "sections": [
         "Apple Design Resources",
         "Technologies",
@@ -830,7 +830,7 @@
         "reachable": true,
         "status": 200
       },
-      "resource_family": "resource-link",
+      "resource_family": "technology-template",
       "sections": [
         "Apple Design Resources",
         "Technologies",
@@ -1064,7 +1064,7 @@
         "reachable": true,
         "status": 202
       },
-      "resource_family": "resource-link",
+      "resource_family": "technology-template",
       "sections": [
         "Apple Design Resources",
         "Technologies",
@@ -1090,7 +1090,7 @@
         "reachable": true,
         "status": 200
       },
-      "resource_family": "resource-link",
+      "resource_family": "technology-template",
       "sections": [
         "Apple Design Resources",
         "Technologies",
@@ -4117,7 +4117,7 @@
       "url": "https://devimages-cdn.apple.com/design/resources/download/watchOS-9-Production-Templates-Sketch.dmg"
     }
   ],
-  "snapshot_dir": "Apple-Design-Resources-20261015-feeds",
-  "source_sha256": "e37087cadef4d7492a1fd0f74144bd46d908bc0e788d23e02a582f66c2a75c67",
+  "snapshot_dir": "Apple-Design-Resources-20261015-history",
+  "source_sha256": "bc34b6ec8b9f7fbc683645277504b20c9801001d2ebe3a418a2a535c36b5f632",
   "source_url": "https://developer.apple.com/design/resources/"
 }
