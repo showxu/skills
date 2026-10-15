@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub Org Steward"
+  short_description: "Coordinate organization-wide GitHub standards"
+  default_prompt: "Use $github-org-steward to maintain this organization’s shared standards, placement, scoped Apps, family profile and coordinated publication, invoking the repository steward for each member."

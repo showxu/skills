@@ -15,6 +15,7 @@ repositories and organization members through the same contract.
 | scripts/configure-clone.sh / prepush-check.sh | Task-clone signing and repository-owned validation gates |
 | scripts/render_social.py / render_terminal.py | Outlined card layout and light/dark recorded-session rendering |
 | scripts/presentation.py | Shared design binding, digest and control-character validation |
+| scripts/scan_repository.py | Partial source/workflow/tag/content observations and license digest, reused by organization aggregation |
 | scripts/audit_repo.py | Read-only settings capture and expected/observed comparison |
 | tests / references/eval-fixtures.md / evals/evals.json | Helper regressions and durable behavioral inputs; execution output is ignored |
 

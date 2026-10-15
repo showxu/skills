@@ -65,7 +65,7 @@ jobs:
       - name: Exercise repository stewardship
         run: python3 -B -m unittest discover -s skills/github-repo-steward/tests -v
       - name: Exercise organization governance
-        run: python3 -B -m unittest discover -s skills/github-product-org/tests -v
+        run: python3 -B -m unittest discover -s skills/github-org-steward/tests -v
 
   result:
     needs: [policy, validate]
