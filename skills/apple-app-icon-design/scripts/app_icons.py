@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Build Icon Composer documents, native renditions, and web icons from DESIGN.md."""
+"""Render Apple-style app icons in each generation's style, with web icons, from DESIGN.md."""
 
 from __future__ import annotations
 
 import argparse
 import base64
+from collections import deque
 import html
 import json
 import os
@@ -19,9 +20,40 @@ import zlib
 
 PLATFORMS = ("iOS", "macOS", "watchOS")
 RENDITIONS = ("Default", "Dark", "ClearLight", "ClearDark", "TintedLight", "TintedDark")
-CORNER = (0.396305, 0.230261, 0.152117, 0.076058)
-SAFE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\Z")
+STYLES = ("liquid-glass", "flat", "mac-tile", "gloss")
+STYLE_FIELDS = {"liquid-glass": {"groups", "design_generation"}, "flat": {"groups"},
+                "mac-tile": {"groups", "unclipped"}, "gloss": {"groups"}}
+GENERATIONS = (26, 27)
+ENTRY_FIELDS = {"background", "gradient", "groups", "maskable_scale", "styles"}
 GROUP_FIELDS = {"name", "layers", "shadow", "translucency", "blur-material", "refractivity"}
+SAFE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\Z")
+
+# Icon Composer mask, measured for design generations 26 and 27 (references/rendering.md):
+# edge departure and control values per side, two mirrored cubics per corner.
+CORNER = (0.396305, 0.230261, 0.152117, 0.076058)
+# Apple's continuous corner per unit radius, read from SwiftUI
+# RoundedRectangle(style: .continuous): three cubics from the departure on one
+# edge (u along that edge, v along the next) to the same departure on the next.
+CONTINUOUS = (1.528665, (((1.088490, 0), (0.868407, 0), (0.631494, 0.074911)),
+                         ((0.372824, 0.169060), (0.169060, 0.372824), (0.074911, 0.631494)),
+                         ((0, 0.868407), (0, 1.088490), (0, 1.528665))))
+# Legacy geometry on the 1024 px canvas, measured against Apple's production templates
+# (references/rendering.md); the gloss values are documented approximations.
+FLAT_RADIUS = 229 / 1024        # continuous radius per side, iOS 7-18
+MAC_TILE = (100, 824, 185.4)    # inset, side and continuous radius, macOS 11-15
+MAC_SHADOW = (10, 10, 0.3)      # y offset, Gaussian deviation and black opacity
+GLOSS_RADIUS = 10 / 57          # circular radius per side, iOS 1-6
+GLOSS_PATH = "M0 0H1024V400Q512 620 0 400Z"
+GLOSS_STOPS = (0.5, 0.1)        # white opacity at the top and at the bottom of the highlight
+
+PNG_TOLERANCE = 1               # per-channel difference that drift checks treat as equal
+LINT_SIZE = 256
+LINT_DISPLAY = 32
+ADVISED_GROUPS = 3
+MIN_SEPARATION = 0.10           # OKLab lightness between a group and what it sits on
+MIN_OVERLAP = 0.01              # share of the smaller group that makes two groups adjacent
+CLIP_TOLERANCE = 0.005          # share of a group's artwork allowed outside the shape
+FULL_BLEED = 0.95               # coverage at which a group is a background layer the shape crops
 
 
 def fail(message):
@@ -92,25 +124,65 @@ def material(group):
             unit(obj[field], f"{key}.{field}")
 
 
-def prepare(spec, base):
+def entry_styles(spec):
+    """Return the entry's style options, defaulting to Liquid Glass alone."""
+    styles = spec.get("styles", {"liquid-glass": {}})
+    if not isinstance(styles, dict) or not styles:
+        fail("styles must be a nonempty object")
+    for style, options in styles.items():
+        if style not in STYLES:
+            fail(f"unknown style: {style}; use one of {', '.join(STYLES)}")
+        if not isinstance(options, dict):
+            fail(f"style {style} must be an object")
+        unknown = set(options) - STYLE_FIELDS[style]
+        if unknown:
+            fail(f"style {style} does not accept {sorted(unknown)}")
+        generation = options.get("design_generation")
+        if generation is not None and (isinstance(generation, bool) or generation not in GENERATIONS):
+            fail(f"design_generation must be one of {', '.join(map(str, GENERATIONS))}")
+    return styles
+
+
+def select_style(spec, requested):
+    styles = entry_styles(spec)
+    if requested is None:
+        if len(styles) != 1:
+            fail(f"--style is required; the entry declares {', '.join(styles)}")
+        return next(iter(styles))
+    if requested not in styles:
+        fail(f"the entry does not declare style {requested}")
+    return requested
+
+
+def prepare(spec, base, style):
+    """Validate the entry for one style and load that style's layers."""
     if not isinstance(spec, dict):
         fail("an app icon entry must be an object")
-    unknown = set(spec) - {"background", "gradient", "groups", "maskable_scale"}
+    unknown = set(spec) - ENTRY_FIELDS
     if unknown:
         fail(f"unknown app icon fields: {sorted(unknown)}")
     fill = color(spec.get("background"))
     if not isinstance(spec.get("gradient", False), bool):
         fail("gradient must be true or false")
-    groups = spec.get("groups")
-    if not isinstance(groups, list) or not 1 <= len(groups) <= 4:
-        fail("supply between one and four foreground groups")
     scale = spec.get("maskable_scale", 0.56)
     if not isinstance(scale, (float, int)) or not 0 < scale <= 0.56:
         fail("maskable_scale must be greater than zero and at most 0.56")
+    styles = entry_styles(spec)
+    if style not in styles:
+        fail(f"the entry does not declare style {style}")
+    options = styles[style]
+    groups = options.get("groups", spec.get("groups"))
+    if not isinstance(groups, list) or not 1 <= len(groups) <= 4:
+        fail("supply between one and four foreground groups")
+    unclipped = options.get("unclipped", [])
+    if (not isinstance(unclipped, list) or len(set(unclipped)) != len(unclipped)
+            or any(isinstance(i, bool) or not isinstance(i, int) or not 1 <= i <= len(groups)
+                   for i in unclipped)):
+        fail("unclipped must list distinct group positions from 1 to the number of groups")
     document = {"fill": {"automatic-gradient" if spec.get("gradient") else "solid": fill},
                 "groups": [], "supported-platforms": {"circles": ["watchOS"], "squares": "shared"}}
     assets = {}
-    web_layers = []
+    loaded = []
     for gi, group in enumerate(groups):
         if not isinstance(group, dict) or set(group) - GROUP_FIELDS:
             fail(f"group {gi + 1} has unknown fields")
@@ -120,6 +192,7 @@ def prepare(spec, base):
             fail(f"group {gi + 1} needs layers")
         native = {k: v for k, v in group.items() if k != "layers"}
         native["layers"] = []
+        art = []
         for li, layer in enumerate(layers):
             if not isinstance(layer, dict) or set(layer) - {"source", "name"}:
                 fail(f"group {gi + 1}, layer {li + 1}: expected source and optional name")
@@ -140,40 +213,122 @@ def prepare(spec, base):
             filename = f"{gi + 1:02d}-{li + 1:02d}{suffix}"
             assets[filename] = data
             native["layers"].append({"image-name": filename, "name": layer.get("name", path.stem)})
-            web_layers.append((suffix, data))
+            art.append((suffix, data))
         if group.get("refractivity", {}).get("enabled"):
             document["features"] = ["refractivity"]
         # Icon Composer lists the foremost layer and group first; SVG paints last on top.
         native["layers"].reverse()
         document["groups"].insert(0, native)
-    return document, assets, web_layers
+        loaded.append({"label": group.get("name", f"group {gi + 1}"), "art": art,
+                       "clipped": gi + 1 not in unclipped})
+    return document, assets, loaded, options
 
 
-def tile_path():
-    side = 1024
-    l, c1, c2, d = (v * side for v in CORNER)
+def rounded_path(x, y, side, departure, segments):
+    """A closed rounded square; each corner runs `segments` in its (u, v) frame."""
     out = []
-    for (cx, cy), e1, e2 in (((side, 0), (-1, 0), (0, 1)), ((side, side), (0, -1), (-1, 0)),
-                            ((0, side), (1, 0), (0, -1)), ((0, 0), (0, 1), (1, 0))):
+    for (cx, cy), e1, e2 in (((x + side, y), (-1, 0), (0, 1)), ((x + side, y + side), (0, -1), (-1, 0)),
+                             ((x, y + side), (1, 0), (0, -1)), ((x, y), (0, 1), (1, 0))):
         def at(u, v):
             return f"{cx+u*e1[0]+v*e2[0]:.2f} {cy+u*e1[1]+v*e2[1]:.2f}"
-        out.append(("M" if not out else "L") + at(l, 0))
-        out.append(f"C{at(c1, 0)} {at(c2, 0)} {at(d, d)}C{at(0, c2)} {at(0, c1)} {at(0, l)}")
+        out.append(("M" if not out else "L") + at(departure, 0))
+        out.append("".join(f"C{at(*a)} {at(*b)} {at(*c)}" for a, b, c in segments))
     return "".join(out) + "Z"
 
 
-def web_svg(spec, layers, rounded=False, scale=1):
-    images = []
-    for suffix, data in layers:
-        mime = "image/svg+xml" if suffix == ".svg" else "image/png"
-        encoded = base64.b64encode(data).decode()
-        images.append(f'<image width="1024" height="1024" href="data:{mime};base64,{encoded}"/>')
-    inset = 512 * (1 - scale)
-    clip = ' clip-path="url(#mask)"' if rounded else ""
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">'
-            f'<defs><clipPath id="mask"><path d="{tile_path()}"/></clipPath></defs><g{clip}>'
-            f'<rect width="1024" height="1024" fill="{spec["background"]}"/>'
-            f'<g transform="translate({inset} {inset}) scale({scale})">{"".join(images)}</g></g></svg>\n')
+def glass_path(x=0, y=0, side=1024):
+    l, c1, c2, d = (v * side for v in CORNER)
+    return rounded_path(x, y, side, l, (((c1, 0), (c2, 0), (d, d)), ((0, c2), (0, c1), (0, l))))
+
+
+def continuous_path(x, y, side, radius):
+    departure, segments = CONTINUOUS
+    return rounded_path(x, y, side, departure * radius,
+                        tuple(tuple((u * radius, v * radius) for u, v in s) for s in segments))
+
+
+def shape(style):
+    """The style's icon outline on the 1024 px canvas."""
+    if style == "liquid-glass":
+        return f'<path d="{glass_path()}"/>'
+    if style == "flat":
+        return f'<path d="{continuous_path(0, 0, 1024, FLAT_RADIUS * 1024)}"/>'
+    if style == "mac-tile":
+        inset, side, radius = MAC_TILE
+        return f'<path d="{continuous_path(inset, inset, side, radius)}"/>'
+    radius = GLOSS_RADIUS * 1024
+    return f'<rect width="1024" height="1024" rx="{radius:.2f}" ry="{radius:.2f}"/>'
+
+
+def art_shape(style):
+    """The style's outline in artwork coordinates, where mac-tile art fills the tile."""
+    if style == "mac-tile":
+        inset, side, radius = MAC_TILE
+        return f'<path d="{continuous_path(0, 0, 1024, radius * 1024 / side)}"/>'
+    return shape(style)
+
+
+def image(suffix, data, extent=None):
+    """An artwork layer; `extent` widens an SVG layer's viewport to (x, side) art units."""
+    if extent is not None and suffix == ".svg":
+        x, side = extent
+        data = re.sub(rb"viewBox\s*=\s*([\"'])[^\"']*\1", f'viewBox="{x:.4f} {x:.4f} {side:.4f} {side:.4f}"'.encode(),
+                      data, count=1)
+    mime = "image/svg+xml" if suffix == ".svg" else "image/png"
+    return f'<image width="1024" height="1024" href="data:{mime};base64,{base64.b64encode(data).decode()}"/>'
+
+
+def background(spec):
+    fill = spec["background"]
+    if not spec.get("gradient"):
+        return fill, ""
+    top = "#" + "".join(f"{round(int(fill[i:i+2], 16) * 0.8 + 255 * 0.2):02x}" for i in (1, 3, 5))
+    return "url(#fill)", (f'<linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">'
+                          f'<stop offset="0" stop-color="{top}"/><stop offset="1" stop-color="{fill}"/>'
+                          f'</linearGradient>')
+
+
+def compose(style, spec, groups, masked=True, scale=1.0):
+    """SVG for one style: the masked icon, or a full-bleed square for platform masks."""
+    paint, gradient = background(spec)
+    defs = [gradient, f'<clipPath id="shape">{shape(style)}</clipPath>']
+    gloss = ""
+    if style == "gloss":
+        top, bottom = GLOSS_STOPS
+        defs.append('<linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">'
+                    f'<stop offset="0" stop-color="#fff" stop-opacity="{top}"/>'
+                    f'<stop offset="1" stop-color="#fff" stop-opacity="{bottom}"/></linearGradient>')
+        gloss = f'<path d="{GLOSS_PATH}" fill="url(#gloss)"/>'
+    if masked and style == "mac-tile":
+        inset, side, radius = MAC_TILE
+        dy, deviation, opacity = MAC_SHADOW
+        defs.append('<filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">'
+                    f'<feGaussianBlur in="SourceAlpha" stdDeviation="{deviation}"/>'
+                    f'<feOffset dy="{dy}" result="blur"/>'
+                    f'<feFlood flood-color="#000" flood-opacity="{opacity}"/>'
+                    '<feComposite in2="blur" operator="in"/>'
+                    '<feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>')
+        fit = f"translate({inset} {inset}) scale({side / 1024})"
+        # Art outside its own 0-1024 box shows only for unclipped groups, up to the canvas edge.
+        margin = inset * 1024 / side
+        body = [f'<path d="{continuous_path(inset, inset, side, radius)}" fill="{paint}"/>']
+        for group in groups:
+            if group["clipped"]:
+                layers = "".join(image(*layer) for layer in group["art"])
+                body.append(f'<g clip-path="url(#shape)"><g transform="{fit}">{layers}</g></g>')
+            else:
+                body.append("".join(image(*layer, extent=(-margin, 1024 + 2 * margin))
+                                    for layer in group["art"]))
+        content = f'<g filter="url(#shadow)">{"".join(body)}</g>'
+    else:
+        inset = 512 * (1 - scale)
+        layers = "".join(image(*layer) for group in groups for layer in group["art"])
+        content = (f'<rect width="1024" height="1024" fill="{paint}"/>'
+                   f'<g transform="translate({inset} {inset}) scale({scale})">{layers}</g>{gloss}')
+        if masked:
+            content = f'<g clip-path="url(#shape)">{content}</g>'
+    return ('<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">'
+            f'<defs>{"".join(defs)}</defs>{content}</svg>\n')
 
 
 def find_ictool(explicit=None):
@@ -228,7 +383,22 @@ def render_png(svg, target, size):
     png_payload(target, size)
 
 
-def contact_sheet(files):
+def resize_png(source, target, size):
+    wrapper = target.with_suffix(".svg")
+    encoded = base64.b64encode(source.read_bytes()).decode()
+    wrapper.write_text('<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024">'
+                       f'<image width="1024" height="1024" href="data:image/png;base64,{encoded}"/></svg>\n')
+    render_png(wrapper, target, size)
+    wrapper.unlink()
+
+
+def label(text, x, y, dark):
+    fill = "#eeeeee" if dark else "#111111"
+    return (f'<text x="{x}" y="{y}" text-anchor="middle" font-family="sans-serif" font-size="11" '
+            f'fill="{fill}">{html.escape(text)}</text>')
+
+
+def native_sheet(files):
     cell, row, width = 180, 220, 6 * 180
     height = len(PLATFORMS) * row * 2
     parts = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">']
@@ -241,14 +411,69 @@ def contact_sheet(files):
                 source = "renditions/" + files[(platform, rendition)].name
                 parts.append(f'<image x="{x+10}" y="{y+4}" width="160" height="160" href="{source}"/>')
                 parts.append(f'<image x="{x+70}" y="{y+163}" width="32" height="32" href="{source}"/>')
-                text_color = "#111111" if bi == 0 else "#eeeeee"
-                label = html.escape(f"{platform} · {rendition}")
-                parts.append(f'<text x="{x+90}" y="{y+212}" text-anchor="middle" font-family="sans-serif" font-size="11" fill="{text_color}">{label}</text>')
+                parts.append(label(f"{platform} · {rendition}", x + 90, y + 212, bi))
     return "".join(parts) + "</svg>\n"
 
 
-def build(name, spec, base, out, ictool=None, document_only=False, generation=None):
-    document, assets, web_layers = prepare(spec, base)
+def style_sheet(name):
+    cells = ((f"{name}.svg", "Icon", None), ("web/apple-touch-icon.png", "Touch, full bleed", None),
+             ("web/maskable-512.png", "Maskable, circle crop", "circle"))
+    cell, row = 180, 220
+    parts = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{len(cells) * cell}" height="{2 * row}">',
+             '<defs><clipPath id="circle"><circle cx="80" cy="80" r="80"/></clipPath></defs>']
+    for bi, bg in enumerate(("#ffffff", "#0d1117")):
+        parts.append(f'<rect y="{bi * row}" width="{len(cells) * cell}" height="{row}" fill="{bg}"/>')
+        for ci, (source, text, crop) in enumerate(cells):
+            x, y = ci * cell, bi * row
+            clip = f' clip-path="url(#{crop})"' if crop else ""
+            parts.append(f'<g transform="translate({x+10} {y+4})"><image width="160" height="160" '
+                         f'href="{source}"{clip}/></g>')
+            parts.append(f'<image x="{x+74}" y="{y+167}" width="32" height="32" href="{source}"/>')
+            parts.append(label(text, x + 90, y + 212, bi))
+    return "".join(parts) + "</svg>\n"
+
+
+def web_set(web, style, spec, groups, masked_source):
+    """Write the web icons; masked sizes come from `masked_source`, a 1024 px PNG or SVG."""
+    web.mkdir()
+    (web / "favicon.svg").write_text(compose(style, spec, groups))
+    (web / "touch.svg").write_text(compose(style, spec, groups, masked=False))
+    (web / "maskable.svg").write_text(compose(style, spec, groups, masked=False,
+                                              scale=spec.get("maskable_scale", 0.56)))
+    for target, size in (("favicon-16.png", 16), ("favicon-32.png", 32), ("icon-192.png", 192),
+                         ("icon-512.png", 512), ("avatar-1024.png", 1024)):
+        if masked_source.suffix == ".png":
+            resize_png(masked_source, web / target, size)
+        else:
+            render_png(masked_source, web / target, size)
+    render_png(web / "touch.svg", web / "apple-touch-icon.png", 180)
+    render_png(web / "maskable.svg", web / "maskable-512.png", 512)
+
+
+def write_manifest(out, data):
+    data["files"] = sorted(str(p.relative_to(out)) for p in out.rglob("*") if p.is_file())
+    (out / "manifest.json").write_text(json.dumps(data, indent=2) + "\n")
+
+
+def build(name, spec, base, out, style="liquid-glass", ictool=None, document_only=False):
+    document, assets, groups, options = prepare(spec, base, style)
+    if style != "liquid-glass":
+        if document_only:
+            fail("--document-only applies to the liquid-glass style")
+        out.mkdir()
+        (out / f"{name}.svg").write_text(compose(style, spec, groups))
+        web_set(out / "web", style, spec, groups, out / f"{name}.svg")
+        (out / "contact-sheet.svg").write_text(style_sheet(name))
+        run(["rsvg-convert", out / "contact-sheet.svg", "-o", out / "contact-sheet.png"])
+        inset, side, radius = MAC_TILE
+        geometry = {"flat": {"continuous_radius": FLAT_RADIUS},
+                    "mac-tile": {"inset": inset, "side": side, "continuous_radius": radius,
+                                 "shadow": dict(zip(("dy", "deviation", "opacity"), MAC_SHADOW))},
+                    "gloss": {"circular_radius": round(GLOSS_RADIUS, 6), "highlight": GLOSS_PATH,
+                              "highlight_opacity": list(GLOSS_STOPS)}}[style]
+        write_manifest(out, {"style": style, "rendering": "style-rendering",
+                             "renderer": run(["rsvg-convert", "--version"]), "geometry": geometry})
+        return
     doc = out / f"{name}.icon"
     (doc / "Assets").mkdir(parents=True)
     (doc / "icon.json").write_text(json.dumps(document, indent=2, ensure_ascii=False) + "\n")
@@ -256,6 +481,7 @@ def build(name, spec, base, out, ictool=None, document_only=False, generation=No
         (doc / "Assets" / filename).write_bytes(data)
     if document_only:
         return
+    generation = options.get("design_generation")
     renditions = out / "renditions"
     renditions.mkdir()
     files = {}
@@ -270,20 +496,11 @@ def build(name, spec, base, out, ictool=None, document_only=False, generation=No
             run(args)
             png_payload(path, size)
             files[(platform, rendition)] = path
-    web = out / "web"
-    web.mkdir()
-    shutil.copyfile(files[("iOS", "Default")], web / "avatar-1024.png")
-    (web / "favicon.svg").write_text(web_svg(spec, web_layers, rounded=True))
-    (web / "touch.svg").write_text(web_svg(spec, web_layers))
-    (web / "maskable.svg").write_text(web_svg(spec, web_layers, scale=spec.get("maskable_scale", 0.56)))
-    for name, source, size in [("favicon-16.png", "favicon.svg", 16), ("favicon-32.png", "favicon.svg", 32),
-                               ("apple-touch-icon.png", "touch.svg", 180), ("maskable-512.png", "maskable.svg", 512)]:
-        render_png(web / source, web / name, size)
-    (out / "contact-sheet.svg").write_text(contact_sheet(files))
+    web_set(out / "web", style, spec, groups, files[("iOS", "Default")])
+    (out / "contact-sheet.svg").write_text(native_sheet(files))
     run(["rsvg-convert", out / "contact-sheet.svg", "-o", out / "contact-sheet.png"])
-    manifest = {"renderer": run([ictool, "--version"]), "design_generation": generation,
-                "files": sorted(str(p.relative_to(out)) for p in out.rglob("*") if p.is_file())}
-    (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    write_manifest(out, {"style": style, "rendering": "native", "renderer": run([ictool, "--version"]),
+                         "design_generation": generation})
 
 
 def compare(candidate, target):
@@ -297,13 +514,231 @@ def compare(candidate, target):
             status = "extra"
         else:
             if name.endswith(".png"):
-                same = png_payload(expected[name]) == png_payload(actual[name])
+                same = png_payload(expected[name]) == png_payload(actual[name]) or same_pixels(
+                    expected[name], actual[name])
             else:
                 same = expected[name].read_bytes() == actual[name].read_bytes()
             status = "same" if same else "drift"
         print(f"{status}\t{name}")
         differences += status != "same"
     return differences
+
+
+def read_png(path):
+    """Decode a non-interlaced 8- or 16-bit RGB or RGBA PNG into 8-bit RGBA pixels."""
+    data = path.read_bytes()
+    pos, idat, header = 8, b"", None
+    while pos < len(data):
+        length, kind = struct.unpack(">I4s", data[pos:pos + 8])
+        chunk = data[pos + 8:pos + 8 + length]
+        if kind == b"IHDR":
+            header = struct.unpack(">IIBBBBB", chunk)
+        elif kind == b"IDAT":
+            idat += chunk
+        pos += 12 + length
+    width, height, depth, kind, _, _, interlace = header
+    if depth not in (8, 16) or kind not in (2, 6) or interlace:
+        fail(f"{path.name}: only non-interlaced 8- or 16-bit RGB or RGBA PNGs are supported")
+    channels, octets = (4 if kind == 6 else 3), depth // 8
+    bpp = channels * octets
+    raw, stride = zlib.decompress(idat), width * bpp
+    rows, prev = [], bytearray(stride)
+    for y in range(height):
+        method, line = raw[y * (stride + 1)], bytearray(raw[y * (stride + 1) + 1:(y + 1) * (stride + 1)])
+        for i in range(stride):
+            a = line[i - bpp] if i >= bpp else 0
+            b, c = prev[i], prev[i - bpp] if i >= bpp else 0
+            if method == 1:
+                line[i] = (line[i] + a) & 255
+            elif method == 2:
+                line[i] = (line[i] + b) & 255
+            elif method == 3:
+                line[i] = (line[i] + (a + b) // 2) & 255
+            elif method == 4:
+                p = a + b - c
+                pa, pb, pc = abs(p - a), abs(p - b), abs(p - c)
+                line[i] = (line[i] + (a if pa <= pb and pa <= pc else b if pb <= pc else c)) & 255
+        rows.append(line)
+        prev = line
+    pixels = []
+    for line in rows:
+        for x in range(width):
+            px = line[x * bpp:(x + 1) * bpp:octets]
+            pixels.append(tuple(px) if channels == 4 else (*px, 255))
+    return width, height, pixels
+
+
+def same_pixels(first, second):
+    """Equal size and every channel within PNG_TOLERANCE; native exports vary by rounding."""
+    try:
+        (w1, h1, a), (w2, h2, b) = read_png(first), read_png(second)
+    except (ValueError, TypeError, zlib.error, struct.error):
+        return False
+    return (w1, h1) == (w2, h2) and all(abs(x - y) <= PNG_TOLERANCE
+                                        for p, q in zip(a, b) for x, y in zip(p, q))
+
+
+def lightness(r, g, b):
+    """OKLab lightness of an sRGB color."""
+    def linear(c):
+        c /= 255
+        return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+    r, g, b = linear(r), linear(g), linear(b)
+    l = (0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b) ** (1 / 3)
+    m = (0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b) ** (1 / 3)
+    s = (0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b) ** (1 / 3)
+    return 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s
+
+
+def shape_widths(cover, size):
+    """Widest stroke, in pixels, of each 8-connected shape in a size x size coverage mask."""
+    inf = size * size
+    dist = [0 if not c else inf for c in cover]
+    for passes in ((range(size), range(size), ((-1, -1), (-1, 0), (-1, 1), (0, -1))),
+                   (range(size - 1, -1, -1), range(size - 1, -1, -1), ((1, 1), (1, 0), (1, -1), (0, 1)))):
+        rows, cols, offsets = passes
+        for y in rows:
+            for x in cols:
+                i = y * size + x
+                if not dist[i]:
+                    continue
+                best = dist[i]
+                for dy, dx in offsets:
+                    ny, nx = y + dy, x + dx
+                    near = dist[ny * size + nx] if 0 <= ny < size and 0 <= nx < size else 0
+                    best = min(best, near + 1)
+                dist[i] = best
+    seen, widths = [False] * inf, []
+    for start in range(inf):
+        if not cover[start] or seen[start]:
+            continue
+        seen[start], queue, deepest = True, deque([start]), 0
+        while queue:
+            i = queue.popleft()
+            deepest = max(deepest, dist[i])
+            y, x = divmod(i, size)
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    ny, nx = y + dy, x + dx
+                    j = ny * size + nx
+                    if 0 <= ny < size and 0 <= nx < size and cover[j] and not seen[j]:
+                        seen[j] = True
+                        queue.append(j)
+        widths.append(2 * deepest - 1)
+    return widths
+
+
+def lint_findings(groups, outline, base_lightness, size, display_scale):
+    """Findings for rendered groups.
+
+    Each group carries `label`, `clipped`, and `pixels` (RGBA at size x size in artwork
+    coordinates); `outline` is the style shape's coverage there; `display_scale` maps the
+    artwork to the icon at LINT_DISPLAY px.
+    """
+    findings = []
+    if len(groups) > ADVISED_GROUPS:
+        findings.append(f"{len(groups)} groups; express the idea with fewer shapes")
+    covers, lights = [], []
+    for group in groups:
+        cover = [p[3] >= 128 for p in group["pixels"]]
+        covers.append(cover)
+        opaque = [p for p, c in zip(group["pixels"], cover) if c]
+        lights.append(sum(lightness(*p[:3]) for p in opaque) / len(opaque) if opaque else None)
+        area = len(opaque)
+        if not area:
+            findings.append(f"{group['label']}: no visible artwork")
+            continue
+        outside = sum(1 for c, inside in zip(cover, outline) if c and not inside)
+        if group["clipped"] and area < FULL_BLEED * size * size and outside > CLIP_TOLERANCE * area:
+            findings.append(f"{group['label']}: {100 * outside / area:.1f}% of the artwork falls outside the shape")
+        factor = LINT_DISPLAY / size * display_scale
+        thin = [w * factor for w in shape_widths(cover, size) if w * factor < 1]
+        if thin:
+            findings.append(f"{group['label']}: {len(thin)} shape(s) narrower than 1 px at {LINT_DISPLAY} px "
+                            f"(thinnest {min(thin):.2f} px)")
+    for i, group in enumerate(groups):
+        if lights[i] is None:
+            continue
+        if abs(lights[i] - base_lightness) < MIN_SEPARATION:
+            findings.append(f"{group['label']}: lightness {lights[i]:.2f} is too close to the "
+                            f"background {base_lightness:.2f} for Clear and Tinted appearances")
+        for j in range(i):
+            if lights[j] is None:
+                continue
+            shared = sum(1 for a, b in zip(covers[i], covers[j]) if a and b)
+            smaller = min(sum(covers[i]), sum(covers[j]))
+            if shared >= MIN_OVERLAP * smaller and abs(lights[i] - lights[j]) < MIN_SEPARATION:
+                findings.append(f"{group['label']}: lightness {lights[i]:.2f} is too close to "
+                                f"{groups[j]['label']} {lights[j]:.2f} where they overlap")
+    return findings
+
+
+def lint(spec, base, style, work):
+    _, _, groups, _ = prepare(spec, base, style)
+
+    def raster(name, body):
+        svg = work / f"{name}.svg"
+        svg.write_text('<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" '
+                       f'viewBox="0 0 1024 1024">{body}</svg>\n')
+        png = work / f"{name}.png"
+        render_png(svg, png, LINT_SIZE)
+        return read_png(png)[2]
+
+    outline = [p[3] >= 128 for p in raster("outline", art_shape(style).replace("/>", ' fill="#000"/>'))]
+    rendered = [{**group, "pixels": raster(f"group-{i}", "".join(image(*layer) for layer in group["art"]))}
+                for i, group in enumerate(groups)]
+    fill = spec["background"]
+    base_lightness = lightness(*(int(fill[i:i+2], 16) for i in (1, 3, 5)))
+    display_scale = MAC_TILE[1] / 1024 if style == "mac-tile" else 1
+    return lint_findings(rendered, outline, base_lightness, LINT_SIZE, display_scale)
+
+
+def sheet(entries, names, base, ictool, work):
+    """A self-contained comparison of each named entry in each of its styles."""
+    cells = [(name, style) for name in names for style in entry_styles(entries[name])]
+    cell, row = 180, 230
+    parts = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{len(cells) * cell}" height="{2 * row}">']
+    renders = []
+    for ci, (name, style) in enumerate(cells):
+        spec = entries[name]
+        document, assets, groups, options = prepare(spec, base, style)
+        large, small = work / f"{ci}-160.png", work / f"{ci}-32.png"
+        if style == "liquid-glass":
+            if ictool is None:
+                renders.append(None)
+                continue
+            doc = work / f"{ci}.icon"
+            (doc / "Assets").mkdir(parents=True)
+            (doc / "icon.json").write_text(json.dumps(document))
+            for filename, data in assets.items():
+                (doc / "Assets" / filename).write_bytes(data)
+            native = work / f"{ci}-native.png"
+            args = [ictool, doc, "--export-image", "--output-file", native, "--platform", "iOS",
+                    "--rendition", "Default", "--width", 1024, "--height", 1024, "--scale", 1]
+            if options.get("design_generation") is not None:
+                args.extend(["--design-generation", options["design_generation"]])
+            run(args)
+            resize_png(native, large, 320)
+            resize_png(native, small, 32)
+        else:
+            svg = work / f"{ci}.svg"
+            svg.write_text(compose(style, spec, groups))
+            render_png(svg, large, 320)
+            render_png(svg, small, 32)
+        renders.append(tuple("data:image/png;base64," + base64.b64encode(p.read_bytes()).decode()
+                             for p in (large, small)))
+    for bi, bg in enumerate(("#ffffff", "#0d1117")):
+        parts.append(f'<rect y="{bi * row}" width="{len(cells) * cell}" height="{row}" fill="{bg}"/>')
+        for ci, (name, style) in enumerate(cells):
+            x, y = ci * cell, bi * row
+            if renders[ci] is None:
+                parts.append(label("not rendered: no ictool", x + 90, y + 84, bi))
+            else:
+                parts.append(f'<image x="{x+10}" y="{y+4}" width="160" height="160" href="{renders[ci][0]}"/>')
+                parts.append(f'<image x="{x+74}" y="{y+167}" width="32" height="32" href="{renders[ci][1]}"/>')
+            parts.append(label(name, x + 90, y + 212, bi))
+            parts.append(label(style, x + 90, y + 225, bi))
+    return "".join(parts) + "</svg>\n"
 
 
 def main():
@@ -313,31 +748,64 @@ def main():
     mode.add_argument("--list", action="store_true")
     mode.add_argument("--out", type=Path, help="write a new, dedicated output directory")
     mode.add_argument("--check", type=Path, help="regenerate privately and compare without modifying this directory")
-    parser.add_argument("--name")
+    mode.add_argument("--lint", action="store_true", help="report measurable layer and contrast problems")
+    mode.add_argument("--sheet", type=Path, help="write a new comparison SVG of the named entries in every style")
+    parser.add_argument("--name", action="append", default=[])
+    parser.add_argument("--style", choices=STYLES)
     parser.add_argument("--document-only", action="store_true")
     parser.add_argument("--ictool", help="path to Icon Composer's export-capable ictool")
-    parser.add_argument("--design-generation", type=int)
     args = parser.parse_args()
     try:
         entries = read_entries(args.design)
         if args.list:
             print("\n".join(entries))
             return 0
-        if args.name not in entries:
-            fail("--name must identify an app_icons entry")
+        unknown = [name for name in args.name if name not in entries]
+        if not args.name or unknown:
+            fail("--name must identify app_icons entries")
+        if not args.sheet and len(args.name) != 1:
+            fail("--name identifies exactly one entry outside --sheet")
+        base = args.design.resolve().parent
+        name = args.name[0]
+        style = None if args.lint or args.sheet else select_style(entries[name], args.style)
+        tool = find_ictool(args.ictool) if style == "liquid-glass" and not args.document_only else None
+        if not args.document_only and not shutil.which("rsvg-convert"):
+            fail("rsvg-convert is required for rendering, lint and contact sheets")
+        if args.lint:
+            styles = [args.style] if args.style else list(entry_styles(entries[name]))
+            findings = []
+            with tempfile.TemporaryDirectory(prefix=".app-icon-lint-") as temp:
+                for style in styles:
+                    if args.style:
+                        select_style(entries[name], style)
+                    findings += [f"{style}\t{text}" for text in lint(entries[name], base, style, Path(temp))]
+            print("\n".join(findings) if findings else "clean")
+            return 1 if findings else 0
+        if args.sheet:
+            target = args.sheet.resolve()
+            if target.exists():
+                fail("sheet file exists; choose a new path")
+            try:
+                tool = find_ictool(args.ictool)
+            except ValueError:
+                if args.ictool:
+                    raise
+                tool = None
+            with tempfile.TemporaryDirectory(prefix=".app-icon-sheet-") as temp:
+                content = sheet(entries, args.name, base, tool, Path(temp))
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(content)
+            print(target)
+            return 0
         target = (args.out or args.check).resolve()
         if args.out and target.exists():
             fail("output directory exists; use a fresh directory or --check to inspect drift")
         if args.check and not target.is_dir():
             fail("check target is not a directory")
-        tool = None if args.document_only else find_ictool(args.ictool)
-        if not args.document_only and not shutil.which("rsvg-convert"):
-            fail("rsvg-convert is required for web icons and contact sheets")
         target.parent.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(prefix=".app-icon-", dir=target.parent) as temp:
             candidate = Path(temp) / "output"
-            build(args.name, entries[args.name], args.design.resolve().parent, candidate,
-                  tool, args.document_only, args.design_generation)
+            build(name, entries[name], base, candidate, style, tool, args.document_only)
             if args.check:
                 return 1 if compare(candidate, target) else 0
             candidate.rename(target)

@@ -1,6 +1,6 @@
 ---
 name: apple-framework-icon-design
-description: Design, generate, and review original icons in the style of Apple developer framework icons, from the Iconography section of a DESIGN.md, in three styles - isometric slabs of stacked colored bands with a raised glyph or standing objects, volumetric front-facing tiles with an extruded glyph and glass panels, or flat gradient tiles - all with Apple's continuous corner. Use when creating a repository, package, or product icon or logo in this style, assigning hues, glyphs, and styles across an icon family, regenerating icons after a DESIGN.md change, checking checked-in logos for drift, or checking the generator's fidelity against reference icons. Produces DESIGN.md Iconography entries, SVG and PNG icons, contact sheets, drift reports, and fidelity reports. Never reproduces Apple marks, SF Symbols, or another company's logo. Do not use for README layout, social preview or banner composition, SF Symbols export, raster illustration, or platform app icon documents and renditions.
+description: Design, generate, and review original icons in the style of Apple developer framework icons, from the Iconography section of a DESIGN.md, in three styles - isometric slabs of stacked colored bands with a raised glyph or standing objects, volumetric front-facing tiles with an extruded glyph and glass panels, or flat gradient tiles - all with Apple's continuous corner. Use when creating a repository, package, or product icon or logo in this style, assigning hues, glyphs, and styles across an icon family, regenerating icons after a DESIGN.md change, checking checked-in logos for drift, or checking the generator's fidelity against reference icons. Produces DESIGN.md Iconography entries, SVG and PNG icons, contact sheets, drift reports, and fidelity reports. Never reproduces Apple marks, SF Symbols, or another company's logo. Do not use for README layout, social preview or banner composition, SF Symbols export, raster illustration, or Apple-style app icons and their renditions.
 ---
 
 # Apple Framework Icon Design
@@ -26,8 +26,8 @@ checked-in logos still match their source.
   existing icons.
 - Exporting SF Symbols or any third-party glyph set.
 - Photographic, painted, or raster illustration.
-- Platform app icon documents, appearance renditions, asset catalogs, or web
-  icon sets.
+- App icons in Apple's app icon styles, platform app icon documents,
+  appearance renditions, asset catalogs, or web icon sets.
 - Brand strategy, naming, or logo work outside these styles.
 
 ## Inputs To Inspect

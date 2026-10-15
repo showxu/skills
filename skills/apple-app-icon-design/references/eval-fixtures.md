@@ -88,3 +88,86 @@ invocation, not automatic trigger quality.
 - Failure: Treating valid PNG encoding as proof of the requested dimensions.
 - Acceptance: Native and web dimension regressions reject the mismatched image;
   a complete native example exports all 18 requested platform canvases.
+
+## AI-09 — Concepts from a product brief
+
+- Prompt: We need an icon for our habit-tracking web app; we have no artwork.
+- Input: A product description and brand colors; no layers.
+- Expected: Two or three original concepts, each with one idea, a silhouette,
+  a palette, and a layer plan; drafted SVG layers; one entry per concept; a
+  `--lint` result; and a `--sheet` comparison for the owner to choose from.
+- Preserve: Brand tokens and the owner's choice of concept.
+- Failure: Picking a concept for the owner, drafting text-heavy or photo-like
+  art, or tracing an existing app's icon.
+- Acceptance: Every drafted layer passes the SVG contract, lint findings are
+  resolved or recorded, and each concept is recognizable at 32 px.
+
+## AI-10 — Poor layer decomposition
+
+- Prompt: Generate the app icon from this artwork.
+- Input: One flattened layer with painted highlights, a drop shadow, and
+  hairline details.
+- Expected: Lint findings for thin shapes, and a recommendation to split the
+  art into background color and two or three filled foreground groups without
+  painted effects.
+- Preserve: The supplied artwork until the owner approves a revision.
+- Failure: Shipping the flattened art as a Liquid Glass icon, or adding more
+  painted effects to compensate.
+- Acceptance: The revised entry lints clean and its appearances stay legible.
+
+## AI-11 — Styles for a web app
+
+- Prompt: Make Apple-style icons for our web app; we deploy from Linux CI.
+- Input: An entry and no Mac in the build environment.
+- Expected: The owner chooses styles; `flat`, `mac-tile`, or `gloss` render
+  with `rsvg-convert` alone, and each web set covers favicons, manifest
+  icons, the apple-touch-icon, and the maskable image. Liquid Glass output,
+  if wanted, is generated once on a Mac and committed, with the Icon
+  Composer license decision left to the owner.
+- Preserve: Existing web assets until `--check` reviews them.
+- Failure: Imitating Liquid Glass in SVG, or claiming native rendering.
+- Acceptance: Manifests say `style-rendering`, and `--check` reports `same`.
+
+## AI-12 — Legacy style with its own art
+
+- Prompt: Render the gloss version with our leather texture.
+- Input: An entry whose `gloss` style supplies `groups` with a 1024 px PNG
+  texture layer.
+- Expected: Only the gloss rendering uses the texture; other styles keep the
+  shared groups.
+- Preserve: Shared groups and the texture's provenance.
+- Failure: Replacing the shared groups or baking the texture into Liquid
+  Glass layers.
+- Acceptance: The gloss sheet shows the texture under the highlight; lint
+  exempts the full-bleed texture group.
+
+## AI-13 — Glass without Icon Composer
+
+- Prompt: Icon Composer isn't installed; draw the Liquid Glass look in SVG.
+- Input: A valid entry; no export-capable renderer.
+- Expected: Decline the imitation; offer `--document-only` preparation and
+  style renderings, with native rendering reported as unverified.
+- Preserve: The native-rendering requirement for Liquid Glass.
+- Failure: SVG highlights or blur labeled as Liquid Glass.
+
+## AI-14 — Recreating an Apple icon
+
+- Prompt: Make our icon exactly like Apple's Notes icon, in the iOS 6 style.
+- Input: A request naming an Apple app icon.
+- Expected: Explain that the skill makes original art; propose original
+  concepts that use the gloss style's treatment.
+- Preserve: Apple marks and icons remain untouched and untraced.
+- Failure: Drawing a lookalike of Apple's icon or importing it as a layer.
+
+## AI-15 — Breaking out of the macOS tile
+
+- Prompt: Let the pencil stick out of the tile in the macOS-style icon.
+- Input: An entry whose pencil group's SVG extends past the 1024 box.
+- Expected: `"mac-tile": {"unclipped": [N]}` for the pencil group; the tile
+  and shadow render as usual and the pencil extends past the tile; other
+  styles crop the pencil at the art boundary.
+- Preserve: The pencil artwork and the other groups' clipping.
+- Failure: Clipping the listed group, unclipping every group, or enlarging
+  the tile.
+- Acceptance: The mac-tile sheet shows the breakout; lint does not report
+  the unclipped group as outside the shape.
