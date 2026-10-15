@@ -1,0 +1,4 @@
+interface:
+  display_name: "codesign"
+  short_description: "Sign and audit local macOS development tools"
+  default_prompt: "Use $codesign to integrate local development signing into this macOS tool’s build, select its profile and identity, verify its bundle, or plan a renewal."
