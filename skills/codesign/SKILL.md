@@ -1,6 +1,6 @@
 ---
 name: codesign
-description: 'Prepare, integrate, review and audit local development signing for native macOS tools, helpers and SwiftPM executables outside Xcode that need profile-authorized entitlements such as Data Protection Keychain access groups. Select provisioning profiles and identities by criteria, sign a single-executable tool bundle through its build, verify its signing inputs and plan renewals. Does not own Xcode archive/export or Developer ID distribution (apple-platform-release), SwiftPM .app packaging and notarization (swiftpm-macos-app-packaging), or SecItem implementation (keychain-patterns).'
+description: 'Prepare, integrate, review and audit local development signing for native macOS tools, helpers and SwiftPM executables outside Xcode that need profile-authorized entitlements such as Data Protection Keychain access groups. Select provisioning profiles and identities by criteria, sign a single-executable tool bundle through its build, verify its signing inputs and plan renewals. Does not own Xcode archive/export or Developer ID distribution, SwiftPM .app packaging and notarization, or SecItem implementation.'
 ---
 
 # codesign
@@ -19,12 +19,10 @@ executable. This wrapper provides a place to embed the provisioning profile.
 
 This skill does not own release archives, distribution or submission:
 
-- Xcode archive/export and Developer ID distribution: `apple-platform-release`.
-- SwiftPM application packaging, notarization, stapling and Sparkle:
-  `swiftpm-macos-app-packaging`.
-- SecItem queries, access control and data models: `keychain-patterns`.
+- Xcode archive/export and Developer ID distribution.
+- SwiftPM .app packaging, notarization, stapling and Sparkle.
+- SecItem implementation, including queries, access control and data models.
 
-These skills can live in another installed collection; refer to them by name.
 Tools without restricted entitlements may use ad-hoc signing, but an ad-hoc
 signature cannot authorize a restricted entitlement.
 
@@ -66,7 +64,7 @@ Keep the existing application identifier and access group stable across
 rebuilds and certificate renewal. Changing the App ID prefix or group can
 remove access to existing Keychain items. The CLI stops when replacing an
 output with a different application identity or group. Plan a secret migration
-before that change, with SecItem implementation owned by `keychain-patterns`.
+with the owner of the tool's SecItem implementation before that change.
 
 ## Workflow
 
