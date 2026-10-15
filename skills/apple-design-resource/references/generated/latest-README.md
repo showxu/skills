@@ -1,24 +1,24 @@
 # Apple Design Resources Catalog
 
 - Source: https://developer.apple.com/design/resources/
-- Source SHA-256: `1236a4564b0b6ff64c7d635e579aa2866783cdcd3670077ed59ebd13d9114c65`
-- Fetched at: `2026-10-15T05:22:02+00:00`
-- Snapshot: `Apple-Design-Resources-20261015-legacy`
+- Source SHA-256: `e37087cadef4d7492a1fd0f74144bd46d908bc0e788d23e02a582f66c2a75c67`
+- Fetched at: `2026-10-15T10:22:55+00:00`
+- Snapshot: `Apple-Design-Resources-20261015-feeds`
 - Filters: `{"label_contains": [], "link_kind": [], "resource_family": [], "section_contains": []}`
-- Resources: 157
-- Direct Apple CDN candidates: 112
-- Previous releases: 72 still served by Apple of 219 indexed
+- Resources: 160
+- Direct Apple CDN candidates: 117
+- Previous releases: 73 still served by Apple of 220 indexed
 
 ## Link Kinds
 
 | Value | Count |
 | --- | ---: |
-| `apple-cdn-download` | 112 |
+| `apple-cdn-download` | 117 |
 | `figma` | 15 |
 | `sketch-cloud-share` | 15 |
 | `apple-developer-page` | 10 |
-| `external` | 3 |
 | `sketch-library` | 2 |
+| `external` | 1 |
 
 ## Resource Families
 
@@ -27,8 +27,8 @@
 | `product-bezel` | 41 |
 | `technology-template` | 32 |
 | `design-template` | 26 |
+| `ui-kit` | 15 |
 | `badge-logo-glyph` | 13 |
-| `ui-kit` | 12 |
 | `font` | 8 |
 | `resource-link` | 7 |
 | `icon-composer` | 5 |
@@ -40,22 +40,23 @@
 
 | Value | Count |
 | --- | ---: |
-| `True` | 155 |
+| `True` | 152 |
+| `False` | 6 |
 | `None` | 2 |
 
 ## Resources
 
-- `ui-kit` / `figma`: Figma (Apple Design Resources > iOS and iPadOS > iOS 27 and iPadOS 27 > UI Kit) reachable=True status=202
+- `ui-kit` / `figma`: Figma (Apple Design Resources > iOS and iPadOS > iOS 27 and iPadOS 27 > UI Kit) reachable=False status=404
   https://www.figma.com/community/file/1651309003795292092/ios-and-ipados-27
 - `ui-kit` / `sketch-cloud-share`: Sketch (Apple Design Resources > iOS and iPadOS > iOS 27 and iPadOS 27 > UI Kit) reachable=True status=200
   https://www.sketch.com/s/04c24d8b-38fb-4afb-8836-36617e022f02
-- `app-icon-template` / `figma`: Figma (Apple Design Resources > iOS and iPadOS > iOS 27 and iPadOS 27 > App Icon Template) reachable=True status=202
+- `app-icon-template` / `figma`: Figma (Apple Design Resources > iOS and iPadOS > iOS 27 and iPadOS 27 > App Icon Template) reachable=False status=404
   https://www.figma.com/community/file/1645923469870515372/app-icon-template-ios-ipados-and-watchos-27
 - `app-icon-template` / `sketch-cloud-share`: Sketch (Apple Design Resources > iOS and iPadOS > iOS 27 and iPadOS 27 > App Icon Template) reachable=True status=200
   https://sketch.com/s/a443d962-d989-4c5b-b1db-fb7fb3946995
 - `app-icon-template` / `apple-cdn-download`: Photoshop, Illustrator (Apple Design Resources > iOS and iPadOS > iOS 27 and iPadOS 27 > App Icon Template) reachable=True status=200
   https://devimages-cdn.apple.com/design/resources/download/iOS-27-Icon-Templates-Photoshop-Illustrator.dmg
-- `ui-kit` / `figma`: Figma (Apple Design Resources > macOS > macOS 27 > UI Kit) reachable=True status=202
+- `ui-kit` / `figma`: Figma (Apple Design Resources > macOS > macOS 27 > UI Kit) reachable=False status=404
   https://www.figma.com/community/file/1651309434229735362/macos-27
 - `ui-kit` / `sketch-cloud-share`: Sketch (Apple Design Resources > macOS > macOS 27 > UI Kit) reachable=True status=200
   https://sketch.com/s/57153a31-3379-4737-8ac6-dbfd6525f052
@@ -67,17 +68,17 @@
   https://devimages-cdn.apple.com/design/resources/download/tvOS-18-Production-Templates-Sketch.dmg
 - `design-template` / `apple-cdn-download`: Photoshop (Apple Design Resources > tvOS > tvOS 18 > Production Templates) reachable=True status=200
   https://devimages-cdn.apple.com/design/resources/download/tvOS-18-Production-Templates-Photoshop.dmg
-- `ui-kit` / `figma`: Figma (Apple Design Resources > watchOS > watchOS 26 > UI Kit) reachable=True status=202
+- `ui-kit` / `figma`: Figma (Apple Design Resources > watchOS > watchOS 26 > UI Kit) reachable=False status=404
   https://www.figma.com/community/file/1540060090060216489/watchos-26
 - `ui-kit` / `sketch-cloud-share`: Sketch (Apple Design Resources > watchOS > watchOS 26 > UI Kit) reachable=True status=200
   https://sketch.com/s/2b12618d-596c-41fd-8488-132bff9535e7
-- `ui-kit` / `figma`: Figma (Apple Design Resources > visionOS > visionOS 26 > UI Kit) reachable=True status=202
+- `ui-kit` / `figma`: Figma (Apple Design Resources > visionOS > visionOS 26 > UI Kit) reachable=False status=404
   https://www.figma.com/community/file/1540071341298017505/visionos-26
 - `ui-kit` / `sketch-cloud-share`: Sketch (Apple Design Resources > visionOS > visionOS 26 > UI Kit) reachable=True status=200
   https://sketch.com/s/eb13bfe1-2ddb-4f87-b92c-740a36abed7a
 - `ui-kit` / `sketch-library`: Sketch (Apple Design Resources > visionOS > visionOS 2 > UI Kit) reachable=None
   sketch://add-library?url=https%3A%2F%2Fdeveloper.apple.com%2Fdesign%2Fdownloads%2Fsketch-visionOS.rss
-- `ui-kit` / `figma`: Figma (Apple Design Resources > visionOS > visionOS 2 > UI Kit) reachable=True status=202
+- `ui-kit` / `figma`: Figma (Apple Design Resources > visionOS > visionOS 2 > UI Kit) reachable=False status=404
   https://www.figma.com/community/file/1253443272911187215/apple-design-resources-visionos
 - `design-template` / `apple-cdn-download`: Sketch (Apple Design Resources > visionOS > visionOS 2 > Templates) reachable=True status=200
   https://devimages-cdn.apple.com/design/resources/download/visionOS-2-Design-Templates-Sketch.dmg
@@ -169,9 +170,9 @@
   https://developer.apple.com/icon-composer/
 - `icon-composer` / `apple-developer-page`: Download Icon Composer (Apple Design Resources > Icon Composer) reachable=True status=200
   https://developer.apple.com/download/all/?q=Icon%20Composer
-- `platform-resource` / `external`: Download version 2 for macOS (Apple Design Resources > Parallax image tools > Parallax Previewer App) reachable=True status=200
+- `platform-resource` / `apple-cdn-download`: Download version 2 for macOS (Apple Design Resources > Parallax image tools > Parallax Previewer App) reachable=True status=200
   https://itunespartner.apple.com/assets/downloads/Parallax%20Previewer.dmg
-- `platform-resource` / `external`: Download version 1 for macOS (Apple Design Resources > Parallax image tools > Parallax Previewer App) reachable=True status=200
+- `platform-resource` / `apple-cdn-download`: Download version 1 for macOS (Apple Design Resources > Parallax image tools > Parallax Previewer App) reachable=True status=200
   https://itunespartner.apple.com/assets/downloads/Parallax%20Previewer_1_0.dmg
 - `resource-link` / `external`: User Guide (Apple Design Resources > Parallax image tools > Parallax Previewer App) reachable=True status=200
   https://help.apple.com/itc/parallaxpreviewer/
@@ -215,12 +216,18 @@
   https://devimages-cdn.apple.com/design/resources/download/Keynote-Live-Video-Product-Bezel.dmg
 - `badge-logo-glyph` / `apple-developer-page`: View Apple Badges and Logos (Apple Design Resources > Badges and Logos) reachable=True status=200
   https://developer.apple.com/licensing-trademarks/
+- `ui-kit` / `apple-cdn-download`: Apple tvOS UI Sketch Library 12 (Apple Design Resources > tvOS > tvOS 18 > UI Kit) reachable=True status=200
+  https://devimages-cdn.apple.com/design/resources/download/Apple-Sketch-Library-tvOS-18.dmg
+- `ui-kit` / `apple-cdn-download`: Apple visionOS UI Sketch Library 7 (Apple Design Resources > visionOS > visionOS 2 > UI Kit) reachable=True status=200
+  https://devimages-cdn.apple.com/design/resources/download/Apple-Sketch-Library-visionOS-2.dmg
 - `ui-kit` / `apple-cdn-download`: Apple iOS 14 Sketch Library (Apple Design Resources > Previous releases) reachable=True status=200
   https://developer.apple.com/design/downloads/Apple-iOS-14-Sketch-Library.dmg
 - `platform-resource` / `apple-cdn-download`: iOS 13 Keynote (Apple Design Resources > Previous releases) reachable=True status=200
   https://devimages-cdn.apple.com/design/resources/download/iOS-13-Keynote.dmg
 - `product-bezel` / `apple-cdn-download`: Apple Sketch Library Product Bezels (Apple Design Resources > Previous releases) reachable=True status=200
   https://devimages-cdn.apple.com/design/resources/download/Apple-Sketch-Library-Product-Bezels.dmg
+- `ui-kit` / `apple-cdn-download`: Apple Sketch Library iOS 18 (Apple Design Resources > Previous releases) reachable=True status=200
+  https://devimages-cdn.apple.com/design/resources/download/Apple-Sketch-Library-iOS-18.dmg
 - `product-bezel` / `apple-cdn-download`: Bezel Apple Watch Series 10 (Apple Design Resources > Previous releases) reachable=True status=200
   https://devimages-cdn.apple.com/design/resources/download/Bezel-Apple-Watch-Series-10.dmg
 - `product-bezel` / `apple-cdn-download`: Bezel Apple Watch Series 8 (Apple Design Resources > Previous releases) reachable=True status=200

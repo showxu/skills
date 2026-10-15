@@ -22,8 +22,9 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.parse import urljoin, urlparse, urlsplit
+from urllib.parse import parse_qs, unquote, urljoin, urlparse, urlsplit
 from urllib.request import Request, urlopen
+import xml.etree.ElementTree as ET
 
 
 DEFAULT_SOURCE_URL = "https://developer.apple.com/design/resources/"
@@ -39,6 +40,7 @@ PREVIOUS_INDEX_URLS = tuple(
     for location in (DOWNLOAD_HOST + DOWNLOAD_PREFIX, LEGACY_HOST + LEGACY_PREFIX)
 )
 PREVIOUS_SECTIONS = ["Apple Design Resources", "Previous releases"]
+SPARKLE = "http://www.andymatuschak.org/xml-namespaces/sparkle"
 USER_AGENT = "Mozilla/5.0 (compatible; AppleDesignResourceSkill/1.0)"
 DIRECT_EXTENSIONS = {
     ".ai",
@@ -189,6 +191,11 @@ def is_resource_link(link: LinkRecord) -> bool:
     return "apple design resources" in text or any(term in text for term in resource_terms)
 
 
+def apple_file(host: str, path: str) -> bool:
+    """A direct file download on an Apple-owned host."""
+    return (host == "apple.com" or host.endswith(".apple.com")) and Path(path).suffix.lower() in DIRECT_EXTENSIONS
+
+
 def classify(link: LinkRecord) -> None:
     parsed = urlparse(link.url)
     host = parsed.netloc.lower()
@@ -198,7 +205,8 @@ def classify(link: LinkRecord) -> None:
 
     if parsed.scheme == "sketch":
         link.link_kind = "sketch-library"
-    elif "devimages-cdn.apple.com" in host or (host == LEGACY_HOST and path.startswith(LEGACY_PREFIX)):
+    elif ("devimages-cdn.apple.com" in host or (host == LEGACY_HOST and path.startswith(LEGACY_PREFIX))
+          or apple_file(host, path)):
         link.link_kind = "apple-cdn-download"
     elif "figma.com" in host:
         link.link_kind = "figma"
@@ -301,6 +309,55 @@ def canonical_download(url: str) -> str | None:
     return None
 
 
+def feed_records(feed_url: str, sections: list[str], timeout: int) -> list[LinkRecord]:
+    """Disk images published by a Sketch library feed, a Sparkle RSS appcast."""
+    channel = ET.fromstring(fetch_text(feed_url, timeout)).find("channel")
+    records = []
+    for item in channel.iter("item") if channel is not None else []:
+        enclosure = item.find("enclosure")
+        if enclosure is None or not enclosure.get("url"):
+            continue
+        title = (item.findtext("title") or channel.findtext("title") or "Apple").strip()
+        version = enclosure.get(f"{{{SPARKLE}}}version")
+        label = f"{title} Sketch Library" + (f" {version}" if version else "")
+        record = LinkRecord(label=label, url=enclosure.get("url"), sections=list(sections))
+        classify(record)
+        records.append(record)
+    return records
+
+
+def library_records(records: list[LinkRecord], timeout: int) -> list[LinkRecord]:
+    """Disk images behind the page's Sketch library subscriptions, not already listed."""
+    listed = {canonical_download(record.url) or record.url for record in records}
+    found = []
+    for record in records:
+        if record.link_kind != "sketch-library":
+            continue
+        feed = parse_qs(urlsplit(record.url).query).get("url", [None])[0]
+        if not feed:
+            continue
+        try:
+            items = feed_records(feed, record.sections, timeout)
+        except (HTTPError, URLError, OSError, ET.ParseError) as exc:
+            print(f"Sketch library feed unavailable: {feed}: {exc}", file=sys.stderr)
+            continue
+        for item in items:
+            key = canonical_download(item.url) or item.url
+            if key not in listed:
+                listed.add(key)
+                found.append(item)
+    return found
+
+
+def legacy_feed(url: str) -> str | None:
+    """The https URL of a Sketch library feed on the developer site's former download path."""
+    parts = urlsplit(url.strip())
+    host, path = parts.netloc.lower().removesuffix(":80"), parts.path
+    if host == LEGACY_HOST and path.startswith(LEGACY_PREFIX) and path.endswith(".rss"):
+        return f"https://{LEGACY_HOST}{path}"
+    return None
+
+
 def previous_records(
     current: list[LinkRecord], timeout: int, max_workers: int
 ) -> tuple[list[LinkRecord], dict[str, Any]]:
@@ -310,8 +367,13 @@ def previous_records(
     once, and dropped when the live page already lists that location.
     """
     listed = {canonical_download(record.url) for record in current}
-    names = {canonical_download(line) for index in PREVIOUS_INDEX_URLS
-             for line in fetch_text(index, timeout).split()}
+    lines = [line for index in PREVIOUS_INDEX_URLS for line in fetch_text(index, timeout).split()]
+    names = {canonical_download(line) for line in lines}
+    for feed in sorted({legacy_feed(line) for line in lines} - {None}):
+        try:
+            names |= {canonical_download(item.url) for item in feed_records(feed, PREVIOUS_SECTIONS, timeout)}
+        except (HTTPError, URLError, OSError, ET.ParseError):
+            continue
     records = []
     for url in sorted(names - listed - {None}):
         stem = Path(urlsplit(url).path).stem
@@ -336,15 +398,17 @@ def previous_records(
 def archive_path(url: str) -> Path:
     """The file's place in an archive: its path below Apple's download folder.
 
-    Files from the developer site's former download path go under `design-downloads/`.
+    Files from the developer site's former download path go under `design-downloads/`,
+    and files from other Apple hosts under their host name and path.
     """
-    path = urlsplit(url).path
-    if path.startswith(DOWNLOAD_PREFIX):
+    parts_url = urlsplit(url)
+    path = unquote(parts_url.path)
+    if parts_url.netloc.lower() == DOWNLOAD_HOST and path.startswith(DOWNLOAD_PREFIX):
         relative = path[len(DOWNLOAD_PREFIX):]
     elif path.startswith(LEGACY_PREFIX):
         relative = "design-downloads/" + path[len(LEGACY_PREFIX):]
     else:
-        relative = Path(path).name
+        relative = parts_url.netloc.lower() + path
     parts = [re.sub(r"[^A-Za-z0-9._-]+", "-", part).strip("-") for part in relative.split("/")]
     parts = [part for part in parts if part and part not in {".", ".."}]
     return Path(*parts) if parts else Path("resource")
@@ -749,6 +813,7 @@ def main(argv: list[str]) -> int:
     page_html = fetch_text(args.source_url, args.timeout)
     source_sha256 = hashlib.sha256(page_html.encode("utf-8")).hexdigest()
     records = parse_links(page_html, args.source_url)
+    records += library_records(records, args.timeout)
     previous = None
     if args.include_previous:
         earlier, previous = previous_records(records, args.timeout, max(1, args.max_workers))
