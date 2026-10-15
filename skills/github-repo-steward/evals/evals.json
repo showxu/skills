@@ -62,6 +62,24 @@
       "prompt": "Audit example-team/parcel. Access to example-team/.github currently returns a permissions error.",
       "expected_output": "Report authority unknown and continue independent observations without substituting personal defaults.",
       "files": []
+    },
+    {
+      "id": 10,
+      "prompt": "Audit example-owner/parcel. Its head is verified, but an ancestor is unsigned with subject “Initial import”. The release set has a lightweight tag, an unsigned annotated tag and an SSH tag whose verification service is unavailable.",
+      "expected_output": "Report each commit signature and Conventional subject result, both tag-type/signature mismatches and the unsupported verification as unknown. Bind tag targets and coverage to exact SHAs; seek legacy dispositions without rewriting history.",
+      "files": []
+    },
+    {
+      "id": 11,
+      "prompt": "Audit reusable-workflow pins. A flow-style job calls a full older SHA, another uses a floating branch, the shared default is stable/next, and one shared repository lookup fails.",
+      "expected_output": "Parse job-level callers, resolve the actual shared default branch, report path/job/observed/expected/source for each external caller, floating-ref drift and lookup unknowns. Local calls bind to the accepted source; disposition pin lag by the applicable standard.",
+      "files": []
+    },
+    {
+      "id": 12,
+      "prompt": "Audit our release caller and reusable jobs. A setup action enables a dependency cache and concurrency uses cancel-in-progress: false in a shared group with a single pending slot.",
+      "expected_output": "Report both release cache use and pending-run replacement; prepare cache-free fresh build paths and capacity-safe queuing or dispatch with no cancelling group.",
+      "files": []
     }
   ]
 }

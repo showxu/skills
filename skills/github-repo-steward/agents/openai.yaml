@@ -1,4 +1,4 @@
 interface:
   display_name: "GitHub Repo Steward"
   short_description: "Set up, present, and audit one GitHub repository"
-  default_prompt: "Use $github-repo-steward to bring this one repository into its applicable standard and verify its settings, community files, CI, release hygiene and public presentation."
+  default_prompt: "Use $github-repo-steward to apply this repository’s standard and audit its settings, accepted commit signatures and subjects, release tags, reusable pins and public presentation."

@@ -27,7 +27,7 @@
     },
     {
       "id": 5,
-      "prompt": "Our protected tap cannot accept the scheduler\u2019s direct pushes. Tool releases are infrequent.",
+      "prompt": "Our protected tap cannot accept the scheduler’s direct pushes. Tool releases are infrequent.",
       "expected_output": "Prefer read-only detection plus a narrow deduplicated issue notice and normal signed PRs; route tap mechanics to homebrew. A scoped App needs a real authorized write requirement.",
       "files": []
     },
@@ -53,6 +53,24 @@
       "id": 9,
       "prompt": "We need to adopt an upstream fork and update my personal profile alongside the organization cleanup.",
       "expected_output": "Keep organization placement/coordination; hand upstream adoption to fork-dog and the personal profile to github-profile-readme, carrying ownership constraints and accepted context.",
+      "files": []
+    },
+    {
+      "id": 10,
+      "prompt": "Roll out shared CI to eight independent members. Our measured macOS capacity is eight slots, two are occupied, two reserved, and each member peaks at two macOS jobs. The aggregate runner budget has spare capacity.",
+      "expected_output": "Admit at most two members per wave from the four available macOS slots, wait for required evidence, then refresh usage before the next wave. Preserve independent release cadence and other workloads.",
+      "files": []
+    },
+    {
+      "id": 11,
+      "prompt": "Should we adopt the proposed build cache? The predeclared saving threshold is 15%. Controlled repeated trials have a 100-second baseline, 110-second cold miss and 65-second warm hit including cache costs, with a representative 50% hit rate.",
+      "expected_output": "Defer or reject adoption: expected cached duration is 87.5 seconds, a 12.5% saving below the stated 15% threshold. Preserve the evidence and threshold in the owning decision record.",
+      "files": []
+    },
+    {
+      "id": 12,
+      "prompt": "Our controlled development-cache trial exceeds the declared threshold with equivalent validation. Roll it out and enable the same cache in release validation; cancel older queued releases to free runners.",
+      "expected_output": "Adopt development caching through bounded reviewed waves, and route each release call graph to the repository steward for cache-free fresh validation/build/publication and preserved running/queued execution.",
       "files": []
     }
   ]

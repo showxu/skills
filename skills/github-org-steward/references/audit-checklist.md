@@ -11,11 +11,12 @@ severity and disposition. Do not claim completion for inaccessible areas.
 | Organization settings | Actions defaults and actual supported ruleset/plan/visibility scope match declaration | Organization owner and settings checker |
 | Apps | Capability, permissions, events, installation selection and credential locations; no secret values | Organization owner; installation gaps need browser evidence |
 | Member conformance | One repository-steward audit per in-scope repository, bound to its source and shared revision | github-repo-steward |
-| Shared rollout | Consumer proof at proposed full pin, current required contexts, template update and every intended member PR | Organization steward coordinating repository steward |
+| Shared rollout | Consumer proof at proposed full pin, current required contexts, template/member PRs and capacity-bound wave receipts for each runner class and aggregate | Organization steward coordinating repository steward |
+| Build-cache adoption | Predeclared material-saving threshold, controlled repeated cold/miss/warm comparisons, net cost and correctness evidence, accepted decision | Organization steward and ecosystem build owner |
 | Family identity | DESIGN, generator revision, accepted exports/consumer bindings and icon owners | Design owner plus repository steward for delivery |
 | Profile/catalog | Job groups, complete generated membership, outcome copy, umbrella identity, account description and working navigation | Organization steward |
 | Pins | Curated set and actual order support the visitor promise | Organization steward; owner browser |
-| Publication | Dependency-ordered accepted releases, downstream distribution/site PRs and real served artifacts | Ecosystem release and distribution owners |
+| Publication | Dependency-ordered accepted releases, release call graph free of cache operations and cancellation, downstream distribution/site PRs and real served artifacts | Repository steward, ecosystem release and distribution owners |
 | Handoffs | Authorization, separate task files, disjoint writes, accepted revisions and one coordinated publisher | Organization steward |
 | Local preservation | Snapshot/compare plus semantic review of local-only deltas; no owner work discarded | Report only unless separately authorized |
 

@@ -37,8 +37,10 @@ or concurrent writers are implied.
 
 1. **Inspect.** Record applicable standard, observed revision and scope. Use the
    [audit matrix](references/audit.md) to gather read-only evidence for settings,
-   community health, CI, versions and presentation. Audit-only requests end in
-   that report without mutations.
+   community health, CI, versions and presentation. Check accepted commit
+   signatures and Conventional Commit subjects, signed annotated release tags
+   with their peeled targets, and reusable-workflow pin drift. Audit-only
+   requests end in that report without mutations.
 2. **Prepare.** Make a bounded change list. Preserve valid historical records,
    legal notices and external authorship. For signed owner work, configure only
    the task clone or worktree using [governance](references/governance.md).

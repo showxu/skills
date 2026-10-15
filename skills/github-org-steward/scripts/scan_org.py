@@ -8,8 +8,8 @@
     python3 scan_org.py compare --root DIR --baseline baseline.json
         report how those checkouts differ from the baseline
 
-remote uses the operator's gh login and keeps one clone on disk at a time. FAIL
-findings exit 1; REVIEW findings need a person's judgment, such as published
+remote uses the operator's gh login and keeps one clone on disk at a time. UNKNOWN
+findings exit 2; FAIL findings exit 1; REVIEW findings need judgment, such as published
 lightweight tags that must not move.
 """
 
@@ -63,7 +63,8 @@ def remote(args):
 
     for repo in sorted((r for r in repos if not r["isArchived"]), key=lambda r: r["name"]):
         try:
-            observation = steward.inspect_repository(args.org, repo, workdir, set(args.identity), args.allowed_signers, report)
+            options = {"commit_types": args.commit_type} if getattr(args, "commit_type", None) else {}
+            observation = steward.inspect_repository(args.org, repo, workdir, set(args.identity), args.allowed_signers, report, **options)
             licenses[observation["license_digest"]].append(repo["name"])
             print(f"SOURCE {repo['name']}: {observation['source_commit']} ({observation['default_branch']})")
         finally:
@@ -73,8 +74,9 @@ def remote(args):
     for value, names in sorted(licenses.items()):
         print(f"LICENSE {value}: {', '.join(names)}")
     failures = sum(level == "FAIL" for level, _, _ in findings)
-    print(f"{sum(map(len, licenses.values()))} repositories, {failures} failures, {len(findings) - failures} review items")
-    return 1 if failures else 0
+    unknowns = sum(level == "UNKNOWN" for level, _, _ in findings)
+    print(f"{sum(map(len, licenses.values()))} repositories, {failures} failures, {unknowns} unknowns, {len(findings) - failures - unknowns} review items")
+    return 2 if unknowns else 1 if failures else 0
 
 
 def checkout_state(path):
@@ -127,6 +129,8 @@ def main():
     scan.add_argument("--org", required=True)
     scan.add_argument("--identity", action="append", default=[], help="owner commit email; repeatable")
     scan.add_argument("--allowed-signers", type=Path, help="SSH allowed signers file for tag verification")
+    scan.add_argument("--commit-type", action="append", default=[],
+                      help="accepted type when the shared standard applies to every scanned member; repeatable")
     scan.add_argument("--repo-steward", type=Path, help="github-repo-steward skill directory; defaults to sibling installation")
     scan.add_argument("--work-dir", type=Path, required=True,
                       help="empty producer-owned ignored directory, reused and left empty after scanning")

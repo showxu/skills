@@ -8,7 +8,7 @@ commit. Such a skip can replace a previous failing required result.
 | --- | --- | --- | --- |
 | Policy | opened, synchronize, reopened, edited | default-branch push | Cancel superseded runs |
 | Validation | opened, synchronize, reopened | default-branch push, manual dispatch | Cancel superseded runs |
-| Release validation/publication | Repository-owned release event or manual accepted tag | As declared by release owner | Never cancel an in-flight release |
+| Release validation/publication | Repository-owned release event or manual accepted tag | As declared by release owner | Preserve running and queued releases |
 
 For policy and validation, use distinct workflow names and this group shape:
 
@@ -19,9 +19,27 @@ concurrency:
 ```
 
 The PR number handles fork contributions; the workflow name separates policy
-from validation. Release workflows omit cancelling groups; tag serialization
-uses `cancel-in-progress: false` and a group identifying the tag. Keep all
-release validation and publication stages outside cancel-on-new-push callers.
+from validation. Release workflows and their callers/callees never cancel
+running or queued releases. Omit a shared concurrency group unless its queue is
+proven to retain every intended run. `cancel-in-progress: false` alone still
+allows a later pending run to replace an earlier one. If serialization is
+required, use the platform's supported queue with an admitted wave below its
+current queue limit and no cancelling option; otherwise coordinate dispatch
+without a conflicting group. Separate workflow names/groups prevent unrelated
+CI from cancelling releases. Keep release validation and publication outside
+cancel-on-new-push callers, including job-level concurrency and cancellation
+automation. Check [current concurrency semantics](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency)
+before choosing a queue configuration. Release matrices disable fail-fast so
+one failing member does not cancel the others; the aggregate still fails.
+
+Release workflows never restore or save caches. This includes validation,
+build, packaging and publication, setup-action caches, dependencies, compiler
+outputs and reusable callees. Build from fresh paths and accepted immutable
+inputs; transfer only artifacts produced and verified within that release run.
+Ecosystem owners implement that contract in their toolchain. Development/PR
+cache adoption needs the organization's controlled measurement gate, or an
+equivalent repository-owned threshold and experiment when no organization
+standard applies; a faster single run is insufficient.
 
 Policy checks the PR title and added lines, using the repository's accepted
 terms and publication constraints. External and bot contributions are welcome.
@@ -50,6 +68,6 @@ rulesets, including reusable names such as `<caller> / <called>`.
 
 Use read-only default permissions, minimal explicit write jobs and Dependabot
 for actual ecosystems. Ecosystem-specific compilers, SDKs, deployment floors,
-version validators, release caches and artifact formats route to their owners.
+version validators and artifact formats route to their owners.
 A timeout during observation is not cancellation: continue observing the same
 run; acceptance uses the latest run per workflow ID at the accepted SHA.
