@@ -7,10 +7,14 @@ description: "GitHub flow: file a well-formed issue in its owning repository whe
 
 ## Purpose
 
+This skill follows [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow).
+
 File one actionable problem in its owning repository, or land any change
 through a minimal, test-backed GitHub pull request, with or without an issue:
 sync, repository conventions, branch, failing test, fix, pull request, green
 CI, merge, cleanup, and an optional release tag.
+
+See [primary sources](references/sources.md) for the specifications and documentation behind this workflow.
 
 ## When To Use
 
