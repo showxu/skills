@@ -73,7 +73,7 @@ forms render and `.github/ISSUE_TEMPLATE/config.yml` takes effect.
 
 Obtain local community-file and template text from `repository-docs` or the
 ecosystem's documentation skill: `pyproject-docs`, or `swiftpm-docs` when
-installed. Issue forms collect what `github-issue-workflow` requires of a
+installed. Issue forms collect what `github-flow` requires of a
 filed issue. Route filing and working issues to that skill.
 
 ## Version and release hygiene
@@ -95,7 +95,7 @@ rendering/upload evidence. It does not own the following artifacts or decisions:
 | --- | --- |
 | Shared standards, organization settings, placement, profile, catalog, pins or coordinated rollout | The organization's standard owner, through its `.github` repository |
 | Documentation roles, architecture, review-rule format and community-file text | `repository-docs` or the ecosystem's documentation skill |
-| Issue filing, triage, implementation and PR lifecycle | `github-issue-workflow` |
+| Issue filing, triage, implementation and PR lifecycle | `github-flow` |
 | Framework icon family or app icons | `apple-framework-icon-design`, `apple-app-icon-design` |
 | Ecosystem release mechanics | The ecosystem's release skill (for SwiftPM, `swiftpm-github-release` when installed) |
 

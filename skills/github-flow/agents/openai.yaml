@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub Flow"
+  short_description: "GitHub flow with or without an issue"
+  default_prompt: "Use $github-flow to land this change, with or without an issue, through a test-backed GitHub pull request following repository conventions, green CI, review resolution, and branch cleanup."
