@@ -11,12 +11,16 @@ SKILL_ROOT = Path(__file__).resolve().parents[1]
 TEMPLATES_ROOT = SKILL_ROOT / "templates"
 PROFILE_NAMES = ("minimal", "standard")
 OUTPUT_ROW = re.compile(
-    r"^\|\s*`(?P<target>[^`]+)`\s*\|\s*`(?P<source>[^`]+)`\s*\|\s*yes\s*\|$"
+    r"^\|\s*`(?P<target>[^`]+)`\s*\|\s*`(?P<source>[^`]+)`\s*\|"
+    r"\s*(?P<requirement>yes|if local)\s*\|$"
 )
 
 
-def output_map(profile_path: Path) -> list[tuple[Path, Path]]:
+def output_map(
+    profile_path: Path, *, local_community_files: set[Path]
+) -> list[tuple[Path, Path]]:
     rows: list[tuple[Path, Path]] = []
+    community_targets: set[Path] = set()
     for line in profile_path.read_text(encoding="utf-8").splitlines():
         match = OUTPUT_ROW.match(line)
         if match is None:
@@ -32,11 +36,23 @@ def output_map(profile_path: Path) -> list[tuple[Path, Path]]:
         if not source.is_file():
             raise FileNotFoundError(f"{profile_path}: missing template {source}")
         rows.append((target, source))
+        if match.group("requirement") == "if local":
+            community_targets.add(target)
     if not rows:
         raise ValueError(f"{profile_path}: no required output map rows")
     if len({target for target, _ in rows}) != len(rows):
         raise ValueError(f"{profile_path}: duplicate target path")
-    return rows
+    issue_targets = {
+        target for target in community_targets
+        if target.parent == Path(".github/ISSUE_TEMPLATE")
+    }
+    local_issue_targets = issue_targets & local_community_files
+    if local_issue_targets and local_issue_targets != issue_targets:
+        raise ValueError(f"{profile_path}: issue templates must be one local or inherited set")
+    return [
+        (target, source) for target, source in rows
+        if target not in community_targets or target in local_community_files
+    ]
 
 
 def review_rule_groups(text: str) -> int | None:
@@ -135,22 +151,66 @@ def validate_release_policy(root: Path, profile_name: str) -> None:
 
 
 def main() -> None:
+    community_files = {
+        Path(path) for path in (
+            "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "SUPPORT.md",
+            ".github/ISSUE_TEMPLATE/bug.md", ".github/ISSUE_TEMPLATE/feature.md",
+            ".github/ISSUE_TEMPLATE/config.yml", ".github/pull_request_template.md",
+        )
+    }
+    decisions = {
+        "local": community_files,
+        "inherited": set(),
+        "mixed": {Path("CONTRIBUTING.md")},
+    }
     with tempfile.TemporaryDirectory(prefix="docs-template-export-") as temporary:
         export_root = Path(temporary)
         for profile_name in PROFILE_NAMES:
             profile_path = SKILL_ROOT / "profiles" / f"{profile_name}.md"
-            profile_root = export_root / profile_name
-            for target, source in output_map(profile_path):
-                destination = profile_root / target
-                destination.parent.mkdir(parents=True, exist_ok=True)
-                destination.write_bytes(source.read_bytes())
-            agent_guide = profile_root / "AGENTS.md"
-            if not agent_guide.is_file():
-                raise FileNotFoundError(f"{profile_name}: AGENTS.md was not exported")
-            validate_agent_guide(agent_guide.read_text(encoding="utf-8"), profile_name)
-            validate_review_rules(agent_guide.read_text(encoding="utf-8"), profile_name)
-            validate_release_policy(profile_root, profile_name)
-            print(f"{profile_name}: template export passed")
+            for decision, local_files in decisions.items():
+                case = f"{profile_name}/{decision}"
+                profile_root = export_root / case
+                for target, source in output_map(
+                    profile_path, local_community_files=local_files
+                ):
+                    destination = profile_root / target
+                    destination.parent.mkdir(parents=True, exist_ok=True)
+                    destination.write_bytes(source.read_bytes())
+                expected_community = local_files & (
+                    {Path("CONTRIBUTING.md")} if profile_name == "minimal"
+                    else community_files
+                )
+                exported = {
+                    path.relative_to(profile_root)
+                    for path in profile_root.rglob("*") if path.is_file()
+                }
+                if exported & community_files != expected_community:
+                    raise ValueError(f"{case}: community files do not match the owner decision")
+                required_count = 5 if profile_name == "minimal" else 13
+                if len(exported) != required_count + len(expected_community):
+                    raise ValueError(f"{case}: unexpected export inventory")
+                if profile_name == "standard":
+                    for target in ("LICENSE", "GOVERNANCE.md", ".github/CODEOWNERS"):
+                        if Path(target) not in exported:
+                            raise ValueError(f"{case}: missing repository-owned {target}")
+                agent_guide = profile_root / "AGENTS.md"
+                if not agent_guide.is_file():
+                    raise FileNotFoundError(f"{case}: AGENTS.md was not exported")
+                validate_agent_guide(agent_guide.read_text(encoding="utf-8"), case)
+                validate_review_rules(agent_guide.read_text(encoding="utf-8"), case)
+                validate_release_policy(profile_root, case)
+                print(f"{case}: template export passed ({len(exported)} files)")
+    try:
+        output_map(
+            SKILL_ROOT / "profiles/standard.md",
+            local_community_files={Path(".github/ISSUE_TEMPLATE/bug.md")},
+        )
+    except ValueError as error:
+        if "issue templates must be one local or inherited set" not in str(error):
+            raise
+    else:
+        raise ValueError("partial local issue-template set was accepted")
+    print("partial local issue-template set: rejected")
 
 
 if __name__ == "__main__":

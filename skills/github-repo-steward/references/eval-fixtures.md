@@ -15,7 +15,7 @@ Context and files:
 
 Expected output:
 
-- A personal repository uses explicit overridable defaults, records choices and creates repository-owned community files without inventing an organization.
+- A personal repository uses explicit overridable defaults, records whether issues are accepted and community files are inherited or local, and routes local community-file text to the documentation owner.
 
 Forbidden behavior:
 
@@ -24,7 +24,7 @@ Forbidden behavior:
 Acceptance checks:
 
 - The authority record says personal defaults; settings, community, CI and presentation are covered; any missing legal choice is owned by the user.
-- Issue forms render on the new-issue page and use `.github/ISSUE_TEMPLATE/config.yml`, not `_config.yml`. Open work is filed in the repository's issue tracker through the issue workflow.
+- Issue forms render on the new-issue page and use `.github/ISSUE_TEMPLATE/config.yml`. Their fields collect the issue workflow's required content; filing and working issues route to that workflow.
 
 Baseline expectation:
 
