@@ -1,18 +1,20 @@
 ---
 name: github-issue-workflow
-description: Take a GitHub issue from triage to a merged, test-backed pull request, then clean up and optionally tag a release. Use for fixing or implementing a GitHub issue, issue-linked branch naming, test-first fixes, pull request hygiene, diagnosing failing CI check runs, post-merge branch cleanup, and issue-driven release tags. Do not use for release readiness audits without an issue to land, store or package-manager publishing, or repositories hosted outside GitHub.
+description: File a well-formed issue in its owning repository when work is discovered for later, or take a GitHub issue from triage to a merged, test-backed pull request, then clean up and optionally tag a release. Use for fixing or implementing a GitHub issue, issue-linked branch naming, test-first fixes, pull request hygiene, diagnosing failing CI check runs, post-merge branch cleanup, and issue-driven release tags. Do not use for release readiness audits without an issue to land, store or package-manager publishing, or repositories hosted outside GitHub.
 ---
 
 # GitHub Issue Workflow
 
 ## Purpose
 
-Run one GitHub issue through a minimal, test-backed change: sync, branch,
-failing test, fix, pull request, green CI, merge cleanup, and an optional
-release tag.
+File one actionable problem in its owning repository, or run a GitHub issue
+through a minimal, test-backed change: sync, branch, failing test, fix, pull
+request, green CI, merge cleanup, and an optional release tag.
 
 ## When To Use
 
+- Work is discovered for later and needs a well-formed issue in its owning
+  repository.
 - The user asks to fix, implement, or close a GitHub issue.
 - A pull request has failing CI checks that need diagnosis and a root-cause
   fix.
@@ -23,7 +25,7 @@ release tag.
 
 - Release readiness audits or version/tag consistency checks without an issue
   to land; use the ecosystem's release skill, such as `swiftpm-github-release`
-  for Swift packages.
+  when installed for Swift packages.
 - App Store, TestFlight, notarization, codesigning, or package-manager
   publishing.
 - Repositories hosted outside GitHub.
@@ -37,6 +39,27 @@ release tag.
 - Repo-local CI workflows, Makefile tasks, and contribution docs for the
   validation commands the repository already uses.
 - Current check runs on the pull request head.
+
+## Filing an issue
+
+1. Choose the repository whose code, documentation or settings would change.
+   Organization-wide work goes to the tracker designated for shared standards.
+   Work with no GitHub owner is not an issue; hand it to its named owner.
+2. Search open and closed issues and pull requests first. Add evidence to an
+   existing issue instead of duplicating it.
+3. Keep one actionable problem per issue. The title states the problem or
+   wanted outcome, using the repository's title convention when it has one.
+4. Use the effective issue form or template, local or inherited from the
+   owner's defaults. Include current behavior or state, expected outcome,
+   reproducible evidence (commands, versions, links), the decision needed and
+   who makes it, and how completion will be checked.
+5. Public issues contain no machine-local paths, private identifiers,
+   credentials, private conversations or unpublished plans. Report
+   vulnerabilities through the repository's private vulnerability reporting,
+   never as a public issue.
+6. Use only labels, issue types and assignees the repository already uses.
+   Link related issues and pull requests.
+7. Read the issue back after filing and report its URL.
 
 ## Workflow
 
@@ -82,11 +105,13 @@ release tag.
    - delete the working branch locally and on the remote.
 7. Release tag, only when the user asks for a release:
    - run the ecosystem's release readiness check when one exists, such as
-     `swiftpm-github-release` for Swift packages;
+     `swiftpm-github-release` when installed for Swift packages;
    - align release-facing metadata first, such as README version tables,
      dependency examples, and manifest version fields like the
      `Package.swift` tools-version;
-   - after the user's confirmation, create and push an annotated tag:
+   - after the user's confirmation, create and push the tag exactly as the
+     repository's release procedure declares, including name, message and
+     signing. Only when no procedure is declared, use an annotated tag:
      `git tag -a <version> -m "Release <version>"`, then
      `git push origin <version>`.
 
@@ -108,6 +133,8 @@ release tag.
   summary.
 
 ## Output Format
+
+For filing only, report the issue URL, owning repository and duplicates checked.
 
 End with an exit checklist:
 

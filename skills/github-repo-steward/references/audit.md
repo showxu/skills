@@ -8,7 +8,7 @@ do not quietly audit an organization member against personal defaults.
 | Area | Evidence to inspect |
 | --- | --- |
 | Settings | Repository metadata, full branch/tag rulesets and inherited rules, legacy protection, Actions token permissions, private vulnerability reporting, discussions and complete topic set |
-| Community | Effective community profile and files, organization fallback, actual issue/PR templates; local LICENSE/notices, CODEOWNERS and Dependabot |
+| Community | Effective community profile and files, organization fallback, actual issue/PR templates; issue forms render on the new-issue page and configuration is named exactly `.github/ISSUE_TEMPLATE/config.yml` (GitHub ignores names such as `_config.yml`); local LICENSE/notices, CODEOWNERS and Dependabot |
 | Commit history | Signature verification and Conventional Commit subject for every accepted commit; exact ancestry scope, signer/type policy, legacy exceptions and coverage gaps |
 | CI | Policy/validation events, concurrency, explicit permissions, full action/shared pins, pin-drift observation and real required contexts |
 | Release hygiene | Version source, Unreleased changelog, tag type/signature and remote peeled SHA; immutable protections; no published ref rewrite |
