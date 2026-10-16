@@ -1,21 +1,24 @@
 ---
 name: github-issue-workflow
-description: File a well-formed issue in its owning repository when work is discovered for later, or take a GitHub issue from triage to a merged, test-backed pull request, then clean up and optionally tag a release. Use for fixing or implementing a GitHub issue, issue-linked branch naming, test-first fixes, pull request hygiene, diagnosing failing CI check runs, post-merge branch cleanup, and issue-driven release tags. Do not use for release readiness audits without an issue to land, store or package-manager publishing, or repositories hosted outside GitHub.
+description: File a well-formed issue in its owning repository when work is discovered for later, or land any change through a merged, test-backed GitHub pull request, with or without an issue, then clean up and optionally tag a release. Use for fixing or implementing a GitHub issue, opening or merging a pull request, repository commit and signing conventions, branch naming including issue-linked branches, test-first fixes, pull request hygiene, diagnosing failing CI check runs, post-merge branch cleanup, and issue-driven release tags. Do not use for release readiness audits without a change to land, store or package-manager publishing, or repositories hosted outside GitHub.
 ---
 
 # GitHub Issue Workflow
 
 ## Purpose
 
-File one actionable problem in its owning repository, or run a GitHub issue
-through a minimal, test-backed change: sync, branch, failing test, fix, pull
-request, green CI, merge cleanup, and an optional release tag.
+File one actionable problem in its owning repository, or land any change
+through a minimal, test-backed GitHub pull request, with or without an issue:
+sync, repository conventions, branch, failing test, fix, pull request, green
+CI, merge, cleanup, and an optional release tag.
 
 ## When To Use
 
 - Work is discovered for later and needs a well-formed issue in its owning
   repository.
 - The user asks to fix, implement, or close a GitHub issue.
+- Any change needs to land through a GitHub pull request, with or without an
+  issue, including opening or merging a pull request.
 - A pull request has failing CI checks that need diagnosis and a root-cause
   fix.
 - A merged pull request needs local sync and branch cleanup.
@@ -23,7 +26,7 @@ request, green CI, merge cleanup, and an optional release tag.
 
 ## When Not To Use
 
-- Release readiness audits or version/tag consistency checks without an issue
+- Release readiness audits or version/tag consistency checks without a change
   to land; use the ecosystem's release skill, such as `swiftpm-github-release`
   for Swift packages, when installed.
 - App Store, TestFlight, notarization, codesigning, or package-manager
@@ -32,7 +35,8 @@ request, green CI, merge cleanup, and an optional release tag.
 
 ## Inputs To Inspect
 
-- Issue text, linked pull requests, and the base branch.
+- Change request, issue text when present, related pull requests, and the base
+  branch.
 - Git status, branch, and remotes.
 - The build manifest, such as `Package.swift`, and the tests around the
   affected code.
@@ -66,18 +70,27 @@ request, green CI, merge cleanup, and an optional release tag.
 1. Sync and baseline:
    - `git fetch --prune origin`
    - `git switch <base-branch>`, then `git pull --ff-only`
-   - collect the issue text, PR state, changed files, and current CI checks.
+   - collect the change request, issue text when present, PR state, changed
+     files, and current CI checks.
+   - before the first commit, read `CONTRIBUTING`, `MAINTENANCE`, or equivalent
+     repository rules and follow their commit subject, pull-request title,
+     signing, and merge method conventions.
+   - when no commit or pull-request title convention is declared, use
+     Conventional Commits. With squash merging, the pull-request title becomes
+     the commit subject on the default branch and must carry that convention.
+   - configure signing only in the repository (`git config --local`), never
+     globally, and verify signatures as the repository requires.
+   - land changes through pull requests; push directly to the default branch
+     only when the repository's rules explicitly allow it.
 2. Branch and scope:
-   - issue-linked: `<prefix>/<type>/issue-<id>-<slug>`; without an issue id:
-     `<prefix>/<type>/<slug>`.
-   - `<prefix>` is the repository's existing agent branch prefix, otherwise
-     the running agent's name, such as `codex`, `cursor`, or `claude`.
+   - use the repository's branch convention. Without one, use `<type>/<slug>`,
+     or `<type>/issue-<id>-<slug>` when there is an issue.
+   - branch names carry no tool, agent, or vendor names.
    - `<type>` is one of `fix`, `feat`, `docs`, `ci`, `refactor`, `chore`,
      `release`.
    - `<slug>` is lowercase kebab-case, usually 3 to 6 words.
-   - Examples: `codex/fix/issue-3-non-swift-output`,
-     `codex/docs/issue-12-readme-swift-version`,
-     `codex/ci/macos-latest-swift-testing`.
+   - Examples: `fix/issue-3-non-swift-output`,
+     `docs/issue-12-readme-swift-version`, `ci/macos-latest-swift-testing`.
    - Keep one clear objective per PR unless the user asks for bundling.
 3. Test first:
    - add or adjust a failing test, or a reproducible failing check, before the
@@ -90,7 +103,7 @@ request, green CI, merge cleanup, and an optional release tag.
 4. Pull request:
    - `git push -u origin <branch>`
    - open or update the PR with a clear summary, the validation commands and
-     their outcomes, and `Resolves #<id>` for the linked issue.
+     their outcomes. Add `Resolves #<id>` only when there is a linked issue.
 5. CI stabilization:
    - inspect check runs with
      `gh api repos/<owner>/<repo>/commits/<sha>/check-runs`;
@@ -99,11 +112,19 @@ request, green CI, merge cleanup, and an optional release tag.
      commits;
    - when the user prefers an infrastructure fix over a code fallback, update
      the CI runner or toolchain explicitly and state the rationale in the PR.
-6. Merge cleanup:
+6. Merge:
+   - after all required checks pass and every review thread is resolved, merge
+     using the repository's declared method, pinned to the reviewed head SHA
+     (`--match-head-commit` with GitHub CLI).
+   - if the head changes, check and review the new head before retrying.
+   - for a squash merge, use the pull-request title as the subject and follow
+     the repository's commit-body rule. For an empty-body rule:
+     `gh pr merge <number> --squash --match-head-commit <sha> --subject '<PR title>' --body ''`.
+7. Merge cleanup:
    - confirm the PR is merged;
    - fast-forward the local base branch to the remote head;
    - delete the working branch locally and on the remote.
-7. Release tag, only when the user asks for a release:
+8. Release tag, only when the user asks for a release:
    - run the ecosystem's release readiness check when one exists, such as
      `swiftpm-github-release` for Swift packages, when installed;
    - align release-facing metadata first, such as README version tables,
@@ -139,11 +160,13 @@ For filing only, report the issue URL, owning repository and duplicates checked.
 End with an exit checklist:
 
 ```text
-GitHub Issue Workflow: <owner>/<repo>#<id>
+GitHub Issue Workflow: <owner>/<repo>
 
+- Issue: #<id> / none
 - Local validation: <commands> -> pass / fail
 - PR: <url>, title and body complete
-- CI: green / documented exceptions
+- Required checks: green / pending / failed
+- Review threads: resolved / <unresolved count>
 - Base branch: synced to <sha>
 - Working branch: deleted locally and remotely
 - Tag: <version> pushed / not requested
@@ -158,3 +181,8 @@ GitHub Issue Workflow: <owner>/<repo>#<id>
   failure rather than the full log.
 - If CI fails for reasons unrelated to the change, report them separately
   instead of folding unrelated fixes into the PR.
+
+## Validation
+
+Use `references/eval-fixtures.md` to review issue-optional entry, repository
+conventions, and merge gates when changing this workflow.
