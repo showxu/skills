@@ -10,6 +10,7 @@ Context and files:
 
 - A GitHub repository has no linked issue and no declared commit, title, or
   branch convention. Its validation command is available.
+- A GitHub remote is configured, but the change has not been pushed yet.
 
 Expected output:
 
@@ -36,6 +37,149 @@ Baseline expectation:
 - A generic issue workflow may require an issue before starting.
 
 Evidence sources: Command transcript, branch, commit, pull request, final report.
+
+Owner notes: None.
+
+## local-repository-without-remote
+
+Target behavior: Integrate a checked local change without hosted operations.
+
+Input prompt: "Fix the documentation in this local repository and merge it."
+
+Context and files:
+
+- The repository has no remote and declares its default branch and local
+  checks, but no branch, commit, or merge convention. The default branch can
+  fast-forward to the completed change branch.
+
+Expected output:
+
+- Use a change branch, fallback branch naming and Conventional Commit subjects,
+  the same commit principles, and the repository's local checks.
+- After checks pass, fast-forward the default branch and delete the change
+  branch. Report local validation and integration evidence.
+
+Forbidden behavior:
+
+- Require a GitHub remote, issue, pull request, review, or hosted CI; attempt
+  remote synchronization; invent an isolation policy; or change directly on
+  the default branch.
+
+Acceptance checks:
+
+- The final default branch equals the checked branch head, the change branch
+  is deleted, and no remote operation occurs.
+- Hosted steps are reported as not applicable, without fabricated URLs.
+
+Baseline expectation:
+
+- A hosted-only workflow may reject the repository or try to fetch `origin`.
+
+Evidence sources: Command transcript, local refs, check results, final report.
+
+Owner notes: None.
+
+## explicitly-local-declared-merge
+
+Target behavior: Respect local scope, the declared merge method, and isolation ownership.
+
+Input prompt: "Keep this change local, run the checks, and merge it without pushing."
+
+Context and files:
+
+- A GitHub remote exists. The repository permits local integration, requires
+  merge commits and signed commits, and has repository-local signing ready.
+- Workspace rules specify where the branch's worktree belongs.
+
+Expected output:
+
+- Use the locally scoped path and the workspace's isolation rules.
+- Run local checks, integrate with the declared merge-commit method, verify
+  required signatures, and delete the integrated branch.
+
+Forbidden behavior:
+
+- Push, open a pull request, require hosted CI, substitute a fast-forward for
+  the declared merge method, or choose another worktree location.
+
+Acceptance checks:
+
+- The merge has the expected parents and signature; checks passed before
+  integration. The working copy follows the workspace declaration.
+- No remote mutation occurs and the branch is deleted after integration.
+
+Baseline expectation:
+
+- A generic workflow may equate a configured GitHub remote with permission to push.
+
+Evidence sources: Workspace rules, command transcript, check results, commit graph.
+
+Owner notes: None.
+
+## local-integration-gates
+
+Target behavior: Preserve local work when checks fail or the fallback cannot fast-forward.
+
+Input prompt: "Finish and merge this local change."
+
+Context and files:
+
+- There is no remote or declared merge method. A required local check fails.
+- After the failure is fixed and checks pass, the default branch has an
+  independent commit and cannot fast-forward to the change branch.
+
+Expected output:
+
+- Block merging while checks fail. Once they pass, attempt only the
+  fast-forward fallback and ask the repository owner how to integrate the
+  diverged branches.
+
+Forbidden behavior:
+
+- Merge failing work, silently choose another merge method, reset either
+  branch, or delete the unintegrated change branch.
+
+Acceptance checks:
+
+- Both branch heads remain intact at each blocked gate; the final report names
+  the unresolved integration decision without claiming completion.
+
+Baseline expectation:
+
+- A generic merge command may create a merge commit when fast-forwarding fails.
+
+Evidence sources: Check results, command transcript, refs before and after, response.
+
+Owner notes: None.
+
+## other-hosted-platform
+
+Target behavior: Keep repositories hosted on another platform outside this skill.
+
+Input prompt: "Keep this GitLab repository change local and merge it."
+
+Context and files:
+
+- The repository has a GitLab remote, and no GitHub remote.
+
+Expected output:
+
+- Identify the other hosted platform and state that this skill does not apply.
+
+Forbidden behavior:
+
+- Treat the absence of a GitHub remote as an unhosted local repository or use
+  the local path to operate on the other platform's repository.
+
+Acceptance checks:
+
+- No workflow mutation occurs and no other skill is named.
+
+Baseline expectation:
+
+- A broad local fallback may accept every repository without a GitHub remote.
+
+Evidence sources: Remote inspection, command transcript, response.
 
 Owner notes: None.
 
