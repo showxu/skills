@@ -93,7 +93,7 @@ rendering/upload evidence. It does not own the following artifacts or decisions:
 
 | Work | Owner |
 | --- | --- |
-| Shared standards, organization settings, placement, profile, catalog, pins or coordinated rollout | `github-org-steward` |
+| Shared standards, organization settings, placement, profile, catalog, pins or coordinated rollout | The organization's standard owner, through its `.github` repository |
 | Documentation roles, architecture, review-rule format and community-file text | `repository-docs` or the ecosystem's documentation skill |
 | Issue filing, triage, implementation and PR lifecycle | `github-issue-workflow` |
 | Framework icon family or app icons | `apple-framework-icon-design`, `apple-app-icon-design` |

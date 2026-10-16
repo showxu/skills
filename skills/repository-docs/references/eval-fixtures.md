@@ -180,8 +180,8 @@ Context and files:
 - Workspace instructions declare root read-first docs and independent child
   Git boundaries. Targets use different documentation casing and paths.
 - The skill collection, tool tap, and website have no ecosystem documentation
-  adapter. Their GitHub settings owner has decided which community files are
-  local and which are inherited.
+  adapter. Community-file inheritance inputs are inherited, local, mixed with
+  local files identified, or absent.
 - Unnamed dependency checkouts, caches, agent state, and scratch also exist.
 
 Expected output: Read declared contracts, inspect only named owners, preserve
@@ -194,7 +194,8 @@ inherited community files.
 
 Acceptance checks: Every named target is accounted for; excluded areas are not
 enumerated; destinations follow each target's existing document convention and
-the GitHub settings owner's community-file inheritance decision.
+the supplied community-file inheritance decision. An absent decision produces
+no community-health files and a report that the decision is needed.
 
 Baseline expectation: A project-specific normalizer may impose its own paths.
 
