@@ -1,0 +1,41 @@
+name: Bug report
+description: Report a skill that gives wrong guidance or fails.
+body:
+  - type: input
+    id: skill
+    attributes:
+      label: Skill name
+      description: Include the skill version or commit when known.
+    validations:
+      required: true
+  - type: input
+    id: host
+    attributes:
+      label: Host and version
+      description: For example, Codex or Claude Code, including its version.
+    validations:
+      required: true
+  - type: textarea
+    id: task
+    attributes:
+      label: Task or prompt
+      description: Provide a minimal example with private details removed.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Include relevant commands, logs or links with private details removed.
