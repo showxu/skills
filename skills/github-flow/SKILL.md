@@ -104,8 +104,9 @@ delivery, follow these steps:
 2. Branch and scope:
    - use the repository's branch convention. Without one, use `<type>/<slug>`,
      or `<type>/issue-<id>-<slug>` when there is an issue.
-   - `<type>` is one of `fix`, `feat`, `docs`, `ci`, `refactor`, `chore`,
-     `release`.
+   - `<type>` is the change's Conventional Commit type (`build`, `chore`, `ci`,
+     `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, `test`), or
+     `release` for release preparation.
    - `<slug>` is lowercase kebab-case, usually 3 to 6 words.
    - Examples: `fix/issue-3-non-swift-output`,
      `docs/issue-12-readme-swift-version`, `ci/macos-latest-swift-testing`.
