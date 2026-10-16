@@ -26,7 +26,9 @@ Use an ExecPlan variant for:
   conversation context
 
 Do not use ExecPlan mode for small changes, ordinary bug fixes, short
-documentation edits, or plans that only need a scannable implementation outline.
+documentation edits, plans that only need a scannable implementation outline,
+or a list of unrelated or unowned work items; those belong in their owners'
+issue trackers until someone executes them.
 
 ## Policy File Versus Plan Instance
 
@@ -259,6 +261,10 @@ At completion, update the plan before reporting done:
 - mark progress accurately
 - set `Task State` to `Status: completed` and `Stop Reason: completed`
 - add final outcomes and remaining gaps
+- give each `Discovered Follow-ups` entry an owner; file it in the owning
+  repository's issue tracker and replace the entry with the issue link, or,
+  when no tracker exists, record the named owner that accepted it. A completed
+  plan is not a backlog.
 - record major decisions that shaped the result
 - preserve evidence needed by the next agent or maintainer
 - move durable architecture or product truth to the repo's declared truth

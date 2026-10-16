@@ -551,6 +551,9 @@ Expected output:
 
 - `Progress` contains only checkout-validation planning and execution steps.
 - `Discovered Follow-ups` records the tax calculation issue as separate scope.
+- The plan's closeout routes that follow-up to the owning repository's issue
+  tracker and replaces the entry with its issue link; if no tracker exists,
+  it records the named owner that accepted it.
 - `Current Next Action` points to the next checkout-validation step, not the tax
   issue.
 
@@ -558,12 +561,14 @@ Forbidden behavior:
 
 - Add the tax bug to the current implementation steps without user approval.
 - Hide the tax issue in `Progress` as if it were current scope.
-- Create external issues or introduce a task backend.
+- Create external issues during read-only planning.
+- Leave the follow-up as backlog in a completed plan.
 
 Acceptance checks:
 
 - Scope is clear to a later implementer.
-- Follow-up work is preserved without silently changing the task.
+- Follow-up work is preserved without silently changing the task, with an
+  issue link or accepted named owner required at closeout.
 
 Evidence sources:
 

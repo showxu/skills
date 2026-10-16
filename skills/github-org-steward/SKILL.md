@@ -45,7 +45,8 @@ permission to spawn agents or message other sessions.
    `github-repo-steward` in audit mode for each in-scope repository. Aggregate
    their expected/observed findings and authority gaps; classify fix, keep,
    distill to owner, insufficient evidence. Audit-only scope ends without
-   mutations. Reuse already granted authorization for concrete fixes.
+   mutations; filing issues for findings is a mutation and needs authorization
+   like any other. Reuse already granted authorization for concrete fixes.
 3. **Establish shared truth.** Change the owning `.github` standard first.
    Organization settings/App changes update its MAINTENANCE declaration in the
    same reviewed change, using [governance](references/governance.md). Shared
@@ -82,7 +83,7 @@ domain artifacts or their implementation procedures:
 | --- | --- |
 | One repository's complete GitHub-side standard, presentation or audit | `github-repo-steward` |
 | Documentation roles and review-rule format | `repository-docs` |
-| Issue implementation and PR flow | `github-issue-workflow` |
+| Filing, implementing and closing issues; PR flow | `github-issue-workflow` |
 | Homebrew formulae, tap operations or installation | `homebrew` |
 | Upstream adoption, maintained forks and source conservation | `fork-dog` |
 | Visual identity file shape and templates | `design-md-template` |
@@ -97,6 +98,28 @@ domain artifacts or their implementation procedures:
 A handoff carries owner/repository, shared revision, owned paths, accepted input,
 constraints, expected output, checks and evidence. Do not copy another owner's
 contract into this skill.
+
+## Open work
+
+Unresolved organization work is tracked as issues, never as hand-maintained
+lists:
+
+- Work in one repository: an issue in that repository, filed through
+  `github-issue-workflow`.
+- Organization-wide work (shared standards, shared workflows, settings,
+  rulesets, Apps, profile, pins, family identity): an issue in the organization's
+  `.github` repository.
+- Sensitive governance gaps, such as a security setting or App permission
+  problem: the organization's member-only repository when one exists.
+  Vulnerabilities go through the affected repository's private vulnerability
+  reporting.
+- A rollout across repositories: one tracking issue in `.github` with the
+  decision, waves and member checklist. Member changes land as pull requests
+  that reference it; a member issue exists only for a member-specific decision.
+  Close the tracking issue after acceptance.
+
+Audit reports link the issues they produce instead of carrying open items;
+organization views query live issues.
 
 ## Participation and safety
 

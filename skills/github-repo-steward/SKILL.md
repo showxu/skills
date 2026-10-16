@@ -65,6 +65,12 @@ or concurrent writers are implied.
    locations; preserve only required evidence and report retained sizes/reasons.
    Never discard the owner's local changes as cleanup.
 
+## Open work
+
+The repository's open work lives in its issue tracker, not in documents, plans
+or local notes. File it through `github-issue-workflow`. A repository that
+accepts issues has effective issue forms, local or inherited.
+
 ## Version and release hygiene
 
 Use the applicable version policy and one version source. Keep a CHANGELOG with
@@ -84,7 +90,7 @@ rendering/upload evidence. It does not own the following artifacts or decisions:
 | --- | --- |
 | Shared standards, organization settings, placement, profile, catalog, pins or coordinated rollout | `github-org-steward` |
 | Documentation roles, architecture and review-rule format | `repository-docs` |
-| Issue triage, implementation and PR lifecycle | `github-issue-workflow` |
+| Issue filing, triage, implementation and PR lifecycle | `github-issue-workflow` |
 | Framework icon family or app icons | `apple-framework-icon-design`, `apple-app-icon-design` |
 | Ecosystem release mechanics | The ecosystem's release skill (for SwiftPM, `swiftpm-github-release` when installed) |
 

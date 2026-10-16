@@ -19,9 +19,10 @@ handoff, read `references/execplans.md` and use the ExecPlan variant instead
 of the short fallback plan shape.
 
 ExecPlan mode must include a `Task State` section with status, owner, last
-update, current next action, stop reason, and discovered follow-ups. Use it to
-make a single plan resumable without relying on session todos, chat history, or
-external task trackers.
+update, current next action, stop reason, and `Discovered Follow-ups`. Route
+each follow-up to its owner at closeout as described in
+[ExecPlans](references/execplans.md#closeout). Use the plan to make one task
+resumable without relying on session todos or chat history.
 
 When a repository has multiple possible plan locations, read
 `references/plan-surfaces.md` before writing or updating a plan.

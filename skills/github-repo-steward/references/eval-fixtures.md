@@ -24,6 +24,7 @@ Forbidden behavior:
 Acceptance checks:
 
 - The authority record says personal defaults; settings, community, CI and presentation are covered; any missing legal choice is owned by the user.
+- Issue forms render on the new-issue page and use `.github/ISSUE_TEMPLATE/config.yml`, not `_config.yml`. Open work is filed in the repository's issue tracker through the issue workflow.
 
 Baseline expectation:
 

@@ -10,7 +10,7 @@
     {
       "id": 2,
       "prompt": "Our organization hosts independent packages. Roll out the new shared validation convention.",
-      "expected_output": "Update the owning shared interface, validate syntax and a pinned consumer, update the template and existing members through repository-steward PRs, and retain independent release cadence.",
+      "expected_output": "Update the owning shared interface, validate syntax and a pinned consumer, update the template and existing members through repository-steward PRs, and retain independent release cadence. With authorization, track the decision, waves and member checklist in one .github issue; link member PRs, create member issues only for member-specific decisions, and close the tracking issue after acceptance.",
       "files": []
     },
     {
