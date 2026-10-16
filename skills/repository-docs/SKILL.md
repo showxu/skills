@@ -42,12 +42,14 @@ existing-document audits, and templates that produce repository documents.
 ## Community Files
 
 Own the text of local CONTRIBUTING, SECURITY, SUPPORT, code of conduct, and
-issue and pull request templates. Write local files only after the owner of
-the repository's GitHub settings has decided they are not inherited; that
-owner verifies them on GitHub. Issue templates ask for the current behavior or
-state, expected outcome, evidence (commands, versions, links), the decision
-needed and who makes it, and how completion will be checked. Name the
-issue-template configuration `.github/ISSUE_TEMPLATE/config.yml` exactly.
+issue and pull request templates. The community-file inheritance decision is
+an input: `inherited`, `local`, or `mixed`, identifying which files are local.
+Write only the files designated local. If the decision is absent, write no
+community-health files and report that the community-file inheritance decision
+is needed. Issue templates ask for the current behavior or state, expected
+outcome, evidence (commands, versions, links), the decision needed and who makes
+it, and how completion will be checked. Name the issue-template configuration
+`.github/ISSUE_TEMPLATE/config.yml` exactly.
 
 ## Workflow
 

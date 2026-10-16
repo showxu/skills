@@ -15,15 +15,16 @@ and tests but no formal docs tree. Add a compact documentation baseline."
 Context and files:
 
 - `pyproject.toml`, the console-script entry point, `README.md`, and `tests/`.
-- The GitHub settings owner's community-file decision: all local, all inherited,
-  or local `CONTRIBUTING.md` with the other community files inherited.
+- Community-file inheritance input: all local, all inherited, local
+  `CONTRIBUTING.md` with the other community files inherited, or absent.
 
 Expected output:
 
 - Reads `pyproject.toml` before writing docs.
 - Selects the minimal or standard profile from the requested scope.
-- Emits community files only where the GitHub settings owner has chosen local
-  ownership; keeps inherited files out of the export.
+- Emits only community files designated local by the supplied inheritance
+  decision. If absent, emits no community-health files and reports that the
+  community-file inheritance decision is needed.
 - Local issue templates use `config.yml` and ask for current state, expected
   outcome, evidence, the decision and its owner, and completion checks.
 - Uses lowercase `docs/`, keeps `AGENTS.md` as the agent route, and keeps

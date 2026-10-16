@@ -98,6 +98,14 @@ Classify the skill before writing hard boundaries:
   queues, owner decisions, bundle classifications, or migration plans. They may
   maintain a concrete owner graph because routing is their output contract.
 
+References point one way: a skill names or relies on only the skills it invokes
+or derives from, never those that invoke it, keeping the reference graph
+acyclic. Treat a caller's decision as an input; when it is absent, produce
+nothing that depends on it and report that the decision is needed. An
+orchestrator invoked by a higher-level orchestrator describes that owner by
+responsibility or by the artifact it reads, such as a shared standard, not by
+skill name.
+
 Do not repair a boundary by hardcoding sibling skill names, downstream workflow
 commands, or external schema fields unless the skill owns routing as an
 artifact, the user request or source packet names them, or the text is an

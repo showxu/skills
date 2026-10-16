@@ -17,8 +17,9 @@ OUTPUT_ROW = re.compile(
 
 
 def output_map(
-    profile_path: Path, *, local_community_files: set[Path]
+    profile_path: Path, *, local_community_files: set[Path] | None = None
 ) -> list[tuple[Path, Path]]:
+    local_community_files = local_community_files or set()
     rows: list[tuple[Path, Path]] = []
     community_targets: set[Path] = set()
     for line in profile_path.read_text(encoding="utf-8").splitlines():
@@ -162,6 +163,7 @@ def main() -> None:
         "local": community_files,
         "inherited": set(),
         "mixed": {Path("CONTRIBUTING.md")},
+        "absent": None,
     }
     with tempfile.TemporaryDirectory(prefix="docs-template-export-") as temporary:
         export_root = Path(temporary)
@@ -176,7 +178,7 @@ def main() -> None:
                     destination = profile_root / target
                     destination.parent.mkdir(parents=True, exist_ok=True)
                     destination.write_bytes(source.read_bytes())
-                expected_community = local_files & (
+                expected_community = (local_files or set()) & (
                     {Path("CONTRIBUTING.md")} if profile_name == "minimal"
                     else community_files
                 )
@@ -199,6 +201,9 @@ def main() -> None:
                 validate_agent_guide(agent_guide.read_text(encoding="utf-8"), case)
                 validate_review_rules(agent_guide.read_text(encoding="utf-8"), case)
                 validate_release_policy(profile_root, case)
+                if local_files is None:
+                    print(f"{case}: community-file inheritance decision is needed; "
+                          "no community-health files emitted")
                 print(f"{case}: template export passed ({len(exported)} files)")
     try:
         output_map(
