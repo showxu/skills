@@ -25,7 +25,7 @@ request, green CI, merge cleanup, and an optional release tag.
 
 - Release readiness audits or version/tag consistency checks without an issue
   to land; use the ecosystem's release skill, such as `swiftpm-github-release`
-  when installed for Swift packages.
+  for Swift packages, when installed.
 - App Store, TestFlight, notarization, codesigning, or package-manager
   publishing.
 - Repositories hosted outside GitHub.
@@ -105,7 +105,7 @@ request, green CI, merge cleanup, and an optional release tag.
    - delete the working branch locally and on the remote.
 7. Release tag, only when the user asks for a release:
    - run the ecosystem's release readiness check when one exists, such as
-     `swiftpm-github-release` when installed for Swift packages;
+     `swiftpm-github-release` for Swift packages, when installed;
    - align release-facing metadata first, such as README version tables,
      dependency examples, and manifest version fields like the
      `Package.swift` tools-version;

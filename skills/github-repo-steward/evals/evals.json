@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "Set up the GitHub side of my personal repository, example-owner/parcel. It has no organization and no standard yet.",
-      "expected_output": "A personal repository uses explicit overridable defaults, records choices and creates repository-owned community files without inventing an organization. Verify issue forms render with config.yml and file open work in its issue tracker through the issue workflow.",
+      "expected_output": "Use explicit overridable personal defaults; record whether issues are accepted and community files are inherited or local. Route local community-file text to the documentation owner. Verify issue forms render with config.yml and collect required issue content; route filing and working issues to the issue workflow.",
       "files": [
         "evals/files/personal.json"
       ]

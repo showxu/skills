@@ -8,15 +8,17 @@ fuller GitHub/community-health surface. That distinction is intentional.
 
 ## Output Map
 
+Apply the [community-file inheritance decision](README.md) to `if local` rows.
+
 | Target path | Source template | Required |
 | --- | --- | --- |
 | `AGENTS.md` | `../templates/AGENTS.md.tpl` | yes |
 | `README.md` | `../templates/README.md.tpl` | yes |
-| `CONTRIBUTING.md` | `../templates/CONTRIBUTING.md.tpl` | yes |
+| `CONTRIBUTING.md` | `../templates/CONTRIBUTING.md.tpl` | if local |
 | `LICENSE` | `../templates/LICENSE.tpl` | yes |
-| `CODE_OF_CONDUCT.md` | `../templates/CODE_OF_CONDUCT.md.tpl` | yes |
-| `SECURITY.md` | `../templates/SECURITY.md.tpl` | yes |
-| `SUPPORT.md` | `../templates/SUPPORT.md.tpl` | yes |
+| `CODE_OF_CONDUCT.md` | `../templates/CODE_OF_CONDUCT.md.tpl` | if local |
+| `SECURITY.md` | `../templates/SECURITY.md.tpl` | if local |
+| `SUPPORT.md` | `../templates/SUPPORT.md.tpl` | if local |
 | `GOVERNANCE.md` | `../templates/GOVERNANCE.md.tpl` | yes |
 | `.github/CODEOWNERS` | `../templates/CODEOWNERS.tpl` | yes |
 | `docs/README.md` | `../templates/docs.README.md.tpl` | yes |
@@ -27,10 +29,10 @@ fuller GitHub/community-health surface. That distinction is intentional.
 | `docs/migrations/README.md` | `../templates/docs.migrations.README.md.tpl` | yes |
 | `docs/archive/README.md` | `../templates/docs.archive.README.md.tpl` | yes |
 | `docs/reference/README.md` | `../templates/docs.reference.README.md.tpl` | yes |
-| `.github/ISSUE_TEMPLATE/bug.md` | `../templates/.github.ISSUE_TEMPLATE.bug.md.tpl` | yes |
-| `.github/ISSUE_TEMPLATE/feature.md` | `../templates/.github.ISSUE_TEMPLATE.feature.md.tpl` | yes |
-| `.github/ISSUE_TEMPLATE/_config.yml` | `../templates/.github.ISSUE_TEMPLATE._config.yml.tpl` | yes |
-| `.github/pull_request_template.md` | `../templates/.github.pull_request_template.md.tpl` | yes |
+| `.github/ISSUE_TEMPLATE/bug.md` | `../templates/.github.ISSUE_TEMPLATE.bug.md.tpl` | if local |
+| `.github/ISSUE_TEMPLATE/feature.md` | `../templates/.github.ISSUE_TEMPLATE.feature.md.tpl` | if local |
+| `.github/ISSUE_TEMPLATE/config.yml` | `../templates/.github.ISSUE_TEMPLATE.config.yml.tpl` | if local |
+| `.github/pull_request_template.md` | `../templates/.github.pull_request_template.md.tpl` | if local |
 
 ## README Placement
 

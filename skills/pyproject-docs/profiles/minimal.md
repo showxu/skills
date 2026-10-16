@@ -9,11 +9,13 @@ public-repo GitHub/community-health surface.
 
 ## Output Map
 
+Apply the [community-file inheritance decision](README.md) to `if local` rows.
+
 | Target path | Source template | Required |
 | --- | --- | --- |
 | `AGENTS.md` | `../templates/AGENTS.md.tpl` | yes |
 | `README.md` | `../templates/README.md.tpl` | yes |
-| `CONTRIBUTING.md` | `../templates/CONTRIBUTING.md.tpl` | yes |
+| `CONTRIBUTING.md` | `../templates/CONTRIBUTING.md.tpl` | if local |
 | `docs/README.md` | `../templates/docs.README.md.tpl` | yes |
 | `docs/architecture/README.md` | `../templates/docs.architecture.README.md.tpl` | yes |
 | `docs/architecture/versioning-and-release.md` | `../templates/docs.architecture.versioning-and-release.md.tpl` | yes |
@@ -34,7 +36,7 @@ public-repo GitHub/community-health surface.
 - `.github/CODEOWNERS`
 - `.github/ISSUE_TEMPLATE/bug.md`
 - `.github/ISSUE_TEMPLATE/feature.md`
-- `.github/ISSUE_TEMPLATE/_config.yml`
+- `.github/ISSUE_TEMPLATE/config.yml`
 - `.github/pull_request_template.md`
 - `.github/README.md`
 

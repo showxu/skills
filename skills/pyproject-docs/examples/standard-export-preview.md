@@ -3,7 +3,8 @@
 ## Profile
 
 This preview shows the expected target-repository outcome for the `standard`
-profile.
+profile. The GitHub settings owner has chosen local community files in this
+example; inherited files are omitted from an export.
 
 ## Source Templates Used
 
@@ -61,7 +62,7 @@ profile.
     ISSUE_TEMPLATE/
       bug.md
       feature.md
-      _config.yml
+      config.yml
     pull_request_template.md
 ```
 

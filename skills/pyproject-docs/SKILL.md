@@ -58,7 +58,8 @@ tooling.
   artifacts. Do not treat `.codex/*` or installed skill configuration as
   temporary execution state.
 - GitHub surface: `.github/*`, issue templates, pull request templates, and
-  GitHub-facing policy files.
+  GitHub-facing policy files, plus the inheritance decision from the owner of
+  the repository's GitHub settings.
 - Skill internals when editing this collection: `rules/`, `templates/`,
   `profiles/`, `examples/`, and `references/`.
 
@@ -118,6 +119,8 @@ repository:
 - Current Truth: `docs/architecture/*`
 - Proposal: `docs/proposals/*`
 - History: `docs/decisions/*`, `docs/migrations/*`, `docs/archive/*`
+- Open Work: the repository's GitHub issues; documents link to them instead of
+  listing work
 - Governance: `.github/*` and root policy files
 - Reference: `docs/reference/*`
 - Python API Reference: `docs/api/*` when generated or intentionally authored
@@ -235,6 +238,12 @@ Anthropic's [Claude Code memory](https://code.claude.com/docs/en/memory) and
   repository intentionally publishes generated or authored API reference there.
   Generated API output must be clearly marked as generated or reproducible.
 - Keep GitHub-facing policy and templates in `.github/*`.
+- Own the text of community files and templates. Emit local community files
+  only when the repository's GitHub settings owner has determined they are not
+  inherited; that owner decides inheritance and verifies the GitHub surface.
+- Issue templates ask for current behavior or state, the expected outcome,
+  reproducible evidence (commands, versions, links), the decision needed and
+  who makes it, and how completion will be checked.
 - Keep CODEOWNERS at `.github/CODEOWNERS` in generated defaults.
 - Keep agent temporary execution artifacts in `.agent/*`. The standard active
   plan surface is `.agent/PLANS.md`. Do not place agent plans at repository
@@ -272,7 +281,8 @@ Anthropic's [Claude Code memory](https://code.claude.com/docs/en/memory) and
 
 ## Validation Rules
 
-- The selected profile matches the emitted or changed file set.
+- The selected profile and the GitHub settings owner's local-community-file
+  decision match the emitted or changed file set.
 - `pyproject.toml` facts align with README usage, package names, console
   scripts, dependency groups, test commands, and generated-output boundaries.
 - Agent guides do not become indexes, and README-class files do not become
@@ -312,8 +322,9 @@ Anthropic's [Claude Code memory](https://code.claude.com/docs/en/memory) and
   redefine current truth on their own.
 - Target-facing templates and exported files do not mention skill-local
   `rules/`, `examples/`, profile mechanics, or source/export internals.
-- `python3 scripts/validate_template_exports.py` materializes both profiles and
-  verifies that each exported `AGENTS.md` carries the complete path-independent
+- `python3 scripts/validate_template_exports.py` checks both profiles with
+  local, inherited and mixed community-file decisions, and verifies that each
+  exported `AGENTS.md` carries the complete path-independent
   canonical-artifact contract and a Code Review Rules section with `###`
   groups.
 - After canonicalizing an existing repository, run

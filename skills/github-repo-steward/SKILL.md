@@ -65,11 +65,16 @@ or concurrent writers are implied.
    locations; preserve only required evidence and report retained sizes/reasons.
    Never discard the owner's local changes as cleanup.
 
-## Open work
+## Issue intake
 
-The repository's open work lives in its issue tracker, not in documents, plans
-or local notes. File it through `github-issue-workflow`. A repository that
-accepts issues has effective issue forms, local or inherited.
+Decide whether the repository accepts issues and whether its community files
+are inherited or local. For repositories accepting issues, verify that issue
+forms render and `.github/ISSUE_TEMPLATE/config.yml` takes effect.
+
+Obtain local community-file and template text from `repository-docs` or the
+ecosystem's documentation skill: `pyproject-docs`, or `swiftpm-docs` when
+installed. Issue forms collect what `github-issue-workflow` requires of a
+filed issue. Route filing and working issues to that skill.
 
 ## Version and release hygiene
 
@@ -89,7 +94,7 @@ rendering/upload evidence. It does not own the following artifacts or decisions:
 | Work | Owner |
 | --- | --- |
 | Shared standards, organization settings, placement, profile, catalog, pins or coordinated rollout | `github-org-steward` |
-| Documentation roles, architecture and review-rule format | `repository-docs` |
+| Documentation roles, architecture, review-rule format and community-file text | `repository-docs` or the ecosystem's documentation skill |
 | Issue filing, triage, implementation and PR lifecycle | `github-issue-workflow` |
 | Framework icon family or app icons | `apple-framework-icon-design`, `apple-app-icon-design` |
 | Ecosystem release mechanics | The ecosystem's release skill (for SwiftPM, `swiftpm-github-release` when installed) |

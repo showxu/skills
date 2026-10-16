@@ -1,6 +1,8 @@
 # Standard Target Tree
 
-This example shows a common normalized end-state for a Python repository.
+This example shows a common normalized end-state for a Python repository
+whose GitHub settings owner has chosen local community files. Omit inherited
+community files from the target tree.
 
 ## Role Map
 
@@ -9,6 +11,7 @@ This example shows a common normalized end-state for a Python repository.
 - Proposal: `docs/proposals/*`
 - Truth: `docs/architecture/*`
 - History: `docs/decisions/*`, `docs/migrations/*`, `docs/archive/*`
+- Open Work: GitHub issues; documents link to them
 - Governance: `.github/*` and root governance files
 - Reference: `docs/reference/*`
 - API Reference: `docs/api/*` when intentionally published
@@ -52,7 +55,7 @@ This example shows a common normalized end-state for a Python repository.
     ISSUE_TEMPLATE/
       bug.md
       feature.md
-      _config.yml
+      config.yml
     pull_request_template.md
     workflows/
       ci.yml
