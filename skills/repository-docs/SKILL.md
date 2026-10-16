@@ -1,6 +1,6 @@
 ---
 name: repository-docs
-description: Create, audit, and normalize repository documentation roles across apps, libraries, tools, plugins, skill collections, and workspaces. Use when writing or reviewing AGENTS.md, Code Review Rules for automatic pull request review, tool entry files such as CLAUDE.md, README files, documentation indexes, architecture placement, duplicated instructions, conflicting document authority, or documentation templates. Produces evidence-backed audits, minimal relocation plans, and authorized documentation changes. Preserves public installation and usage guidance, concise agent edit guardrails, repository conventions, and existing Git state. Does not own product requirements, architecture redesign, runtime implementation, build or release automation, or general skill workflow redesign.
+description: Create, audit, and normalize repository documentation roles across apps, libraries, tools, plugins, skill collections, and workspaces. Use when writing or reviewing AGENTS.md, Code Review Rules for automatic pull request review, tool entry files such as CLAUDE.md, README files, documentation indexes, architecture placement, duplicated instructions, conflicting document authority, documentation templates, or community-health file text and templates. Produces evidence-backed audits, minimal relocation plans, and authorized documentation changes. Preserves public installation and usage guidance, concise agent edit guardrails, repository conventions, and existing Git state. Does not own product requirements, architecture redesign, runtime implementation, build or release automation, or general skill workflow redesign.
 ---
 
 # Repository Docs
@@ -30,11 +30,24 @@ existing-document audits, and templates that produce repository documents.
 - Write or review AGENTS guides and their Code Review Rules, tool entry files,
   repository landing manuals, directory indexes, and links to current
   architecture and reference material.
+- Write or review local community-health file text and templates for
+  repositories without an ecosystem documentation adapter, including skill
+  collections, tool taps, and websites.
 - Audit duplication, misplaced content, contradictory statements, missing
   entry files, and templates that generate those problems.
 - Move already-established facts to their documentation owner and preserve
   their meaning. Architecture decisions, runtime behavior, tool interfaces,
   and skill workflow semantics remain with their respective owners.
+
+## Community Files
+
+Own the text of local CONTRIBUTING, SECURITY, SUPPORT, code of conduct, and
+issue and pull request templates. Write local files only after the owner of
+the repository's GitHub settings has decided they are not inherited; that
+owner verifies them on GitHub. Issue templates ask for the current behavior or
+state, expected outcome, evidence (commands, versions, links), the decision
+needed and who makes it, and how completion will be checked. Name the
+issue-template configuration `.github/ISSUE_TEMPLATE/config.yml` exactly.
 
 ## Workflow
 
