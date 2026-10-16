@@ -1,6 +1,6 @@
 ---
 name: github-flow
-description: "GitHub flow: file a well-formed issue in its owning repository when work is discovered for later, or land any change through a merged, test-backed GitHub pull request, with or without an issue, then clean up and optionally tag a release. Use for fixing or implementing a GitHub issue, opening or merging a pull request, repository commit and signing conventions, branch naming including issue-linked branches, test-first fixes, pull request hygiene, diagnosing failing CI check runs, post-merge branch cleanup, and issue-driven release tags. Do not use for release readiness audits without a change to land, store or package-manager publishing, or repositories hosted outside GitHub."
+description: "GitHub flow: file a well-formed issue in its owning repository when work is discovered for later, or land any change through a merged, test-backed GitHub pull request, with or without an issue, then clean up and optionally tag a release. Also apply the flow to local repositories without a remote or explicitly local work before any push. Use for fixing or implementing a GitHub issue, opening or merging a pull request, repository commit and signing conventions, branch naming including issue-linked branches, test-first fixes, pull request hygiene, diagnosing failing CI check runs, post-merge branch cleanup, and issue-driven release tags. Do not use for release readiness audits without a change to land, store or package-manager publishing, or repositories hosted on other platforms such as GitLab."
 ---
 
 # GitHub Flow
@@ -13,6 +13,9 @@ File one actionable problem in its owning repository, or land any change
 through a minimal, test-backed GitHub pull request, with or without an issue:
 sync, repository conventions, branch, failing test, fix, pull request, green
 CI, merge, cleanup, and an optional release tag.
+
+For local work, apply the same branch-based process with repository checks and
+a local merge.
 
 See [primary sources](references/sources.md) for the specifications and documentation behind this workflow.
 
@@ -27,15 +30,16 @@ See [primary sources](references/sources.md) for the specifications and document
   fix.
 - A merged pull request needs local sync and branch cleanup.
 - The user wants an issue fix released as a new tag.
+- A repository has no remote, or work is explicitly scoped to stay local
+  before any push.
 
 ## When Not To Use
 
 - Release readiness audits or version/tag consistency checks without a change
-  to land; use the ecosystem's release skill, such as `swiftpm-github-release`
-  for Swift packages, when installed.
+  to land; these belong to the ecosystem's release process.
 - App Store, TestFlight, notarization, codesigning, or package-manager
   publishing.
-- Repositories hosted outside GitHub.
+- Repositories hosted on other platforms, such as GitLab.
 
 ## Inputs To Inspect
 
@@ -71,6 +75,10 @@ See [primary sources](references/sources.md) for the specifications and document
 
 ## Workflow
 
+For a repository without a remote or work explicitly scoped to stay local
+before any push, use [Local repositories](#local-repositories). For GitHub
+delivery, follow these steps:
+
 1. Sync and baseline:
    - `git fetch --prune origin`
    - `git switch <base-branch>`, then `git pull --ff-only`
@@ -91,8 +99,8 @@ See [primary sources](references/sources.md) for the specifications and document
      names in commits, pull-request titles, or branch names, unless the
      repository requires them. Real human co-authors are allowed.
    - never rewrite published history or move published tags.
-   - land changes through pull requests; push directly to the default branch
-     only when the repository's rules explicitly allow it.
+   - for GitHub delivery, land changes through pull requests; push directly to
+     the default branch only when the repository's rules explicitly allow it.
 2. Branch and scope:
    - use the repository's branch convention. Without one, use `<type>/<slug>`,
      or `<type>/issue-<id>-<slug>` when there is an issue.
@@ -135,8 +143,7 @@ See [primary sources](references/sources.md) for the specifications and document
    - fast-forward the local base branch to the remote head;
    - delete the working branch locally and on the remote.
 8. Release tag, only when the user asks for a release:
-   - run the ecosystem's release readiness check when one exists, such as
-     `swiftpm-github-release` for Swift packages, when installed;
+   - run the ecosystem's release readiness check when one exists;
    - align release-facing metadata first, such as README version tables,
      dependency examples, and manifest version fields like the
      `Package.swift` tools-version;
@@ -145,6 +152,24 @@ See [primary sources](references/sources.md) for the specifications and document
      signing. Only when no procedure is declared, use an annotated tag:
      `git tag -a <version> -m "Release <version>"`, then
      `git push origin <version>`.
+
+## Local repositories
+
+For a repository without a remote, or work explicitly scoped to remain local
+before any push:
+
+- Use a branch per change with the same branch naming, commit principles, and
+  repository checks. Use the local default branch as the baseline when there
+  is no remote.
+- Replace pull requests, review, and hosted CI with the repository's local
+  checks. Failed checks block merging.
+- After checks pass, merge the branch into the default branch using the
+  repository's declared method, otherwise a fast-forward
+  (`git merge --ff-only <branch>`). If that fallback cannot fast-forward, stop
+  and ask the repository owner how to integrate. After successful integration,
+  delete the branch.
+- The branch's working copy location, including any worktree placement, follows
+  repository or workspace isolation rules; this skill does not define them.
 
 ## Decision Rules
 
@@ -167,7 +192,9 @@ See [primary sources](references/sources.md) for the specifications and document
 
 For filing only, report the issue URL, owning repository and duplicates checked.
 
-End with an exit checklist:
+For local work, report the repository, validation results, merge method and
+commit, default branch state, and branch cleanup. Hosted steps are not
+applicable. For GitHub delivery, end with an exit checklist:
 
 ```text
 GitHub Flow: <owner>/<repo>
@@ -185,8 +212,8 @@ GitHub Flow: <owner>/<repo>
 
 ## Failure / Uncertainty Handling
 
-- If the repository is not hosted on GitHub, stop and say this skill does not
-  apply.
+- If the repository is hosted on another platform, stop and say this skill
+  does not apply. A local repository without a remote uses the local path.
 - If a validation command fails, report the command and its first actionable
   failure rather than the full log.
 - If CI fails for reasons unrelated to the change, report them separately
@@ -195,4 +222,5 @@ GitHub Flow: <owner>/<repo>
 ## Validation
 
 Use `references/eval-fixtures.md` to review issue-optional entry, repository
-conventions, and merge gates when changing this workflow.
+conventions, local integration, platform boundaries, and merge gates when
+changing this workflow.
