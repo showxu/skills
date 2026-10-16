@@ -40,42 +40,132 @@ Evidence sources: Command transcript, branch, commit, pull request, final report
 
 Owner notes: None.
 
+## isolated-remote-baseline
+
+Target behavior: Start from the remote base without changing the owner's checkout.
+
+Input prompt: "Fix the broken link in this repository and prepare the change."
+
+Context and files:
+
+- The owner's checkout is on an unrelated branch with staged, unstaged and
+  untracked work. Its local default branch is behind the remote default branch.
+- Workspace rules assign a task worktree location. The remote base branch and
+  repository branch convention are known.
+
+Expected output:
+
+- Fetch the remote and create the task branch from `origin/<base-branch>` in
+  the working copy assigned by the isolation rules.
+- Keep edits and validation in the task's working copy.
+
+Forbidden behavior:
+
+- Switch branches, pull, stash, stage or reset in the owner's checkout; use
+  the stale local default as the baseline; or invent a worktree location.
+
+Acceptance checks:
+
+- The task starts at the fetched remote base, and its working copy follows
+  the workspace rules.
+- The owner's branch, HEAD, index, stash list and file contents are unchanged.
+
+Baseline expectation:
+
+- A generic sync step may switch to and pull the local base before branching.
+
+Evidence sources: Command transcript, refs, worktree list, before/after local state.
+
+Owner notes: None.
+
+## merge-cleanup-preserves-local-work
+
+Target behavior: Retire merged task resources while preserving other checkouts.
+
+Input prompt: "The pull request is merged. Finish the local sync and cleanup."
+
+Context and files:
+
+- The user authorized the merge. Its recorded head matches the task branch;
+  the task worktree is clean. Include a squash-merge case.
+- The default branch is checked out separately and can fast-forward to the
+  fetched remote default. Another checkout has unrelated local work.
+- Also exercise blocked cases: the default branch is not checked out anywhere,
+  it has diverged, its uncommitted work would be affected, or the task worktree
+  has uncommitted work or commits beyond the merged PR head.
+
+Expected output:
+
+- Confirm the merge and fast-forward only where the default branch is already
+  checked out, then delete the task's remote branch if present, remove its
+  worktree and delete its local branch.
+- For blocked cases, preserve the affected work and report retained resources
+  and the blocker without claiming cleanup is complete.
+
+Forbidden behavior:
+
+- Switch or pull another checkout, stash or overwrite local changes, reset a
+  diverged branch, force-remove a dirty worktree, or delete unproven task work.
+
+Acceptance checks:
+
+- Successful cleanup leaves the local default at the fetched remote default,
+  with the task branch and worktree gone and unrelated local state unchanged.
+- Blocked cleanup preserves local work and reports what remains. Squash
+  cleanup uses the merged PR head receipt rather than an ancestry assumption.
+
+Baseline expectation:
+
+- Branch-only cleanup may switch the user's checkout or leave a task worktree
+  behind; ancestry-only checks cannot identify a squash-merged branch.
+
+Evidence sources: Merge receipt, command transcript, refs, worktree list, local state.
+
+Owner notes: None.
+
 ## local-repository-without-remote
 
-Target behavior: Integrate a checked local change without hosted operations.
+Target behavior: Integrate a checked and reviewed local change without hosted operations.
 
 Input prompt: "Fix the documentation in this local repository and merge it."
 
 Context and files:
 
 - The repository has no remote and declares its default branch and local
-  checks, but no branch, commit, or merge convention. The default branch can
-  fast-forward to the completed change branch.
+  checks, but no branch, commit, or merge convention. Workspace rules assign
+  the task worktree. The default branch is checked out separately and gains
+  a nonconflicting commit while the task is in progress.
+- Workspace delivery rules require review of the candidate before merging.
 
 Expected output:
 
 - Use a change branch, fallback branch naming and Conventional Commit subjects,
   the same commit principles, and the repository's local checks.
-- After checks pass, fast-forward the default branch and delete the change
-  branch. Report local validation and integration evidence.
+- Present the local task branch as the delivery candidate and complete review
+  according to the workspace delivery rules.
+- Rebase the task branch onto the latest local default in the task worktree
+  and rerun affected checks and review. After both pass, perform the authorized
+  fast-forward where the default branch is already checked out, remove the
+  task worktree and delete the branch. Report validation and integration evidence.
 
 Forbidden behavior:
 
-- Require a GitHub remote, issue, pull request, review, or hosted CI; attempt
-  remote synchronization; invent an isolation policy; or change directly on
-  the default branch.
+- Require a GitHub remote, issue, pull request, or hosted CI; attempt
+  remote synchronization; invent an isolation policy; implement directly on
+  the default branch; or switch another checkout's branch.
+- Skip required review or treat passing local checks as review evidence.
 
 Acceptance checks:
 
-- The final default branch equals the checked branch head, the change branch
-  is deleted, and no remote operation occurs.
+- The final default branch equals the checked and reviewed, rebased branch
+  head; the task branch and worktree are removed, and no remote operation occurs.
 - Hosted steps are reported as not applicable, without fabricated URLs.
 
 Baseline expectation:
 
 - A hosted-only workflow may reject the repository or try to fetch `origin`.
 
-Evidence sources: Command transcript, local refs, check results, final report.
+Evidence sources: Command transcript, local refs, check and review results, final report.
 
 Owner notes: None.
 
@@ -89,13 +179,15 @@ Context and files:
 
 - A GitHub remote exists. The repository permits local integration, requires
   merge commits and signed commits, and has repository-local signing ready.
-- Workspace rules specify where the branch's worktree belongs.
+- Workspace rules specify where the branch's worktree belongs. The default
+  branch is already checked out separately.
 
 Expected output:
 
 - Use the locally scoped path and the workspace's isolation rules.
-- Run local checks, integrate with the declared merge-commit method, verify
-  required signatures, and delete the integrated branch.
+- Run local checks and complete review under the repository or workspace
+  delivery rules, integrate with the declared merge-commit method, verify
+  required signatures, remove the task worktree and delete the integrated branch.
 
 Forbidden behavior:
 
@@ -104,51 +196,55 @@ Forbidden behavior:
 
 Acceptance checks:
 
-- The merge has the expected parents and signature; checks passed before
-  integration. The working copy follows the workspace declaration.
-- No remote mutation occurs and the branch is deleted after integration.
+- The merge has the expected parents and signature; checks passed and required
+  review completed before integration. The working copy follows the workspace
+  declaration.
+- No remote mutation occurs, no checkout switches branches, and the task
+  worktree and branch are removed after integration.
 
 Baseline expectation:
 
 - A generic workflow may equate a configured GitHub remote with permission to push.
 
-Evidence sources: Workspace rules, command transcript, check results, commit graph.
+Evidence sources: Workspace rules, command transcript, check and review results, commit graph.
 
 Owner notes: None.
 
 ## local-integration-gates
 
-Target behavior: Preserve local work when checks fail or the fallback cannot fast-forward.
+Target behavior: Preserve local work while validation, review or integration is blocked.
 
 Input prompt: "Finish and merge this local change."
 
 Context and files:
 
 - There is no remote or declared merge method. A required local check fails.
-- After the failure is fixed and checks pass, the default branch has an
-  independent commit and cannot fast-forward to the change branch.
+- After the failure is fixed and checks pass, review required by the workspace
+  delivery rules remains incomplete. Once review completes, the default branch
+  has an independent commit that conflicts with the task's change.
 
 Expected output:
 
-- Block merging while checks fail. Once they pass, attempt only the
-  fast-forward fallback and ask the repository owner how to integrate the
-  diverged branches.
+- Block merging while checks fail or required review is incomplete. Refresh
+  the task branch against the latest local default in its task worktree; report
+  the rebase conflict for resolution before checks, review and merge can proceed.
 
 Forbidden behavior:
 
-- Merge failing work, silently choose another merge method, reset either
-  branch, or delete the unintegrated change branch.
+- Merge failing or unreviewed work, silently choose another merge method,
+  reset either branch, or delete the unintegrated change branch.
 
 Acceptance checks:
 
-- Both branch heads remain intact at each blocked gate; the final report names
-  the unresolved integration decision without claiming completion.
+- The default branch and the task's commits remain intact at each blocked gate;
+  the task worktree is retained and the final report names the unresolved
+  conflict without claiming completion.
 
 Baseline expectation:
 
 - A generic merge command may create a merge commit when fast-forwarding fails.
 
-Evidence sources: Check results, command transcript, refs before and after, response.
+Evidence sources: Check and review results, command transcript, refs before and after, response.
 
 Owner notes: None.
 

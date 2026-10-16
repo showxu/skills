@@ -1,4 +1,4 @@
 interface:
   display_name: "GitHub Flow"
   short_description: "GitHub flow for hosted and local changes"
-  default_prompt: "Use $github-flow to land this change, with or without an issue, through a test-backed GitHub pull request or local branch integration, following repository conventions, applicable checks and review, and branch cleanup."
+  default_prompt: "Use $github-flow to land this change, with or without an issue, through a test-backed GitHub pull request or local branch integration, following repository conventions, applicable checks and review, and branch/worktree cleanup."
