@@ -1,9 +1,9 @@
 ---
-name: github-issue-workflow
-description: File a well-formed issue in its owning repository when work is discovered for later, or land any change through a merged, test-backed GitHub pull request, with or without an issue, then clean up and optionally tag a release. Use for fixing or implementing a GitHub issue, opening or merging a pull request, repository commit and signing conventions, branch naming including issue-linked branches, test-first fixes, pull request hygiene, diagnosing failing CI check runs, post-merge branch cleanup, and issue-driven release tags. Do not use for release readiness audits without a change to land, store or package-manager publishing, or repositories hosted outside GitHub.
+name: github-flow
+description: "GitHub flow: file a well-formed issue in its owning repository when work is discovered for later, or land any change through a merged, test-backed GitHub pull request, with or without an issue, then clean up and optionally tag a release. Use for fixing or implementing a GitHub issue, opening or merging a pull request, repository commit and signing conventions, branch naming including issue-linked branches, test-first fixes, pull request hygiene, diagnosing failing CI check runs, post-merge branch cleanup, and issue-driven release tags. Do not use for release readiness audits without a change to land, store or package-manager publishing, or repositories hosted outside GitHub."
 ---
 
-# GitHub Issue Workflow
+# GitHub Flow
 
 ## Purpose
 
@@ -78,14 +78,20 @@ CI, merge, cleanup, and an optional release tag.
    - when no commit or pull-request title convention is declared, use
      Conventional Commits. With squash merging, the pull-request title becomes
      the commit subject on the default branch and must carry that convention.
-   - configure signing only in the repository (`git config --local`), never
-     globally, and verify signatures as the repository requires.
+   - keep one logical change per commit.
+   - use the repository's existing signing configuration. Configure signing
+     only in the repository (`git config --local`), never globally, and verify
+     signatures as the repository requires. If signing is required but not
+     configured, stop and ask the repository owner.
+   - do not add tool or agent attribution trailers, or tool, agent, or vendor
+     names in commits, pull-request titles, or branch names, unless the
+     repository requires them. Real human co-authors are allowed.
+   - never rewrite published history or move published tags.
    - land changes through pull requests; push directly to the default branch
      only when the repository's rules explicitly allow it.
 2. Branch and scope:
    - use the repository's branch convention. Without one, use `<type>/<slug>`,
      or `<type>/issue-<id>-<slug>` when there is an issue.
-   - branch names carry no tool, agent, or vendor names.
    - `<type>` is one of `fix`, `feat`, `docs`, `ci`, `refactor`, `chore`,
      `release`.
    - `<slug>` is lowercase kebab-case, usually 3 to 6 words.
@@ -160,7 +166,7 @@ For filing only, report the issue URL, owning repository and duplicates checked.
 End with an exit checklist:
 
 ```text
-GitHub Issue Workflow: <owner>/<repo>
+GitHub Flow: <owner>/<repo>
 
 - Issue: #<id> / none
 - Local validation: <commands> -> pass / fail

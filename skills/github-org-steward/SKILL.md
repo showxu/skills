@@ -83,7 +83,7 @@ domain artifacts or their implementation procedures:
 | --- | --- |
 | One repository's complete GitHub-side standard, presentation or audit | `github-repo-steward` |
 | Documentation roles, review-rule format and community-file text, including the shared defaults in `.github` | `repository-docs` |
-| Filing, implementing and closing issues; PR flow | `github-issue-workflow` |
+| Filing, implementing and closing issues; PR flow | `github-flow` |
 | Homebrew formulae, tap operations or installation | `homebrew` |
 | Upstream adoption, maintained forks and source conservation | `fork-dog` |
 | Visual identity file shape and templates | `design-md-template` |
@@ -105,7 +105,7 @@ Unresolved organization work is tracked as issues, never as hand-maintained
 lists:
 
 - Work in one repository: an issue in that repository, filed through
-  `github-issue-workflow`.
+  `github-flow`.
 - Organization-wide work (shared standards, shared workflows, settings,
   rulesets, Apps, profile, pins, family identity): an issue in the organization's
   `.github` repository.

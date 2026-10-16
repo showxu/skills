@@ -1,4 +1,0 @@
-interface:
-  display_name: "GitHub Issue Workflow"
-  short_description: "GitHub pull requests with or without an issue"
-  default_prompt: "Use $github-issue-workflow to land this change, with or without an issue, through a test-backed GitHub pull request following repository conventions, green CI, review resolution, and branch cleanup."
