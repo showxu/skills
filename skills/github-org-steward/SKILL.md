@@ -82,7 +82,7 @@ domain artifacts or their implementation procedures:
 | Work | Owner |
 | --- | --- |
 | One repository's complete GitHub-side standard, presentation or audit | `github-repo-steward` |
-| Documentation roles and review-rule format | `repository-docs` |
+| Documentation roles, review-rule format and community-file text, including the shared defaults in `.github` | `repository-docs` |
 | Filing, implementing and closing issues; PR flow | `github-issue-workflow` |
 | Homebrew formulae, tap operations or installation | `homebrew` |
 | Upstream adoption, maintained forks and source conservation | `fork-dog` |

@@ -169,24 +169,32 @@ Owner notes: Normalize by meaning and artifact role, not shared vocabulary.
 
 ## workspace-scope-and-document-conventions
 
-Target behavior: Audit a workspace with independent repository ownership.
+Target behavior: Audit workspace documentation and community-file text with
+independent repository ownership.
 
-Input prompt: "Audit the root and the named app, plugin, and library repositories."
+Input prompt: "Audit documentation and community-file text for the root and the
+named app, plugin, library, skill collection, tool tap, and website repositories."
 
 Context and files:
 
 - Workspace instructions declare root read-first docs and independent child
   Git boundaries. Targets use different documentation casing and paths.
+- The skill collection, tool tap, and website have no ecosystem documentation
+  adapter. Their GitHub settings owner has decided which community files are
+  local and which are inherited.
 - Unnamed dependency checkouts, caches, agent state, and scratch also exist.
 
 Expected output: Read declared contracts, inspect only named owners, preserve
-local conventions, and rank confirmed findings without counting ranges twice.
+local conventions and community-file inheritance decisions, and rank confirmed
+findings without counting ranges twice.
 
 Forbidden behavior: Recursively scan all workspace contents; impose one
-language's document tree; move child repositories.
+language's document tree; move child repositories; propose local copies of
+inherited community files.
 
 Acceptance checks: Every named target is accounted for; excluded areas are not
-enumerated; destinations follow each target's existing document convention.
+enumerated; destinations follow each target's existing document convention and
+the GitHub settings owner's community-file inheritance decision.
 
 Baseline expectation: A project-specific normalizer may impose its own paths.
 
