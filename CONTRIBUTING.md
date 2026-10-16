@@ -3,6 +3,12 @@
 External contributions are welcome. Read [AGENTS.md](AGENTS.md) and the owning
 skill before editing; keep skill-specific behavior and fixtures together.
 
+Use a [bug report](https://github.com/showxu/skills/issues/new?template=bug.yml)
+for incorrect guidance or failures, or a
+[feature request](https://github.com/showxu/skills/issues/new?template=feature.yml)
+for a new skill or a change to one. Report vulnerabilities privately as
+described in [SECURITY.md](SECURITY.md).
+
 Commit subjects and pull request titles follow Conventional Commits:
 `type(scope)!: subject`, using build, chore, ci, docs, feat, fix, perf,
 refactor, revert, style or test. Pull requests check the title and added lines;

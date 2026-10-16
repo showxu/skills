@@ -1,0 +1,31 @@
+name: Feature request
+description: Propose a new skill or a change to an existing skill.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Explain what is difficult or missing today.
+    validations:
+      required: true
+  - type: textarea
+    id: audience
+    attributes:
+      label: Who needs it
+      description: Describe the users and tasks this would help.
+    validations:
+      required: true
+  - type: textarea
+    id: existing_skills
+    attributes:
+      label: Why existing skills do not cover it
+      description: Name the relevant skills and the gap that remains.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Proposed scope
+      description: Describe the intended responsibility and expected outcome.
+    validations:
+      required: true
