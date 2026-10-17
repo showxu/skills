@@ -145,10 +145,13 @@ delivery, follow these steps:
    - after the user authorizes merging, all required checks pass and every
      review thread is resolved, merge using the repository's declared method,
      pinned to the reviewed head SHA (`--match-head-commit` with GitHub CLI).
+     Record the full SHA when the review of that head completes, for example
+     from `gh pr view <number> --json headRefOid`; never expand an
+     abbreviated SHA by hand.
    - if the head changes, check and review the new head before retrying.
    - for a squash merge, use the pull-request title as the subject and follow
      the repository's commit-body rule. For an empty-body rule:
-     `gh pr merge <number> --squash --match-head-commit <sha> --subject '<PR title>' --body ''`.
+     `gh pr merge <number> --squash --match-head-commit <reviewed-sha> --subject '<PR title>' --body ''`.
 7. Merge cleanup:
    - the merger confirms the PR is merged and the task branch still matches
      the merged PR head, including for squash merges;
