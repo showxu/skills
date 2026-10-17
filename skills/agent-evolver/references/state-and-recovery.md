@@ -60,6 +60,30 @@ to recognize duplicate work and notifications. Reuse matching evidence without
 repeating edits or full evals. Compare page content and applicability even
 when publication dates did not change.
 
+## Delivery ledger
+
+When a run can create external items such as pull requests or issues, keep a
+delivery ledger in the configured state directory, separate from source
+freshness and session ledgers.
+
+- Identify each candidate by a stable key built from the target repository,
+  the affected target or claim, and the intended outcome. Keep dates,
+  revisions and source hashes as attributes, not parts of the key, so an
+  unrelated HEAD or page change does not create a new candidate.
+- Record the route, the proposed change, the external item's URL and number,
+  the task branch and working copy, the candidate revision, check and review
+  evidence, the status and the last notification.
+- Before creating an item, check the ledger and the remote's open and closed
+  pull requests and issues. Include the stable key in the item body so the
+  remote can be searched for it.
+- Write the intent to the ledger before creating the item. After creation,
+  read the item back and record its identity. On recovery, reconcile every
+  intent without an identity against the remote before creating anything; if
+  the result stays ambiguous, keep the candidate pending for review.
+- Keep the disposition and reason for rejected, closed and merged items. Raise
+  a rejected or closed candidate again only with new evidence or a new
+  decision.
+
 ## Mutation and recovery
 
 Before writing, capture the exact current file and hash, relevant Git state,

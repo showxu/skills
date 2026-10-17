@@ -118,6 +118,33 @@ unscoped discovery, costly scans, and live mutations need their own authorizatio
   changes to the user's authority or production rules need their own owners
   and authorization.
 
+## External Delivery
+
+Use this section only when the caller authorizes delivery beyond local edits,
+such as pushing task branches, opening pull requests or filing issues. The
+caller's profile names the authorized repositories and actions; this skill
+does not grant them.
+
+Route each candidate before any write:
+
+| Route | Condition | Delivery |
+| --- | --- | --- |
+| Repair | Within the profile's allowed actions, with a clear owner and current evidence, and without changing responsibilities, principles, permissions, acceptance criteria or executable behavior. Typical repairs correct facts, versions, source links, paths, navigation and metadata typos. | Edit in the target repository's own task working copy, as its isolation rules assign. Run its checks and obtain review from an agent that did not author the change. Push only the task branch and open a pull request. Never merge, push a default branch or force-push. |
+| Decision | A profile owner decision, a change to helper, script or example behavior, or any candidate that cannot be shown to be a repair. | File one issue in the owning repository with the evidence, the proposed change and the decision needed. Do not edit the target. For a repository without a remote, list the candidate in the run's pending decisions instead. |
+| No change | Already covered, evidence unavailable or impact unclear. | Record no-change, watch or a retry condition. |
+
+Treat a candidate whose route is uncertain as a decision.
+
+Record every external item in the [delivery ledger](references/state-and-recovery.md#delivery-ledger)
+before and after creating it. Read a target's canonical checkout without
+changing it, and leave unrelated changes untouched. Paths the profile locks are
+report-only: list proposed changes as pending decisions, without branches, pull
+requests or edits.
+
+End the run with one batch listing new pull requests, issues, local candidates,
+review and check results, and pending decisions. Report an unchanged pending
+item again only when its state changes.
+
 ## Scheduled Use
 
 The scheduler supplies this skill, topics, a profile or explicit targets, and
