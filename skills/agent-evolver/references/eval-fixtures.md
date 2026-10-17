@@ -188,8 +188,8 @@ the inventory helper; these fixtures do not require access to real user chats.
   under the profile's authorized actions.
 - Context: The candidate is described as a metadata correction, but its diff
   changes a helper script's behavior. A second variant changes a permission
-  statement. The owning repository has a remote, issue filing is authorized,
-  and no matching external item exists.
+  statement. The profile authorizes delivery to the owning repository, which
+  has a remote; issue filing is authorized, and no matching external item exists.
 - Expected artifact: A decision-route issue containing evidence, the proposed
   change and the owner decision needed; target files remain unchanged.
 - Must preserve: Executable behavior and permission boundaries until an owner
@@ -226,7 +226,7 @@ the inventory helper; these fixtures do not require access to real user chats.
 - Context: One repair fails its repository checks; the other repository's
   repair cannot obtain independent review. A separate candidate touches a
   profile-locked path. The caller authorizes task-branch pushes, pull requests
-  and issues within the profile's scope.
+  and issues within the profile's scope; both repositories have remotes.
 - Expected artifact: Pending records with actual check failure and missing
   review evidence, a pending decision for the locked path, and one summary batch.
 - Must preserve: Check and independent-review gates, locked-path contents,

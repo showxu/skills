@@ -131,9 +131,15 @@ Route each candidate before any write:
 | --- | --- | --- |
 | Repair | Within the profile's allowed actions, with a clear owner and current evidence, and without changing responsibilities, principles, permissions, acceptance criteria or executable behavior. Typical repairs correct facts, versions, source links, paths, navigation and metadata typos. | Edit in the target repository's own task working copy, as its isolation rules assign. Run its checks and obtain review from an agent that did not author the change. Push only the task branch and open a pull request. Never merge, push a default branch or force-push. |
 | Decision | A profile owner decision, a change to helper, script or example behavior, or any candidate that cannot be shown to be a repair. | File one issue in the owning repository with the evidence, the proposed change and the decision needed. Do not edit the target. For a repository without a remote, list the candidate in the run's pending decisions instead. |
-| No change | Already covered, evidence unavailable or impact unclear. | Record no-change, watch or a retry condition. |
+| No change | No concrete change is proposed yet: the claim is already covered, evidence is unavailable, or the effect cannot yet be established. | Record no-change, watch or a retry condition. |
 
-Treat a candidate whose route is uncertain as a decision.
+Route in two steps. Without a concrete proposed change, record no change with a
+watch or retry condition. Once a concrete change is proposed, it is a repair
+only when every repair condition is shown; otherwise it is a decision.
+
+Deliver only to repositories the profile authorizes for delivery and that have
+a remote. For any other repository, including one found during discovery, list
+both repair and decision candidates in the run's pending decisions.
 
 Record every external item in the [delivery ledger](references/state-and-recovery.md#delivery-ledger)
 before and after creating it. Read a target's canonical checkout without
