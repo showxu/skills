@@ -1,6 +1,6 @@
 ---
 name: github-flow
-description: "GitHub flow: file a well-formed issue in its owning repository when work is discovered for later, or land any change through a merged, test-backed GitHub pull request, with or without an issue, then clean up and optionally tag a release. Also apply the flow to local repositories without a remote or explicitly local work before any push. Use for fixing or implementing a GitHub issue, opening or merging a pull request, repository commit and signing conventions, branch naming including issue-linked branches, test-first fixes, pull request hygiene, diagnosing failing CI check runs, post-merge branch cleanup, and issue-driven release tags. Do not use for release readiness audits without a change to land, store or package-manager publishing, or repositories hosted on other platforms such as GitLab."
+description: "GitHub flow: file a well-formed issue in its owning repository when work is discovered for later, or land any change through a merged, test-backed GitHub pull request, with or without an issue, then clean up and optionally tag a release. Also apply the flow to local repositories without a remote or explicitly local work before any push. Use for fixing or implementing a GitHub issue, opening or merging a pull request, repository commit and signing conventions, branch naming including issue-linked branches, test-first fixes, pull request hygiene, diagnosing failing CI check runs, post-merge branch and worktree cleanup, and issue-driven release tags. Do not use for release readiness audits without a change to land, store or package-manager publishing, or repositories hosted on other platforms such as GitLab."
 ---
 
 # GitHub Flow
@@ -28,7 +28,7 @@ See [primary sources](references/sources.md) for the specifications and document
   issue, including opening or merging a pull request.
 - A pull request has failing CI checks that need diagnosis and a root-cause
   fix.
-- A merged pull request needs local sync and branch cleanup.
+- A merged pull request needs local sync and branch/worktree cleanup.
 - The user wants an issue fix released as a new tag.
 - A repository has no remote, or work is explicitly scoped to stay local
   before any push.
@@ -45,7 +45,8 @@ See [primary sources](references/sources.md) for the specifications and document
 
 - Change request, issue text when present, related pull requests, and the base
   branch.
-- Git status, branch, and remotes.
+- Git status, branch, remotes, worktrees, and repository or workspace isolation
+  rules.
 - The build manifest, such as `Package.swift`, and the tests around the
   affected code.
 - Repo-local CI workflows, Makefile tasks, and contribution docs for the
@@ -75,13 +76,22 @@ See [primary sources](references/sources.md) for the specifications and document
 
 ## Workflow
 
+The task's working copy location, including any worktree placement, follows
+repository or workspace isolation rules; this skill does not define them.
+Edit, build and test only in the task's working copy. Do not switch branches,
+pull, stash, stage or reset in another checkout. Outside the task's working
+copy, limit writes to the authorized default-branch update and task cleanup
+described below, preserving unrelated work.
+
 For a repository without a remote or work explicitly scoped to stay local
 before any push, use [Local repositories](#local-repositories). For GitHub
 delivery, follow these steps:
 
 1. Sync and baseline:
    - `git fetch --prune origin`
-   - `git switch <base-branch>`, then `git pull --ff-only`
+   - create the task branch from `origin/<base-branch>` in the working copy
+     assigned by the isolation rules, using the branch convention below. For
+     an existing task working copy, verify its branch and baseline before edits.
    - collect the change request, issue text when present, PR state, changed
      files, and current CI checks.
    - before the first commit, read `CONTRIBUTING`, `MAINTENANCE`, or equivalent
@@ -132,17 +142,26 @@ delivery, follow these steps:
    - when the user prefers an infrastructure fix over a code fallback, update
      the CI runner or toolchain explicitly and state the rationale in the PR.
 6. Merge:
-   - after all required checks pass and every review thread is resolved, merge
-     using the repository's declared method, pinned to the reviewed head SHA
-     (`--match-head-commit` with GitHub CLI).
+   - after the user authorizes merging, all required checks pass and every
+     review thread is resolved, merge using the repository's declared method,
+     pinned to the reviewed head SHA (`--match-head-commit` with GitHub CLI).
    - if the head changes, check and review the new head before retrying.
    - for a squash merge, use the pull-request title as the subject and follow
      the repository's commit-body rule. For an empty-body rule:
      `gh pr merge <number> --squash --match-head-commit <sha> --subject '<PR title>' --body ''`.
 7. Merge cleanup:
-   - confirm the PR is merged;
-   - fast-forward the local base branch to the remote head;
-   - delete the working branch locally and on the remote.
+   - the merger confirms the PR is merged and the task branch still matches
+     the merged PR head, including for squash merges;
+   - fetch the remote and fast-forward the local default branch to
+     `origin/<default-branch>` only in the checkout where that branch is already
+     checked out, using `git merge --ff-only origin/<default-branch>`;
+   - if that checkout is unavailable, the branch has diverged, or the update
+     would affect uncommitted changes, stop and report. Do not stash or
+     overwrite those changes;
+   - delete the task's remote branch if it still exists. If a task worktree was
+     used, leave it and remove it without force. Then delete the local task
+     branch. Preserve uncommitted or unmerged task work and report any retained
+     resources.
 8. Release tag, only when the user asks for a release:
    - run the ecosystem's release readiness check when one exists;
    - align release-facing metadata first, such as README version tables,
@@ -162,15 +181,25 @@ before any push:
 - Use a branch per change with the same branch naming, commit principles, and
   repository checks. Use the local default branch as the baseline when there
   is no remote.
-- Replace pull requests, review, and hosted CI with the repository's local
-  checks. Failed checks block merging.
-- After checks pass, merge the branch into the default branch using the
-  repository's declared method, otherwise a fast-forward
-  (`git merge --ff-only <branch>`). If that fallback cannot fast-forward, stop
-  and ask the repository owner how to integrate. After successful integration,
-  delete the branch.
-- The branch's working copy location, including any worktree placement, follows
-  repository or workspace isolation rules; this skill does not define them.
+- Use the local task branch as the delivery candidate in place of a pull
+  request, and the repository's local checks in place of hosted CI. Complete
+  review according to repository or workspace delivery rules. Failed checks
+  or incomplete required review block merging.
+- Follow the repository's declared integration method. For the fast-forward
+  fallback, rebase the task branch onto the latest local default branch in the
+  task's working copy, then rerun affected checks and review. Preserve published
+  history; if rebase is unsafe or conflicts, stop and report the blocker.
+- After checks pass, required review is complete and the user authorizes
+  merging, integrate only in the checkout where the default branch is already
+  checked out, using the declared method or `git merge --ff-only <branch>`.
+  If that checkout is unavailable or the update would affect uncommitted
+  changes, stop and report without stashing or overwriting them. If the default
+  branch advances, refresh the baseline and affected checks and review before
+  retrying; do not substitute another merge method.
+- After successful integration, the merger leaves and removes the task
+  worktree, if used, without force, then deletes the local task branch. Preserve
+  unrelated work and report retained resources. Remote cleanup does not apply
+  to work scoped to remain local.
 
 ## Decision Rules
 
@@ -193,9 +222,9 @@ before any push:
 
 For filing only, report the issue URL, owning repository and duplicates checked.
 
-For local work, report the repository, validation results, merge method and
-commit, default branch state, and branch cleanup. Hosted steps are not
-applicable. For GitHub delivery, end with an exit checklist:
+For local work, report the repository, validation and review results, merge
+method and commit, default branch state, and branch/worktree cleanup. Hosted
+steps are not applicable. For GitHub delivery, end with an exit checklist:
 
 ```text
 GitHub Flow: <owner>/<repo>
@@ -205,8 +234,9 @@ GitHub Flow: <owner>/<repo>
 - PR: <url>, title and body complete
 - Required checks: green / pending / failed
 - Review threads: resolved / <unresolved count>
-- Base branch: synced to <sha>
-- Working branch: deleted locally and remotely
+- Default branch: synced to <sha> / retained with <reason>
+- Working branch: deleted locally and remotely / retained with <reason>
+- Task worktree: removed / not used / retained with <reason>
 - Tag: <version> pushed / not requested
 - Protection bypasses: none / <events>
 ```
@@ -223,5 +253,5 @@ GitHub Flow: <owner>/<repo>
 ## Validation
 
 Use `references/eval-fixtures.md` to review issue-optional entry, repository
-conventions, local integration, platform boundaries, and merge gates when
-changing this workflow.
+conventions, isolated baselines, local integration, cleanup preservation,
+platform boundaries, and merge gates when changing this workflow.
