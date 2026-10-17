@@ -85,15 +85,22 @@ group. The collection's own taxonomy or authoring docs own that choice.
 
 1. Parse every manifest as JSON.
 2. Run `claude plugin validate <repo>` for the Claude marketplace.
-3. Record checksums of the real host configuration files.
-4. Install into throwaway host homes: point `CLAUDE_CONFIG_DIR` and
-   `CODEX_HOME` at temporary directories, add the marketplace from the
-   repository path, and install each plugin.
+3. Record checksums of the real host configuration files you will compare,
+   naming each file.
+4. Create two empty temporary directories and use them as throwaway host
+   homes: point `CLAUDE_CONFIG_DIR` and `CODEX_HOME` at them, add the
+   marketplace from the repository path, and install each plugin. Both
+   directories must exist before the first host command.
 5. Check the installed version with `claude plugin list --json` and the skill
    inventory with `claude plugin details <plugin>@<marketplace>`: every
    expected skill is listed once.
-6. Delete the temporary homes and confirm the real configuration checksums are
-   unchanged.
+6. Delete the temporary homes and compare the real configuration checksums.
+   When one differs, record the file, the changed fields, and whether the
+   check can be shown to have caused the change; a running host app may
+   also write these files. Report the difference instead of claiming the
+   configuration was untouched.
 
-These are observed host behaviors, not host contracts. Re-run the isolated
+These are observed host behaviors, not host contracts. Pointing the
+variables at temporary homes is not shown to stop every host process from
+writing the real configuration; step 6 is the check. Re-run the isolated
 check when a host CLI changes, and mark anything not exercised as untested.
