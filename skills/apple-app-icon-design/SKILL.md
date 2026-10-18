@@ -35,16 +35,26 @@ or geometry. For a new entry, start from `examples/DESIGN.example.md`.
 2. Propose two or three concepts. Each names one central idea, a silhouette,
    a palette, and a layer plan: which shapes form the background color and
    each foreground group, back to front.
-3. Draft each concept as flat vector layers on a 1024 px canvas, or adopt the
+3. Draft each concept as vector layers on a 1024 px canvas, or adopt the
    owner's layers. Use filled shapes with clear edges, no text unless the
-   brand requires it, and no painted highlights, shadows, or masks.
+   brand requires it, and no painted highlights, shadows, or masks. Give SVG
+   artwork the colors needed by the earlier styles. For Liquid Glass, use
+   native layer `automatic-gradient` fills for modeled color, `solid` for
+   uniform color, and group glass and blend controls for overlapping material.
+   The [Apple icon study](references/rendering.md#apple-icon-material-study)
+   records why gradients, translucency, and compositing matter; tune them
+   together and inspect every appearance. Use native appearance overrides for
+   fills, layer/group opacity, and group materials when an appearance needs
+   different contrast. Default, Dark, and the shared Clear/Tinted family can
+   be tuned separately without changing the source artwork.
 4. Add each concept as an entry, run `--lint`, and render the candidates
    with `--sheet`. Ask the owner to choose; iterate on the entry and layers,
    never on generated files.
 5. Choose styles from the delivery target. Apple apps ship Liquid Glass with
    an explicit `design_generation`; other projects may use any style. Record
    them under `styles`, with style artwork overrides only where a style needs
-   different art.
+   different art. Set entry `web_dark: true` when a web target also needs
+   masked dark icons from the native iOS Dark export; it is off by default.
 6. Generate each style into the producer's ignored output directory with
    `scripts/app_icons.py DESIGN.md --name NAME --style STYLE --out OUTPUT`.
    Inspect the contact sheet on light and dark backgrounds at 160 px and
@@ -87,7 +97,8 @@ releases.
 - Each style's web set contains `favicon.svg`, 16 and 32 px favicons, 192 and
   512 px icons, a 1024 px avatar, a full-bleed 180 px apple-touch-icon, and a
   full-bleed 512 px maskable image whose essential content stays inside the
-  central safe circle.
+  central safe circle. With `web_dark`, Liquid Glass also includes five
+  masked PNGs under `web/dark/`; verify them against native iOS Dark.
 - `--check` reports `same` for every file of every delivered style and
   detects missing and extra files.
 - The manifest labels each output `native` or `style-rendering`.

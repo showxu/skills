@@ -16,9 +16,120 @@ publishing the candidate. Inspect the circular composition at small size. The sa
 appearance labels may produce identical exports on a platform; preserve
 the native result and do not invent differences.
 
-Apple's design workflow uses flat foreground layers, with the background and
-materials applied by Icon Composer. Do not pre-mask layers or paint native
-specular effects into them. See [Apple's workflow](https://developer.apple.com/videos/play/wwdc2025/361/).
+Apple's design workflow separates foreground artwork from the background and
+native materials. Layer fills can be solid or automatic gradients; group
+blending and glass controls shape their overlap. Do not pre-mask layers or
+paint native specular effects into them. See [Apple's workflow](https://developer.apple.com/videos/play/wwdc2025/361/).
+
+## Apple Icon Material Study
+
+A read-only `xcrun assetutil --info` inspection of the built-in Photos, Games,
+App Store, Maps, and Preview `Assets.car` files on macOS 27.0.1 (26A434)
+found the following compiled material metadata. These are observations of
+Apple's icons, not a specification for the editable `.icon` JSON format.
+No artwork, catalog, or extracted image is redistributed.
+
+| Icon | Material evidence |
+| --- | --- |
+| Photos | `LayerGradientColorName`, opacity 0.5/0.95, Multiply/PlusL/Hard Light, refraction strength 0.10/0.23, translucency 0.05–0.40 |
+| Games | Gradient colors, opacity down to 0.31, Multiply/PlusL, blur 0.48–0.50, refraction about 0.71, translucency 0.20–0.30 |
+| App Store | Gradient colors, Multiply/Screen/PlusL/Hard Light, varying opacity and shadows |
+| Maps | Gradient colors, Multiply, varying opacity, refraction about 0.56 |
+| Preview | Gradient colors, PlusL/Soft Light, opacity 0.4/0.8, refraction about 0.24, translucency 0.20 |
+
+All five contain specular-enabled elements with per-element gathering.
+The editable document's `layer-color` shadow is chromatic; `neutral` is neutral.
+Compiled shadow style numbers alone do not establish editable enum names.
+Native probes below establish the names this generator accepts. Per-element
+specular gathering is renderer behavior, not a separate entry control.
+
+Use these observations to choose materials for original art: gradients model
+color across a surface, overlapping glass transmits the layers behind it, and
+blend modes control how their colors combine. The observed strengths are
+examples, not prescribed defaults. [Apple's Icon Composer guide](https://developer.apple.com/icon-composer/)
+describes the corresponding material and appearance controls.
+
+## Native Material Schema
+
+Verified with the export-capable Icon Composer 27.0 (129) renderer using an
+original rounded colored panel over a contrasting background, exported as
+iOS PNGs at 128 px. Comparisons decode pixels and require differences larger
+than the skill's existing drift tolerance of 1/255 per channel.
+
+- Group `blend-mode` accepts `normal`, `plus-lighter`, `plus-darker`, `overlay`,
+  `multiply`, `soft-light`, `hard-light`, `darken`, `lighten`, and `screen`.
+  Every non-normal mode changes the export. `normal` equals the omitted default.
+- Group `specular: false` changes the export; `true` equals the omitted default.
+  Group `opacity` changes the export.
+- Shadow kinds `neutral`, `layer-color`, and `none` render successfully and
+  change the shadow at controlled opacity. DESIGN.md also accepts `chromatic`
+  for the chromatic shadow; both it and `layer-color` serialize to native
+  `layer-color`. Scalar and appearance-specific values use the same conversion.
+- Layer `solid` and `automatic-gradient` fills, fill alpha, and layer opacity
+  change the export. The same color rendered as solid and automatic gradient
+  produces different pixels.
+- Layer blend mode and group `lighting` did not change exports in the supplied
+  preliminary probes; these are not supported entry fields. The compiled icon
+  catalog's `LayerBlendMode` does not establish a layer-level editable control.
+
+Native scalar properties and their `-specializations` arrays are alternative
+encodings. When both are present, the scalar wins and the override array is
+ignored. This applies to layer fill and opacity, and to group opacity,
+blend mode, specular, shadow, translucency, blur material, and refractivity.
+For an inherited green solid fill with a red Dark override and full opacity
+only in Dark, emit:
+
+```json
+{
+  "fill-specializations": [
+    {"value": {"solid": "srgb:0.00000,1.00000,0.00000,1.00000"}},
+    {"appearance": "dark", "value": {"solid": "srgb:1.00000,0.00000,0.00000,1.00000"}}
+  ],
+  "opacity-specializations": [
+    {"value": 0.6},
+    {"appearance": "dark", "value": 1}
+  ]
+}
+```
+
+The unqualified item carries the inherited value (native `base`). The explicit
+native appearance keys are `light`, `dark`, and `tinted`; DESIGN.md uses
+`default`, `dark`, and `tinted`. Unmatched appearances retain the inherited
+value, or the native default if no base was supplied. Layer fill and both
+opacity owners were also rendered with no explicit base. Unknown fields are
+errors in the entry contract, even when the native decoder might ignore them.
+
+Probes compare all six iOS renditions for each property and each specialization
+separately. A striped backdrop makes blur and refraction measurable. Results:
+
+| Material | Generation 26 | Generation 27 |
+| --- | --- | --- |
+| Layer fill, layer/group opacity | Only the selected appearance family changes | Only the selected appearance family changes |
+| Group blend mode, specular, shadow, translucency, blur material | Only the selected appearance family changes | Only the selected appearance family changes |
+| Group refractivity | Both scalar and specialized values have no visible effect | Only the selected appearance family changes |
+
+For each effective material, `light` changes only Default, `dark` only Dark,
+and `tinted` all four Clear/Tinted renditions. Clear is not a separate
+specialization family. Changes must exceed 1/255 per channel; unmatched
+renditions must stay within the existing drift tolerance. These assertions
+run in `NativeMaterialTests` when the export-capable renderer is available.
+
+Only the native document carries materials. `flat`, `mac-tile`, and `gloss`,
+their web icons, contact/comparison sheets, and drift checks use the original
+SVG/PNG artwork. Liquid Glass masked web PNGs and its sheet cells use native
+exports; its SVG favicon and full-bleed web sources keep their existing
+artwork-only composition. Lint also measures artwork, never approximated glass.
+
+### Optional dark web exports
+
+Entry `web_dark: true` adds `web/dark/favicon-16.png`,
+`web/dark/favicon-32.png`, `web/dark/icon-192.png`, `web/dark/icon-512.png`,
+and `web/dark/avatar-1024.png` for Liquid Glass. Each is a resize of the native
+iOS Dark PNG with its mask intact. The default web set is preserved; select
+the dark files in the consuming site's theme or metadata. No dark SVG or
+full-bleed touch/maskable approximation is generated from the masked export.
+Omitting the option or setting it to false preserves the existing file set
+and bytes. Other styles and document-only runs do not export the dark set.
 
 ## Liquid Glass Outline
 
@@ -105,7 +216,8 @@ measurement requires accepting the license agreement in each disk image.
 
 ## Web Icons
 
-Every style writes the same web set:
+Every style writes the same default web set. Liquid Glass can also opt into
+the [dark web exports](#optional-dark-web-exports).
 
 - **Masked images** come from the style's own rendering: `favicon-16.png`,
   `favicon-32.png`, `icon-192.png`, and `icon-512.png` for a web manifest's
@@ -134,6 +246,11 @@ reports:
   covering at least 1% of the smaller group's area;
 - more than three groups.
 
+When any layer in a group has a fill or appearance fill override, lint prints
+an `info` line explaining that the Liquid Glass appearance comes from the
+fill, and that the group's lightness findings concern artwork used by other
+styles. Informational lines do not cause failure or suppress artwork findings.
+
 The thresholds are this skill's heuristics for the guidance in
 [design](design.md); a finding is fixed or recorded as an owner decision.
 
@@ -152,3 +269,13 @@ appearance. A tool upgrade can legitimately change native or style
 rendering; review the new sheet before replacing published assets. Never
 mark a renderer failure, missing image, or unavailable native preview as
 verified.
+
+For a producer regression against a pre-change script, set
+`APP_ICONS_BASELINE=/path/to/app_icons.py` when running `scripts/test_app_icons.py`.
+The test generates every declared style of every `examples/DESIGN*.md` entry
+with both versions. Legacy output must match byte-for-byte. Live native output
+must match within the existing PNG tolerance. A second native build replays
+actual baseline exports after checking identical document/assets and renderer
+arguments, and requires all producer outputs to be byte-identical. This
+separates producer regressions from GPU rounding; it does not claim that
+independent native invocations always produce identical bytes.

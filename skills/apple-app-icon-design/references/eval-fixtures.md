@@ -171,3 +171,158 @@ invocation, not automatic trigger quality.
   the tile.
 - Acceptance: The mac-tile sheet shows the breakout; lint does not report
   the unclipped group as outside the shape.
+
+
+## native-material-isolation
+
+Target behavior: native material controls preserve the artwork used by other styles.
+
+Input prompt: "Give our glass layers gradient fills, a chromatic shadow and additive
+blending, while preserving our flat, mac-tile and gloss icons."
+
+Context and files:
+
+- Original layered SVG artwork and a DESIGN.md entry declaring all four styles.
+- A candidate with group blending, specular, group/layer opacity, shadow kinds,
+  and solid/automatic-gradient fills; include both chromatic shadow spellings.
+- Baseline outputs from the same artwork and the pre-material script; an unchanged
+  `chromatic` entry is a compatibility control.
+
+Expected output:
+
+- Native JSON carries the materials and uses `layer-color` for chromatic shadows.
+- Native exports respond to material changes. Other styles retain their artwork.
+- Lint measures SVG colors and emits informational fill notices.
+
+Forbidden behavior:
+
+- Recoloring or fading another style's artwork, rejecting an existing `chromatic`
+  entry, treating an informational line as failure, or claiming an ignored native
+  property works.
+
+Acceptance checks:
+
+- Compare full legacy output trees and comparison sheets byte-for-byte against
+  their controls; run `--check` and require `same` for every committed file.
+- Assert that both chromatic spellings produce equal native documents and native
+  pixels within the existing 1/255 tolerance, without mutating the entry.
+- Require native material changes larger than 1/255 and unchanged SVG asset bytes.
+- Assert that fill notices do not change lint status and artwork findings remain.
+
+Baseline expectation:
+
+- An old skill rejects the new controls or passes `chromatic` through to native
+  JSON. Its successful legacy `chromatic` outputs must still match the candidate.
+- A no-skill implementation may bake materials into artwork and alter other styles.
+
+Evidence sources:
+
+- Generated `.icon` JSON/assets, native PNG comparisons, legacy file hashes, sheet
+  bytes, lint and `--check` output, and `scripts/test_app_icons.py` results with
+  `APP_ICONS_BASELINE` pointing to the pre-material script.
+
+Owner notes:
+
+- Material ownership and native names are defined in [format](format.md) and
+  [rendering](rendering.md#native-material-schema).
+
+## appearance-material-specialization
+
+Target behavior: material overrides affect only the selected native appearance family.
+
+Input prompt: "Keep the normal green layer, make it red only in Dark, and use a
+separate monochrome treatment for Clear and Tinted. Adjust their opacity as needed."
+
+Context and files:
+
+- Original layered artwork and an entry with layer fill, layer/group opacity,
+  and group material controls.
+- Base-only controls and candidates with each default, dark, and tinted override;
+  cover absent base values and malformed overrides separately.
+- Export-capable Icon Composer with design generations 26 and 27.
+
+Expected output:
+
+- Each overridden property uses one native specialization array containing the
+  inherited value and explicit appearance entries, with no competing scalar.
+- Default retains its base unless explicitly overridden; Dark and Clear/Tinted
+  use their respective overrides. Opacity and group materials follow the same rule.
+
+Forbidden behavior:
+
+- Emitting a scalar beside its native array, leaking Dark into Default, accepting
+  partial structured overrides, or treating Clear as a separate specialization key.
+
+Acceptance checks:
+
+- Compare all six iOS renditions for every property and appearance override.
+  Require target changes greater than 1/255 and unmatched deltas at most 1/255.
+- Verify fill and group/layer opacity fallback with no explicit base value.
+- Verify generation-27 refraction changes pixels; generation 26 preserves its
+  native no-effect behavior for both scalar and specialized refraction values.
+- Assert malformed maps, partial materials, and invalid colors are rejected;
+  invalid opacity overrides identify the correct group or layer owner.
+
+Baseline expectation:
+
+- An old skill rejects appearance fields. A no-skill implementation may leave the
+  scalar in place, silently suppressing the overrides, or use guessed Clear keys.
+
+Evidence sources:
+
+- Serialized documents, base/candidate PNGs and decoded channel deltas for every
+  rendition, validation diagnostics, and native appearance tests in
+  `scripts/test_app_icons.py`.
+
+Owner notes:
+
+- The native appearance mapping and generation limits are recorded in
+  [rendering](rendering.md#native-material-schema).
+
+## optional-native-dark-web-set
+
+Target behavior: an explicit opt-in exports dark web PNGs from native iOS Dark.
+
+Input prompt: "Provide dark favicons and manifest icons for our Liquid Glass icon."
+
+Context and files:
+
+- Original layered artwork with visibly distinct Default and Dark fills.
+- Entries with `web_dark` omitted, false, and true; include legacy styles.
+- Native iOS Dark export and pre-material producer outputs as comparison controls.
+
+Expected output:
+
+- Five masked PNG sizes under `web/dark/`, resized from native iOS Dark and listed
+  in the manifest. Existing default web files retain their bytes.
+- Other styles, source artwork, and full-bleed files are preserved.
+
+Forbidden behavior:
+
+- Synthesizing dark colors from artwork, changing the default set, or producing
+  dark files when the option is omitted or false.
+
+Acceptance checks:
+
+- Check the five documented filenames and dimensions and compare each file's
+  bytes with a direct resize of native iOS Dark; require manifest membership.
+- Compare omitted/false output byte-for-byte against the baseline using identical
+  native exports. Require no dark directory and unchanged legacy style outputs.
+- Compare opt-in output with the default set: only the five dark files and the
+  manifest's file list may differ.
+
+Baseline expectation:
+
+- An old skill rejects the opt-in field and cannot produce the dark web set.
+- A no-skill implementation may derive dark colors from artwork or replace default
+  files instead of adding the explicitly requested native appearance.
+
+Evidence sources:
+
+- Native Dark and resized PNGs, file lists, dimensions, manifest contents, baseline
+  file comparisons, and the dark-web and baseline tests in `scripts/test_app_icons.py`.
+
+Owner notes:
+
+- Output filenames and source ownership are defined in
+  [rendering](rendering.md#optional-dark-web-exports).

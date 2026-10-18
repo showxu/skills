@@ -1,6 +1,10 @@
-"""Run document, style, lint and failure-path regressions without a native renderer."""
+"""Run contract, isolation, drift and optional native-rendering regressions."""
 
 import base64
+import copy
+import importlib.util
+import io
+from contextlib import redirect_stdout
 import hashlib
 import json
 import os
@@ -95,6 +99,16 @@ class DocumentTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("missing or unsupported layer", result.stderr)
         self.assertFalse(self.out.exists())
+
+    def test_check_stages_outside_the_target_repository(self):
+        self.generate()
+        temporary_directory = tempfile.TemporaryDirectory
+        with patch.object(app_icons.tempfile, 'TemporaryDirectory', wraps=temporary_directory) as temporary:
+            with patch.object(sys, 'argv', [str(SCRIPT), str(self.design), '--name', 'example',
+                                           '--document-only', '--check', str(self.out)]):
+                with redirect_stdout(io.StringIO()):
+                    self.assertEqual(app_icons.main(), 0)
+            self.assertIsNone(temporary.call_args.kwargs['dir'])
 
     def test_material_range_is_validated(self):
         self.spec["groups"][0]["shadow"] = {"kind": "neutral", "opacity": 2}
@@ -383,6 +397,545 @@ class StyleRenderingTests(unittest.TestCase):
         for style in ("flat", "mac-tile", "gloss"):
             self.assertIn(f">{style}<", text)
         self.assertEqual(self.invoke("--sheet", sheet).returncode, 1)
+
+class MaterialTests(unittest.TestCase):
+    setUp = DocumentTests.setUp
+    write_design = DocumentTests.write_design
+    invoke = DocumentTests.invoke
+    generate = DocumentTests.generate
+
+    def prepared(self, group=None, layer=None):
+        spec = copy.deepcopy(self.spec)
+        if group is not None:
+            spec['groups'][0].update(group)
+        if layer is not None:
+            spec['groups'][0]['layers'][0].update(layer)
+        return app_icons.prepare(spec, self.root, 'liquid-glass')[0]['groups'][0]
+
+    def test_group_material_values(self):
+        for key, values in {
+            'blend-mode': ('normal', 'plus-lighter', 'plus-darker', 'overlay', 'multiply',
+                           'soft-light', 'hard-light', 'darken', 'lighten', 'screen'),
+            'specular': (True, False), 'opacity': (0, 0.25, 1),
+            'shadow': tuple({'kind': kind, 'opacity': 0.5} for kind in ('neutral', 'layer-color', 'none')),
+        }.items():
+            for value in values:
+                with self.subTest(key=key, value=value):
+                    self.assertEqual(self.prepared(group={key: value})[key], value)
+        for key, values in {
+            'blend-mode': ('Multiply', 'color', '', None, [], 1, True),
+            'specular': (0, 1, 'false', None, [], {}),
+            'opacity': (-0.1, 1.01, True, '0.5', None, [], float('nan'), float('inf')),
+            'shadow': ({'kind': 'unknown', 'opacity': 0.5}, {'kind': 'NONE', 'opacity': 0},
+                       {'kind': [], 'opacity': 0}, {'kind': 'none'},
+                       {'kind': 'neutral', 'opacity': True},
+                       {'kind': 'none', 'opacity': 0, 'extra': 1}),
+            'lighting': (True,), 'unknown': (0,),
+        }.items():
+            for value in values:
+                with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                    self.prepared(group={key: value})
+
+    def test_chromatic_shadow_normalizes_without_mutating_input(self):
+        for specialized in (False, True):
+            for kind in ('chromatic', 'layer-color'):
+                with self.subTest(specialized=specialized, kind=kind):
+                    group = self.spec['groups'][0]
+                    group['shadow'] = {'kind': kind, 'opacity': 0.5}
+                    if specialized:
+                        group['shadow-specializations'] = {
+                            appearance: {'kind': kind, 'opacity': 0.3} for appearance in app_icons.APPEARANCES}
+                    before = copy.deepcopy(self.spec)
+                    native = app_icons.prepare(self.spec, self.root, 'liquid-glass')[0]['groups'][0]
+                    expected = {'kind': 'layer-color', 'opacity': 0.5}
+                    if specialized:
+                        self.assertNotIn('shadow', native)
+                        self.assertEqual(native['shadow-specializations'], [{'value': expected}] + [
+                            {'appearance': appearance, 'value': {'kind': 'layer-color', 'opacity': 0.3}}
+                            for appearance in app_icons.APPEARANCES.values()])
+                    else:
+                        self.assertEqual(native['shadow'], expected)
+                    self.assertEqual(self.spec, before)
+
+    def test_layer_fill_and_opacity_values(self):
+        for kind in ('solid', 'automatic-gradient'):
+            for hex_color, expected in (
+                ('#000000', 'srgb:0.00000,0.00000,0.00000,1.00000'),
+                ('#ff800000', 'srgb:1.00000,0.50196,0.00000,0.00000'),
+                ('#FF008080', 'srgb:1.00000,0.00000,0.50196,0.50196')):
+                with self.subTest(kind=kind, color=hex_color):
+                    native = self.prepared(layer={'fill': {kind: hex_color}})['layers'][0]
+                    self.assertEqual(native['fill'], {kind: expected})
+        for opacity in (0, 0.75, 1):
+            self.assertEqual(self.prepared(layer={'opacity': opacity})['layers'][0]['opacity'], opacity)
+        for value in (None, [], '#FFFFFF', {}, {'solid': '#fff'}, {'solid': '#1234567'},
+                      {'solid': '#GG0000'}, {'solid': 'srgb:1,1,1,1'}, {'solid': 123},
+                      {'gradient': '#ffffff'}, {'solid': '#ffffff', 'automatic-gradient': '#ffffff'}):
+            with self.subTest(fill=value), self.assertRaises(ValueError):
+                self.prepared(layer={'fill': value})
+        for value in (-0.1, 1.01, True, '0.5', None, [], float('nan'), float('inf')):
+            with self.subTest(opacity=value), self.assertRaises(ValueError):
+                self.prepared(layer={'opacity': value})
+        for key in ('blend-mode', 'lighting', 'specular', 'unknown'):
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                self.prepared(layer={key: 'normal'})
+
+    def test_fill_specializations_serialize_as_one_native_property(self):
+        layer = {'fill': {'solid': '#00FF00'}, 'fill-specializations': {
+            'tinted': {'solid': '#40404080'}, 'dark': {'automatic-gradient': '#FF0000'},
+            'default': {'solid': '#0000FF'}}}
+        native = self.prepared(layer=layer)['layers'][0]
+        self.assertNotIn('fill', native)
+        self.assertEqual(native['fill-specializations'], [
+            {'value': {'solid': 'srgb:0.00000,1.00000,0.00000,1.00000'}},
+            {'appearance': 'light', 'value': {'solid': 'srgb:0.00000,0.00000,1.00000,1.00000'}},
+            {'appearance': 'dark', 'value': {'automatic-gradient': 'srgb:1.00000,0.00000,0.00000,1.00000'}},
+            {'appearance': 'tinted', 'value': {'solid': 'srgb:0.25098,0.25098,0.25098,0.50196'}}])
+        del layer['fill']
+        self.assertEqual(len(self.prepared(layer=layer)['layers'][0]['fill-specializations']), 3)
+        for value in (None, [], {}, [{'appearance': 'dark', 'value': {'solid': '#FFFFFF'}}],
+                      {'light': {'solid': '#FFFFFF'}}, {'Dark': {'solid': '#FFFFFF'}},
+                      {'clear': {'solid': '#FFFFFF'}}, {'dark': None}, {'dark': {'solid': '#xyz'}}):
+            with self.subTest(overrides=value), self.assertRaises(ValueError):
+                self.prepared(layer={'fill-specializations': value})
+
+    def test_material_specialization_validation_and_serialization(self):
+        cases = {
+            'opacity': (1, 0.25, [True, -1, 2, '0.3', None, float('nan'), float('inf')]),
+            'blend-mode': ('normal', 'screen', ['invalid', True, [], None]),
+            'specular': (True, False, [0, 1, 'false', None]),
+            'shadow': ({'kind': 'neutral', 'opacity': 0.5}, {'kind': 'layer-color', 'opacity': 0.3},
+                       [{'kind': 'unknown', 'opacity': 0.5}, {'kind': 'none'}, {'kind': 'none', 'opacity': 2}]),
+            'translucency': ({'enabled': True, 'value': 0.3}, {'enabled': False, 'value': 0},
+                            [{'enabled': 1, 'value': 0.3}, {'enabled': True, 'value': -1}]),
+            'blur-material': (0.5, 0.8, [-1, 2, True, '0.3', None]),
+            'refractivity': ({'enabled': False, 'strength': 0, 'depth': 0},
+                             {'enabled': True, 'strength': 0.4, 'depth': 0.1},
+                             [{'enabled': True, 'strength': 0.4}, {'enabled': True, 'strength': 0.4, 'depth': 2}]),
+        }
+        self.assertEqual(set(cases), set(app_icons.GROUP_MATERIALS))
+        for key, (base, override, bad_values) in cases.items():
+            field = key + '-specializations'
+            for owner in (('group', 'layer') if key == 'opacity' else ('group',)):
+                for appearance, native_appearance in [('default', 'light'), ('dark', 'dark'), ('tinted', 'tinted')]:
+                    with self.subTest(key=key, owner=owner, appearance=appearance):
+                        group = self.prepared(**{owner: {key: base, field: {appearance: override}}})
+                        native = group if owner == 'group' else group['layers'][0]
+                        self.assertNotIn(key, native)
+                        self.assertEqual(native[field], [{'value': base},
+                                                        {'appearance': native_appearance, 'value': override}])
+                        group = self.prepared(**{owner: {field: {appearance: override}}})
+                        native = group if owner == 'group' else group['layers'][0]
+                        self.assertEqual(native[field], [{'appearance': native_appearance, 'value': override}])
+                invalid_maps = [None, [], {}, {'light': override}, {'base': override}, {'Dark': override},
+                                {'clear': override}, {'dark': override, 'unknown': override}]
+                invalid_maps += [{'dark': bad} for bad in bad_values]
+                for value in invalid_maps:
+                    with self.subTest(key=key, owner=owner, invalid=value), self.assertRaises(ValueError):
+                        self.prepared(**{owner: {field: value}})
+        for owner, field in [('layer', 'shadow-specializations'), ('group', 'fill-specializations'),
+                             ('group', 'lighting-specializations'), ('layer', 'blend-mode-specializations')]:
+            with self.subTest(owner=owner, field=field), self.assertRaises(ValueError):
+                self.prepared(**{owner: {field: {'dark': 0}}})
+
+    def test_opacity_override_diagnostic_names_its_owner(self):
+        for owner in ('group', 'layer'):
+            for appearance in app_icons.APPEARANCES:
+                with self.subTest(owner=owner, appearance=appearance):
+                    with self.assertRaises(ValueError) as raised:
+                        self.prepared(**{owner: {'opacity-specializations': {appearance: True}}})
+                    self.assertEqual(str(raised.exception),
+                                     f'opacity-specializations.{appearance}: {owner} opacity must be a number from 0 to 1')
+
+    def test_specialized_refraction_enables_native_feature(self):
+        self.spec['groups'][0]['refractivity-specializations'] = {
+            'dark': {'enabled': True, 'strength': 0.4, 'depth': 0.1}}
+        doc = app_icons.prepare(self.spec, self.root, 'liquid-glass')[0]
+        self.assertEqual(doc['features'], ['refractivity'])
+
+    def test_web_dark_is_an_explicit_entry_boolean(self):
+        for value in (0, 1, 'true', None, [], {}):
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'web_dark'):
+                app_icons.prepare({**self.spec, 'web_dark': value}, self.root, 'liquid-glass')
+        for value in (True, False):
+            self.assertEqual(app_icons.prepare({**self.spec, 'web_dark': value}, self.root, 'liquid-glass'),
+                             app_icons.prepare(self.spec, self.root, 'liquid-glass'))
+
+    def test_material_document_serialization_preserves_artwork(self):
+        group = self.spec['groups'][0]
+        group.update({'blend-mode': 'plus-lighter', 'specular': False, 'opacity': 0.8,
+                      'shadow': {'kind': 'none', 'opacity': 0}})
+        group['layers'][0].update({'fill': {'automatic-gradient': '#FF0080'}, 'opacity': 0.6})
+        self.write_design()
+        self.generate()
+        native = json.loads((self.out / 'example.icon/icon.json').read_text())['groups'][0]
+        self.assertEqual(native, self.prepared())
+        self.assertEqual((self.out / 'example.icon/Assets/01-01.svg').read_text(), SVG)
+
+
+@unittest.skipUnless(shutil.which('rsvg-convert'), 'rsvg-convert renders the SVG styles')
+class MaterialIsolationTests(unittest.TestCase):
+    setUp = StyleTests.setUp
+    invoke = StyleTests.invoke
+
+    def test_materials_do_not_change_legacy_outputs_sheets_or_checks(self):
+        plain = copy.deepcopy(self.spec)
+        plain['styles'] = {style: {} for style in ('flat', 'mac-tile', 'gloss')}
+        enriched = copy.deepcopy(plain)
+        enriched['web_dark'] = True
+        for group in enriched['groups']:
+            group.update({'blend-mode': 'multiply', 'specular': False, 'opacity': 0.1,
+                          'shadow': {'kind': 'layer-color', 'opacity': 0.9},
+                          'refractivity': {'enabled': True, 'strength': 0.8, 'depth': 0.2},
+                          'blur-material': 0.7, 'translucency': {'enabled': True, 'value': 0.8}})
+            group['layers'][0].update({'fill': {'automatic-gradient': '#FF000080'}, 'opacity': 0.2,
+                                      'fill-specializations': {'dark': {'solid': '#00FF00'}},
+                                      'opacity-specializations': {'dark': 0.5}})
+            for key in app_icons.GROUP_MATERIALS:
+                group[key + '-specializations'] = {'dark': group[key]}
+        for style in plain['styles']:
+            with self.subTest(style=style):
+                outputs = [self.root / (style + suffix) for suffix in ('-plain', '-materials')]
+                for spec, out in zip((plain, enriched), outputs):
+                    app_icons.build('example', spec, self.root, out, style)
+                self.assertEqual(tree_bytes(outputs[0]), tree_bytes(outputs[1]))
+                result = self.invoke(enriched, '--style', style, '--check', outputs[0])
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        for spec, folder in ((plain, 'plain-sheet'), (enriched, 'material-sheet')):
+            (self.root / folder).mkdir()
+        self.assertEqual(app_icons.sheet({'example': plain}, ['example'], self.root, None, self.root / 'plain-sheet'),
+                         app_icons.sheet({'example': enriched}, ['example'], self.root, None, self.root / 'material-sheet'))
+        # Liquid Glass's SVG favicon and full-bleed web sources also use the artwork.
+        for spec in (plain, enriched):
+            spec['styles'] = {'liquid-glass': {}}
+        for masked, scale in ((True, 1), (False, 1), (False, 0.56)):
+            self.assertEqual(*(app_icons.compose('liquid-glass', spec,
+                                                 app_icons.prepare(spec, self.root, 'liquid-glass')[2],
+                                                 masked=masked, scale=scale) for spec in (plain, enriched)))
+
+    def test_lint_fill_notice_is_informational_and_artwork_still_matters(self):
+        self.spec['groups'] = [self.spec['groups'][0]]
+        self.spec['groups'][0]['layers'][0]['fill'] = {'solid': '#123456'}
+        result = self.invoke(self.spec, '--lint')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn('info\tliquid-glass\tgroup 1: Liquid Glass appearance is determined by layer fill', result.stdout)
+        self.assertTrue(result.stdout.endswith('clean\n'))
+        (self.root / 'glyph.svg').write_text(SVG.replace('white', '#123456'))
+        self.spec['groups'][0]['layers'][0]['fill'] = {'solid': '#FFFFFF'}
+        result = self.invoke(self.spec, '--lint')
+        self.assertEqual(result.returncode, 1)
+        self.assertIn('lightness', result.stdout)
+        self.assertIn('too close', result.stdout)
+
+
+def tree_bytes(root):
+    return {str(p.relative_to(root)): p.read_bytes() for p in root.rglob('*') if p.is_file()}
+
+
+class NativeMaterialTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        try:
+            cls.tool = app_icons.find_ictool()
+        except (ValueError, OSError) as exc:
+            raise unittest.SkipTest(str(exc))
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        (self.root / 'panel.svg').write_text(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">'
+            '<rect x="180" y="230" width="640" height="540" rx="100" fill="#a0c060"/></svg>')
+        self.spec = {'background': '#334DA6', 'groups': [{'layers': [{'source': 'panel.svg'}]}]}
+        self.serial = 0
+
+    def render(self, spec, rendition='Default', generation=27):
+        self.serial += 1
+        out = self.root / str(self.serial)
+        app_icons.build('probe', spec, self.root, out, document_only=True)
+        png = out / 'render.png'
+        app_icons.run([self.tool, out / 'probe.icon', '--export-image', '--output-file', png,
+                       '--platform', 'iOS', '--rendition', rendition, '--width', 128, '--height', 128,
+                       '--scale', 1, '--design-generation', generation])
+        return app_icons.read_png(png)[2]
+
+    def delta(self, a, b):
+        return max(abs(x-y) for p, q in zip(a, b) for x, y in zip(p, q))
+
+    def test_every_native_group_material_changes_pixels(self):
+        control = self.render(self.spec)
+        for key, values in {
+            'blend-mode': app_icons.BLEND_MODES,
+            'specular': (False, True), 'opacity': (0.3,),
+            'shadow': tuple({'kind': kind, 'opacity': 0.8} for kind in app_icons.SHADOW_KINDS),
+        }.items():
+            for value in values:
+                with self.subTest(key=key, value=value):
+                    spec = copy.deepcopy(self.spec)
+                    spec['groups'][0][key] = value
+                    difference = self.delta(control, self.render(spec))
+                    if (key, value) in (('blend-mode', 'normal'), ('specular', True)):
+                        self.assertLessEqual(difference, app_icons.PNG_TOLERANCE)
+                    else:
+                        self.assertGreater(difference, app_icons.PNG_TOLERANCE)
+
+    def test_layer_fills_alpha_and_opacity_change_pixels(self):
+        control = self.render(self.spec)
+        images = []
+        for material in ({'fill': {'solid': '#FF0000'}}, {'fill': {'automatic-gradient': '#FF0000'}},
+                         {'fill': {'solid': '#FF000080'}}, {'opacity': 0.3}):
+            with self.subTest(material=material):
+                spec = copy.deepcopy(self.spec)
+                spec['groups'][0]['layers'][0].update(material)
+                rendered = self.render(spec)
+                self.assertGreater(self.delta(control, rendered), app_icons.PNG_TOLERANCE)
+                images.append(rendered)
+        self.assertGreater(self.delta(images[0], images[1]), app_icons.PNG_TOLERANCE)
+        self.assertGreater(self.delta(images[0], images[2]), app_icons.PNG_TOLERANCE)
+
+    def test_chromatic_shadow_renders_as_layer_color(self):
+        alias = copy.deepcopy(self.spec)
+        alias['groups'][0]['shadow'] = {'kind': 'chromatic', 'opacity': 0.5}
+        native = copy.deepcopy(alias)
+        native['groups'][0]['shadow']['kind'] = 'layer-color'
+        for generation in app_icons.GENERATIONS:
+            for rendition in app_icons.RENDITIONS:
+                with self.subTest(generation=generation, rendition=rendition):
+                    self.assertLessEqual(self.delta(self.render(alias, rendition, generation),
+                                                    self.render(native, rendition, generation)), app_icons.PNG_TOLERANCE)
+
+    def test_appearance_override_without_base_fill_inherits_artwork(self):
+        spec = copy.deepcopy(self.spec)
+        spec['groups'][0]['layers'][0]['fill-specializations'] = {'dark': {'solid': '#FF0000'}}
+        for rendition in app_icons.RENDITIONS:
+            with self.subTest(rendition=rendition):
+                difference = self.delta(self.render(self.spec, rendition), self.render(spec, rendition))
+                if rendition == 'Dark':
+                    self.assertGreater(difference, app_icons.PNG_TOLERANCE)
+                else:
+                    self.assertLessEqual(difference, app_icons.PNG_TOLERANCE)
+
+    def test_fill_overrides_affect_only_their_native_appearances(self):
+        self.spec['groups'][0]['layers'][0]['fill'] = {'solid': '#00FF00'}
+        for generation in app_icons.GENERATIONS:
+            controls = {rend: self.render(self.spec, rend, generation) for rend in app_icons.RENDITIONS}
+            for appearance, affected in {'default': {'Default'}, 'dark': {'Dark'},
+                                         'tinted': {'TintedLight', 'TintedDark', 'ClearLight', 'ClearDark'}}.items():
+                spec = copy.deepcopy(self.spec)
+                spec['groups'][0]['layers'][0]['fill-specializations'] = {appearance: {'solid': '#FF0000'}}
+                for rendition, control in controls.items():
+                    with self.subTest(generation=generation, appearance=appearance, rendition=rendition):
+                        difference = self.delta(control, self.render(spec, rendition, generation))
+                        if rendition in affected:
+                            self.assertGreater(difference, app_icons.PNG_TOLERANCE)
+                        else:
+                            self.assertLessEqual(difference, app_icons.PNG_TOLERANCE)
+
+    def test_material_overrides_affect_only_their_appearance_family(self):
+        (self.root / 'back.svg').write_text(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">'
+            '<path fill="#FF5020" d="M280 100H480V900H280Z"/>'
+            '<path fill="#1060FF" d="M500 100H700V900H500Z"/></svg>')
+        self.spec['groups'].insert(0, {'layers': [{'source': 'back.svg'}]})
+        cases = [
+            ('group', 'opacity', 1, 0.2), ('layer', 'opacity', 1, 0.2),
+            ('group', 'blend-mode', 'normal', 'multiply'), ('group', 'specular', True, False),
+            ('group', 'shadow', {'kind': 'neutral', 'opacity': 0.8}, {'kind': 'none', 'opacity': 0}),
+            ('group', 'translucency', {'enabled': True, 'value': 0.1}, {'enabled': True, 'value': 0.8}),
+            ('group', 'blur-material', 0, 0.9),
+            ('group', 'refractivity', {'enabled': True, 'strength': 0, 'depth': 0.1},
+             {'enabled': True, 'strength': 0.8, 'depth': 0.6})]
+        for generation in app_icons.GENERATIONS:
+            for owner, key, initial, value in cases:
+                base = copy.deepcopy(self.spec)
+                group = base['groups'][1]
+                target = group if owner == 'group' else group['layers'][0]
+                target[key] = initial
+                controls = {r: self.render(base, r, generation) for r in app_icons.RENDITIONS}
+                for appearance, affected in {'default': {'Default'}, 'dark': {'Dark'},
+                                             'tinted': {'ClearLight', 'ClearDark', 'TintedLight', 'TintedDark'}}.items():
+                    # Generation 26 ignores this refraction model in both encodings.
+                    if generation == 26 and key == 'refractivity':
+                        affected = set()
+                    spec = copy.deepcopy(base)
+                    group = spec['groups'][1]
+                    target = group if owner == 'group' else group['layers'][0]
+                    target[key + '-specializations'] = {appearance: value}
+                    deltas = {}
+                    for rendition, control in controls.items():
+                        with self.subTest(generation=generation, owner=owner, key=key,
+                                          appearance=appearance, rendition=rendition):
+                            difference = self.delta(control, self.render(spec, rendition, generation))
+                            deltas[rendition] = difference
+                            if generation == 26 and key == 'refractivity' and appearance == 'default':
+                                scalar = copy.deepcopy(base)
+                                scalar['groups'][1][key] = value
+                                self.assertLessEqual(self.delta(control, self.render(scalar, rendition, generation)),
+                                                     app_icons.PNG_TOLERANCE)
+                            if rendition in affected:
+                                self.assertGreater(difference, app_icons.PNG_TOLERANCE)
+                            else:
+                                self.assertLessEqual(difference, app_icons.PNG_TOLERANCE)
+                    print(f'appearance\t{generation}\t{owner}.{key}\t{appearance}\t{deltas}', flush=True)
+
+    def test_opacity_override_without_base_uses_native_default(self):
+        for owner in ('group', 'layer'):
+            spec = copy.deepcopy(self.spec)
+            group = spec['groups'][0]
+            target = group if owner == 'group' else group['layers'][0]
+            target['opacity-specializations'] = {'dark': 0.25}
+            for rendition in app_icons.RENDITIONS:
+                with self.subTest(owner=owner, rendition=rendition):
+                    difference = self.delta(self.render(self.spec, rendition), self.render(spec, rendition))
+                    if rendition == 'Dark':
+                        self.assertGreater(difference, app_icons.PNG_TOLERANCE)
+                    else:
+                        self.assertLessEqual(difference, app_icons.PNG_TOLERANCE)
+
+    @unittest.skipUnless(shutil.which('rsvg-convert'), 'rsvg-convert scales native web exports')
+    def test_dark_web_set_comes_from_native_dark_and_is_opt_in(self):
+        self.spec['groups'][0]['layers'][0].update({
+            'fill': {'solid': '#00FF00'}, 'fill-specializations': {'dark': {'solid': '#FF0000'}}})
+        out = self.root / 'dark-output'
+        app_icons.build('example', {**self.spec, 'web_dark': True}, self.root, out, ictool=self.tool)
+        dark = out / 'web/dark'
+        self.assertEqual({p.name for p in dark.iterdir()}, {name for name, _ in app_icons.MASKED_WEB_SIZES})
+        manifest = json.loads((out / 'manifest.json').read_text())
+        for name, size in app_icons.MASKED_WEB_SIZES:
+            app_icons.png_payload(dark / name, size)
+            expected = self.root / name
+            app_icons.resize_png(out / 'renditions/iOS-Dark.png', expected, size)
+            self.assertEqual(expected.read_bytes(), (dark / name).read_bytes())
+            self.assertNotEqual(app_icons.png_payload(dark / name), app_icons.png_payload(out / 'web' / name))
+            self.assertIn('web/dark/' + name, manifest['files'])
+        # Reuse the actual native exports to isolate opt-in behavior from GPU rounding.
+        original_run = app_icons.run
+        def replay(args):
+            if '--export-image' in args:
+                output = Path(args[args.index('--output-file') + 1])
+                output.write_bytes((out / 'renditions' / output.name).read_bytes())
+                return ''
+            return original_run(args)
+        with patch.object(app_icons, 'run', side_effect=replay):
+            for label, spec in [('off', {**self.spec, 'web_dark': False}), ('omitted', self.spec)]:
+                app_icons.build('example', spec, self.root, self.root / label, ictool=self.tool)
+        off = tree_bytes(self.root / 'off')
+        self.assertEqual(off, tree_bytes(self.root / 'omitted'))
+        self.assertFalse((self.root / 'off/web/dark').exists())
+        for name, data in off.items():
+            if name != 'manifest.json':
+                self.assertEqual(data, (out / name).read_bytes(), name)
+@unittest.skipUnless(os.environ.get('APP_ICONS_BASELINE'), 'set APP_ICONS_BASELINE to the pre-change script')
+@unittest.skipUnless(shutil.which('rsvg-convert'), 'rsvg-convert renders the examples')
+class BaselineRenderingTests(unittest.TestCase):
+    def test_chromatic_shadow_preserves_baseline_style_bytes(self):
+        module = importlib.util.spec_from_file_location('baseline_icons', os.environ['APP_ICONS_BASELINE'])
+        baseline = importlib.util.module_from_spec(module)
+        module.loader.exec_module(baseline)
+        spec = {'background': '#123456', 'groups': [{'layers': [{'source': 'glyph.svg'}],
+                'shadow': {'kind': 'chromatic', 'opacity': 0.5}}],
+                'styles': {style: {} for style in app_icons.STYLES}}
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / 'glyph.svg').write_text(SVG)
+            for style in app_icons.STYLES:
+                with self.subTest(style=style):
+                    old_doc, old_assets, old_art, _ = baseline.prepare(spec, root, style)
+                    new_doc, new_assets, new_art, _ = app_icons.prepare(spec, root, style)
+                    old_doc = copy.deepcopy(old_doc)
+                    self.assertEqual(old_doc['groups'][0]['shadow']['kind'], 'chromatic')
+                    old_doc['groups'][0]['shadow']['kind'] = 'layer-color'
+                    self.assertEqual(new_doc, old_doc)
+                    self.assertEqual(new_assets, old_assets)
+                    for masked, scale in ((True, 1), (False, 1), (False, 0.56)):
+                        self.assertEqual(baseline.compose(style, spec, old_art, masked=masked, scale=scale),
+                                         app_icons.compose(style, spec, new_art, masked=masked, scale=scale))
+                    if style == 'liquid-glass':
+                        print('baseline-chromatic\tliquid-glass\tartwork compositions and assets byte-identical; '
+                              'native shadow normalized to layer-color', flush=True)
+                        continue
+                    outputs = [root / (style + suffix) for suffix in ('-baseline', '-current')]
+                    baseline.build('example', spec, root, outputs[0], style)
+                    app_icons.build('example', spec, root, outputs[1], style)
+                    self.assertEqual(tree_bytes(outputs[0]), tree_bytes(outputs[1]))
+                    print(f'baseline-chromatic\t{style}\t{len(tree_bytes(outputs[0]))} files byte-identical', flush=True)
+            spec['styles'].pop('liquid-glass')
+            sheets = []
+            for name, producer in [('baseline', baseline), ('current', app_icons)]:
+                work = root / name
+                work.mkdir()
+                sheets.append(producer.sheet({'example': spec}, ['example'], root, None, work))
+            self.assertEqual(*sheets)
+
+    def test_all_example_styles_preserve_bytes_with_identical_native_exports(self):
+        module = importlib.util.spec_from_file_location('baseline_icons', os.environ['APP_ICONS_BASELINE'])
+        baseline = importlib.util.module_from_spec(module)
+        module.loader.exec_module(baseline)
+        tool = app_icons.find_ictool()
+        examples = SCRIPT.parent.parent / 'examples'
+        with tempfile.TemporaryDirectory() as temp:
+            for design in sorted(examples.glob('DESIGN*.md')):
+                for name, spec in app_icons.read_entries(design).items():
+                    for style in app_icons.entry_styles(spec):
+                        with self.subTest(design=design.name, name=name, style=style):
+                            outputs = [Path(temp) / f'{design.stem}-{name}-{style}-{i}' for i in range(2)]
+                            exports = {}
+                            original_run = baseline.run
+
+                            def command_key(args):
+                                args = list(map(str, args))
+                                args[1] = '<document>'
+                                args[args.index('--output-file') + 1] = '<output>'
+                                return tuple(args)
+
+                            def record(args):
+                                result = original_run(args)
+                                if '--export-image' in args:
+                                    png = Path(args[args.index('--output-file') + 1])
+                                    exports[command_key(args)] = (tree_bytes(Path(args[1])), png.read_bytes())
+                                return result
+
+                            with patch.object(baseline, 'run', side_effect=record):
+                                baseline.build(name, spec, design.parent, outputs[0], style, tool)
+                            app_icons.build(name, spec, design.parent, outputs[1], style, tool)
+                            before, after = map(tree_bytes, outputs)
+                            self.assertEqual(before.keys(), after.keys())
+                            different = [key for key in before if before[key] != after[key]]
+                            for key in different:
+                                self.assertEqual(style, 'liquid-glass', key)
+                                self.assertTrue(key.endswith('.png'), key)
+                                self.assertTrue(app_icons.same_pixels(outputs[0] / key, outputs[1] / key), key)
+                            print(f'baseline-live\t{name}\t{style}\t{len(before)-len(different)}/{len(before)} '
+                                  f'files byte-identical; rounding-only: {different}', flush=True)
+                            if style == 'liquid-glass':
+                                # Replay actual baseline exports after verifying identical renderer
+                                # inputs. This isolates producer bytes from GPU rounding between runs.
+                                replay = Path(temp) / f'{design.stem}-{name}-{style}-replay'
+                                used = set()
+                                current_run = app_icons.run
+
+                                def replay_native(args):
+                                    if '--export-image' not in args:
+                                        return current_run(args)
+                                    key = command_key(args)
+                                    document, png = exports[key]
+                                    self.assertEqual(tree_bytes(Path(args[1])), document)
+                                    Path(args[args.index('--output-file') + 1]).write_bytes(png)
+                                    used.add(key)
+                                    return ''
+
+                                with patch.object(app_icons, 'run', side_effect=replay_native):
+                                    app_icons.build(name, spec, design.parent, replay, style, tool)
+                                self.assertEqual(used, exports.keys())
+                                after = tree_bytes(replay)
+                                disabled = Path(temp) / f'{design.stem}-{name}-{style}-disabled'
+                                with patch.object(app_icons, 'run', side_effect=replay_native):
+                                    app_icons.build(name, {**spec, 'web_dark': False}, design.parent, disabled, style, tool)
+                                self.assertEqual(after, tree_bytes(disabled))
+                                print(f'baseline-option-off\t{name}\t{style}\t{len(after)} files byte-identical', flush=True)
+                            self.assertEqual([key for key in before if before[key] != after[key]], [])
+                            print(f'baseline-producer\t{name}\t{style}\t{len(before)} files byte-identical', flush=True)
 
 
 if __name__ == "__main__":

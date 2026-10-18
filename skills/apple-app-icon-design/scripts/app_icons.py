@@ -24,8 +24,16 @@ STYLES = ("liquid-glass", "flat", "mac-tile", "gloss")
 STYLE_FIELDS = {"liquid-glass": {"groups", "design_generation"}, "flat": {"groups"},
                 "mac-tile": {"groups", "unclipped"}, "gloss": {"groups"}}
 GENERATIONS = (26, 27)
-ENTRY_FIELDS = {"background", "gradient", "groups", "maskable_scale", "styles"}
-GROUP_FIELDS = {"name", "layers", "shadow", "translucency", "blur-material", "refractivity"}
+ENTRY_FIELDS = {"background", "gradient", "groups", "maskable_scale", "styles", "web_dark"}
+GROUP_MATERIALS = ("shadow", "translucency", "blur-material", "refractivity", "blend-mode", "specular", "opacity")
+GROUP_FIELDS = {"name", "layers", *GROUP_MATERIALS, *(f"{key}-specializations" for key in GROUP_MATERIALS)}
+LAYER_FIELDS = {"source", "name", "fill", "fill-specializations", "opacity", "opacity-specializations"}
+APPEARANCES = {"default": "light", "dark": "dark", "tinted": "tinted"}
+MASKED_WEB_SIZES = (("favicon-16.png", 16), ("favicon-32.png", 32), ("icon-192.png", 192),
+                    ("icon-512.png", 512), ("avatar-1024.png", 1024))
+BLEND_MODES = ("normal", "plus-lighter", "plus-darker", "overlay", "multiply",
+               "soft-light", "hard-light", "darken", "lighten", "screen")
+SHADOW_KINDS = ("neutral", "chromatic", "layer-color", "none")
 SAFE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\Z")
 
 # Icon Composer mask, measured for design generations 26 and 27 (references/rendering.md):
@@ -81,6 +89,16 @@ def color(value):
     return "srgb:" + ",".join(f"{int(value[i:i+2], 16)/255:.5f}" for i in (1, 3, 5)) + ",1.00000"
 
 
+def layer_fill(value):
+    if not isinstance(value, dict) or len(value) != 1 or next(iter(value)) not in ("solid", "automatic-gradient"):
+        fail("layer fill needs exactly one solid or automatic-gradient color")
+    kind, hex_color = next(iter(value.items()))
+    if not isinstance(hex_color, str) or not re.fullmatch(r"#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?", hex_color):
+        fail("layer fill color must be #RRGGBB or #RRGGBBAA")
+    rgba = hex_color + "FF" if len(hex_color) == 7 else hex_color
+    return {kind: "srgb:" + ",".join(f"{int(rgba[i:i+2], 16)/255:.5f}" for i in (1, 3, 5, 7))}
+
+
 def validate_svg(data):
     root = ET.fromstring(data)
     viewbox = [float(v) for v in re.split(r"[\s,]+", root.get("viewBox", "").strip()) if v]
@@ -100,6 +118,7 @@ def validate_svg(data):
 def unit(value, label):
     if isinstance(value, bool) or not isinstance(value, (float, int)) or not 0 <= value <= 1:
         fail(f"{label} must be a number from 0 to 1")
+    return value
 
 
 def material(group):
@@ -107,6 +126,12 @@ def material(group):
         fail("group name must be nonempty text")
     if "blur-material" in group:
         unit(group["blur-material"], "blur-material")
+    if "opacity" in group:
+        unit(group["opacity"], "group opacity")
+    if "specular" in group and not isinstance(group["specular"], bool):
+        fail("specular must be true or false")
+    if "blend-mode" in group and group["blend-mode"] not in BLEND_MODES:
+        fail(f"blend-mode must be one of {', '.join(BLEND_MODES)}")
     for key, fields in {"translucency": {"enabled", "value"},
                         "refractivity": {"enabled", "strength", "depth"},
                         "shadow": {"kind", "opacity"}}.items():
@@ -116,12 +141,40 @@ def material(group):
         if not isinstance(obj, dict) or set(obj) != fields:
             fail(f"{key} needs exactly {', '.join(sorted(fields))}")
         if key == "shadow":
-            if obj["kind"] not in {"neutral", "chromatic"}:
-                fail("shadow kind must be neutral or chromatic")
+            if obj["kind"] not in SHADOW_KINDS:
+                fail(f"shadow kind must be one of {', '.join(SHADOW_KINDS)}")
         elif not isinstance(obj["enabled"], bool):
             fail(f"{key}.enabled must be true or false")
         for field in fields - {"enabled", "kind"}:
             unit(obj[field], f"{key}.{field}")
+
+
+def material_value(key, value):
+    material({key: value})
+    if key == "shadow" and value["kind"] == "chromatic":
+        return {**value, "kind": "layer-color"}
+    return value
+
+
+def specialize(source, native, key, convert):
+    """Encode one native property with its inherited value and appearance overrides."""
+    field = f"{key}-specializations"
+    if field not in source:
+        return
+    overrides = source[field]
+    if not isinstance(overrides, dict) or not overrides or set(overrides) - APPEARANCES.keys():
+        fail(f"{field} must map default, dark, or tinted to {key} values")
+    # Scalar and specialized native properties are alternative encodings: the scalar
+    # wins if both exist. An unqualified specialization carries the inherited value.
+    values = [{"value": native.pop(key)}] if key in native else []
+    for appearance, native_appearance in APPEARANCES.items():
+        if appearance in overrides:
+            try:
+                value = convert(overrides[appearance])
+            except ValueError as exc:
+                fail(f"{field}.{appearance}: {exc}")
+            values.append({"appearance": native_appearance, "value": value})
+    native[field] = values
 
 
 def entry_styles(spec):
@@ -164,6 +217,8 @@ def prepare(spec, base, style):
     fill = color(spec.get("background"))
     if not isinstance(spec.get("gradient", False), bool):
         fail("gradient must be true or false")
+    if not isinstance(spec.get("web_dark", False), bool):
+        fail("web_dark must be true or false")
     scale = spec.get("maskable_scale", 0.56)
     if not isinstance(scale, (float, int)) or not 0 < scale <= 0.56:
         fail("maskable_scale must be greater than zero and at most 0.56")
@@ -190,12 +245,24 @@ def prepare(spec, base, style):
         layers = group.get("layers")
         if not isinstance(layers, list) or not layers:
             fail(f"group {gi + 1} needs layers")
-        native = {k: v for k, v in group.items() if k != "layers"}
+        native = {k: v for k, v in group.items() if k != "layers" and not k.endswith("-specializations")}
+        for key in GROUP_MATERIALS:
+            if key in native:
+                native[key] = material_value(key, native[key])
+            specialize(group, native, key, lambda value: material_value(key, value))
         native["layers"] = []
         art = []
         for li, layer in enumerate(layers):
-            if not isinstance(layer, dict) or set(layer) - {"source", "name"}:
-                fail(f"group {gi + 1}, layer {li + 1}: expected source and optional name")
+            if not isinstance(layer, dict) or set(layer) - LAYER_FIELDS:
+                fail(f"group {gi + 1}, layer {li + 1}: unknown layer fields")
+            native_material = {}
+            if "fill" in layer:
+                native_material["fill"] = layer_fill(layer["fill"])
+            specialize(layer, native_material, "fill", layer_fill)
+            if "opacity" in layer:
+                unit(layer["opacity"], "layer opacity")
+                native_material["opacity"] = layer["opacity"]
+            specialize(layer, native_material, "opacity", lambda value: unit(value, "layer opacity"))
             source = layer.get("source")
             if "name" in layer and (not isinstance(layer["name"], str) or not layer["name"]):
                 fail("layer name must be nonempty text")
@@ -212,15 +279,18 @@ def prepare(spec, base, style):
                 fail("PNG layers must be 1024 px square")
             filename = f"{gi + 1:02d}-{li + 1:02d}{suffix}"
             assets[filename] = data
-            native["layers"].append({"image-name": filename, "name": layer.get("name", path.stem)})
+            native["layers"].append({"image-name": filename, "name": layer.get("name", path.stem),
+                                     **native_material})
             art.append((suffix, data))
-        if group.get("refractivity", {}).get("enabled"):
+        refractivities = [group.get("refractivity", {})] + list(group.get("refractivity-specializations", {}).values())
+        if any(value.get("enabled") for value in refractivities):
             document["features"] = ["refractivity"]
         # Icon Composer lists the foremost layer and group first; SVG paints last on top.
         native["layers"].reverse()
         document["groups"].insert(0, native)
         loaded.append({"label": group.get("name", f"group {gi + 1}"), "art": art,
-                       "clipped": gi + 1 not in unclipped})
+                       "clipped": gi + 1 not in unclipped,
+                       "native_fill": any("fill" in layer or "fill-specializations" in layer for layer in layers)})
     return document, assets, loaded, options
 
 
@@ -440,8 +510,7 @@ def web_set(web, style, spec, groups, masked_source):
     (web / "touch.svg").write_text(compose(style, spec, groups, masked=False))
     (web / "maskable.svg").write_text(compose(style, spec, groups, masked=False,
                                               scale=spec.get("maskable_scale", 0.56)))
-    for target, size in (("favicon-16.png", 16), ("favicon-32.png", 32), ("icon-192.png", 192),
-                         ("icon-512.png", 512), ("avatar-1024.png", 1024)):
+    for target, size in MASKED_WEB_SIZES:
         if masked_source.suffix == ".png":
             resize_png(masked_source, web / target, size)
         else:
@@ -497,6 +566,11 @@ def build(name, spec, base, out, style="liquid-glass", ictool=None, document_onl
             png_payload(path, size)
             files[(platform, rendition)] = path
     web_set(out / "web", style, spec, groups, files[("iOS", "Default")])
+    if spec.get("web_dark", False):
+        dark_web = out / "web" / "dark"
+        dark_web.mkdir()
+        for filename, size in MASKED_WEB_SIZES:
+            resize_png(files[("iOS", "Dark")], dark_web / filename, size)
     (out / "contact-sheet.svg").write_text(native_sheet(files))
     run(["rsvg-convert", out / "contact-sheet.svg", "-o", out / "contact-sheet.png"])
     write_manifest(out, {"style": style, "rendering": "native", "renderer": run([ictool, "--version"]),
@@ -673,8 +747,12 @@ def lint_findings(groups, outline, base_lightness, size, display_scale):
     return findings
 
 
-def lint(spec, base, style, work):
+def lint(spec, base, style, work, information=None):
     _, _, groups, _ = prepare(spec, base, style)
+    if information is not None:
+        information.extend(f"{group['label']}: Liquid Glass appearance is determined by layer fill; "
+                           "lightness findings refer to SVG/PNG artwork used by other styles"
+                           for group in groups if group["native_fill"])
 
     def raster(name, body):
         svg = work / f"{name}.svg"
@@ -778,7 +856,10 @@ def main():
                 for style in styles:
                     if args.style:
                         select_style(entries[name], style)
-                    findings += [f"{style}\t{text}" for text in lint(entries[name], base, style, Path(temp))]
+                    information = []
+                    findings += [f"{style}\t{text}" for text in lint(entries[name], base, style, Path(temp), information)]
+                    for text in information:
+                        print(f"info\t{style}\t{text}")
             print("\n".join(findings) if findings else "clean")
             return 1 if findings else 0
         if args.sheet:
@@ -802,8 +883,10 @@ def main():
             fail("output directory exists; use a fresh directory or --check to inspect drift")
         if args.check and not target.is_dir():
             fail("check target is not a directory")
-        target.parent.mkdir(parents=True, exist_ok=True)
-        with tempfile.TemporaryDirectory(prefix=".app-icon-", dir=target.parent) as temp:
+        if args.out:
+            target.parent.mkdir(parents=True, exist_ok=True)
+        # Publishing needs a same-filesystem rename; checking must not write near the target.
+        with tempfile.TemporaryDirectory(prefix=".app-icon-", dir=target.parent if args.out else None) as temp:
             candidate = Path(temp) / "output"
             build(name, entries[name], base, candidate, style, tool, args.document_only)
             if args.check:

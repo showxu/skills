@@ -55,6 +55,11 @@ recognize at 32 px, two or three colors, and the layer plan.
   background and from groups it overlaps.
 - Base dark variants on the light design with complementary, less bright
   colors. Avoid a black background on watchOS.
+- Use native fill and opacity specializations when automatic appearance
+  treatment loses the intended contrast. Tune group materials per appearance
+  where needed, and compare every rendition to confirm the change stays in
+  its intended family. Clear and Tinted share one specialization family;
+  their light and dark renditions still need separate visual inspection.
 
 ## Drafting Layers
 
@@ -64,8 +69,14 @@ When the skill drafts artwork:
   text elements, no external references, and no clip to the icon shape.
 - Use the layer plan's back-to-front order, and keep each group's shapes in
   that group's file or files.
-- Use flat fills. A gradient belongs to the background color, or to Icon
-  Composer for Liquid Glass.
+- Choose artwork colors for the SVG style renderings. Give Liquid Glass layers
+  native `automatic-gradient` fills where color should respond to material
+  shading, or `solid` fills where a uniform color is intentional. Layer opacity
+  and group blend modes control native overlap: Multiply darkens, Screen and
+  Plus Lighter brighten, and Soft/Hard Light alter contrast. Use restrained
+  translucency and refraction for glass, then verify the result at small sizes
+  and across appearances. See the [Apple icon material study](rendering.md#apple-icon-material-study).
+  These native controls leave the SVG artwork and other styles unchanged.
 - For `mac-tile`, artwork may extend beyond the 1024 box only in a group
   listed in `unclipped`; every other style crops it at the art boundary.
 - Mark drafted art as original and keep it with the owner's assets.
