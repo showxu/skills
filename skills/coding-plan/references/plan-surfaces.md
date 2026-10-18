@@ -43,10 +43,26 @@ task plan unless the repository says otherwise.
 Read `.agent/PLANS.md` first, then create or update `.agent/PLAN.md` according
 to that policy.
 
+### Task worktrees
+
+This is a fallback: an explicit user path and a repository-declared plan
+surface take precedence. When neither exists and the repository's instructions
+isolate tasks in worktrees, create or enter the task's worktree first, such as
+a `<type>/<slug>` branch in its own worktree, then write the plan at
+`.agent/plans/<branch>.md` in that worktree, for example
+`.agent/plans/feat/export-cache.md` for `feat/export-cache`. By default keep
+the plan untracked: do not stage or commit it, and it goes away with the
+worktree. Commit it only when the repository's conventions or the user call
+for a committed plan; then edit it only on that branch and remove it before
+the branch merges. Never add entries for several tasks to one shared plan
+file: parallel branches would conflict. An existing `.agent/PLANS.md` is then
+read as policy, not written.
+
 ### Fallback `.agent/PLANS.md`
 
 Use `.agent/PLANS.md` as the default active task plan when the repository has
-no clearer plan convention and the user did not name another path.
+no clearer plan convention, does not isolate tasks in worktrees, and the user
+did not name another path.
 
 If `.agent/PLANS.md` already exists, inspect it before writing. Treat it as a
 policy file only when its content clearly defines plan rules or points to a
@@ -55,8 +71,8 @@ the repo-declared separate surface rather than overwriting it.
 
 ### `plans/` directory only
 
-Use an existing matching `plans/*.md` when it is the same task. Otherwise create
-a new fallback `.agent/PLANS.md` unless the repository already requires new
+Use an existing matching `plans/*.md` when it is the same task. Otherwise apply
+Task worktrees or the fallback below, unless the repository already requires new
 task plans under `plans/`.
 
 If several plan files look related, choose the one with matching module, goal,

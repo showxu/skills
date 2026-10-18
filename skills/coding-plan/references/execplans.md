@@ -43,9 +43,11 @@ exists, read it before creating or updating an ExecPlan. If it conflicts with
 this reference, prefer the repository-local policy.
 
 When no repository-local policy or active plan location exists, the default
-active task plan is `.agent/PLANS.md`. Otherwise, the active task plan may live
-in `PLAN.md`, `.agent/PLAN.md`, `.agents/PLAN.md`, `plans/*.md`, or another
-repo-declared location.
+active task plan follows [Task worktrees](plan-surfaces.md#task-worktrees):
+`.agent/plans/<branch>.md` in the task's worktree when the repository isolates
+tasks in worktrees, otherwise `.agent/PLANS.md`. A repository may instead
+declare `PLAN.md`, `.agent/PLAN.md`, `.agents/PLAN.md`, `plans/*.md`, or
+another location.
 
 ## Core Standard
 
@@ -176,8 +178,8 @@ validated and the plan says how to retire the old path safely.
 ## Suggested ExecPlan Shape
 
 Use the repository's `.agent/PLANS.md` or `.agents/PLANS.md` if present and it
-declares a local policy. If no local policy exists, write the ExecPlan to
-`.agent/PLANS.md` using this shape:
+declares a local policy. If no local policy exists, write the ExecPlan to the
+default active task plan above using this shape:
 
 ```md
 # <Action-oriented title>
@@ -270,7 +272,10 @@ At completion, update the plan before reporting done:
 - move durable architecture or product truth to the repo's declared truth
   surface when the plan is temporary
 
-If the plan is no longer the durable truth after execution, leave a closeout
-receipt or remove it only when repository policy and the user request allow it.
+A branch-named plan in a task worktree is untracked by default and goes away
+with the worktree; a committed one is removed before its branch merges.
+For other plans that are no longer the durable truth after execution, leave a
+closeout receipt or remove them only when repository policy and the user
+request allow it.
 Completed plans must not be reopened for adjacent work unless the user
 explicitly asks to reopen that plan.
