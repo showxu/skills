@@ -62,7 +62,9 @@ than the skill's existing drift tolerance of 1/255 per channel.
 - Group `specular: false` changes the export; `true` equals the omitted default.
   Group `opacity` changes the export.
 - Shadow kinds `neutral`, `layer-color`, and `none` render successfully and
-  change the shadow at controlled opacity. `chromatic` is not a native spelling.
+  change the shadow at controlled opacity. DESIGN.md also accepts `chromatic`
+  for the chromatic shadow; both it and `layer-color` serialize to native
+  `layer-color`. Scalar and appearance-specific values use the same conversion.
 - Layer `solid` and `automatic-gradient` fills, fill alpha, and layer opacity
   change the export. The same color rendered as solid and automatic gradient
   produces different pixels.

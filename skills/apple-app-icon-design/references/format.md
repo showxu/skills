@@ -55,7 +55,9 @@ Optional group fields mirror the native material controls:
 - `specular`: boolean, enabling or disabling native specular highlights.
 - `opacity`: a number from 0 to 1.
 - `shadow`: `{"kind": "neutral", "opacity": 0.5}`. Kind is `neutral`,
-  `layer-color` (chromatic), or `none`; opacity is 0–1.
+  `chromatic`, `layer-color`, or `none`; opacity is 0–1. `chromatic` names the
+  chromatic shadow and is an alias for native `layer-color`. Both spellings
+  serialize as `layer-color`, including appearance overrides.
 - `translucency`: `{"enabled": true, "value": 0.3}`.
 - `blur-material`: a strength from 0 to 1.
 - `refractivity`: `{"enabled": true, "strength": 0.5, "depth": 0}`.

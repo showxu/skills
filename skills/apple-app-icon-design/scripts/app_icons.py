@@ -33,7 +33,7 @@ MASKED_WEB_SIZES = (("favicon-16.png", 16), ("favicon-32.png", 32), ("icon-192.p
                     ("icon-512.png", 512), ("avatar-1024.png", 1024))
 BLEND_MODES = ("normal", "plus-lighter", "plus-darker", "overlay", "multiply",
                "soft-light", "hard-light", "darken", "lighten", "screen")
-SHADOW_KINDS = ("neutral", "layer-color", "none")
+SHADOW_KINDS = ("neutral", "chromatic", "layer-color", "none")
 SAFE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\Z")
 
 # Icon Composer mask, measured for design generations 26 and 27 (references/rendering.md):
@@ -118,6 +118,7 @@ def validate_svg(data):
 def unit(value, label):
     if isinstance(value, bool) or not isinstance(value, (float, int)) or not 0 <= value <= 1:
         fail(f"{label} must be a number from 0 to 1")
+    return value
 
 
 def material(group):
@@ -150,6 +151,8 @@ def material(group):
 
 def material_value(key, value):
     material({key: value})
+    if key == "shadow" and value["kind"] == "chromatic":
+        return {**value, "kind": "layer-color"}
     return value
 
 
@@ -244,6 +247,8 @@ def prepare(spec, base, style):
             fail(f"group {gi + 1} needs layers")
         native = {k: v for k, v in group.items() if k != "layers" and not k.endswith("-specializations")}
         for key in GROUP_MATERIALS:
+            if key in native:
+                native[key] = material_value(key, native[key])
             specialize(group, native, key, lambda value: material_value(key, value))
         native["layers"] = []
         art = []
@@ -257,7 +262,7 @@ def prepare(spec, base, style):
             if "opacity" in layer:
                 unit(layer["opacity"], "layer opacity")
                 native_material["opacity"] = layer["opacity"]
-            specialize(layer, native_material, "opacity", lambda value: material_value("opacity", value))
+            specialize(layer, native_material, "opacity", lambda value: unit(value, "layer opacity"))
             source = layer.get("source")
             if "name" in layer and (not isinstance(layer["name"], str) or not layer["name"]):
                 fail("layer name must be nonempty text")
