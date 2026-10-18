@@ -1,6 +1,6 @@
 ---
 name: coding-plan
-description: Enter plan mode for a coding task inside a code repository. Use when the user asks for a written implementation plan before code changes, says plan mode, /coding-plan, make a plan, draft a plan first, give me a plan before you code, write a PLAN.md, update the existing PLAN.md, add a subplan, ExecPlan, PLANS.md, multi-hour plan, think before coding, investigate the codebase and propose an approach without touching source files, or otherwise asks for a repo-local plan artifact such as PLAN.md, .agent/PLAN.md, .agents/PLAN.md, .agent/PLANS.md, .agents/PLANS.md, or a repo-declared plans/*.md file. The default fallback plan surface is .agent/PLANS.md. This skill is read-only except for writing the selected plan file. Do not use when the user wants immediate implementation, a code review findings report, non-code research planning, final prose, or a conversational answer without a plan artifact.
+description: Enter plan mode for a coding task inside a code repository. Use when the user asks for a written implementation plan before code changes, says plan mode, /coding-plan, make a plan, draft a plan first, give me a plan before you code, write a PLAN.md, update the existing PLAN.md, add a subplan, ExecPlan, PLANS.md, multi-hour plan, think before coding, investigate the codebase and propose an approach without touching source files, or otherwise asks for a repo-local plan artifact such as PLAN.md, .agent/PLAN.md, .agents/PLAN.md, .agent/PLANS.md, .agents/PLANS.md, or a repo-declared plans/*.md file. Without a declared plan surface, the default is a branch-named file under .agent/plans/ in a task worktree, else .agent/PLANS.md. This skill is read-only except for writing the selected plan file. Do not use when the user wants immediate implementation, a code review findings report, non-code research planning, final prose, or a conversational answer without a plan artifact.
 ---
 
 # Plan Mode
@@ -38,6 +38,9 @@ While this skill is active:
 - Read-only operations are encouraged: file reads, code search, doc lookup,
   web search, non-mutating tool help, and dry-run inspection commands.
 - If a command may change repository state, skip it or ask before running it.
+- Exception: when the repository's instructions isolate tasks in worktrees and
+  the task's worktree does not exist yet, create it with its branch before
+  writing the plan. This is the only other permitted state change.
 
 Apply this boundary during the user's planning request, within the host's
 instruction hierarchy. An explicit request to implement the plan ends this
@@ -312,13 +315,14 @@ Check these surfaces in order:
    documented planning locations.
 5. Existing plan architecture: headings, status fields, slices, ledgers,
    checkboxes, closeout sections, and naming conventions.
-6. Fallback: if the repo has no planning convention, create or update
-   `.agent/PLANS.md`.
+6. Fallback: if the repo has no planning convention and its instructions
+   isolate tasks in worktrees, write `.agent/plans/<branch>.md` in the task's
+   worktree; otherwise create or update `.agent/PLANS.md`.
 
-Treat `.agent/PLANS.md` and `.agents/PLANS.md` as policy surfaces only when the
-repository clearly uses them that way or provides a separate active plan
-surface. Otherwise, `.agent/PLANS.md` is the default active fallback plan
-surface.
+Treat `.agent/PLANS.md` and `.agents/PLANS.md` as policy surfaces when the
+repository clearly uses them that way, provides a separate active plan
+surface, or the task-worktree fallback in item 6 applies. Otherwise,
+`.agent/PLANS.md` is the default active fallback plan surface.
 
 ### Active plan handling
 
@@ -340,11 +344,16 @@ only the sections needed for the current task.
 
 ### Filename
 
-If fallback is needed, use:
+If fallback is needed and the repository isolates tasks in worktrees, write
+the plan in the task's worktree, named after its branch:
+
+`.agent/plans/<branch>.md`, for example `.agent/plans/feat/export-cache.md`
+
+Otherwise use:
 
 `.agent/PLANS.md`
 
-Do not create `plans/` by default. Use a `plans/<prefix>-<short-kebab-name>.md`
+Do not create a root `plans/` directory by default. Use a `plans/<prefix>-<short-kebab-name>.md`
 file only when the user names that path, repository policy requires it, or an
 existing repo pattern clearly uses per-task files. If `.agent/` does not
 exist, create it. If `.agent/PLANS.md` already exists and belongs to unrelated

@@ -741,6 +741,113 @@ Evidence sources:
 - Existing locked plan status.
 - Generated or proposed non-conflicting plan surface.
 
+## branch-named-plan
+
+Target behavior: keep a task's plan in its own worktree when the repository
+isolates tasks in worktrees and declares no plan surface.
+
+Input prompt: "Write an implementation plan for adding an export cache before
+touching source files."
+
+Input setup:
+
+- Repository has `AGENTS.md` and `README.md` with no declared plan surface;
+  its instructions isolate tasks in worktrees.
+- The task runs on branch `feat/export-cache` in its own worktree.
+- An unrelated `.agent/PLANS.md` exists.
+- User did not name a plan path or approve implementation.
+
+Expected routing:
+
+- Use `coding-plan`.
+- Read repository guidance and `.agent/PLANS.md` only as policy.
+- Select `.agent/plans/feat/export-cache.md` in the task's worktree.
+- Stay read-only except for the selected plan file.
+
+Expected output:
+
+- A standalone implementation plan at `.agent/plans/feat/export-cache.md`,
+  left untracked.
+- The selected path and branch are reported.
+- `.agent/PLANS.md` remains unchanged, with no entry added for this task.
+
+Forbidden behavior:
+
+- Write the plan or add an index entry to `.agent/PLANS.md`.
+- Stage or commit the plan.
+- Overwrite unrelated work.
+- Edit source files or start implementation.
+
+Acceptance checks:
+
+- The plan exists at `.agent/plans/feat/export-cache.md` in the
+  `feat/export-cache` worktree and is neither staged nor committed.
+- `.agent/PLANS.md` is byte-for-byte unchanged.
+- The selected plan is the only file written.
+
+Baseline expectation:
+
+- A no-skill baseline may write the plan into `.agent/PLANS.md` or append a
+  shared index entry that conflicts with parallel tasks.
+
+Evidence sources:
+
+- Final response.
+- Generated plan artifact and branch state.
+- Transcript showing `.agent/PLANS.md` was read only as policy.
+- File diff confirming `.agent/PLANS.md` is unchanged.
+
+## worktree-plan-respects-declared-surface
+
+Target behavior: keep explicit and repository-declared plan surfaces ahead of
+the task-worktree default.
+
+Input prompt: "Write an implementation plan for adding an export cache before
+touching source files."
+
+Input setup:
+
+- Repository `AGENTS.md` declares that active plans live in
+  `docs/plans/<slug>.md`; its instructions isolate tasks in worktrees.
+- The task runs on branch `feat/export-cache` in its own worktree.
+- User did not name a plan path or approve implementation.
+
+Expected routing:
+
+- Use `coding-plan`.
+- Select `docs/plans/export-cache.md` from the repository declaration, in the
+  task's worktree.
+- Stay read-only except for the selected plan file.
+
+Expected output:
+
+- A standalone implementation plan at `docs/plans/export-cache.md` on
+  `feat/export-cache`.
+- The selected path, the declaration that chose it and the branch are reported.
+
+Forbidden behavior:
+
+- Write `.agent/plans/feat/export-cache.md` or `.agent/PLANS.md` instead of the
+  declared surface.
+- Write the plan in a checkout the task does not own.
+- Edit source files or start implementation.
+
+Acceptance checks:
+
+- The plan exists only at `docs/plans/export-cache.md` on `feat/export-cache`.
+- No file under `.agent/` was created or changed.
+
+Baseline expectation:
+
+- A no-skill baseline may apply the task-worktree default and ignore the
+  repository declaration.
+
+Evidence sources:
+
+- Final response.
+- Generated plan artifact and branch state.
+- Transcript showing the repository declaration was read.
+
 ## ambiguous-plan-surface
 
 Target behavior: resolve plan surface ambiguity from repository policy before
