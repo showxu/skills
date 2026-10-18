@@ -171,3 +171,31 @@ invocation, not automatic trigger quality.
   the tile.
 - Acceptance: The mac-tile sheet shows the breakout; lint does not report
   the unclipped group as outside the shape.
+
+
+## AI-16 — Native materials and independent artwork
+
+- Prompt: Give our glass layers gradient fills, a chromatic shadow and additive
+  blending, while preserving our flat, mac-tile and gloss icons.
+- Input: Original SVGs, group `plus-lighter`, `specular: false`, group and layer
+  opacity, `layer-color`/`none` shadows, and solid/automatic-gradient layer fills.
+- Expected: Native JSON preserves every control and native exports visibly
+  respond. Legacy styles, their complete web sets and sheets remain byte-identical.
+  Lint still measures SVG colors and emits informational fill notices.
+- Failure: Recoloring or fading the artwork in another style, treating an info
+  line as failure, or accepting ignored native properties as working controls.
+- Acceptance: Run material serialization, native rendering, style isolation,
+  lint, and baseline regressions in `scripts/test_app_icons.py`.
+
+## AI-17 — Appearance fill specialization
+
+- Prompt: Keep the normal green layer, make it red only in Dark, and use a
+  separate monochrome fill for Clear and Tinted.
+- Input: Layer `fill` plus `fill-specializations` for `dark` and `tinted`.
+- Expected: The document uses a single native specialization array with the
+  unqualified base fill and explicit appearance entries. Default retains green;
+  Dark changes to red; Clear/Tinted use their override.
+- Failure: Emitting `fill` beside the native array, leaking Dark into Default,
+  or treating Clear as an independently configurable fill family.
+- Acceptance: Pixel comparisons verify affected and unaffected renditions for
+  design generations 26 and 27; malformed fields and colors are rejected.

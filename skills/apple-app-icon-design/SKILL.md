@@ -35,9 +35,15 @@ or geometry. For a new entry, start from `examples/DESIGN.example.md`.
 2. Propose two or three concepts. Each names one central idea, a silhouette,
    a palette, and a layer plan: which shapes form the background color and
    each foreground group, back to front.
-3. Draft each concept as flat vector layers on a 1024 px canvas, or adopt the
+3. Draft each concept as vector layers on a 1024 px canvas, or adopt the
    owner's layers. Use filled shapes with clear edges, no text unless the
-   brand requires it, and no painted highlights, shadows, or masks.
+   brand requires it, and no painted highlights, shadows, or masks. Give SVG
+   artwork the colors needed by the earlier styles. For Liquid Glass, use
+   native layer `automatic-gradient` fills for modeled color, `solid` for
+   uniform color, and group glass and blend controls for overlapping material.
+   The [Apple icon study](references/rendering.md#apple-icon-material-study)
+   records why gradients, translucency, and compositing matter; tune them
+   together and inspect every appearance.
 4. Add each concept as an entry, run `--lint`, and render the candidates
    with `--sheet`. Ask the owner to choose; iterate on the entry and layers,
    never on generated files.

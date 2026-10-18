@@ -39,7 +39,8 @@ block. Each entry's key is its output name.
 Every group has a nonempty `layers` list in back-to-front order. The generator
 converts both group and layer order to Icon Composer's front-to-back format;
 style renderings and web icons retain the input's painting order. Each layer
-supplies a `source` path relative to DESIGN.md and an optional display `name`.
+supplies a `source` path relative to DESIGN.md and an optional display `name`,
+plus the optional native materials described below.
 SVG layers need `viewBox="0 0 1024 1024"`, with text converted to paths and no
 external file dependencies. PNG layers are 1024 px square. Supply
 transparency around the foreground; the renderer owns the background and
@@ -48,12 +49,53 @@ final mask.
 Optional group fields mirror the native material controls:
 
 - `name`: a descriptive group name, also used in lint findings.
-- `shadow`: `{"kind": "neutral", "opacity": 0.5}`.
+- `blend-mode`: `normal`, `plus-lighter`, `plus-darker`, `overlay`, `multiply`,
+  `soft-light`, `hard-light`, `darken`, `lighten`, or `screen`.
+- `specular`: boolean, enabling or disabling native specular highlights.
+- `opacity`: a number from 0 to 1.
+- `shadow`: `{"kind": "neutral", "opacity": 0.5}`. Kind is `neutral`,
+  `layer-color` (chromatic), or `none`; opacity is 0–1.
 - `translucency`: `{"enabled": true, "value": 0.3}`.
 - `blur-material`: a strength from 0 to 1.
 - `refractivity`: `{"enabled": true, "strength": 0.5, "depth": 0}`.
 
-These controls were inspected in Icon Composer 27. Native rendering must
+Optional layer materials:
+
+- `fill`: exactly one of `{"automatic-gradient": "#RRGGBB"}` or
+  `{"solid": "#RRGGBB"}`. Both accept six-digit RGB or eight-digit RGBA hex,
+  converted to native sRGB components. Alpha is independent of layer opacity.
+- `opacity`: a number from 0 to 1.
+- `fill-specializations`: a nonempty object mapping `default`, `dark`, and/or
+  `tinted` to fills of the same shape. `fill` supplies the inherited fill;
+  without it, native artwork behavior supplies the fallback. `default`
+  overrides only Default, `dark` only Dark, and `tinted` both Tinted and Clear
+  appearances. These are native appearance families, not platform overrides.
+
+For example, an original layer can use a gradient normally and a dimmer solid
+fill in Dark:
+
+```json
+{
+  "source": "layers/foreground.svg",
+  "fill": {"automatic-gradient": "#B38AFF"},
+  "opacity": 0.85,
+  "fill-specializations": {
+    "dark": {"solid": "#7155AA"},
+    "tinted": {"solid": "#CCCCCC"}
+  }
+}
+```
+
+Unknown fields, fill kinds, appearance names, and enum values are errors;
+booleans are not numbers. Material fields are serialized only into the native
+`.icon`. They do not recolor or fade the source artwork in other styles, their
+web icons, sheets, or drift checks. Liquid Glass masked web PNGs continue to
+come from the native iOS Default export; its SVG favicon and full-bleed web
+images retain their existing artwork composition.
+
+These controls were rendered with Icon Composer 27.0 (129), with appearance
+specializations checked in design generations 26 and 27. See the
+[probe results](rendering.md#native-material-schema). Native rendering must
 validate them for the selected tool version; a JSON document alone is not
 proof of material behavior. Start with defaults and inspect appearance
 exports before adding blur or refraction. Style renderings ignore material

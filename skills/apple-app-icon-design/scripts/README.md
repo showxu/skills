@@ -36,7 +36,8 @@ iOS home screen icon; `avatar-1024.png` suits profiles and listings.
 `touch.svg` and `maskable.svg` are their sources.
 
 `--lint` checks every style of the entry, or only `--style`, prints `clean`
-or one tab-separated finding per line, and exits 1 on any finding. `--sheet`
+or one tab-separated finding per line, and exits 1 on any finding. Material
+fill notices use `info` lines and do not affect the exit status. `--sheet`
 writes a new self-contained SVG comparing each named entry in each of its
 styles at 160 and 32 px on light and dark backgrounds. Without an
 export-capable `ictool`, its Liquid Glass cells say so. Convert it with
@@ -49,5 +50,8 @@ document-only run does not establish native rendition or visual readiness.
 
 Run `python3 scripts/test_app_icons.py` for document, style, lint, drift,
 preservation, dimension, and failure-path regressions. Rendering tests run
-only when `rsvg-convert` is installed; use the native example and contact
-sheets to validate renderer behavior and visual quality.
+only when `rsvg-convert` is installed. Native material and appearance tests
+run when export-capable `ictool` is available. Set `APP_ICONS_BASELINE` to a
+pre-change `app_icons.py` to compare all example styles; see the exact-byte and
+native-rounding distinction in [rendering](../references/rendering.md#drift).
+Use native contact sheets for visual quality review.

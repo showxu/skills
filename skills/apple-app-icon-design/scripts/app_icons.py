@@ -25,7 +25,13 @@ STYLE_FIELDS = {"liquid-glass": {"groups", "design_generation"}, "flat": {"group
                 "mac-tile": {"groups", "unclipped"}, "gloss": {"groups"}}
 GENERATIONS = (26, 27)
 ENTRY_FIELDS = {"background", "gradient", "groups", "maskable_scale", "styles"}
-GROUP_FIELDS = {"name", "layers", "shadow", "translucency", "blur-material", "refractivity"}
+GROUP_FIELDS = {"name", "layers", "shadow", "translucency", "blur-material", "refractivity",
+                "blend-mode", "specular", "opacity"}
+LAYER_FIELDS = {"source", "name", "fill", "fill-specializations", "opacity"}
+FILL_APPEARANCES = {"default": "light", "dark": "dark", "tinted": "tinted"}
+BLEND_MODES = ("normal", "plus-lighter", "plus-darker", "overlay", "multiply",
+               "soft-light", "hard-light", "darken", "lighten", "screen")
+SHADOW_KINDS = ("neutral", "layer-color", "none")
 SAFE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\Z")
 
 # Icon Composer mask, measured for design generations 26 and 27 (references/rendering.md):
@@ -81,6 +87,16 @@ def color(value):
     return "srgb:" + ",".join(f"{int(value[i:i+2], 16)/255:.5f}" for i in (1, 3, 5)) + ",1.00000"
 
 
+def layer_fill(value):
+    if not isinstance(value, dict) or len(value) != 1 or next(iter(value)) not in ("solid", "automatic-gradient"):
+        fail("layer fill needs exactly one solid or automatic-gradient color")
+    kind, hex_color = next(iter(value.items()))
+    if not isinstance(hex_color, str) or not re.fullmatch(r"#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?", hex_color):
+        fail("layer fill color must be #RRGGBB or #RRGGBBAA")
+    rgba = hex_color + "FF" if len(hex_color) == 7 else hex_color
+    return {kind: "srgb:" + ",".join(f"{int(rgba[i:i+2], 16)/255:.5f}" for i in (1, 3, 5, 7))}
+
+
 def validate_svg(data):
     root = ET.fromstring(data)
     viewbox = [float(v) for v in re.split(r"[\s,]+", root.get("viewBox", "").strip()) if v]
@@ -107,6 +123,12 @@ def material(group):
         fail("group name must be nonempty text")
     if "blur-material" in group:
         unit(group["blur-material"], "blur-material")
+    if "opacity" in group:
+        unit(group["opacity"], "group opacity")
+    if "specular" in group and not isinstance(group["specular"], bool):
+        fail("specular must be true or false")
+    if "blend-mode" in group and group["blend-mode"] not in BLEND_MODES:
+        fail(f"blend-mode must be one of {', '.join(BLEND_MODES)}")
     for key, fields in {"translucency": {"enabled", "value"},
                         "refractivity": {"enabled", "strength", "depth"},
                         "shadow": {"kind", "opacity"}}.items():
@@ -116,8 +138,8 @@ def material(group):
         if not isinstance(obj, dict) or set(obj) != fields:
             fail(f"{key} needs exactly {', '.join(sorted(fields))}")
         if key == "shadow":
-            if obj["kind"] not in {"neutral", "chromatic"}:
-                fail("shadow kind must be neutral or chromatic")
+            if obj["kind"] not in SHADOW_KINDS:
+                fail(f"shadow kind must be one of {', '.join(SHADOW_KINDS)}")
         elif not isinstance(obj["enabled"], bool):
             fail(f"{key}.enabled must be true or false")
         for field in fields - {"enabled", "kind"}:
@@ -194,8 +216,26 @@ def prepare(spec, base, style):
         native["layers"] = []
         art = []
         for li, layer in enumerate(layers):
-            if not isinstance(layer, dict) or set(layer) - {"source", "name"}:
-                fail(f"group {gi + 1}, layer {li + 1}: expected source and optional name")
+            if not isinstance(layer, dict) or set(layer) - LAYER_FIELDS:
+                fail(f"group {gi + 1}, layer {li + 1}: unknown layer fields")
+            native_material = {}
+            if "fill" in layer:
+                native_material["fill"] = layer_fill(layer["fill"])
+            if "fill-specializations" in layer:
+                overrides = layer["fill-specializations"]
+                if (not isinstance(overrides, dict) or not overrides
+                        or set(overrides) - FILL_APPEARANCES.keys()):
+                    fail("fill-specializations must map default, dark, or tinted to layer fills")
+                # Native fill and fill-specializations are alternative encodings: fill wins
+                # if both exist. An unqualified specialization carries the inherited fill.
+                specializations = ([{"value": native_material.pop("fill")}]
+                                   if "fill" in native_material else [])
+                specializations.extend({"appearance": native, "value": layer_fill(overrides[appearance])}
+                                       for appearance, native in FILL_APPEARANCES.items() if appearance in overrides)
+                native_material["fill-specializations"] = specializations
+            if "opacity" in layer:
+                unit(layer["opacity"], "layer opacity")
+                native_material["opacity"] = layer["opacity"]
             source = layer.get("source")
             if "name" in layer and (not isinstance(layer["name"], str) or not layer["name"]):
                 fail("layer name must be nonempty text")
@@ -212,7 +252,8 @@ def prepare(spec, base, style):
                 fail("PNG layers must be 1024 px square")
             filename = f"{gi + 1:02d}-{li + 1:02d}{suffix}"
             assets[filename] = data
-            native["layers"].append({"image-name": filename, "name": layer.get("name", path.stem)})
+            native["layers"].append({"image-name": filename, "name": layer.get("name", path.stem),
+                                     **native_material})
             art.append((suffix, data))
         if group.get("refractivity", {}).get("enabled"):
             document["features"] = ["refractivity"]
@@ -220,7 +261,8 @@ def prepare(spec, base, style):
         native["layers"].reverse()
         document["groups"].insert(0, native)
         loaded.append({"label": group.get("name", f"group {gi + 1}"), "art": art,
-                       "clipped": gi + 1 not in unclipped})
+                       "clipped": gi + 1 not in unclipped,
+                       "native_fill": any("fill" in layer or "fill-specializations" in layer for layer in layers)})
     return document, assets, loaded, options
 
 
@@ -673,8 +715,12 @@ def lint_findings(groups, outline, base_lightness, size, display_scale):
     return findings
 
 
-def lint(spec, base, style, work):
+def lint(spec, base, style, work, information=None):
     _, _, groups, _ = prepare(spec, base, style)
+    if information is not None:
+        information.extend(f"{group['label']}: Liquid Glass appearance is determined by layer fill; "
+                           "lightness findings refer to SVG/PNG artwork used by other styles"
+                           for group in groups if group["native_fill"])
 
     def raster(name, body):
         svg = work / f"{name}.svg"
@@ -778,7 +824,10 @@ def main():
                 for style in styles:
                     if args.style:
                         select_style(entries[name], style)
-                    findings += [f"{style}\t{text}" for text in lint(entries[name], base, style, Path(temp))]
+                    information = []
+                    findings += [f"{style}\t{text}" for text in lint(entries[name], base, style, Path(temp), information)]
+                    for text in information:
+                        print(f"info\t{style}\t{text}")
             print("\n".join(findings) if findings else "clean")
             return 1 if findings else 0
         if args.sheet:
@@ -802,8 +851,10 @@ def main():
             fail("output directory exists; use a fresh directory or --check to inspect drift")
         if args.check and not target.is_dir():
             fail("check target is not a directory")
-        target.parent.mkdir(parents=True, exist_ok=True)
-        with tempfile.TemporaryDirectory(prefix=".app-icon-", dir=target.parent) as temp:
+        if args.out:
+            target.parent.mkdir(parents=True, exist_ok=True)
+        # Publishing needs a same-filesystem rename; checking must not write near the target.
+        with tempfile.TemporaryDirectory(prefix=".app-icon-", dir=target.parent if args.out else None) as temp:
             candidate = Path(temp) / "output"
             build(name, entries[name], base, candidate, style, tool, args.document_only)
             if args.check:
