@@ -24,11 +24,13 @@ STYLES = ("liquid-glass", "flat", "mac-tile", "gloss")
 STYLE_FIELDS = {"liquid-glass": {"groups", "design_generation"}, "flat": {"groups"},
                 "mac-tile": {"groups", "unclipped"}, "gloss": {"groups"}}
 GENERATIONS = (26, 27)
-ENTRY_FIELDS = {"background", "gradient", "groups", "maskable_scale", "styles"}
-GROUP_FIELDS = {"name", "layers", "shadow", "translucency", "blur-material", "refractivity",
-                "blend-mode", "specular", "opacity"}
-LAYER_FIELDS = {"source", "name", "fill", "fill-specializations", "opacity"}
-FILL_APPEARANCES = {"default": "light", "dark": "dark", "tinted": "tinted"}
+ENTRY_FIELDS = {"background", "gradient", "groups", "maskable_scale", "styles", "web_dark"}
+GROUP_MATERIALS = ("shadow", "translucency", "blur-material", "refractivity", "blend-mode", "specular", "opacity")
+GROUP_FIELDS = {"name", "layers", *GROUP_MATERIALS, *(f"{key}-specializations" for key in GROUP_MATERIALS)}
+LAYER_FIELDS = {"source", "name", "fill", "fill-specializations", "opacity", "opacity-specializations"}
+APPEARANCES = {"default": "light", "dark": "dark", "tinted": "tinted"}
+MASKED_WEB_SIZES = (("favicon-16.png", 16), ("favicon-32.png", 32), ("icon-192.png", 192),
+                    ("icon-512.png", 512), ("avatar-1024.png", 1024))
 BLEND_MODES = ("normal", "plus-lighter", "plus-darker", "overlay", "multiply",
                "soft-light", "hard-light", "darken", "lighten", "screen")
 SHADOW_KINDS = ("neutral", "layer-color", "none")
@@ -146,6 +148,32 @@ def material(group):
             unit(obj[field], f"{key}.{field}")
 
 
+def material_value(key, value):
+    material({key: value})
+    return value
+
+
+def specialize(source, native, key, convert):
+    """Encode one native property with its inherited value and appearance overrides."""
+    field = f"{key}-specializations"
+    if field not in source:
+        return
+    overrides = source[field]
+    if not isinstance(overrides, dict) or not overrides or set(overrides) - APPEARANCES.keys():
+        fail(f"{field} must map default, dark, or tinted to {key} values")
+    # Scalar and specialized native properties are alternative encodings: the scalar
+    # wins if both exist. An unqualified specialization carries the inherited value.
+    values = [{"value": native.pop(key)}] if key in native else []
+    for appearance, native_appearance in APPEARANCES.items():
+        if appearance in overrides:
+            try:
+                value = convert(overrides[appearance])
+            except ValueError as exc:
+                fail(f"{field}.{appearance}: {exc}")
+            values.append({"appearance": native_appearance, "value": value})
+    native[field] = values
+
+
 def entry_styles(spec):
     """Return the entry's style options, defaulting to Liquid Glass alone."""
     styles = spec.get("styles", {"liquid-glass": {}})
@@ -186,6 +214,8 @@ def prepare(spec, base, style):
     fill = color(spec.get("background"))
     if not isinstance(spec.get("gradient", False), bool):
         fail("gradient must be true or false")
+    if not isinstance(spec.get("web_dark", False), bool):
+        fail("web_dark must be true or false")
     scale = spec.get("maskable_scale", 0.56)
     if not isinstance(scale, (float, int)) or not 0 < scale <= 0.56:
         fail("maskable_scale must be greater than zero and at most 0.56")
@@ -212,7 +242,9 @@ def prepare(spec, base, style):
         layers = group.get("layers")
         if not isinstance(layers, list) or not layers:
             fail(f"group {gi + 1} needs layers")
-        native = {k: v for k, v in group.items() if k != "layers"}
+        native = {k: v for k, v in group.items() if k != "layers" and not k.endswith("-specializations")}
+        for key in GROUP_MATERIALS:
+            specialize(group, native, key, lambda value: material_value(key, value))
         native["layers"] = []
         art = []
         for li, layer in enumerate(layers):
@@ -221,21 +253,11 @@ def prepare(spec, base, style):
             native_material = {}
             if "fill" in layer:
                 native_material["fill"] = layer_fill(layer["fill"])
-            if "fill-specializations" in layer:
-                overrides = layer["fill-specializations"]
-                if (not isinstance(overrides, dict) or not overrides
-                        or set(overrides) - FILL_APPEARANCES.keys()):
-                    fail("fill-specializations must map default, dark, or tinted to layer fills")
-                # Native fill and fill-specializations are alternative encodings: fill wins
-                # if both exist. An unqualified specialization carries the inherited fill.
-                specializations = ([{"value": native_material.pop("fill")}]
-                                   if "fill" in native_material else [])
-                specializations.extend({"appearance": native, "value": layer_fill(overrides[appearance])}
-                                       for appearance, native in FILL_APPEARANCES.items() if appearance in overrides)
-                native_material["fill-specializations"] = specializations
+            specialize(layer, native_material, "fill", layer_fill)
             if "opacity" in layer:
                 unit(layer["opacity"], "layer opacity")
                 native_material["opacity"] = layer["opacity"]
+            specialize(layer, native_material, "opacity", lambda value: material_value("opacity", value))
             source = layer.get("source")
             if "name" in layer and (not isinstance(layer["name"], str) or not layer["name"]):
                 fail("layer name must be nonempty text")
@@ -255,7 +277,8 @@ def prepare(spec, base, style):
             native["layers"].append({"image-name": filename, "name": layer.get("name", path.stem),
                                      **native_material})
             art.append((suffix, data))
-        if group.get("refractivity", {}).get("enabled"):
+        refractivities = [group.get("refractivity", {})] + list(group.get("refractivity-specializations", {}).values())
+        if any(value.get("enabled") for value in refractivities):
             document["features"] = ["refractivity"]
         # Icon Composer lists the foremost layer and group first; SVG paints last on top.
         native["layers"].reverse()
@@ -482,8 +505,7 @@ def web_set(web, style, spec, groups, masked_source):
     (web / "touch.svg").write_text(compose(style, spec, groups, masked=False))
     (web / "maskable.svg").write_text(compose(style, spec, groups, masked=False,
                                               scale=spec.get("maskable_scale", 0.56)))
-    for target, size in (("favicon-16.png", 16), ("favicon-32.png", 32), ("icon-192.png", 192),
-                         ("icon-512.png", 512), ("avatar-1024.png", 1024)):
+    for target, size in MASKED_WEB_SIZES:
         if masked_source.suffix == ".png":
             resize_png(masked_source, web / target, size)
         else:
@@ -539,6 +561,11 @@ def build(name, spec, base, out, style="liquid-glass", ictool=None, document_onl
             png_payload(path, size)
             files[(platform, rendition)] = path
     web_set(out / "web", style, spec, groups, files[("iOS", "Default")])
+    if spec.get("web_dark", False):
+        dark_web = out / "web" / "dark"
+        dark_web.mkdir()
+        for filename, size in MASKED_WEB_SIZES:
+            resize_png(files[("iOS", "Dark")], dark_web / filename, size)
     (out / "contact-sheet.svg").write_text(native_sheet(files))
     run(["rsvg-convert", out / "contact-sheet.svg", "-o", out / "contact-sheet.png"])
     write_manifest(out, {"style": style, "rendering": "native", "renderer": run([ictool, "--version"]),

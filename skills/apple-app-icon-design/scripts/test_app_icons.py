@@ -478,6 +478,59 @@ class MaterialTests(unittest.TestCase):
             with self.subTest(overrides=value), self.assertRaises(ValueError):
                 self.prepared(layer={'fill-specializations': value})
 
+    def test_material_specialization_validation_and_serialization(self):
+        cases = {
+            'opacity': (1, 0.25, [True, -1, 2, '0.3', None, float('nan'), float('inf')]),
+            'blend-mode': ('normal', 'screen', ['invalid', True, [], None]),
+            'specular': (True, False, [0, 1, 'false', None]),
+            'shadow': ({'kind': 'neutral', 'opacity': 0.5}, {'kind': 'layer-color', 'opacity': 0.3},
+                       [{'kind': 'chromatic', 'opacity': 0.5}, {'kind': 'none'}, {'kind': 'none', 'opacity': 2}]),
+            'translucency': ({'enabled': True, 'value': 0.3}, {'enabled': False, 'value': 0},
+                            [{'enabled': 1, 'value': 0.3}, {'enabled': True, 'value': -1}]),
+            'blur-material': (0.5, 0.8, [-1, 2, True, '0.3', None]),
+            'refractivity': ({'enabled': False, 'strength': 0, 'depth': 0},
+                             {'enabled': True, 'strength': 0.4, 'depth': 0.1},
+                             [{'enabled': True, 'strength': 0.4}, {'enabled': True, 'strength': 0.4, 'depth': 2}]),
+        }
+        self.assertEqual(set(cases), set(app_icons.GROUP_MATERIALS))
+        for key, (base, override, bad_values) in cases.items():
+            field = key + '-specializations'
+            for owner in (('group', 'layer') if key == 'opacity' else ('group',)):
+                for appearance, native_appearance in [('default', 'light'), ('dark', 'dark'), ('tinted', 'tinted')]:
+                    with self.subTest(key=key, owner=owner, appearance=appearance):
+                        group = self.prepared(**{owner: {key: base, field: {appearance: override}}})
+                        native = group if owner == 'group' else group['layers'][0]
+                        self.assertNotIn(key, native)
+                        self.assertEqual(native[field], [{'value': base},
+                                                        {'appearance': native_appearance, 'value': override}])
+                        group = self.prepared(**{owner: {field: {appearance: override}}})
+                        native = group if owner == 'group' else group['layers'][0]
+                        self.assertEqual(native[field], [{'appearance': native_appearance, 'value': override}])
+                invalid_maps = [None, [], {}, {'light': override}, {'base': override}, {'Dark': override},
+                                {'clear': override}, {'dark': override, 'unknown': override}]
+                invalid_maps += [{'dark': bad} for bad in bad_values]
+                for value in invalid_maps:
+                    with self.subTest(key=key, owner=owner, invalid=value), self.assertRaises(ValueError):
+                        self.prepared(**{owner: {field: value}})
+        for owner, field in [('layer', 'shadow-specializations'), ('group', 'fill-specializations'),
+                             ('group', 'lighting-specializations'), ('layer', 'blend-mode-specializations')]:
+            with self.subTest(owner=owner, field=field), self.assertRaises(ValueError):
+                self.prepared(**{owner: {field: {'dark': 0}}})
+
+    def test_specialized_refraction_enables_native_feature(self):
+        self.spec['groups'][0]['refractivity-specializations'] = {
+            'dark': {'enabled': True, 'strength': 0.4, 'depth': 0.1}}
+        doc = app_icons.prepare(self.spec, self.root, 'liquid-glass')[0]
+        self.assertEqual(doc['features'], ['refractivity'])
+
+    def test_web_dark_is_an_explicit_entry_boolean(self):
+        for value in (0, 1, 'true', None, [], {}):
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'web_dark'):
+                app_icons.prepare({**self.spec, 'web_dark': value}, self.root, 'liquid-glass')
+        for value in (True, False):
+            self.assertEqual(app_icons.prepare({**self.spec, 'web_dark': value}, self.root, 'liquid-glass'),
+                             app_icons.prepare(self.spec, self.root, 'liquid-glass'))
+
     def test_material_document_serialization_preserves_artwork(self):
         group = self.spec['groups'][0]
         group.update({'blend-mode': 'plus-lighter', 'specular': False, 'opacity': 0.8,
@@ -499,13 +552,17 @@ class MaterialIsolationTests(unittest.TestCase):
         plain = copy.deepcopy(self.spec)
         plain['styles'] = {style: {} for style in ('flat', 'mac-tile', 'gloss')}
         enriched = copy.deepcopy(plain)
+        enriched['web_dark'] = True
         for group in enriched['groups']:
             group.update({'blend-mode': 'multiply', 'specular': False, 'opacity': 0.1,
                           'shadow': {'kind': 'layer-color', 'opacity': 0.9},
                           'refractivity': {'enabled': True, 'strength': 0.8, 'depth': 0.2},
                           'blur-material': 0.7, 'translucency': {'enabled': True, 'value': 0.8}})
             group['layers'][0].update({'fill': {'automatic-gradient': '#FF000080'}, 'opacity': 0.2,
-                                      'fill-specializations': {'dark': {'solid': '#00FF00'}}})
+                                      'fill-specializations': {'dark': {'solid': '#00FF00'}},
+                                      'opacity-specializations': {'dark': 0.5}})
+            for key in app_icons.GROUP_MATERIALS:
+                group[key + '-specializations'] = {'dark': group[key]}
         for style in plain['styles']:
             with self.subTest(style=style):
                 outputs = [self.root / (style + suffix) for suffix in ('-plain', '-materials')]
@@ -634,7 +691,100 @@ class NativeMaterialTests(unittest.TestCase):
                         else:
                             self.assertLessEqual(difference, app_icons.PNG_TOLERANCE)
 
+    def test_material_overrides_affect_only_their_appearance_family(self):
+        (self.root / 'back.svg').write_text(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">'
+            '<path fill="#FF5020" d="M280 100H480V900H280Z"/>'
+            '<path fill="#1060FF" d="M500 100H700V900H500Z"/></svg>')
+        self.spec['groups'].insert(0, {'layers': [{'source': 'back.svg'}]})
+        cases = [
+            ('group', 'opacity', 1, 0.2), ('layer', 'opacity', 1, 0.2),
+            ('group', 'blend-mode', 'normal', 'multiply'), ('group', 'specular', True, False),
+            ('group', 'shadow', {'kind': 'neutral', 'opacity': 0.8}, {'kind': 'none', 'opacity': 0}),
+            ('group', 'translucency', {'enabled': True, 'value': 0.1}, {'enabled': True, 'value': 0.8}),
+            ('group', 'blur-material', 0, 0.9),
+            ('group', 'refractivity', {'enabled': True, 'strength': 0, 'depth': 0.1},
+             {'enabled': True, 'strength': 0.8, 'depth': 0.6})]
+        for generation in app_icons.GENERATIONS:
+            for owner, key, initial, value in cases:
+                base = copy.deepcopy(self.spec)
+                group = base['groups'][1]
+                target = group if owner == 'group' else group['layers'][0]
+                target[key] = initial
+                controls = {r: self.render(base, r, generation) for r in app_icons.RENDITIONS}
+                for appearance, affected in {'default': {'Default'}, 'dark': {'Dark'},
+                                             'tinted': {'ClearLight', 'ClearDark', 'TintedLight', 'TintedDark'}}.items():
+                    # Generation 26 ignores this refraction model in both encodings.
+                    if generation == 26 and key == 'refractivity':
+                        affected = set()
+                    spec = copy.deepcopy(base)
+                    group = spec['groups'][1]
+                    target = group if owner == 'group' else group['layers'][0]
+                    target[key + '-specializations'] = {appearance: value}
+                    deltas = {}
+                    for rendition, control in controls.items():
+                        with self.subTest(generation=generation, owner=owner, key=key,
+                                          appearance=appearance, rendition=rendition):
+                            difference = self.delta(control, self.render(spec, rendition, generation))
+                            deltas[rendition] = difference
+                            if generation == 26 and key == 'refractivity' and appearance == 'default':
+                                scalar = copy.deepcopy(base)
+                                scalar['groups'][1][key] = value
+                                self.assertLessEqual(self.delta(control, self.render(scalar, rendition, generation)),
+                                                     app_icons.PNG_TOLERANCE)
+                            if rendition in affected:
+                                self.assertGreater(difference, app_icons.PNG_TOLERANCE)
+                            else:
+                                self.assertLessEqual(difference, app_icons.PNG_TOLERANCE)
+                    print(f'appearance\t{generation}\t{owner}.{key}\t{appearance}\t{deltas}', flush=True)
 
+    def test_opacity_override_without_base_uses_native_default(self):
+        for owner in ('group', 'layer'):
+            spec = copy.deepcopy(self.spec)
+            group = spec['groups'][0]
+            target = group if owner == 'group' else group['layers'][0]
+            target['opacity-specializations'] = {'dark': 0.25}
+            for rendition in app_icons.RENDITIONS:
+                with self.subTest(owner=owner, rendition=rendition):
+                    difference = self.delta(self.render(self.spec, rendition), self.render(spec, rendition))
+                    if rendition == 'Dark':
+                        self.assertGreater(difference, app_icons.PNG_TOLERANCE)
+                    else:
+                        self.assertLessEqual(difference, app_icons.PNG_TOLERANCE)
+
+    @unittest.skipUnless(shutil.which('rsvg-convert'), 'rsvg-convert scales native web exports')
+    def test_dark_web_set_comes_from_native_dark_and_is_opt_in(self):
+        self.spec['groups'][0]['layers'][0].update({
+            'fill': {'solid': '#00FF00'}, 'fill-specializations': {'dark': {'solid': '#FF0000'}}})
+        out = self.root / 'dark-output'
+        app_icons.build('example', {**self.spec, 'web_dark': True}, self.root, out, ictool=self.tool)
+        dark = out / 'web/dark'
+        self.assertEqual({p.name for p in dark.iterdir()}, {name for name, _ in app_icons.MASKED_WEB_SIZES})
+        manifest = json.loads((out / 'manifest.json').read_text())
+        for name, size in app_icons.MASKED_WEB_SIZES:
+            app_icons.png_payload(dark / name, size)
+            expected = self.root / name
+            app_icons.resize_png(out / 'renditions/iOS-Dark.png', expected, size)
+            self.assertEqual(expected.read_bytes(), (dark / name).read_bytes())
+            self.assertNotEqual(app_icons.png_payload(dark / name), app_icons.png_payload(out / 'web' / name))
+            self.assertIn('web/dark/' + name, manifest['files'])
+        # Reuse the actual native exports to isolate opt-in behavior from GPU rounding.
+        original_run = app_icons.run
+        def replay(args):
+            if '--export-image' in args:
+                output = Path(args[args.index('--output-file') + 1])
+                output.write_bytes((out / 'renditions' / output.name).read_bytes())
+                return ''
+            return original_run(args)
+        with patch.object(app_icons, 'run', side_effect=replay):
+            for label, spec in [('off', {**self.spec, 'web_dark': False}), ('omitted', self.spec)]:
+                app_icons.build('example', spec, self.root, self.root / label, ictool=self.tool)
+        off = tree_bytes(self.root / 'off')
+        self.assertEqual(off, tree_bytes(self.root / 'omitted'))
+        self.assertFalse((self.root / 'off/web/dark').exists())
+        for name, data in off.items():
+            if name != 'manifest.json':
+                self.assertEqual(data, (out / name).read_bytes(), name)
 @unittest.skipUnless(os.environ.get('APP_ICONS_BASELINE'), 'set APP_ICONS_BASELINE to the pre-change script')
 @unittest.skipUnless(shutil.which('rsvg-convert'), 'rsvg-convert renders the examples')
 class BaselineRenderingTests(unittest.TestCase):
@@ -699,6 +849,11 @@ class BaselineRenderingTests(unittest.TestCase):
                                     app_icons.build(name, spec, design.parent, replay, style, tool)
                                 self.assertEqual(used, exports.keys())
                                 after = tree_bytes(replay)
+                                disabled = Path(temp) / f'{design.stem}-{name}-{style}-disabled'
+                                with patch.object(app_icons, 'run', side_effect=replay_native):
+                                    app_icons.build(name, {**spec, 'web_dark': False}, design.parent, disabled, style, tool)
+                                self.assertEqual(after, tree_bytes(disabled))
+                                print(f'baseline-option-off\t{name}\t{style}\t{len(after)} files byte-identical', flush=True)
                             self.assertEqual([key for key in before if before[key] != after[key]], [])
                             print(f'baseline-producer\t{name}\t{style}\t{len(before)} files byte-identical', flush=True)
 

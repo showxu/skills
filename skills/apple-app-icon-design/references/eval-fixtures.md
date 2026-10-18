@@ -187,15 +187,31 @@ invocation, not automatic trigger quality.
 - Acceptance: Run material serialization, native rendering, style isolation,
   lint, and baseline regressions in `scripts/test_app_icons.py`.
 
-## AI-17 — Appearance fill specialization
+## AI-17 — Appearance material specialization
 
 - Prompt: Keep the normal green layer, make it red only in Dark, and use a
   separate monochrome fill for Clear and Tinted.
-- Input: Layer `fill` plus `fill-specializations` for `dark` and `tinted`.
+- Input: Layer `fill` plus `fill-specializations` for `dark` and `tinted`,
+  layer/group opacity overrides, and per-appearance group materials.
 - Expected: The document uses a single native specialization array with the
-  unqualified base fill and explicit appearance entries. Default retains green;
-  Dark changes to red; Clear/Tinted use their override.
+  unqualified base value and explicit appearance entries for each property.
+  Default retains green; Dark changes to red; Clear/Tinted use their override.
+  Opacity and group material changes stay within the selected family.
 - Failure: Emitting `fill` beside the native array, leaking Dark into Default,
   or treating Clear as an independently configurable fill family.
 - Acceptance: Pixel comparisons verify affected and unaffected renditions for
-  design generations 26 and 27; malformed fields and colors are rejected.
+  design generations 26 and 27; refraction takes effect in generation 27.
+  Malformed fields, partial material objects, and invalid colors are rejected.
+
+## AI-18 — Optional native dark web set
+
+- Prompt: Provide dark favicons and manifest icons for our Liquid Glass icon.
+- Input: An entry with distinct Default and Dark fills and `web_dark: true`.
+- Expected: Five masked PNG sizes under `web/dark/`, resized from native iOS
+  Dark and listed in the manifest. The default web files retain their bytes.
+- Preserve: The other styles, source artwork, and existing full-bleed files.
+- Failure: Synthesizing dark colors from the artwork, changing the default
+  set, or producing dark files when the option is omitted or false.
+- Acceptance: Verify the five PNGs against resizes of native iOS Dark; compare
+  omitted/false output byte-for-byte against the baseline using identical
+  native exports.

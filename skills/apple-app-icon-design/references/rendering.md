@@ -70,31 +70,64 @@ than the skill's existing drift tolerance of 1/255 per channel.
   preliminary probes; these are not supported entry fields. The compiled icon
   catalog's `LayerBlendMode` does not establish a layer-level editable control.
 
-Native `fill` and `fill-specializations` are alternative encodings. When both
-are present, `fill` wins and the override array is ignored. For an inherited
-green solid fill with a red Dark override, emit only:
+Native scalar properties and their `-specializations` arrays are alternative
+encodings. When both are present, the scalar wins and the override array is
+ignored. This applies to layer fill and opacity, and to group opacity,
+blend mode, specular, shadow, translucency, blur material, and refractivity.
+For an inherited green solid fill with a red Dark override and full opacity
+only in Dark, emit:
 
 ```json
 {
   "fill-specializations": [
     {"value": {"solid": "srgb:0.00000,1.00000,0.00000,1.00000"}},
     {"appearance": "dark", "value": {"solid": "srgb:1.00000,0.00000,0.00000,1.00000"}}
+  ],
+  "opacity-specializations": [
+    {"value": 0.6},
+    {"appearance": "dark", "value": 1}
   ]
 }
 ```
 
-The unqualified item carries the base fill. The native appearance keys are
-`light`, `dark`, and `tinted`; DESIGN.md uses `default`, `dark`, and `tinted`.
-Render probes in design generations 26 and 27 verify that `light` affects
-only Default, `dark` only Dark, and `tinted` all four Clear/Tinted renditions.
-Unmatched appearances retain the base fill. Unknown fields are errors in the
-entry contract, even when the native decoder might silently ignore them.
+The unqualified item carries the inherited value (native `base`). The explicit
+native appearance keys are `light`, `dark`, and `tinted`; DESIGN.md uses
+`default`, `dark`, and `tinted`. Unmatched appearances retain the inherited
+value, or the native default if no base was supplied. Layer fill and both
+opacity owners were also rendered with no explicit base. Unknown fields are
+errors in the entry contract, even when the native decoder might ignore them.
+
+Probes compare all six iOS renditions for each property and each specialization
+separately. A striped backdrop makes blur and refraction measurable. Results:
+
+| Material | Generation 26 | Generation 27 |
+| --- | --- | --- |
+| Layer fill, layer/group opacity | Only the selected appearance family changes | Only the selected appearance family changes |
+| Group blend mode, specular, shadow, translucency, blur material | Only the selected appearance family changes | Only the selected appearance family changes |
+| Group refractivity | Both scalar and specialized values have no visible effect | Only the selected appearance family changes |
+
+For each effective material, `light` changes only Default, `dark` only Dark,
+and `tinted` all four Clear/Tinted renditions. Clear is not a separate
+specialization family. Changes must exceed 1/255 per channel; unmatched
+renditions must stay within the existing drift tolerance. These assertions
+run in `NativeMaterialTests` when the export-capable renderer is available.
 
 Only the native document carries materials. `flat`, `mac-tile`, and `gloss`,
 their web icons, contact/comparison sheets, and drift checks use the original
 SVG/PNG artwork. Liquid Glass masked web PNGs and its sheet cells use native
 exports; its SVG favicon and full-bleed web sources keep their existing
 artwork-only composition. Lint also measures artwork, never approximated glass.
+
+### Optional dark web exports
+
+Entry `web_dark: true` adds `web/dark/favicon-16.png`,
+`web/dark/favicon-32.png`, `web/dark/icon-192.png`, `web/dark/icon-512.png`,
+and `web/dark/avatar-1024.png` for Liquid Glass. Each is a resize of the native
+iOS Dark PNG with its mask intact. The default web set is preserved; select
+the dark files in the consuming site's theme or metadata. No dark SVG or
+full-bleed touch/maskable approximation is generated from the masked export.
+Omitting the option or setting it to false preserves the existing file set
+and bytes. Other styles and document-only runs do not export the dark set.
 
 ## Liquid Glass Outline
 
@@ -181,7 +214,8 @@ measurement requires accepting the license agreement in each disk image.
 
 ## Web Icons
 
-Every style writes the same web set:
+Every style writes the same default web set. Liquid Glass can also opt into
+the [dark web exports](#optional-dark-web-exports).
 
 - **Masked images** come from the style's own rendering: `favicon-16.png`,
   `favicon-32.png`, `icon-192.png`, and `icon-512.png` for a web manifest's

@@ -55,6 +55,11 @@ recognize at 32 px, two or three colors, and the layer plan.
   background and from groups it overlaps.
 - Base dark variants on the light design with complementary, less bright
   colors. Avoid a black background on watchOS.
+- Use native fill and opacity specializations when automatic appearance
+  treatment loses the intended contrast. Tune group materials per appearance
+  where needed, and compare every rendition to confirm the change stays in
+  its intended family. Clear and Tinted share one specialization family;
+  their light and dark renditions still need separate visual inspection.
 
 ## Drafting Layers
 

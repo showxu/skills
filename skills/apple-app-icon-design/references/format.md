@@ -34,6 +34,7 @@ block. Each entry's key is its output name.
 | `gradient` | Optional boolean, default false. Liquid Glass uses Icon Composer's automatic gradient from the background color; style renderings blend from 20% white at the top to the background color at the bottom. |
 | `groups` | One to four material groups in back-to-front order, shared by every style. |
 | `maskable_scale` | Foreground scale for the 512 px maskable web image. Default and maximum 0.56, fitting a square inside the central 80%-diameter safe circle. |
+| `web_dark` | Optional boolean, default false. For `liquid-glass` exports, also writes five masked PNGs under `web/dark/` from the native iOS Dark rendition. Other styles and document-only output are unaffected. |
 | `styles` | Optional object of styles to render: `liquid-glass`, `flat`, `mac-tile`, `gloss`. Default `{"liquid-glass": {}}`. |
 
 Every group has a nonempty `layers` list in back-to-front order. The generator
@@ -65,11 +66,26 @@ Optional layer materials:
   `{"solid": "#RRGGBB"}`. Both accept six-digit RGB or eight-digit RGBA hex,
   converted to native sRGB components. Alpha is independent of layer opacity.
 - `opacity`: a number from 0 to 1.
-- `fill-specializations`: a nonempty object mapping `default`, `dark`, and/or
-  `tinted` to fills of the same shape. `fill` supplies the inherited fill;
-  without it, native artwork behavior supplies the fallback. `default`
-  overrides only Default, `dark` only Dark, and `tinted` both Tinted and Clear
-  appearances. These are native appearance families, not platform overrides.
+
+### Appearance overrides
+
+Each group material above supports a corresponding `-specializations` field:
+`blend-mode-specializations`, `specular-specializations`,
+`opacity-specializations`, `shadow-specializations`,
+`translucency-specializations`, `blur-material-specializations`, and
+`refractivity-specializations`. Layers support `fill-specializations` and
+`opacity-specializations`.
+
+Each is a nonempty object mapping `default`, `dark`, and/or `tinted` to values
+of exactly the same type and range as the base field. Structured values such
+as shadows replace the whole value, so every required member must be supplied.
+The base field supplies the inherited value; when omitted, Icon Composer's
+native default applies (the artwork for a layer fill). `default` overrides
+only Default, `dark` only Dark, and `tinted` both Tinted and Clear appearances.
+These are native appearance families, not platform overrides. Clear has no
+separate specialization key. Refraction requires design generation 27 for a
+visible effect in the verified renderer; generation 26 ignores both its base
+value and overrides.
 
 For example, an original layer can use a gradient normally and a dimmer solid
 fill in Dark:
@@ -79,6 +95,7 @@ fill in Dark:
   "source": "layers/foreground.svg",
   "fill": {"automatic-gradient": "#B38AFF"},
   "opacity": 0.85,
+  "opacity-specializations": {"dark": 1},
   "fill-specializations": {
     "dark": {"solid": "#7155AA"},
     "tinted": {"solid": "#CCCCCC"}
@@ -86,12 +103,21 @@ fill in Dark:
 }
 ```
 
+The same pattern applies to a group's opacity and other materials, for example
+`"opacity": 0.8, "opacity-specializations": {"dark": 1}` or
+`"shadow-specializations": {"tinted": {"kind": "none", "opacity": 0}}`.
+
 Unknown fields, fill kinds, appearance names, and enum values are errors;
 booleans are not numbers. Material fields are serialized only into the native
 `.icon`. They do not recolor or fade the source artwork in other styles, their
 web icons, sheets, or drift checks. Liquid Glass masked web PNGs continue to
 come from the native iOS Default export; its SVG favicon and full-bleed web
-images retain their existing artwork composition.
+images retain their existing artwork composition. With `web_dark: true`, the
+additional files are `web/dark/favicon-16.png`, `web/dark/favicon-32.png`,
+`web/dark/icon-192.png`, `web/dark/icon-512.png`, and
+`web/dark/avatar-1024.png`. These are resizes of iOS Dark, preserving its native
+mask; they do not replace the default set or add dark full-bleed touch/maskable
+images or an SVG approximation. The manifest lists the additional files.
 
 These controls were rendered with Icon Composer 27.0 (129), with appearance
 specializations checked in design generations 26 and 27. See the

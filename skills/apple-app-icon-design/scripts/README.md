@@ -35,6 +35,13 @@ purpose; `maskable-512.png` serves `maskable`; `apple-touch-icon.png` is the
 iOS home screen icon; `avatar-1024.png` suits profiles and listings.
 `touch.svg` and `maskable.svg` are their sources.
 
+Set `"web_dark": true` in the entry to add Liquid Glass dark web exports:
+`web/dark/favicon-16.png`, `web/dark/favicon-32.png`,
+`web/dark/icon-192.png`, `web/dark/icon-512.png`, and
+`web/dark/avatar-1024.png`. Each comes from native iOS Dark, with its mask;
+the existing default and full-bleed files are preserved. The option defaults
+to false and has no effect on other styles or document-only output.
+
 `--lint` checks every style of the entry, or only `--style`, prints `clean`
 or one tab-separated finding per line, and exits 1 on any finding. Material
 fill notices use `info` lines and do not affect the exit status. `--sheet`
@@ -51,7 +58,9 @@ document-only run does not establish native rendition or visual readiness.
 Run `python3 scripts/test_app_icons.py` for document, style, lint, drift,
 preservation, dimension, and failure-path regressions. Rendering tests run
 only when `rsvg-convert` is installed. Native material and appearance tests
-run when export-capable `ictool` is available. Set `APP_ICONS_BASELINE` to a
+run when export-capable `ictool` is available. They check fill, layer/group
+opacity, and group material specializations across every appearance, plus
+the opt-in dark web set. Set `APP_ICONS_BASELINE` to a
 pre-change `app_icons.py` to compare all example styles; see the exact-byte and
 native-rounding distinction in [rendering](../references/rendering.md#drift).
 Use native contact sheets for visual quality review.
