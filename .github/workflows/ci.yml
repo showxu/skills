@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   source-policy:
-    uses: swift-library/.github/.github/workflows/policy.yml@c4fac2499d45d7ff3fb543e803e89dae2be5a6c6
+    uses: swift-library/.github/.github/workflows/policy.yml@ee5e95f136ce58b0f24bdd2c8b65763271e4b873
     with:
       allow-terms: |
         ChatGPT
