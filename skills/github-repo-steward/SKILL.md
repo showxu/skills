@@ -51,9 +51,12 @@ or concurrent writers are implied.
    Ecosystem validation stays with its ecosystem owner.
 4. **Present.** Resolve current About, topics and homepage from the repository's
    product. Prepare its header and Quick look with
-   [presentation](references/presentation.md). Render social cards and recorded
-   terminal demos using [renderers](references/renderers.md). Review the exact
-   images in light and dark before publication.
+   [presentation](references/presentation.md). Take badge values, Install and
+   Quick look snippets and package section content from the ecosystem's README
+   skill when one applies, and compose them into the first screen and section
+   skeleton. Render social cards and recorded terminal demos using
+   [renderers](references/renderers.md). Review the exact images in light and
+   dark before publication.
 5. **Publish.** Follow the repository's issue/PR workflow; require checks for the
    accepted head and resolved findings. Squash with the PR title, an empty body
    and `--match-head-commit`. Read back the merge and verification state. Upload
@@ -95,6 +98,7 @@ rendering/upload evidence. It does not own the following artifacts or decisions:
 | --- | --- |
 | Shared standards, organization settings, placement, profile, catalog, pins or coordinated rollout | The organization's standard owner, through its `.github` repository |
 | Documentation roles, architecture, review-rule format and community-file text | `repository-docs` or the ecosystem's documentation skill |
+| Ecosystem README facts: badge values, verified Install and Quick look snippets, package section content and ecosystem topics | The ecosystem's README skill (for SwiftPM, `swiftpm-readme-design` when installed) |
 | Issue filing, triage, implementation and PR lifecycle | `github-flow` |
 | Framework icon family or app icons | `apple-framework-icon-design`, `apple-app-icon-design` |
 | Ecosystem release mechanics | The ecosystem's release skill (for SwiftPM, `swiftpm-github-release` when installed) |

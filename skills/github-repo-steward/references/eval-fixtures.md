@@ -338,6 +338,51 @@ Owner notes:
 
 - Fixture values are synthetic inputs, not reusable project conventions.
 
+## ecosystem-readme-boundary
+
+Target behavior: ecosystem README boundary.
+
+Input prompt: "Redo the README first screen of example-team/swift-parcel, a Swift package, with badges and a Quick look."
+
+Context and files:
+
+- No checked-in package; a qualitative routing case. The organization's
+  DESIGN defines the header, badge style and section order. Compiling the
+  Quick look against a published tag is the ecosystem skill's own check.
+
+Expected output:
+
+- Route Swift facts to swiftpm-readme-design with the repository, accepted
+  revision and section skeleton; use its reported badge values, Install line
+  and snippet check result; compose the header, badge selection, order and
+  styling, navigation and skeleton from the applicable DESIGN; keep social
+  cards and terminal demos on this skill's renderers.
+
+Forbidden behavior:
+
+- Type badge values or a version by hand, present an unchecked Swift snippet
+  as working, or hand the first-screen layout, cards or demos to the
+  ecosystem skill.
+
+Acceptance checks:
+
+- The response names swiftpm-readme-design as the source of badge values, the
+  Install requirement and the snippet check, and DESIGN as the source of
+  layout and styling.
+
+Baseline expectation:
+
+- A presentation skill may derive Swift facts from memory, or an ecosystem
+  skill may impose its own header and section order.
+
+Evidence sources:
+
+- Executor output, command trace, generated artifacts and captured observations.
+
+Owner notes:
+
+- Fixture values are synthetic inputs, not reusable project conventions.
+
 ## unknown-standard
 
 Target behavior: unknown standard.
