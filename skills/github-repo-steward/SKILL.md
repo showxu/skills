@@ -1,6 +1,6 @@
 ---
 name: github-repo-steward
-description: Set up, maintain, present, and audit one GitHub repository, whether personally owned or an organization member. Use a repository URL or checkout to resolve the applicable standard, configure settings and community health, establish CI and release hygiene, prepare README headers and Quick looks, render social cards and terminal demos, upload accepted previews, or report evidence-backed drift. An organization's .github standards are authoritative; otherwise use documented overridable defaults. Does not own organization-wide decisions, package implementation, documentation architecture, icon design, or ecosystem release mechanics.
+description: Set up, maintain, present, and audit one GitHub repository, whether personally owned or an organization member. Use a repository URL or checkout to resolve the applicable standard, configure settings and community health, establish CI and release hygiene, decide what a library, CLI, MCP server, plugin or app README states and where each value comes from, upload accepted previews, or report evidence-backed drift. An organization's .github standards are authoritative; otherwise use documented overridable defaults. Does not own organization-wide decisions, README layout or image rendering, package implementation, documentation architecture, icon design, or ecosystem release mechanics.
 ---
 
 # GitHub Repo Steward
@@ -30,8 +30,8 @@ is a first-class target; organization membership is optional.
    come from those owners; do not import another project's values.
 
 The workflow is staged and serial. Semantic decisions resolve authority and
-copy; helpers compare settings and render deterministic assets. No delegation
-or concurrent writers are implied.
+copy; helpers compare settings and record observations. No delegation or
+concurrent writers are implied.
 
 ## Workflow
 
@@ -49,14 +49,12 @@ or concurrent writers are implied.
    changes use signed PRs. Use the [CI contract](references/ci.md) for policy and
    validation separation, safe concurrency, full pins and drift observations.
    Ecosystem validation stays with its ecosystem owner.
-4. **Present.** Resolve current About, topics and homepage from the repository's
-   product. Prepare its header and Quick look with
-   [presentation](references/presentation.md). Take each fact the README states
-   from its owner in the routing table below, and compose the facts into the
-   first screen and section skeleton. Render social cards and recorded terminal
-   demos using
-   [renderers](references/renderers.md). Review the exact images in light and
-   dark before publication.
+4. **Present.** Classify the product kind. Decide what the README, About,
+   topics and homepage state with [information](references/information.md),
+   taking each value from its owner in the routing table below. Hand the
+   information set and the applicable DESIGN to `github-readme-design`, which
+   lays out the README and renders social cards and terminal demos. Review the
+   exact layout and images in light and dark before publication.
 5. **Publish.** Follow the repository's issue/PR workflow; require checks for the
    accepted head and resolved findings. Squash with the PR title, an empty body
    and `--match-head-commit`. Read back the merge and verification state. Upload
@@ -91,18 +89,22 @@ installation procedures belong to the ecosystem's release skill.
 
 ## Boundaries and routing
 
-This skill owns repository settings, conformance, GitHub presentation and
-rendering/upload evidence. It does not own the following artifacts or decisions:
+This skill owns repository settings, conformance, README information and
+upload evidence. It does not own the following artifacts or decisions:
 
 | Work | Owner |
 | --- | --- |
 | Shared standards, organization settings, placement, profile, catalog, pins or coordinated rollout | The organization's standard owner, through its `.github` repository |
 | Documentation roles, architecture, review-rule format and community-file text | `repository-docs` or the ecosystem's documentation skill |
+| README layout, badge styling, Quick look form, social cards, terminal demos and app screenshots | `github-readme-design` |
 | Package facts: badge values, dependency and build-from-source snippets, verified Quick look code, package section content and ecosystem topics | The ecosystem's README skill (for SwiftPM, `swiftpm-readme` when installed) |
 | Homebrew formulae and casks, and the install commands a README shows | `homebrew` |
 | CLI commands, options and output a README shows | `cli-creator` |
 | MCP server commands, client configuration and tool lists a README shows | `mcp-server-patterns` |
 | macOS privacy permissions a README states | `macos-tcc-permissions-patterns` when installed |
+| App store listings: app IDs, store links and beta availability | `app-store-connect` |
+| Store metadata: subtitle, promotional text, support and privacy policy URLs | `app-store-metadata` |
+| Store screenshot sets and official store badge artwork | `app-store-screenshots`, `apple-design-resource` |
 | Issue filing, triage, implementation and PR lifecycle | `github-flow` |
 | Framework icon family or app icons | `apple-framework-icon-design`, `apple-app-icon-design` |
 | Ecosystem release mechanics, and the release downloads, checksums, signing and notarization a README states | The ecosystem's release skill (for SwiftPM, `swiftpm-github-release`; for Apple apps, `apple-platform-release` or `swiftpm-macos-app-packaging`; when installed) |

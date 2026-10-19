@@ -1,0 +1,33 @@
+{
+  "skill_name": "github-readme-design",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Render a social card for sample-appstoreconnect. Keep its full name and summary readable.",
+      "expected_output": "Try a single-line title from maximum down to the stated minimum; use balanced separator boundaries only when necessary. Never leave a dangling hyphen or split arbitrary letters.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Render our social preview using this accepted PNG app icon, then check that the exported card is current.",
+      "expected_output": "Embed the accepted raster icon's exact bytes at the recipe's icon position and size, and record the file's SHA-256. Accept square PNG, JPEG and WebP inputs at or above icon_size; verify and fully decode every raster frame. SVGs retain only allowlisted SVG-namespace elements, attributes and value functions, and drop metadata contents. Only use accepts fragment links; only image accepts matching raster base64 data links. Reject foreign namespaces, unknown elements or attributes, styles, animation, non-fragment url() values, DOCTYPE/entity declarations and processing instructions at every depth. Real app PNG and generated framework SVG icons still render. Repeated renders and --check are deterministic; icon byte drift fails --check without writing.",
+      "files": []
+    },
+    {
+      "prompt": "Lay out the README of example-team/parcel-app, an open-source macOS app shipped as a notarized DMG and a Homebrew cask, with a bundled CLI. The information set is attached; no DESIGN applies.",
+      "expected_output": "Use the app layout: header, download block with the DMG and checksum, the cask and a requirements line, light/dark screenshots planned from the released build, what you can do, getting started, permissions and privacy with the privacy policy link, support, release notes, building from source, Contributing and License, plus a short bundled CLI section; use supplied values unchanged and report a missing statement instead of inventing it.",
+      "files": [
+        "evals/files/open-source-app.json"
+      ],
+      "id": 3
+    },
+    {
+      "prompt": "Lay out the README for example-team/parcel-ios, a closed-source iOS app on the App Store, in a private repository. The information set is attached; no DESIGN applies.",
+      "expected_output": "Use the same app layout with the official App Store badge artwork unchanged, the store screenshot set, and the supplied privacy statements and policy link; link the terms instead of build, Contributing and License sections; private visibility changes nothing else.",
+      "files": [
+        "evals/files/closed-source-app.json"
+      ],
+      "id": 4
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "kind": "app",
+  "source": "closed",
+  "visibility": "private",
+  "summary": "Plan a week of meals in one minute.",
+  "statements": [
+    {"item": "download", "value": "App Store, app ID 0000000000, link https://apps.apple.com/app/id0000000000", "owner": "app-store-connect"},
+    {"item": "store badge", "value": "Official Download on the App Store badge, localized artwork", "owner": "apple-design-resource"},
+    {"item": "requirements", "value": "iOS 18 or later; iPhone and iPad", "owner": "apple-platform-release"},
+    {"item": "screenshots", "value": "Store screenshot set: Plan, Shop, Cook, light and dark", "owner": "app-store-screenshots"},
+    {"item": "capabilities", "value": ["Plan meals for the week", "Build a shopping list", "Cook with step timers"], "owner": "product"},
+    {"item": "permissions", "value": [{"permission": "Notifications", "feature": "step timers"}], "owner": "product"},
+    {"item": "privacy", "value": "Data Not Collected, matching the store privacy label", "owner": "app-store-metadata"},
+    {"item": "privacy policy", "value": "https://example.com/privacy", "owner": "app-store-metadata"},
+    {"item": "terms", "value": "https://example.com/terms", "owner": "product"},
+    {"item": "support", "value": "https://example.com/support with app version and build, iOS version and device", "owner": "app-store-metadata"},
+    {"item": "release notes", "value": "What's New on the App Store", "owner": "app-store-whats-new"}
+  ],
+  "quick_look": "the weekly plan screen",
+  "design": null
+}

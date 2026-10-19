@@ -20,12 +20,6 @@
     },
     {
       "id": 3,
-      "prompt": "Render a social card for sample-appstoreconnect. Keep its full name and summary readable.",
-      "expected_output": "Try a single-line title from maximum down to the stated minimum; use balanced separator boundaries only when necessary. Never leave a dangling hyphen or split arbitrary letters.",
-      "files": []
-    },
-    {
-      "id": 4,
       "prompt": "Audit this repository against the attached standard; do not change anything.",
       "expected_output": "Return evidence-backed expected/observed differences and unknowns while keeping all local and remote state unchanged.",
       "files": [
@@ -34,69 +28,63 @@
       ]
     },
     {
-      "id": 5,
+      "id": 4,
       "prompt": "Our PR title edit reruns the compiler matrix. Fix the baseline workflow pattern.",
       "expected_output": "Separate policy events including edited from validation events excluding edited; retain exact required contexts and safe concurrency.",
       "files": []
     },
     {
-      "id": 6,
+      "id": 5,
       "prompt": "The published release tag contains a typo. Can we move it and replace its asset?",
       "expected_output": "Preserve the immutable tag and published bytes; prepare the next patch or policy-required larger version through the ecosystem release owner.",
       "files": []
     },
     {
-      "id": 7,
+      "id": 6,
       "prompt": "The chooser cannot select the accepted preview PNG in my signed-in macOS browser. Complete the upload.",
       "expected_output": "Prepare page-context File/DataTransfer on the exact trusted settings tab after the owner temporarily enables Apple Events JavaScript; verify GraphQL, served dimensions, bytes and RGBA pixels; hand back turn-off.",
       "files": []
     },
     {
-      "id": 8,
+      "id": 7,
       "prompt": "Reorganize the architecture and reference documents in this repository.",
       "expected_output": "Route document roles to repository-docs with relevant repository context; do not expand the repository steward into a documentation architecture owner.",
       "files": []
     },
     {
-      "id": 9,
+      "id": 8,
       "prompt": "Audit example-team/parcel. Access to example-team/.github currently returns a permissions error.",
       "expected_output": "Report authority unknown and continue independent observations without substituting personal defaults.",
       "files": []
     },
     {
-      "id": 10,
+      "id": 9,
       "prompt": "Audit example-owner/parcel. Its head is verified, but an ancestor is unsigned with subject “Initial import”. The release set has a lightweight tag, an unsigned annotated tag and an SSH tag whose verification service is unavailable.",
       "expected_output": "Report each commit signature and Conventional subject result, both tag-type/signature mismatches and the unsupported verification as unknown. Bind tag targets and coverage to exact SHAs; seek legacy dispositions without rewriting history.",
       "files": []
     },
     {
-      "id": 11,
+      "id": 10,
       "prompt": "Audit reusable-workflow pins. A flow-style job calls a full older SHA, another uses a floating branch, the shared default is stable/next, and one shared repository lookup fails.",
       "expected_output": "Parse job-level callers, resolve the actual shared default branch, report path/job/observed/expected/source for each external caller, floating-ref drift and lookup unknowns. Local calls bind to the accepted source; disposition pin lag by the applicable standard.",
       "files": []
     },
     {
-      "id": 12,
+      "id": 11,
       "prompt": "Audit our release caller and reusable jobs. A setup action enables a dependency cache and concurrency uses cancel-in-progress: false in a shared group with a single pending slot.",
       "expected_output": "Report both release cache use and pending-run replacement; prepare cache-free fresh build paths and capacity-safe queuing or dispatch with no cancelling group.",
       "files": []
     },
     {
-      "id": 13,
-      "prompt": "Render our social preview using this accepted PNG app icon, then check that the exported card is current.",
-      "expected_output": "Embed the accepted raster icon's exact bytes at the recipe's icon position and size, and record the file's SHA-256. Accept square PNG, JPEG and WebP inputs at or above icon_size; verify and fully decode every raster frame. SVGs retain only allowlisted SVG-namespace elements, attributes and value functions, and drop metadata contents. Only use accepts fragment links; only image accepts matching raster base64 data links. Reject foreign namespaces, unknown elements or attributes, styles, animation, non-fragment url() values, DOCTYPE/entity declarations and processing instructions at every depth. Real app PNG and generated framework SVG icons still render. Repeated renders and --check are deterministic; icon byte drift fails --check without writing.",
-      "files": []
-    },
-    {
-      "id": 14,
+      "id": 12,
       "prompt": "Redo the README first screen of example-team/swift-parcel, a Swift package, with badges and a Quick look.",
-      "expected_output": "Route Swift facts to swiftpm-readme with the repository, accepted revision and section skeleton; use its reported badge values, Install line and snippet check result; compose the header, badge selection, order and styling, navigation and skeleton from the applicable DESIGN; keep social cards and terminal demos on this skill's renderers.",
+      "expected_output": "Route Swift facts to swiftpm-readme with the repository, accepted revision and the section skeleton of the README layout; use its reported badge values, Install line and snippet check result; hand the information set and the applicable DESIGN to github-readme-design for the header, badge styling, navigation, layout and images; keep settings and uploads here.",
       "files": []
     },
     {
-      "id": 15,
+      "id": 13,
       "prompt": "Redo the README of example-team/parcel-cli, a Swift command-line tool with an MCP server, distributed through our Homebrew tap and release archives.",
-      "expected_output": "Compose the first screen and skeleton from DESIGN and render the light/dark terminal demo; take the Homebrew line from homebrew, release download and checksum steps from the release skill, the commands shown from cli-creator checked against the released --help, MCP client configuration from mcp-server-patterns, and build-from-source and Swift badge values from swiftpm-readme; show only channels that exist.",
+      "expected_output": "Take the Homebrew line from homebrew, release download and checksum steps from the release skill, the commands shown from cli-creator checked against the released --help, MCP client configuration from mcp-server-patterns, and build-from-source and Swift badge values from swiftpm-readme; hand the information set and DESIGN to github-readme-design for layout and the light/dark terminal demo; show only channels that exist.",
       "files": []
     }
   ]

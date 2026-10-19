@@ -4,8 +4,10 @@
 
 The organization skill owns shared authority, placement, organization settings,
 scoped Apps, family identity/profile/pins, coordination and aggregate acceptance.
-`github-repo-steward` owns one repository's GitHub-side standard, renderers,
-upload procedure, local signing gates and per-repository acceptance observations.
+`github-repo-steward` owns one repository's GitHub-side standard, README
+information, upload procedure, local signing gates and per-repository acceptance
+observations. `github-readme-design` owns README and profile layout and the
+renderers.
 No compatibility alias or duplicate per-repository procedure belongs here.
 
 | File | Responsibility |

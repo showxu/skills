@@ -23,7 +23,7 @@ from presentation import load_spec, sha256, write_or_check
 from render_social import fit_title, icon_svg, wrap_about
 from render_terminal import cells, render
 
-OUTPUT = Path(os.environ["REPO_STEWARD_TEST_OUTPUT"])
+OUTPUT = Path(os.environ["README_DESIGN_TEST_OUTPUT"])
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
 

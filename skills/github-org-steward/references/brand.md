@@ -18,19 +18,20 @@ consumer no longer needs it.
 
 A product family takes claims from the owning product; independent packages
 keep their own copy. Generated images consume those accepted words. Font
-licenses and provenance stay with bundled resources. Per-repository header,
-Quick look, social-card and terminal rendering/upload procedures belong to
-`github-repo-steward`; invoke it for every consumer with the accepted DESIGN
-revision. Do not maintain a second renderer here.
+licenses and provenance stay with bundled resources. Per-repository README
+information and preview uploads belong to `github-repo-steward`, and the
+layout and rendering of headers, Quick looks, social cards and terminal demos
+to `github-readme-design`. Invoke the repository steward for every consumer
+with the accepted DESIGN revision. Do not maintain a second renderer here.
 
 ## Organization profile
 
 Treat the profile as a visitor entry organized by the reader's job, not a list
-of internal repository types. Its header uses the accepted umbrella icon,
-organization promise, a secondary line and links to documentation, contributing,
-security and support where available. The account description expresses the
-same promise. Keep text as text and an icon next to its linked repository name;
-the header umbrella can stand alone.
+of internal repository types. It states the organization promise and a
+secondary line, uses the accepted umbrella icon, and links documentation,
+contributing, security and support where available. The account description
+expresses the same promise. `github-readme-design` lays out the profile from
+these inputs and the catalog.
 
 One catalog input owns the promise, navigation roles, job groups and ordering.
 Authoritative GitHub inventory supplies intended public membership; each
