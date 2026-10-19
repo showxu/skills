@@ -133,8 +133,9 @@ Markdown layout. Use positive integer pixel sizes and a supported badge style.
 | Icon | Catalog umbrella mark and repository README-header icons | Same catalog icons at member sizes |
 
 Public layout: centered umbrella mark, promise heading, secondary line,
-documentation/contributing/security/support navigation, then job-grouped rows
-with icon, linked name and outcome; optional maintainer line from input.
+documentation/contributing/security/support navigation, an optional quick
+start, then job-grouped rows with icon, linked name and outcome; optional
+maintainer line from input.
 
 Member layout: smaller umbrella mark and dashboard title, public entry link,
 maintenance navigation, catalog-ordered groups with icon/name/CI/release rows,
