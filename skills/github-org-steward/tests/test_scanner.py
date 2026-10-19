@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
@@ -13,6 +14,7 @@ from unittest.mock import Mock, patch
 
 
 SKILL = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(SKILL / "scripts"))
 SPEC = importlib.util.spec_from_file_location("scan_org", SKILL / "scripts/scan_org.py")
 SCAN = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(SCAN)

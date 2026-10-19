@@ -12,6 +12,7 @@ Choose the model before placing artifacts:
 | Repository role | Owns |
 | --- | --- |
 | `.github` | Shared maintenance/versioning/design standards, supported default community files, reusable workflows, organization checks and public profile |
+| `.github-private` (private) | Member profile, maintenance navigation and live status; shared policy stays in `.github` |
 | Product/package/tool | Its source, interface, requirements, checks, version source, release evidence and meaning |
 | Template | Initial member layout and callers; stamping/first-publication validation owned by its ecosystem |
 | Website | Public entry, documentation integration, generated catalog and release reconciliation |

@@ -63,13 +63,16 @@ permission to spawn agents or message other sessions.
 5. **Deliver organization surfaces.** Apply [family and profile](references/brand.md),
    [website integration](references/website.md) and
    [coordinated publication](references/release.md). Keep catalog membership
-   generated from authoritative inventory. Organization profile copy, umbrella
-   icon and pins are reviewed as one public entry surface. Per-repository image
-   production and upload stay with the repository steward.
+   generated from authoritative inventory. Deliver the public profile in
+   `.github` and the maintainer dashboard in private `.github-private` through the shared profile renderer. Review public
+   copy, umbrella identity and pins together; the member profile consumes the
+   pinned public catalog and links to shared policy with live operational
+   state. Per-repository image production and upload stay with the repository
+   steward.
 6. **Accept.** Run the organization's settings check and the cross-repository
    acceptance scanner below. Reconcile every repository report with its current
-   accepted SHA, live check status and published artifacts. Confirm profile,
-   membership, pin order, scoped App installations and working public URLs.
+   accepted SHA, live check status and published artifacts. Confirm both profiles,
+   matching membership, pin order, scoped App installations and working public URLs.
    Unknowns stay unknown; a prepared branch is not a delivered change.
 7. **Retire.** Compare local state with the starting snapshot, remove task-owned
    outputs and worktrees, retain only required evidence and report sizes/reasons.
@@ -83,7 +86,7 @@ domain artifacts or their implementation procedures:
 | Work | Owner |
 | --- | --- |
 | One repository's complete GitHub-side standard, presentation or audit | `github-repo-steward` |
-| Layout and rendering of READMEs, social cards, terminal demos and the organization profile | `github-readme-design` |
+| Layout and rendering of READMEs, social cards, terminal demos and public/member organization profiles | `github-readme-design` |
 | Documentation roles, review-rule format and community-file text, including the shared defaults in `.github` | `repository-docs` |
 | Filing, implementing and closing issues; PR flow | `github-flow` |
 | Homebrew formulae, tap operations or installation | `homebrew` |
@@ -113,7 +116,7 @@ lists:
   rulesets, Apps, profile, pins, family identity): an issue in the organization's
   `.github` repository.
 - Sensitive governance gaps, such as a security setting or App permission
-  problem: the organization's member-only repository when one exists.
+  problem: the organization's private `.github-private` repository when one exists.
   Vulnerabilities go through the affected repository's private vulnerability
   reporting.
 - A rollout across repositories: one tracking issue in `.github` with the
@@ -152,13 +155,20 @@ artifacts; an empty word search is not an ownership proof.
   --identity <owner-email> --allowed-signers <file>
   --work-dir <ignored-empty-directory>`. Per-repository observations execute
   from the repository steward package. Use `--repo-steward <skill-dir>` when
-  the skills are installed separately. Explain all REVIEW lines and pending runs.
+  the skills are installed separately. Profile checks also use
+  `github-readme-design`; pass `--readme-design <skill-dir>` for a separate
+  installation and `--member-input <path>` when its input is not
+  `profile/member.json`. Observe `.github-private` visibility, pinned-catalog
+  membership/digest, declared default branches against GitHub, workflow files,
+  releases and icons. Absence is optional;
+  unreadable input is REVIEW. Explain all REVIEW lines and pending runs.
 - Local preservation: `python3 scripts/scan_org.py compare --root <checkouts>
   --baseline <snapshot.json>` reports no unrelated status/index/stash/worktree
   changes. Intended ref alignments require their own evidence.
-- Manual: actual App selection and reviewer behavior, organization profile in
-  light/dark, catalog membership and links, umbrella identity, pin order and
-  dependent publication receipts. Installation alone does not prove automatic
+- Manual: actual App selection and reviewer behavior, both public and member
+  organization profiles in light/dark, complete matching catalog membership,
+  working live links, umbrella identity, pin order and dependent publication
+  receipts. Installation alone does not prove automatic
   review is active.
 
 Report changes/PRs and accepted SHAs, applicable standard, settings and per-repo

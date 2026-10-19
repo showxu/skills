@@ -15,20 +15,23 @@ No compatibility alias or duplicate per-repository procedure belongs here.
 | SKILL.md | Organization-only trigger, authority, serial coordination, routing and output |
 | topology.md | Repository roles and cross-repository placement |
 | governance.md | Shared declarations, organization settings and authorized Apps |
-| brand.md / website.md | Family source, job-grouped generated profile, pins and site integration |
+| brand.md / website.md | Family source, public/member generated profiles, pins and site integration |
 | release.md | Capacity-bound rollout waves, measured development-cache gate, publication dependencies and downstream acceptance |
 | operations.md / audit-checklist.md | Local preservation, authorized handoffs and organization acceptance |
 | scripts/scan_org.py | Organization enumeration, delegation to repository observations, license grouping and local snapshot/compare |
+| scripts/profile_observations.py | Public inventory and pinned member-catalog checks, private visibility, default-branch/workflow/release facts and icon resolution; reuses the profile renderer schema |
 | templates/MAINTENANCE.md.tpl | Organization-level declarations, with member settings delegated to their owner |
 | tests / references/eval-fixtures.md / evals/evals.json | Scanner regressions and behavioral inputs; dated results stay ignored |
 
 The scanner loads `github-repo-steward/scripts/scan_repository.py` from a sibling
 skill installation or explicit `--repo-steward`. Missing dependency is an
 actionable failure. It does not embed or fork that implementation. Runtime
+Profile observations load `github-readme-design/scripts/render_profile.py`
+from a sibling installation or `--readme-design`; they do not fork its schema.
 GitHub operations use the existing CLI login; no credentials are bundled.
 Install the repository steward's pinned Python requirements in an ignored
 environment for its parsed workflow audit. UNKNOWN member evidence propagates
-as exit 2; current FAIL is exit 1; historical REVIEW still needs disposition.
+as exit 2; current FAIL is exit 1; unreadable profile evidence is REVIEW; historical REVIEW still needs disposition.
 
 ## Validation
 

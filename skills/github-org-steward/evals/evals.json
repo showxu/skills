@@ -72,6 +72,18 @@
       "prompt": "Our controlled development-cache trial exceeds the declared threshold with equivalent validation. Roll it out and enable the same cache in release validation; cancel older queued releases to free runners.",
       "expected_output": "Adopt development caching through bounded reviewed waves, and route each release call graph to the repository steward for cache-free fresh validation/build/publication and preserved running/queued execution.",
       "files": []
+    },
+    {
+      "id": 13,
+      "prompt": "Create the member-only organization dashboard using our existing public catalog and shared maintenance documents.",
+      "expected_output": "Prepare private .github-private/profile/README.md with the shared renderer, pinned catalog revision/digest, declared maintenance navigation, identical groups/order/membership, icons, live operational rows and organization searches. Apply settings/rulesets/signing/CI and review both profiles in light and dark. Member input owns default_branch; CI badge URLs carry it and the online steward reports mismatches with GitHub.",
+      "files": []
+    },
+    {
+      "id": 14,
+      "prompt": "Audit our member dashboard. It has a hand-edited table of repositories, CI results and release versions.",
+      "expected_output": "Report drift and the owning catalog/member-input/shared-renderer correction. Require exact catalog membership, live badges or declared fallback links, and a pinned digest. Preserve audit-only scope.",
+      "files": []
     }
   ]
 }

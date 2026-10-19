@@ -23,6 +23,8 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+from profile_observations import inspect_profiles
+
 
 def run(*cmd, cwd=None, check=True):
     result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
@@ -50,6 +52,7 @@ def remote(args):
     steward = load_repo_steward(getattr(args, "repo_steward", None))
     pages = json.loads(run("gh", "api", f"orgs/{args.org}/repos?type=all&per_page=100", "--paginate", "--slurp"))
     repos = [{"name": item["name"], "isArchived": item["archived"], "isFork": item["fork"],
+              "visibility": item.get("visibility", "private" if item.get("private") else "public"),
               "defaultBranchRef": {"name": item["default_branch"]}} for page in pages for item in page]
     args.work_dir.mkdir(parents=True, exist_ok=True)
     if any(args.work_dir.iterdir()):
@@ -60,6 +63,9 @@ def remote(args):
     def report(level, repo, message):
         findings.append((level, repo, message))
         print(f"{level} {repo}: {message}", flush=True)
+
+    inspect_profiles(args.org, repos, report, getattr(args, "readme_design", None),
+                     getattr(args, "member_input", "profile/member.json"))
 
     for repo in sorted((r for r in repos if not r["isArchived"]), key=lambda r: r["name"]):
         try:
@@ -75,7 +81,8 @@ def remote(args):
         print(f"LICENSE {value}: {', '.join(names)}")
     failures = sum(level == "FAIL" for level, _, _ in findings)
     unknowns = sum(level == "UNKNOWN" for level, _, _ in findings)
-    print(f"{sum(map(len, licenses.values()))} repositories, {failures} failures, {unknowns} unknowns, {len(findings) - failures - unknowns} review items")
+    reviews = sum(level == "REVIEW" for level, _, _ in findings)
+    print(f"{sum(map(len, licenses.values()))} repositories, {failures} failures, {unknowns} unknowns, {reviews} review items")
     return 2 if unknowns else 1 if failures else 0
 
 
@@ -132,6 +139,8 @@ def main():
     scan.add_argument("--commit-type", action="append", default=[],
                       help="accepted type when the shared standard applies to every scanned member; repeatable")
     scan.add_argument("--repo-steward", type=Path, help="github-repo-steward skill directory; defaults to sibling installation")
+    scan.add_argument("--readme-design", type=Path, help="github-readme-design skill directory; defaults to sibling installation")
+    scan.add_argument("--member-input", default="profile/member.json", help="member input path in .github-private")
     scan.add_argument("--work-dir", type=Path, required=True,
                       help="empty producer-owned ignored directory, reused and left empty after scanning")
     scan.set_defaults(func=remote)
