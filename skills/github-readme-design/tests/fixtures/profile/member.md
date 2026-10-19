@@ -28,7 +28,7 @@
 <h2>Needs attention</h2>
 
 <ul>
-<li><a href="https://github.com/search?q=org%3Aexample-team+is%3Apr+is%3Aopen&amp;type=issues">Open pull requests</a></li>
+<li><a href="https://github.com/search?q=org%3Aexample-team+is%3Apr+is%3Aopen&amp;type=pullrequests">Open pull requests</a></li>
 <li><a href="https://github.com/search?q=org%3Aexample-team+is%3Aissue+is%3Aopen&amp;type=issues">Open issues</a></li>
-<li><a href="https://github.com/search?q=org%3Aexample-team+is%3Apr+is%3Aopen+author%3Aapp%2Fdependabot&amp;type=issues">Dependabot pull requests</a></li>
+<li><a href="https://github.com/search?q=org%3Aexample-team+is%3Apr+is%3Aopen+author%3Aapp%2Fdependabot&amp;type=pullrequests">Dependabot pull requests</a></li>
 </ul>

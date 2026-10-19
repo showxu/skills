@@ -6,6 +6,13 @@
 
 <p align="center"><a href="https://example.test/docs">Documentation</a> · <a href="../CONTRIBUTING.md">Contributing</a> · <a href="../SECURITY.md">Security</a> · <a href="https://example.test/help">Support</a></p>
 
+<h2>Get started</h2>
+
+```sh
+example-cli inspect .
+example-cli share --dry-run
+```
+
 <h2>Build your project</h2>
 
 <table>

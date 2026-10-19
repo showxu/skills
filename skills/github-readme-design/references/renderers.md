@@ -173,6 +173,8 @@ The catalog owns these fields:
 | `navigation` | Optional roles `documentation`, `contributing`, `security`, `support`; each has `label`, `url` |
 | `groups` | Ordered array of `{title, repositories}`; each repository has `name`, `outcome`, `icon` |
 | `maintainer` | Optional `{label, url}` public-profile closing line |
+| `description` | Optional one-line organization account description expressing the promise; validated, never rendered |
+| `quickstart` | Optional `{title, commands}` rendered on the public profile after the navigation as a heading and an `sh` code block; commands are single lines without code fences |
 
 Each repository occurs once. Names identify repositories within the catalog's
 organization. An `icon` is a URL or `{light, dark}` URLs for the logo shown in

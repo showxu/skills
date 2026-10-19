@@ -96,7 +96,7 @@ def navigation(value, roles, complete=False):
 
 def validate_catalog(catalog):
     fields(catalog, ("organization", "promise", "secondary", "mark", "navigation", "groups"),
-           ("website", "maintainer"), "catalog")
+           ("website", "maintainer", "description", "quickstart"), "catalog")
     fields(catalog["organization"], ("login", "name"), context="organization")
     identifier(catalog["organization"]["login"], "organization")
     for value in (catalog["organization"]["name"], catalog["promise"], catalog["secondary"]):
@@ -105,6 +105,17 @@ def validate_catalog(catalog):
     navigation(catalog["navigation"], NAVIGATION)
     if "website" in catalog:
         link(catalog["website"])
+    if "description" in catalog:
+        text(catalog["description"])
+    if "quickstart" in catalog:
+        quickstart = catalog["quickstart"]
+        fields(quickstart, ("title", "commands"), context="quickstart")
+        text(quickstart["title"])
+        if not isinstance(quickstart["commands"], list) or not quickstart["commands"]:
+            raise ValueError("Quick start needs a nonempty commands array")
+        for command in quickstart["commands"]:
+            if "```" in text(command):
+                raise ValueError("Quick start commands must not contain code fences")
     if "maintainer" in catalog:
         fields(catalog["maintainer"], ("label", "url"), context="maintainer")
         text(catalog["maintainer"]["label"])
@@ -217,6 +228,9 @@ def render(catalog, spec, member=None, catalog_bytes=None):
                  for role in NAVIGATION if role in catalog["navigation"]]
         if links:
             output.extend(['<p align="center">' + ' · '.join(links) + '</p>', ''])
+        if "quickstart" in catalog:
+            output.extend([f'<h2>{escape(catalog["quickstart"]["title"])}</h2>', '', '```sh',
+                           *catalog["quickstart"]["commands"], '```', ''])
     else:
         public = resolve(catalog["website"]) if "website" in catalog else f"https://github.com/{owner}"
         output.extend([f'<p align="center">{anchor(public, "Public website" if "website" in catalog else "Public profile")}</p>', '',
@@ -252,9 +266,10 @@ def render(catalog, spec, member=None, catalog_bytes=None):
         output.extend(['</table>', ''])
     if member is not None:
         output.extend(['<h2>Needs attention</h2>', '', '<ul>'])
-        for label, query in (("Open pull requests", "is:pr is:open"), ("Open issues", "is:issue is:open"),
-                             ("Dependabot pull requests", "is:pr is:open author:app/dependabot")):
-            url = "https://github.com/search?" + urlencode({"q": f"org:{owner} {query}", "type": "issues"})
+        for label, query, kind in (("Open pull requests", "is:pr is:open", "pullrequests"),
+                                   ("Open issues", "is:issue is:open", "issues"),
+                                   ("Dependabot pull requests", "is:pr is:open author:app/dependabot", "pullrequests")):
+            url = "https://github.com/search?" + urlencode({"q": f"org:{owner} {query}", "type": kind})
             output.append(f'<li>{anchor(url, label)}</li>')
         output.extend(['</ul>', ''])
     elif "maintainer" in catalog:

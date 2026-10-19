@@ -215,6 +215,47 @@ class ProfileTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unknown fields.*groups"):
             self.render(True)
 
+    def test_quick_start_renders_only_on_the_public_profile(self):
+        public, member = self.render(), self.render(True)
+        block = "<h2>Get started</h2>\n\n```sh\nexample-cli inspect .\nexample-cli share --dry-run\n```\n"
+        self.assertIn(block, public)
+        self.assertLess(public.index(block), public.index("Build your project"))
+        self.assertNotIn("Get started", member)
+        for value in (public, member):
+            self.assertNotIn(self.catalog["description"], value)
+
+    def test_quick_start_and_description_are_validated(self):
+        for mutation in (lambda c: c["quickstart"].update(commands=[]),
+                         lambda c: c["quickstart"].update(commands=["run\nother"]),
+                         lambda c: c["quickstart"].update(commands=["echo ```"]),
+                         lambda c: c["quickstart"].update(note="extra"),
+                         lambda c: c.update(description=" "),
+                         lambda c: c.update(description="one\ntwo")):
+            with self.subTest(mutation=mutation):
+                self.setUp()
+                mutation(self.catalog)
+                with self.assertRaises(ValueError):
+                    self.render()
+
+    def test_searches_open_the_matching_result_type(self):
+        class Links(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.searches = {}
+                self.href = None
+            def handle_starttag(self, tag, attrs):
+                if tag == "a":
+                    self.href = dict(attrs)["href"]
+            def handle_data(self, data):
+                if self.href and "/search?" in self.href:
+                    self.searches[data] = parse_qs(urlsplit(self.href).query)
+                    self.href = None
+        links = Links()
+        links.feed(self.render(True))
+        self.assertEqual(links.searches["Open pull requests"]["type"], ["pullrequests"])
+        self.assertEqual(links.searches["Dependabot pull requests"]["type"], ["pullrequests"])
+        self.assertEqual(links.searches["Open issues"]["type"], ["issues"])
+
 
 if __name__ == "__main__":
     unittest.main()

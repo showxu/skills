@@ -2,6 +2,7 @@
   "organization": {"login": "example-team", "name": "Example Team"},
   "promise": "Tools for careful work",
   "secondary": "Build, inspect and share with confidence.",
+  "description": "Tools for careful work: build, inspect and share with confidence.",
   "website": "https://example.test",
   "mark": {"light": "../assets/mark-light.svg", "dark": "../assets/mark-dark.svg"},
   "navigation": {
@@ -10,6 +11,7 @@
     "security": {"label": "Security", "url": "../SECURITY.md"},
     "support": {"label": "Support", "url": "https://example.test/help"}
   },
+  "quickstart": {"title": "Get started", "commands": ["example-cli inspect .", "example-cli share --dry-run"]},
   "groups": [
     {"title": "Build your project", "repositories": [
       {"name": "example-library", "outcome": "Compose reusable features.", "icon": "https://example.test/library.svg"},

@@ -69,7 +69,9 @@ promise heading, secondary line, then documentation, contributing, security
 and support links where declared. Each row places the repository's README
 header icon beside its linked name and outcome sentence. A distribution
 repository uses the product icon when it has no logo of its own. An optional
-maintainer line comes from input. Keep text as text.
+quick start (a heading and shell commands) follows the navigation, and an
+optional maintainer line closes the profile; both come from input. Keep text
+as text.
 
 The member profile is the maintainers' entry. In order, render a smaller
 umbrella mark, `<organization display name> maintainer dashboard`, and one line
