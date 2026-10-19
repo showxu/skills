@@ -453,8 +453,8 @@ Expected output:
   corner edges only in the corner cells, turning into the outer lines.
 - Lint findings for thin lines, corner edges crossing the outline, and
   lightness against a light foreground, recorded as owner decisions.
-- Style renderings, if delivered, use a style layer generated with
-  `opacity=0.2`.
+- Style renderings, if delivered, use a style layer from
+  `--grid-backdrop opacity=0.2`.
 
 Forbidden behavior:
 
