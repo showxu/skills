@@ -257,5 +257,11 @@ class ProfileTests(unittest.TestCase):
         self.assertEqual(links.searches["Open issues"]["type"], ["issues"])
 
 
+    def test_icons_have_their_own_cell_before_the_name(self):
+        public, member = self.render(), self.render(True)
+        self.assertIn('alt="example-library icon"></td><td><strong><a href="https://github.com/example-team/example-library">example-library</a></strong><br>Compose reusable features.</td>', public)
+        self.assertIn('<tr><th></th><th>Repository</th><th>CI</th><th>Release</th></tr>', member)
+        self.assertIn('alt="example-library icon"></td><td><strong><a href="https://github.com/example-team/example-library">example-library</a></strong></td><td>', member)
+
 if __name__ == "__main__":
     unittest.main()
