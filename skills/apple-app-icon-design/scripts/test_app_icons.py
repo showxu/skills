@@ -462,6 +462,10 @@ class ContinuousRectTests(unittest.TestCase):
         self.assertEqual([line.split(":")[0] for line in run.stderr.splitlines()],
                          ["info\tradii scaled by 0.8333 so that each edge holds its two radii", "info\tright edge",
                           "info\tleft edge"])
+        sharp = subprocess.run([sys.executable, str(SCRIPT), "--continuous-rect", "0", "0", "100", "100", "100", "0", "0", "0"],
+                               capture_output=True, text=True, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+        self.assertNotIn("tangent cubic", sharp.stderr)
+        self.assertIn("cut where it meets the sharp corner's other edge", sharp.stderr)
         for args, code in ((["--continuous-rect", "0", "0", "3", "3"], 1), (["--list"], 2),
                            (["--continuous-rect", "nan", "0", "100", "100", "20"], 1),
                            (["design.md", "--continuous-rect", "0", "0", "3", "3", "1"], 2)):
@@ -587,6 +591,11 @@ class PathReversalTests(unittest.TestCase):
                        f'<path d="{naive_continuous_square(0, 0, 100, 40)}"/></g></svg>')
         self.assertEqual(app_icons.doubled_back(transformed), found)
         self.assertEqual(app_icons.doubled_back(layer("M0 0H10H5H20")), [(10.0, 0.0, 5.0)])
+        # A curve that leaves far along its chord and returns is not straight, even where its
+        # control values overflow.
+        for far in ("M20 0L0 0C1e308 0 0 0 10 0L0 0", "M20 20L0 0C1.7e308 1.7e308 5 5 10 10L0 0"):
+            with self.subTest(path=far):
+                self.assertEqual(app_icons.doubled_back(layer(far)), [])
         for line in ("L20 10", "L20 15L20 10", "C20 17 20 13 20 10", "C20 9 20 11 20 10", "Q20 12 20 10"):
             with self.subTest(line=line):
                 self.assertEqual(app_icons.doubled_back(layer(f"M0 0C10 0 20 10 20 20{line}C20 20 30 30 40 30")),

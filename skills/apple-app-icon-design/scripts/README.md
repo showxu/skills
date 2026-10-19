@@ -56,7 +56,8 @@ export-capable `ictool`, its Liquid Glass cells say so. Convert it with
 DESIGN.md and prints SVG path data for a rectangle with continuous corners,
 with one radius or four: top-left, top-right, bottom-right, bottom-left. Use it
 to draw rounded rectangles in artwork. Corners whose departures overrun an
-edge end early and a tangent cubic joins them; `info` lines on standard error
+edge end early: a tangent cubic joins two rounded corners, and a corner beside
+a sharp one is cut on that corner's other edge. `info` lines on standard error
 report scaled radii and each overrun edge. See
 [continuous rectangles](../references/rendering.md#continuous-rectangles).
 

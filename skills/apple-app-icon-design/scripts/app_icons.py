@@ -1019,6 +1019,11 @@ PATH_ARITY = {"M": 2, "L": 2, "H": 1, "V": 1, "C": 6, "S": 4, "Q": 4, "T": 2, "A
 def advances(values, tolerance):
     """Whether a Bezier with these 1D control values never decreases over [0, 1]."""
     rates = [b - a for a, b in zip(values, values[1:])]
+    scale = max(map(abs, rates))
+    if not math.isfinite(scale):
+        return False
+    if scale:
+        rates, tolerance = [rate / scale for rate in rates], tolerance / scale
     if len(rates) < 3:
         return min(rates) >= -tolerance
     first, middle, last = rates
@@ -1345,10 +1350,13 @@ def main():
             _, scale, overruns = continuous_corners(width, height, radii)
             if scale < 1:
                 print(f"info\tradii scaled by {scale:.4g} so that each edge holds its two radii", file=sys.stderr)
-            for edge, excess in zip(EDGES, overruns):
+            fitted = continuous_corners(width, height, radii)[0]
+            for i, (edge, excess) in enumerate(zip(EDGES, overruns)):
                 if excess > OVERRUN:
-                    print(f"info\t{edge} edge: corner departures exceed it by {excess:.2f}; "
-                          "the corners end early and a tangent cubic joins them", file=sys.stderr)
+                    joined = ("the corners end early and a tangent cubic joins them"
+                              if fitted[i] and fitted[(i + 1) % 4] else
+                              "the rounded corner is cut where it meets the sharp corner's other edge")
+                    print(f"info\t{edge} edge: corner departures exceed it by {excess:.2f}; {joined}", file=sys.stderr)
             return 0
         entries = read_entries(args.design)
         if args.list:
