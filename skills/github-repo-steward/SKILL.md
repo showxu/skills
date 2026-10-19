@@ -66,6 +66,13 @@ concurrent writers are implied.
    locations; preserve only required evidence and report retained sizes/reasons.
    Never discard the owner's local changes as cleanup.
 
+## Member-profile repository
+
+For a private `.github-private` repository, apply the scope in
+[standard](references/standard.md#private-member-profile-repository) before the
+Present and Issue intake steps; `github-readme-design` reviews its dashboard
+rendering.
+
 ## Issue intake
 
 Decide whether the repository accepts issues and whether its community files

@@ -144,3 +144,111 @@ Outputs are `Demo-light.svg` and `Demo-dark.svg`. Commit recording, recipe and
 exports together; use `--check` in the project's CI. Helpers never execute the
 recorded commands and never upload. Build/test outputs stay in the producer's
 ignored directory, reused across runs and removed after the task.
+
+## Organization profiles
+
+`render_profile.py` produces `.github/profile/README.md` from the public
+`.github/profile/catalog.json`, and `.github-private/profile/README.md` from
+that same catalog plus member input. It uses only the Python standard library
+and `presentation.py`. Generation is offline, deterministic UTF-8 with LF line
+endings; `--check` compares exact bytes and never writes. Validation finishes
+before writing. Links accept `https:` URLs or repository-relative paths, never
+protocol-relative URLs, credentials, active schemes or control characters.
+Text is escaped HTML text, not embedded Markdown or trusted HTML.
+
+The runnable neutral inputs and golden outputs are under
+`tests/fixtures/profile/`. Their placeholder hosts and synthetic revision are
+fixtures, not live acceptance evidence.
+
+### Catalog contract
+
+The catalog owns these fields:
+
+| Field | Value and owner |
+| --- | --- |
+| `organization` | `login` and display `name`, supplied by the organization |
+| `promise`, `secondary` | Accepted visitor promise and secondary line |
+| `mark` | Umbrella image URL or `{light, dark}` image URLs |
+| `website` | Optional public website URL; member header otherwise links the public organization profile |
+| `navigation` | Optional roles `documentation`, `contributing`, `security`, `support`; each has `label`, `url` |
+| `groups` | Ordered array of `{title, repositories}`; each repository has `name`, `outcome`, `icon` |
+| `maintainer` | Optional `{label, url}` public-profile closing line |
+| `description` | Optional one-line organization account description expressing the promise; validated, never rendered |
+| `quickstart` | Optional `{title, commands}` rendered on the public profile after the navigation as a heading and an `sh` code block; commands are single lines without code fences |
+
+Each repository occurs once. Names identify repositories within the catalog's
+organization. An `icon` is a URL or `{light, dark}` URLs for the logo shown in
+that repository's README header; a repository without its own logo uses the
+product it distributes. Groups contain at least one repository; an empty
+catalog has an empty groups array. GitHub inventory supplies public,
+non-archived membership except `.github`; the organization steward reconciles
+it online rather than the renderer fetching or inventing members.
+
+Catalog relative links are relative to `.github/profile/README.md`. Public
+output preserves them. Member output resolves them against the pinned `.github`
+revision: images use raw content URLs, other links use GitHub file URLs.
+They must remain within that repository. Member maintenance links are relative
+to `.github-private/profile/README.md`; use HTTPS links for shared `.github`
+documents. The organization declares the document paths and labels.
+
+### Member input contract
+
+The member repository owns a small input, conventionally `profile/member.json`:
+
+- `catalog`: `revision` (full 40-character commit SHA) and `sha256` of the exact
+  catalog bytes downloaded from that revision of `.github`. Keep the fetched
+  file in a producer-owned ignored directory and pass it with `--catalog`.
+  Record the pin and digest, never fork the catalog into another maintained
+  group/row list. The renderer checks the digest; the online steward verifies
+  the file at the recorded revision and compares membership with current truth.
+- `maintenance`: required roles `maintenance`, `versioning`, `settings`,
+  `design`, each with the organization's declared `label` and `url`.
+- `repositories`: object keyed by exact catalog repository name. Each value
+  contains only `default_branch` (the declared nonempty GitHub default branch
+  name), `workflow` (workflow filename, such as `validate.yml`, or `null`),
+  and `releases` (`published`, `channel` or `none`). These release
+  states respectively render a live latest-release badge, a Releases link or
+  an em dash. They encode publication/channel facts, never a version or status.
+
+Unknown fields, duplicate catalog members, and missing or extra operational
+members fail. Input does not carry a status, copied group, outcome or policy.
+Release badges sort published releases by date and include prereleases; drafts
+are excluded. They link to the repository Releases page. See the
+[Shields release badge parameters](https://shields.io/badges/git-hub-release).
+The renderer includes the declared `default_branch` as an explicit CI badge
+query parameter and filters the workflow evidence link to that branch. Branch
+names are URL-encoded, including slashes and non-ASCII characters. The
+organization steward verifies each declared default branch against GitHub,
+checks workflows on the observed default branch, release presence, icon
+resolution and public inventory; unreadable evidence stays
+REVIEW. Badge values remain live and may be cached by their provider.
+
+```sh
+python3 <renderer-dir>/render_profile.py --catalog <catalog.json> --spec <profile-recipe.json> --output profile/README.md
+python3 <renderer-dir>/render_profile.py --catalog <pinned-catalog.json> --member profile/member.json --spec <profile-recipe.json> --output profile/README.md
+python3 <renderer-dir>/render_profile.py --catalog <pinned-catalog.json> --member profile/member.json --spec <profile-recipe.json> --output profile/README.md --check
+```
+
+Omit `--member` for public mode. Omit `--spec` only when the documented defaults
+apply; otherwise use the DESIGN-bound recipe described above with the
+[profile tokens](design.md#profile-tokens). Fetch the pinned catalog before CI
+runs `--check`; do not silently substitute branch HEAD when a pin is unreadable.
+
+### Vendoring shared renderers
+
+Vendor `render_profile.py` and `presentation.py` beside the profile inputs in
+an organization-owned renderer directory, using the same process as vendoring
+`render_terminal.py` and `presentation.py` beside terminal inputs. Record the
+source repository, full source commit, source paths, and SHA-256 of each copied
+file in the consumer's existing source receipt. Copy accepted bytes, preserve
+the source license, and verify those digests in consumer CI. A renderer update
+is a reviewed pin/digest change with regenerated output and `--check`, not a
+local layout fork. Keep the renderer pin distinct from the catalog pin and
+DESIGN digest. Commit inputs, receipt and generated README together.
+
+The output uses GitHub-supported HTML tables, anchors, headings and images;
+`<picture>` switches declared light/dark images with a fallback. See GitHub's
+[organization profile paths and private visibility requirement](https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/customizing-your-organizations-profile)
+and [theme-aware Markdown images](https://github.blog/changelog/2022-08-15-specify-theme-context-for-images-in-markdown-ga/).
+Read both generated files for markup correctness and review actual served
+light/dark appearances before publication. No renderer performs uploads.
