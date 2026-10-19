@@ -106,6 +106,68 @@ Owner notes:
 
 - Fixture values are synthetic inputs, not reusable project conventions.
 
+## social-card-icon
+
+Target behavior: social card icon validation and embedding.
+
+Input prompt: "Render our social preview using this accepted PNG app icon, then check that the exported card is current."
+
+Context and files:
+
+- A project recipe, licensed fonts and a square 1024 px PNG app icon. Exercise
+  JPEG and WebP variants, an outlined SVG containing an embedded raster, nested
+  XHTML iframe/srcdoc and img/srcset, MathML, unknown SVG elements and attributes,
+  style declarations, external presentation URLs, animation and metadata with
+  foreign children. Include a real app-icon PNG and a generated framework-logo
+  SVG, a nonsquare raster, an unsupported format and a 256 px raster at the
+  default icon size. Include corrupt PNG pixel streams with valid chunk
+  checksums, truncated JPEGs and a corrupt later animation frame, both as files
+  and embedded SVG images.
+
+Expected output:
+
+- Preserve the accepted icon's exact bytes in a base64 image data URI at the
+  recipe's icon position and size. Accept self-contained SVGs with PNG, JPEG or
+  WebP base64 images; report clear validation failures for invalid inputs.
+
+Forbidden behavior:
+
+- Replace the icon's style, upscale a small raster, allow other non-fragment
+  references or active SVG content, or overwrite exports during `--check`.
+
+Acceptance checks:
+
+- Decoding the card's raster data URI reproduces the input file byte for byte;
+  the layout receipt records that file's SHA-256.
+- Square rasters at or above `icon_size` pass; nonsquare, too-small, unsupported
+  and corrupt rasters fail. Each raster is verified and fully decoded in every
+  frame. SVGs retain only allowlisted SVG-namespace elements, attributes and
+  value functions. Metadata contents are dropped. Only `use` accepts fragment
+  links and only `image` accepts matching PNG, JPEG or WebP base64 data links;
+  attribute `url()` references must be fragments. Foreign namespaces outside
+  metadata, unknown elements/attributes, styles, animation, scripts and live
+  text fail at every depth. DOCTYPE/entity declarations and processing
+  instructions fail in UTF-8 and UTF-16 input.
+- Both real icon types still render complete social cards with deterministic
+  receipts and unchanged icon pixels compared with their source exports.
+- Repeated renders and `--check` are deterministic. Changing icon bytes,
+  including metadata alone, causes `--check` to fail without changing exports.
+
+Baseline expectation:
+
+- A blocklist can admit foreign-namespace elements or attributes carrying
+  active content; structure-only raster checks can accept undecodable pixels.
+
+Evidence sources:
+
+- Input bytes, generated SVG and layout receipt, validation errors and command
+  exit codes.
+
+Owner notes:
+
+- Fixture images are synthetic; their dimensions are case inputs. The minimum
+  accepted raster dimensions come from the recipe's rendered icon size.
+
 ## audit-drift
 
 Target behavior: audit drift.
