@@ -16,7 +16,7 @@ repositories and organization members through the same contract.
 | scripts/render_social.py / render_terminal.py | Outlined card layout and light/dark recorded-session rendering |
 | scripts/presentation.py | Shared design binding, digest and control-character validation |
 | scripts/scan_repository.py | Accepted-ancestry signatures/subjects, tag type/signatures, parsed reusable-pin drift, workflow/content observations and license digest; reused by organization aggregation |
-| scripts/requirements.txt | Pinned safe YAML parser for reusable-workflow caller discovery |
+| scripts/requirements.txt | Pinned safe YAML parser for reusable-workflow caller discovery and Pillow for raster icon validation |
 | scripts/audit_repo.py | Read-only settings capture and expected/observed comparison |
 | tests / references/eval-fixtures.md / evals/evals.json | Helper regressions and durable behavioral inputs; execution output is ignored |
 

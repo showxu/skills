@@ -3,9 +3,10 @@
 Use a repository-owned renderer when it implements the accepted standard.
 Otherwise the helpers here provide portable rendering primitives. Run them
 from the repository being served. Python 3 is required; social outlines need
-`fonttools`. PNG conversion uses `rsvg-convert` and pixel verification uses
-Pillow. Install dependencies in that repository's producer-owned ignored
-location, not in the skill source or the owner's global environment.
+`fonttools`. Raster icon validation and pixel verification use Pillow; PNG
+conversion uses `rsvg-convert`. Install dependencies in that repository's
+producer-owned ignored location, not in the skill source or the owner's global
+environment.
 
 ## Project inputs
 
@@ -40,9 +41,17 @@ most three lines with a 44 px line height. Default background is white, title
 and owner black, summary dark gray. Override `background`, `ink`, `muted`,
 `title_max`, `title_min`, `font_owner`, `owner_size`, `text_x`, `text_width`, `icon_size` and `padding`
 with accepted DESIGN values. `font_owner` defaults to the body font; supply a
-distinct face when DESIGN specifies one. Icon lettering must already be
-outlined. Canvas and About size remain the card contract.
-Unbreakable overflow fails instead of clipping or silently reducing type.
+distinct face when DESIGN specifies one. Canvas and About size remain the card
+contract. Unbreakable overflow fails instead of clipping or silently reducing type.
+
+`icon` accepts a self-contained SVG or a PNG, JPEG or WebP image. Raster icons
+must be square and at least `icon_size` pixels on each side (384 by default);
+smaller inputs fail rather than being upscaled. The renderer embeds the file's
+exact bytes in an `<image>` data URI at the same position and size as an SVG.
+SVG icons need a `viewBox` and outlined lettering. Their `<image>` elements may
+use base64 `data:image/png`, `data:image/jpeg` or `data:image/webp` URIs whose
+payload matches the declared format. All other non-fragment `href` references,
+scripts, `foreignObject`, event attributes and live text are rejected.
 
 ```sh
 python3 <skill>/scripts/render_social.py --spec <recipe.json> --output <card.svg>
@@ -51,8 +60,9 @@ python3 <skill>/scripts/render_social.py --spec <recipe.json> --output <card.svg
 ```
 
 The SVG uses glyph outlines. A sibling `.layout.json` records title/About
-lines, actual font size, dimensions and input digests. `--check` compares both
-outputs and fails on drift without writing. Inspect both output images.
+lines, actual font size, dimensions and input digests, including the icon file's
+SHA-256 for either input type. `--check` compares both outputs and fails on drift
+without writing. Inspect both output images.
 
 ## Terminal recording
 

@@ -80,6 +80,12 @@
       "prompt": "Audit our release caller and reusable jobs. A setup action enables a dependency cache and concurrency uses cancel-in-progress: false in a shared group with a single pending slot.",
       "expected_output": "Report both release cache use and pending-run replacement; prepare cache-free fresh build paths and capacity-safe queuing or dispatch with no cancelling group.",
       "files": []
+    },
+    {
+      "id": 13,
+      "prompt": "Render our social preview using this accepted PNG app icon, then check that the exported card is current.",
+      "expected_output": "Embed the accepted raster icon's exact bytes at the recipe's icon position and size, and record the file's SHA-256. Accept square PNG, JPEG and WebP inputs at or above icon_size and SVG images with matching raster base64 data URIs. Reject nonsquare, too-small, unsupported and corrupt rasters, other non-fragment references and active SVG content. Repeated renders and --check are deterministic; icon byte drift fails --check without writing.",
+      "files": []
     }
   ]
 }

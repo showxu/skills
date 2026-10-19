@@ -2,7 +2,10 @@
 """Render a 1280x640 outlined social card from a project-owned JSON recipe."""
 
 import argparse
+import base64
+import binascii
 from html import escape
+from io import BytesIO
 import json
 from pathlib import Path
 import re
@@ -79,16 +82,51 @@ def wrap_about(value, measure, width):
     return lines
 
 
+def raster_info(data):
+    from PIL import Image
+    mime_types = {"PNG": "image/png", "JPEG": "image/jpeg", "WEBP": "image/webp"}
+    try:
+        with Image.open(BytesIO(data), formats=list(mime_types)) as image:
+            mime, dimensions = mime_types[image.format], image.size
+            image.verify()
+    except (OSError, SyntaxError) as error:
+        raise ValueError("Raster icon must be a valid PNG, JPEG or WebP image") from error
+    return mime, dimensions
+
+
 def icon_svg(path, x, y, size):
-    root = ET.fromstring(path.read_text())
+    data = path.read_bytes()
+    try:
+        root = ET.fromstring(data)
+    except ET.ParseError:
+        mime, (width, height) = raster_info(data)
+        if width != height:
+            raise ValueError(f"Raster icon must be square; got {width}x{height} pixels")
+        if width < size:
+            raise ValueError(f"Raster icon must be at least {size:g}x{size:g} pixels; got {width}x{height}")
+        uri = f"data:{mime};base64," + base64.b64encode(data).decode("ascii")
+        return f'<image x="{x}" y="{y}" width="{size}" height="{size}" href="{uri}"/>'
     if root.tag.rsplit("}", 1)[-1] != "svg":
-        raise ValueError("Icon must be SVG")
+        raise ValueError("Icon must be SVG, PNG, JPEG or WebP")
     for node in root.iter():
-        if node.tag.rsplit("}", 1)[-1] in {"script", "foreignObject", "text"}:
+        tag = node.tag.rsplit("}", 1)[-1]
+        if tag in {"script", "foreignObject", "text"}:
             raise ValueError("Icon must be static SVG with outlined lettering")
         for key, value in node.attrib.items():
-            if key.lower().startswith("on") or (key.rsplit("}", 1)[-1] == "href" and not value.startswith("#")):
+            attribute = key.rsplit("}", 1)[-1]
+            if attribute.lower().startswith("on"):
                 raise ValueError("Icon must be self-contained SVG")
+            if attribute == "href" and not value.startswith("#"):
+                match = re.fullmatch(r"data:(image/(?:png|jpeg|webp));base64,(.+)", value)
+                if tag != "image" or not match:
+                    raise ValueError("Icon must be self-contained SVG")
+                try:
+                    embedded = base64.b64decode(match[2], validate=True)
+                except binascii.Error as error:
+                    raise ValueError("Embedded raster image needs valid base64 data") from error
+                mime, _ = raster_info(embedded)
+                if mime != match[1]:
+                    raise ValueError("Embedded raster image format must match its data URI")
     if "viewBox" not in root.attrib:
         raise ValueError("Icon needs a viewBox")
     root.attrib.update(x=str(x), y=str(y), width=str(size), height=str(size))

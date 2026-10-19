@@ -106,6 +106,55 @@ Owner notes:
 
 - Fixture values are synthetic inputs, not reusable project conventions.
 
+## social-card-icon
+
+Target behavior: social card icon validation and embedding.
+
+Input prompt: "Render our social preview using this accepted PNG app icon, then check that the exported card is current."
+
+Context and files:
+
+- A project recipe, licensed fonts and a square 1024 px PNG app icon. Exercise
+  JPEG and WebP variants, an outlined SVG containing an embedded raster, an SVG
+  with an external image reference, a nonsquare raster, an unsupported format
+  and a 256 px raster at the default icon size.
+
+Expected output:
+
+- Preserve the accepted icon's exact bytes in a base64 image data URI at the
+  recipe's icon position and size. Accept self-contained SVGs with PNG, JPEG or
+  WebP base64 images; report clear validation failures for invalid inputs.
+
+Forbidden behavior:
+
+- Replace the icon's style, upscale a small raster, allow other non-fragment
+  references or active SVG content, or overwrite exports during `--check`.
+
+Acceptance checks:
+
+- Decoding the card's raster data URI reproduces the input file byte for byte;
+  the layout receipt records that file's SHA-256.
+- Square rasters at or above `icon_size` pass; nonsquare, too-small, unsupported
+  and corrupt rasters fail. SVGs accept only matching PNG, JPEG or WebP base64
+  image data and fragment references; scripts, `foreignObject`, event
+  attributes and live text still fail.
+- Repeated renders and `--check` are deterministic. Changing icon bytes,
+  including metadata alone, causes `--check` to fail without changing exports.
+
+Baseline expectation:
+
+- An SVG-only renderer rejects a valid app icon or its embedded raster wrapper.
+
+Evidence sources:
+
+- Input bytes, generated SVG and layout receipt, validation errors and command
+  exit codes.
+
+Owner notes:
+
+- Fixture images are synthetic; their dimensions are case inputs. The minimum
+  accepted raster dimensions come from the recipe's rendered icon size.
+
 ## audit-drift
 
 Target behavior: audit drift.
