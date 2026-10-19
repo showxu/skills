@@ -50,6 +50,7 @@ CONTINUOUS = (1.528665, (((1.088490, 0), (0.868407, 0), (0.631494, 0.074911)),
 OVERRUN = 0.01                  # px by which two corners' departures must exceed their edge to need a blend
 BLEND_HANDLE = 2 / 3            # share of the way to the tangents' intersection, as a quadratic would reach
 SLIVER = 2                      # px below which a cut corner's end cubic cannot keep its rounded tangent
+BLEND_REACH = 0.1               # share of a blend's chord each handle must span to set a clear tangent
 EDGES = ("right", "bottom", "left", "top")  # the edge after each corner, clockwise from top-right
 # Legacy geometry on the 1024 px canvas, measured against Apple's production templates
 # (references/rendering.md); the gloss values are documented approximations.
@@ -405,20 +406,14 @@ def corner_inset(radius, distance):
     return cubic_point(corner_cubics()[index], position - index)[0] * radius
 
 
-def drawable(radii, lengths):
-    """Whether cutting and blending overrunning corners outlines these radii without a notch."""
+def sharp_cuts_fit(radii, lengths):
+    """Whether each corner cut at a sharp neighbour's other edge meets that edge before the corner
+    beyond it begins."""
     departure = CONTINUOUS[0]
     for i in range(4):
         a, b, length = radii[i], radii[(i + 1) % 4], lengths[i]
-        if departure * (a + b) - length <= OVERRUN:
+        if bool(a) == bool(b) or departure * (a + b) - length <= OVERRUN:
             continue
-        if a and b:
-            # Neither corner may run deeper past the other's vertex than that corner reaches.
-            if corner_inset(a, length) > departure * b or corner_inset(b, length) > departure * a:
-                return False
-            continue
-        # A corner cut at a sharp neighbour's other edge must meet that edge before the corner
-        # beyond it begins.
         if a:
             big, far, other = a, radii[(i + 2) % 4], lengths[(i + 1) % 4]
         else:
@@ -440,46 +435,127 @@ def continuous_corners(width, height, radii):
     top_left, top_right, bottom_right, bottom_left = values
     requested = (top_right, bottom_right, bottom_left, top_left)
     lengths = (height, width, height, width)
+
+    def drawable(scale):
+        scaled = tuple(r * scale for r in requested)
+        return sharp_cuts_fit(scaled, lengths) and continuous_outline(0, 0, width, height, scaled) is not None
     # As CSS border-radius does, shrink all radii together until every edge holds its two radii,
-    # then further while a corner would swallow its neighbour.
+    # then further while the cut corners cannot be outlined.
     scale = min([1.0] + [lengths[i] / (requested[i] + requested[(i + 1) % 4])
                          for i in range(4) if requested[i] + requested[(i + 1) % 4] > lengths[i]])
-    if not drawable(tuple(r * scale for r in requested), lengths):
+    if not drawable(scale):
         low, high = 0.0, scale
         for _ in range(48):
             middle = (low + high) / 2
-            low, high = (middle, high) if drawable(tuple(r * middle for r in requested), lengths) else (low, middle)
+            low, high = (middle, high) if drawable(middle) else (low, middle)
         scale = low
     radii = tuple(r * scale for r in requested) if scale < 1 else requested
     return radii, scale, [CONTINUOUS[0] * (radii[i] + radii[(i + 1) % 4]) - lengths[i] for i in range(4)]
 
 
 def tangent_blend(p, p_direction, q, q_direction, box):
-    """Cubic control points joining p, arriving along p_direction, to q, leaving along q_direction.
+    """Control points of a cubic joining p, arriving along p_direction, to q, leaving along
+    q_direction; its handles run toward the tangents' intersection and stop at the edge of `box`
+    (x0, y0, x1, y1), so the blend stays inside it.
 
-    Handles run toward the tangents' intersection and stop at the edge of `box` (x0, y0, x1, y1),
-    so the blend stays inside it. Returns None when the tangents are too close to parallel to meet
-    ahead of p and behind q; a straight line then joins them within the path's precision.
+    Returns () when the tangents are too close to parallel to meet, where a line joins p and q
+    within the path's precision, and None when they meet behind p or ahead of q or a handle would
+    span less than BLEND_REACH of the chord.
     """
     (dx, dy), (ex, ey) = p_direction, q_direction
     rx, ry = q[0] - p[0], q[1] - p[1]
     determinant = dx * ey - dy * ex
     if abs(determinant) <= 1e-12 * math.hypot(dx, dy) * math.hypot(ex, ey):
-        return None
+        return ()
     a, b = (rx * ey - ry * ex) / determinant, (dx * ry - dy * rx) / determinant
-    meet = (p[0] + a * dx, p[1] + a * dy)
-    if not (a > 0 and b > 0 and all(map(math.isfinite, meet))):
+    if not (a > 0 and b > 0 and math.isfinite(a * math.hypot(dx, dy)) and math.isfinite(b * math.hypot(ex, ey))):
         return None
 
-    def handle(origin):
+    def handle(origin, step):
+        # Steps follow the exact tangents, so an edge-aligned tangent is never clamped by its edge.
         share = BLEND_HANDLE
         for axis in (0, 1):
-            step = meet[axis] - origin[axis]
-            bound = box[axis + 2] if step > 0 else box[axis]
-            if step:
-                share = min(share, max(0.0, (bound - origin[axis]) / step))
-        return tuple(o + share * (m - o) for o, m in zip(origin, meet))
-    return handle(p), handle(q)
+            if step[axis]:
+                bound = box[axis + 2] if step[axis] > 0 else box[axis]
+                share = min(share, max(0.0, (bound - origin[axis]) / step[axis]))
+        return tuple(o + share * s for o, s in zip(origin, step))
+    handles = handle(p, (a * dx, a * dy)), handle(q, (-b * ex, -b * ey))
+    if min(math.dist(p, handles[0]), math.dist(q, handles[1])) < BLEND_REACH * math.hypot(rx, ry):
+        return None
+    return handles
+
+
+def continuous_outline(x, y, width, height, radii):
+    """Path data for corners of `radii` in drawing order, or None when a blend cannot join two cut
+    corners. Blends are solved relative to the rectangle, so the result does not depend on where
+    it lies."""
+    lengths = (height, width, height, width)
+    overrun = [CONTINUOUS[0] * (radii[i] + radii[(i + 1) % 4]) - lengths[i] > OVERRUN for i in range(4)]
+    # Two rounded corners overrunning their edge are joined by a blend; a sharp corner is not.
+    blended = [overrun[i] and radii[i] > 0 and radii[(i + 1) % 4] > 0 for i in range(4)]
+    vertices = ((width, 0), (width, height), (0, height), (0, 0))
+    axes = (((-1, 0), (0, 1)), ((0, -1), (-1, 0)), ((1, 0), (0, -1)), ((0, 1), (1, 0)))
+    elements = []  # (corner, start, leave, cubics, end, arrive); points as (absolute, relative)
+    for i, ((vx, vy), (e1, e2)) in enumerate(zip(vertices, axes)):
+        radius, cx, cy = radii[i], x + vx, y + vy
+
+        def place(u, v):
+            du, dv = u * radius, v * radius
+            return ((cx + du * e1[0] + dv * e2[0], cy + du * e1[1] + dv * e2[1]),
+                    (vx + du * e1[0] + dv * e2[0], vy + du * e1[1] + dv * e2[1]))
+
+        def direction(a, b):
+            # Directions from the unit frame keep their precision far from the origin.
+            u, v = b[0] - a[0], b[1] - a[1]
+            return (u * e1[0] + v * e2[0], u * e1[1] + v * e2[1])
+        if not radius:
+            if not (overrun[i - 1] or overrun[i]):
+                elements.append((i, ((cx, cy), (vx, vy)), None, [], ((cx, cy), (vx, vy)), None))
+            continue
+        start = corner_position(0, (lengths[i - 1] - CONTINUOUS[0] * radii[i - 1]) / radius) if overrun[i - 1] else 0.0
+        end = corner_position(1, (lengths[i] - CONTINUOUS[0] * radii[(i + 1) % 4]) / radius) if overrun[i] else 3.0
+        # Only an end that a blend replaces may lose a sliver; a cut at a sharp corner's edge must
+        # stay on that edge.
+        pieces = corner_piece(start, end, radius, (blended[i - 1], blended[i])) if start < end else []
+        if pieces:
+            elements.append((i, place(*pieces[0][0]), direction(pieces[0][0], pieces[0][1]),
+                             [tuple(place(*point)[0] for point in cubic) for cubic in pieces],
+                             place(*pieces[-1][3]), direction(pieces[-1][2], pieces[-1][3])))
+        elif overrun[i - 1] != overrun[i]:
+            # Consumed from one side only: keep the end that meets the edge that does not overrun.
+            first, last = corner_cubics()[0], corner_cubics()[-1]
+            point, tangent = ((last[3], direction(last[2], last[3])) if not overrun[i]
+                              else (first[0], direction(first[0], first[1])))
+            elements.append((i, place(*point), tangent, [], place(*point), tangent))
+    if not elements:
+        return None
+
+    def at(point):
+        if not all(map(math.isfinite, point)):
+            fail("a continuous rectangle this large has no finite outline")
+        return f"{point[0]:.2f} {point[1]:.2f}"
+
+    def join(element, after):
+        """The connection from an element's end to the start of the next, or None."""
+        edges = range(element[0], element[0] + ((after[0] - element[0]) % 4 or 4))
+        if any(blended[edge % 4] for edge in edges) and element[5] and after[2]:
+            handles = tangent_blend(element[4][1], element[5], after[1][1], after[2], (0, 0, width, height))
+            if handles is None:
+                return None
+            if handles:
+                h1, h2 = ((x + h[0], y + h[1]) for h in handles)
+                return f"C{at(h1)} {at(h2)} {at(after[1][0])}"
+        return "L" + at(after[1][0])
+
+    path = ["M" + at(elements[0][1][0])]
+    for index, element in enumerate(elements):
+        path.append("".join(f"C{at(b)} {at(c)} {at(d)}" for _, b, c, d in element[3]))
+        connection = join(element, elements[(index + 1) % len(elements)])
+        if connection is None:
+            return None
+        if index < len(elements) - 1 or connection.startswith("C"):
+            path.append(connection)
+    return "".join(path) + "Z"
 
 
 def continuous_rect(x, y, width, height, radii):
@@ -490,72 +566,14 @@ def continuous_rect(x, y, width, height, radii):
     corner stops where the other leaves that edge and a tangent cubic joins them instead of a line
     that doubles back; a corner that ends before it starts is consumed (references/rendering.md).
     """
-    radii, _, excess = continuous_corners(width, height, radii)
+    radii = continuous_corners(width, height, radii)[0]
     if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v)
            for v in (x, y, x + width, y + height)):
         fail("a continuous rectangle needs a finite position and extent")
-    lengths = (height, width, height, width)
-    frames = (((x + width, y), (-1, 0), (0, 1)), ((x + width, y + height), (0, -1), (-1, 0)),
-              ((x, y + height), (1, 0), (0, -1)), ((x, y), (0, 1), (1, 0)))
-    overrun = [e > OVERRUN for e in excess]
-    # Two rounded corners overrunning their edge are joined by a blend; a sharp corner is not.
-    blended = [overrun[i] and radii[i] > 0 and radii[(i + 1) % 4] > 0 for i in range(4)]
-    elements = []  # (corner, start, leave, cubics, end, arrive) in drawing order
-    for i, ((cx, cy), e1, e2) in enumerate(frames):
-        radius = radii[i]
-
-        def place(u, v):
-            return (cx + u * radius * e1[0] + v * radius * e2[0], cy + u * radius * e1[1] + v * radius * e2[1])
-
-        def direction(u, v):
-            # Directions from the unit frame keep their precision far from the origin.
-            return (u * e1[0] + v * e2[0], u * e1[1] + v * e2[1])
-        if not radius:
-            if not (overrun[i - 1] or overrun[i]):
-                elements.append((i, (cx, cy), None, [], (cx, cy), None))
-            continue
-        start = corner_position(0, (lengths[i - 1] - CONTINUOUS[0] * radii[i - 1]) / radius) if overrun[i - 1] else 0.0
-        end = corner_position(1, (lengths[i] - CONTINUOUS[0] * radii[(i + 1) % 4]) / radius) if overrun[i] else 3.0
-        # Only an end that a blend replaces may lose a sliver; a cut at a sharp corner's edge must
-        # stay on that edge.
-        pieces = corner_piece(start, end, radius, (blended[i - 1], blended[i])) if start < end else []
-        if pieces:
-            elements.append((i, place(*pieces[0][0]), direction(*(b - a for a, b in zip(pieces[0][0], pieces[0][1]))),
-                             [tuple(place(*point) for point in cubic) for cubic in pieces],
-                             place(*pieces[-1][3]), direction(*(b - a for a, b in zip(pieces[-1][2], pieces[-1][3])))))
-        elif overrun[i - 1] != overrun[i]:
-            # Consumed from one side only: keep the end that meets the edge that does not overrun.
-            first, last = corner_cubics()[0], corner_cubics()[-1]
-            point, tangent = ((last[3], (b - a for a, b in zip(last[2], last[3]))) if not overrun[i]
-                              else (first[0], (b - a for a, b in zip(first[0], first[1]))))
-            tangent = direction(*tangent)
-            elements.append((i, place(*point), tangent, [], place(*point), tangent))
-    if not elements:
+    path = continuous_outline(x, y, width, height, radii)
+    if path is None:
         fail("a continuous rectangle with these radii has no outline")
-
-    def at(point):
-        if not all(map(math.isfinite, point)):
-            fail("a continuous rectangle this large has no finite outline")
-        return f"{point[0]:.2f} {point[1]:.2f}"
-
-    def join(element, after):
-        """The connection from an element's end to the start of the next."""
-        edges = range(element[0], element[0] + ((after[0] - element[0]) % 4 or 4))
-        if any(blended[edge % 4] for edge in edges) and element[5] and after[2]:
-            handles = tangent_blend(element[4], element[5], after[1], after[2], (x, y, x + width, y + height))
-            if handles:
-                return f"C{at(handles[0])} {at(handles[1])} {at(after[1])}"
-        return "L" + at(after[1])
-
-    path = ["M" + at(elements[0][1])]
-    for index, element in enumerate(elements):
-        path.append("".join(f"C{at(b)} {at(c)} {at(d)}" for _, b, c, d in element[3]))
-        if index < len(elements) - 1:
-            path.append(join(element, elements[index + 1]))
-    closing = join(elements[-1], elements[0])
-    if closing.startswith("C"):
-        path.append(closing)
-    return "".join(path) + "Z"
+    return path
 
 
 def grid_backdrop(lines=(256, 512, 768), width=10, inset=25, radius=189, turn=30, opacity=1):

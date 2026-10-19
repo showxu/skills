@@ -252,8 +252,9 @@ one value or four: top-left, top-right, bottom-right, bottom-left.
 - When an edge cannot hold its two radii, all radii shrink by one factor
   until every edge can, as CSS `border-radius` does; a single radius is
   therefore at most half the shorter side. They shrink further, still
-  together, while a corner would swallow a rounded neighbour or run past a
-  sharp neighbour into the corner beyond it. A large corner beside a small one
+  together, while two cut corners cannot be joined by a blend whose handles
+  each span at least a tenth of its chord, or a corner would run past a sharp
+  neighbour into the corner beyond it. A large corner beside a small one
   otherwise keeps its radius even though its departure exceeds the edge.
 - Where the corners fit, the path is the continuous corner joined by straight
   edges; for a square it is byte-identical to the style outlines above.

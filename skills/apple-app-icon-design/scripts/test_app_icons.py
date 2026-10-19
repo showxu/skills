@@ -341,7 +341,7 @@ class ContinuousRectTests(unittest.TestCase):
               (0, 0, 300, 100, (45, 45, 20, 20)), (5, 5, 80, 300, (40, 10, 40, 10)), (0, 0, 120, 100, 49),
               (0, 0, 100, 100, 50), (0, 0, 100, 100, (50, 0, 50, 0)), (0, 0, 100, 100, (80, 10, 0, 20)),
               (25, 25, 231, 231, (189, 30 / app_icons.CONTINUOUS[0], 0, 30 / app_icons.CONTINUOUS[0])),
-              (0, 0, 300, 100, (40, 60, 40, 60))]
+              (0, 0, 300, 100, (40, 60, 40, 60)), (0, 0, 950, 850, (70, 830, 4, 730))]
 
     def test_feasible_corners_meet_each_edge_at_their_departure(self):
         k = app_icons.CONTINUOUS[0]
@@ -420,14 +420,27 @@ class ContinuousRectTests(unittest.TestCase):
                 path = app_icons.continuous_rect(0, 0, width, height, radii)
                 self.assertEqual(app_icons.doubled_back(layer(path)), [])
                 points = [app_icons.cubic_point(c, t / 20) for c in path_cubics(path) for t in range(20)]
-                self.assertTrue(all(-0.005 <= px <= width + 0.005 and -0.005 <= py <= height + 0.005
+                # Overlaps below OVERRUN are left uncut, so the outline may pass its box by that much.
+                tolerance = app_icons.OVERRUN + 0.005
+                self.assertTrue(all(-tolerance <= px <= width + tolerance and -tolerance <= py <= height + tolerance
                                     for px, py in points))
                 turns = [(b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0])
                          for a, b, c in zip(points, points[1:] + points[:1], points[2:] + points[:2])]
                 self.assertGreaterEqual(min(turns), -0.05, "outline must stay convex")
-                for start, _, _, end in (c for c in path_cubics(path) if c[0] == c[1] and c[2] == c[3]):
+                cubics = path_cubics(path)
+                for start, _, _, end in (c for c in cubics if c[0] == c[1] and c[2] == c[3]):
                     self.assertTrue(abs(start[0] - end[0]) < 0.05 or abs(start[1] - end[1]) < 0.05,
                                     f"line {start}-{end} must follow an edge")
+                for before, after in zip(cubics, cubics[1:] + cubics[:1]):
+                    joint = before[3]
+                    # Creases belong only where a corner meets a sharp neighbour's edge.
+                    if min(abs(joint[0]), abs(joint[0] - width), abs(joint[1]), abs(joint[1] - height)) < 0.05:
+                        continue
+                    arrive = (before[3][0] - before[2][0], before[3][1] - before[2][1])
+                    leave = (after[1][0] - after[0][0], after[1][1] - after[0][1])
+                    if math.hypot(*arrive) > 1 and math.hypot(*leave) > 1:
+                        self.assertGreater((arrive[0] * leave[0] + arrive[1] * leave[1]) /
+                                           (math.hypot(*arrive) * math.hypot(*leave)), 0.995, f"kink at {joint}")
 
     def test_barely_overrunning_corners_stay_well_formed_at_any_scale(self):
         k = app_icons.CONTINUOUS[0]
@@ -513,6 +526,12 @@ class GridBackdropTests(unittest.TestCase):
                                 self.assertTrue(inside(point, polygon) or
                                                 min(math.dist(point, q) for q in polygon) < 0.05)
         self.assertGreater(accepted, 20)
+        svg = app_icons.grid_backdrop(lines=(198, 512, 826), width=4.2, inset=10, radius=129, turn=71)
+        for d in re.findall(r'fill-rule="evenodd" d="([^"]+)"', svg):
+            outer, inner = (path_cubics(sub) for sub in re.findall(r"M[^M]+", d))
+            polygon = [app_icons.cubic_point(c, t / 12) for c in outer for t in range(12)]
+            for point in (app_icons.cubic_point(c, t / 12) for c in inner for t in range(12)):
+                self.assertTrue(inside(point, polygon) or min(math.dist(point, q) for q in polygon) < 0.05, point)
         with self.assertRaisesRegex(ValueError, "do not fit"):
             app_icons.grid_backdrop(radius=250, turn=8)
 
