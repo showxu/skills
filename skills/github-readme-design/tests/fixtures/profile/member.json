@@ -1,0 +1,41 @@
+{
+  "catalog": {
+    "revision": "1111111111111111111111111111111111111111",
+    "sha256": "efce3161d09a4f83b105207f2da680abbde80bddf1c73396a2a0b7ba8aeeb2cb"
+  },
+  "maintenance": {
+    "maintenance": {
+      "label": "Maintenance",
+      "url": "https://github.com/example-team/.github/blob/trunk/docs/maintenance.md"
+    },
+    "versioning": {
+      "label": "Release procedure",
+      "url": "https://github.com/example-team/.github/blob/trunk/docs/releases.md"
+    },
+    "settings": {
+      "label": "Settings check",
+      "url": "https://github.com/example-team/.github/blob/trunk/checks/settings.py"
+    },
+    "design": {
+      "label": "Design",
+      "url": "https://github.com/example-team/.github/blob/trunk/DESIGN.md"
+    }
+  },
+  "repositories": {
+    "example-library": {
+      "default_branch": "trunk",
+      "workflow": "validate.yml",
+      "releases": "published"
+    },
+    "example-cli": {
+      "default_branch": "stable/next",
+      "workflow": "checks.yaml",
+      "releases": "channel"
+    },
+    "example-distribution": {
+      "default_branch": "main",
+      "workflow": null,
+      "releases": "none"
+    }
+  }
+}

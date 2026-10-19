@@ -28,6 +28,12 @@
         "evals/files/closed-source-app.json"
       ],
       "id": 4
+    },
+    {
+      "id": 5,
+      "prompt": "Render our public and maintainer profiles from the supplied catalog, member input and DESIGN recipe.",
+      "expected_output": "Use render_profile.py for both layouts with one icon per row, the four documented sizes unless overridden, live badges/fallbacks and correct relative-link rebasing. Return byte checks and light/dark review scope. Member input owns default_branch; CI badge URLs carry it and the online steward reports mismatches with GitHub.",
+      "files": []
     }
   ]
 }

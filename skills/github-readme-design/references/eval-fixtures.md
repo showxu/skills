@@ -187,3 +187,37 @@ Evidence sources:
 Owner notes:
 
 - Fixture values are synthetic inputs, not reusable project conventions.
+
+## shared-profile-rendering
+
+Target behavior: Render both organization views with catalog-owned icons and groups.
+
+Input prompt: "Render our public and maintainer profiles from the supplied catalog, member input and DESIGN recipe."
+
+Context and files:
+
+- Neutral inputs in tests/fixtures/profile; full catalog pin and matching digest, two job groups and all three release states.
+
+Expected output:
+
+- Use render_profile.py for both layouts with one icon per row, the four documented sizes unless overridden, live badges/fallbacks and correct relative-link rebasing. Return byte checks and light/dark review scope.
+
+Forbidden behavior:
+
+- Omit row icons, duplicate catalog groups in member input, insert policy/status prose, permit active link schemes or claim placeholder hosts were live-tested.
+
+Acceptance checks:
+
+- Both goldens and --check pass; CI badge URLs carry each member input's declared default branch; missing/extra operational members, stale digests, hostile markup and unsafe schemes fail or escape as documented.
+
+Baseline expectation:
+
+- An organization-specific generator can lose icons or drift between the two inventories.
+
+Evidence sources:
+
+- Generated artifacts, renderer/check output and executor response.
+
+Owner notes:
+
+- Neutral fixture inputs; execution evidence stays in ignored output.

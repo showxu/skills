@@ -8,10 +8,11 @@ with the caller.
 | Surface | Responsibility |
 | --- | --- |
 | SKILL.md | Triggers, inputs, workflow, boundaries, validation, output |
-| design.md | Developer-product README layout, badges, Quick look forms, social preview, organization profile layout |
+| design.md | Developer-product README layout, badges, Quick look forms, social preview, public and member organization profile layouts and tokens |
 | design-apps.md | App README layout, variants, consistency and images |
 | renderers.md | Renderer input contracts, DESIGN binding and terminal recording format |
 | scripts/render_social.py / render_terminal.py | Outlined card layout and light/dark recorded-session rendering |
+| scripts/render_profile.py | Deterministic public/member profiles, catalog/member validation and pinned catalog binding |
 | scripts/presentation.py | Shared design binding, digest and control-character validation |
 | scripts/requirements.txt | Pinned Pillow for raster validation and tinycss2 for SVG attribute URL validation |
 | tests / references/eval-fixtures.md / evals/evals.json | Helper regressions and durable behavioral inputs; execution output is ignored |

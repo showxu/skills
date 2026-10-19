@@ -1,4 +1,4 @@
-# Public design
+# README and profile design
 
 Lay out the supplied information with the applicable DESIGN and
 documentation roles. Where DESIGN is silent, choose and document project
@@ -23,7 +23,8 @@ badge only if an actual workflow, supported requirement or license backs it.
 Badge values come from their information owners; this skill owns the
 selection, order, labels and styling. Non-package repositories omit
 compiler/platform claims. Use accessible labels and link each badge to its
-evidence.
+evidence. Use DESIGN's `badge_style` when declared; otherwise use `flat`. Keep
+status and release values live rather than writing results into labels.
 
 ## Quick look form
 
@@ -62,9 +63,49 @@ bytes. The renderer and byte checks do not replace visual review.
 
 ## Organization profile
 
-The profile is organized by the reader's job, from the supplied promise, job
-groups, ordering and catalog rows. The header carries the umbrella icon, the
-promise, a secondary line and links to documentation, contributing, security
-and support where they exist. Keep text as text, and place each repository's
-icon next to its linked name and outcome sentence; the header umbrella can
-stand alone. Review the served profile in light and dark.
+The public profile is organized by the reader's job, from the supplied catalog's
+promise, job groups, ordering and rows. Center the header: umbrella icon,
+promise heading, secondary line, then documentation, contributing, security
+and support links where declared. Each row places the repository's README
+header icon beside its linked name and outcome sentence. A distribution
+repository uses the product icon when it has no logo of its own. An optional
+maintainer line comes from input. Keep text as text.
+
+The member profile is the maintainers' entry. In order, render a smaller
+umbrella mark, `<organization display name> maintainer dashboard`, and one line
+linking the public website or public profile; maintenance navigation from the
+member input; repositories in the public catalog's job groups and order; and
+organization-wide searches for open pull requests, open issues and Dependabot
+pull requests. Every repository row carries its icon and linked name, a live
+badge for its declared CI workflow on the default branch (or an Actions link),
+and a latest-release badge for a release publisher, a Releases link for an
+unused release channel, or an em dash for no release channel.
+
+Use the shared [profile renderer](renderers.md#organization-profiles) for both
+surfaces. The member input supplies maintenance links and each repository's
+`default_branch`, CI workflow and release facts;
+it does not duplicate catalog rows, policy or manually recorded status. Treat
+all dashboard content as shareable with any member: no credentials, private
+paths or unpublished plans. The shared standard remains linked in `.github`.
+
+### Profile tokens
+
+Resolve these named tokens from the accepted DESIGN when present into the
+profile recipe, with its DESIGN path and digest. These are recipe names, not
+assumed key paths in an arbitrary DESIGN file. Record defaults when DESIGN is
+silent.
+
+| Token | Default | Meaning |
+| --- | --- | --- |
+| `public_header_icon_size` | 128 px | Public umbrella mark square |
+| `member_header_icon_size` | 64 px | Member umbrella mark square |
+| `public_row_icon_size` | 40 px | Public repository icon square |
+| `member_row_icon_size` | 24 px | Member repository icon square |
+| `badge_style` | `flat` | Badge style under the Badges rules above |
+
+Sizes are positive integer pixels. Badge styles are the supported Shields
+styles: flat, flat-square, plastic, for-the-badge or social. Review both served
+profiles in light and dark. Use HTML tables for rows and `<picture>` with a
+dark `<source>` and fallback `<img>` when input declares both appearances.
+Do not put Markdown syntax inside HTML tables or depend on CSS, scripts, inline
+SVG, or embedded fonts in GitHub's renderer.

@@ -1,6 +1,6 @@
 ---
 name: github-readme-design
-description: Lay out and render the public face of a GitHub repository or organization profile from a supplied information set and the applicable DESIGN. Use for README first screens and section layout for libraries, CLIs, MCP servers, plugins and apps, open or closed source; badge styling; Quick look form; app download blocks and screenshot plans; organization profile layout; and rendering social cards and light/dark terminal demos with layout receipts. Produces README layouts, image exports, recipes and review evidence. Does not decide what a README states or source its values, change repository settings, upload previews, assign documentation roles, design icons, or build personal profile READMEs.
+description: Lay out and render GitHub repository READMEs and public or member-only organization profiles from a supplied information set and the applicable DESIGN. Use for README first screens and section layout for libraries, CLIs, MCP servers, plugins and apps, open or closed source; badge styling; Quick look form; app download blocks and screenshot plans; public and member-only organization profile layout; and deterministic catalog-driven profiles, social cards and light/dark terminal demos with layout receipts. Produces README layouts, image exports, recipes and review evidence. Does not decide what a README states or source its values, change repository settings, upload previews, assign documentation roles, design icons, or build personal profile READMEs.
 ---
 
 # GitHub README Design
@@ -19,6 +19,8 @@ it takes and how it looks, and renders the images that carry it.
 - **DESIGN:** the applicable DESIGN file at its reviewed revision, usually the
   organization's `.github/DESIGN.md`. Where it is silent, choose project
   defaults and record them for the DESIGN owner.
+- **Profile inputs:** the public catalog; for a member dashboard, its pinned
+  catalog bytes and member operational input. Missing or extra members fail.
 - **Existing surface:** the current README, assets, recordings, recipes and
   any repository-owned renderer.
 
@@ -33,7 +35,8 @@ requirement, command or claim the information set does not contain.
    CLIs, MCP servers and plugins, and [app design](references/design-apps.md)
    for apps. Badges, the social preview and review in
    [design](references/design.md) apply to every kind. An organization profile
-   uses the profile layout in [design](references/design.md).
+   uses the public or member layout in [design](references/design.md) and the
+   shared profile renderer in [renderers](references/renderers.md).
 3. **Produce images.** Render social cards and recorded terminal demos with
    [renderers](references/renderers.md), or with a repository-owned renderer
    that implements the accepted standard. Plan app screenshots from the

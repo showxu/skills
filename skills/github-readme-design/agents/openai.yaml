@@ -1,4 +1,4 @@
 interface:
   display_name: "GitHub README Design"
-  short_description: "Lay out and render repository READMEs and previews"
-  default_prompt: "Use $github-readme-design to lay out this repository's README for its product kind from the supplied information and DESIGN, and render its social card and terminal demos in light and dark."
+  short_description: "Render READMEs, organization profiles and previews"
+  default_prompt: "Use $github-readme-design to lay out this README or public/member organization profile from the supplied information and DESIGN, and render its social card and terminal demos in light and dark."
