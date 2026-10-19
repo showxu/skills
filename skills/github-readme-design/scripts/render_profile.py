@@ -241,13 +241,14 @@ def render(catalog, spec, member=None, catalog_bytes=None):
         heading = "h3" if member is not None else "h2"
         output.extend([f'<{heading}>{escape(group["title"])}</{heading}>', '', '<table>'])
         if member is not None:
-            output.append('<tr><th>Repository</th><th>CI</th><th>Release</th></tr>')
+            output.append('<tr><th></th><th>Repository</th><th>CI</th><th>Release</th></tr>')
         for repo in group["repositories"]:
             url = f'https://github.com/{owner}/{repo["name"]}'
             mark = image_tag(repo["icon"], f'{repo["name"]} icon', style[f"{mode}_row_icon_size"], resolve_image)
-            cell = f'<td>{mark} {anchor(url, repo["name"])}</td>'
+            # The icon has its own cell so names never wrap beneath it in GitHub's narrow profile column.
+            name = f'<strong>{anchor(url, repo["name"])}</strong>'
             if member is None:
-                output.append(f'<tr>{cell}<td>{escape(repo["outcome"])}</td></tr>')
+                output.append(f'<tr><td>{mark}</td><td>{name}<br>{escape(repo["outcome"])}</td></tr>')
             else:
                 facts = operations[repo["name"]]
                 ci = anchor(url + "/actions", "Actions")
@@ -262,7 +263,7 @@ def render(catalog, spec, member=None, catalog_bytes=None):
                                     + urlencode({"style": style["badge_style"], "sort": "date", "include_prereleases": "true"}), f'{repo["name"]} latest release')
                 elif facts["releases"] == "channel":
                     release = anchor(url + "/releases", "Releases")
-                output.append(f'<tr>{cell}<td>{ci}</td><td>{release}</td></tr>')
+                output.append(f'<tr><td>{mark}</td><td>{name}</td><td>{ci}</td><td>{release}</td></tr>')
         output.extend(['</table>', ''])
     if member is not None:
         output.extend(['<h2>Needs attention</h2>', '', '<ul>'])

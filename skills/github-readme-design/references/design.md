@@ -67,19 +67,21 @@ The public profile is organized by the reader's job, from the supplied catalog's
 promise, job groups, ordering and rows. Center the header: umbrella icon,
 promise heading, secondary line, then documentation, contributing, security
 and support links where declared. Each row places the repository's README
-header icon beside its linked name and outcome sentence. A distribution
-repository uses the product icon when it has no logo of its own. An optional
-quick start (a heading and shell commands) follows the navigation, and an
-optional maintainer line closes the profile; both come from input. Keep text
-as text.
+header icon in its own cell, then the linked name in bold above its outcome
+sentence, so names never wrap beneath the icon in GitHub's narrow profile
+column. A distribution repository uses the product icon when it has no logo
+of its own. An optional quick start (a heading and shell commands) follows
+the navigation, and an optional maintainer line closes the profile; both come
+from input. Keep text as text.
 
 The member profile is the maintainers' entry. In order, render a smaller
 umbrella mark, `<organization display name> maintainer dashboard`, and one line
 linking the public website or public profile; maintenance navigation from the
 member input; repositories in the public catalog's job groups and order; and
 organization-wide searches for open pull requests, open issues and Dependabot
-pull requests. Every repository row carries its icon and linked name, a live
-badge for its declared CI workflow on the default branch (or an Actions link),
+pull requests. Every repository row carries its icon in its own cell, its
+linked name, a live badge for its declared CI workflow on the default branch
+(or an Actions link),
 and a latest-release badge for a release publisher, a Releases link for an
 unused release channel, or an em dash for no release channel.
 
