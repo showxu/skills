@@ -351,6 +351,10 @@ class ContinuousRectTests(unittest.TestCase):
             self.assertIn(f"{point[0]:.2f} {point[1]:.2f}", path)
         self.assertEqual(path.count("C"), 9)
         self.assertEqual(app_icons.continuous_path(3, 7, 500, 100), app_icons.continuous_rect(3, 7, 500, 500, 100))
+        for radius in (0.5, 1, 2, 30):
+            with self.subTest(radius=radius):
+                self.assertEqual(app_icons.continuous_rect(0, 0, 100, 100, radius),
+                                 naive_continuous_square(0, 0, 100, radius))
 
     def test_overrunning_corners_blend_without_doubling_back(self):
         for x, y, width, height, radii in self.shapes:
@@ -474,6 +478,34 @@ class GridBackdropTests(unittest.TestCase):
         diagonal = min(points, key=lambda p: abs(p[0] - p[1]) + p[0])
         self.assertGreater(gap(turn), 18)
         self.assertLess(gap(diagonal), 4)
+
+    def test_corner_edges_are_nested_bands_for_any_accepted_override(self):
+        def inside(point, polygon):
+            crossings = 0
+            for (x0, y0), (x1, y1) in zip(polygon, polygon[1:] + polygon[:1]):
+                if (y0 > point[1]) != (y1 > point[1]):
+                    crossings += point[0] < x0 + (point[1] - y0) * (x1 - x0) / (y1 - y0)
+            return crossings % 2 == 1
+
+        accepted = 0
+        for radius in (60, 150, 189, 220, 250):
+            for turn in (0, 8, 30, 60):
+                for width in (4, 10, 20):
+                    try:
+                        svg = app_icons.grid_backdrop(width=width, radius=radius, turn=turn)
+                    except ValueError:
+                        continue
+                    accepted += 1
+                    for d in re.findall(r'fill-rule="evenodd" d="([^"]+)"', svg):
+                        outer, inner = (path_cubics(sub) for sub in re.findall(r"M[^M]+", d))
+                        polygon = [app_icons.cubic_point(c, t / 12) for c in outer for t in range(12)]
+                        for point in (app_icons.cubic_point(c, t / 12) for c in inner for t in range(12)):
+                            with self.subTest(radius=radius, turn=turn, width=width, point=point):
+                                self.assertTrue(inside(point, polygon) or
+                                                min(math.dist(point, q) for q in polygon) < 0.05)
+        self.assertGreater(accepted, 20)
+        with self.assertRaisesRegex(ValueError, "do not fit"):
+            app_icons.grid_backdrop(radius=250, turn=8)
 
     def test_command_prints_backdrop_with_overrides(self):
         def run(*args):

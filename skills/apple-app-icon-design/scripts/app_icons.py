@@ -373,10 +373,11 @@ def corner_position(axis, target):
 def corner_piece(start, end, radius):
     """The unit corner's cubics between positions start < end, from 0 at its first departure to 3.
 
-    A cubic shorter than SLIVER px at either end is dropped when others remain, so a cut corner
-    ends on a cubic boundary rather than on a sliver whose tangent rounding would bend.
+    Where a cut leaves less than SLIVER px of a cubic and other cubics remain, that sliver is
+    dropped, so the corner ends on a cubic boundary rather than on a segment whose tangent rounding
+    would bend. Uncut cubics are kept whatever their size.
     """
-    pieces = []
+    pieces, cut = [], []
     for index, cubic in enumerate(corner_cubics()):
         low, high = max(start - index, 0.0), min(end - index, 1.0)
         if high - low < 1e-12:
@@ -386,9 +387,11 @@ def corner_piece(start, end, radius):
         if low > 0:
             cubic = split_cubic(cubic, low / high)[1]
         pieces.append(cubic)
-    while len(pieces) > 1 and math.dist(pieces[0][0], pieces[0][3]) * radius < SLIVER:
+        cut.append((low > 0, high < 1))
+    if len(pieces) > 1 and cut[0][0] and math.dist(pieces[0][0], pieces[0][3]) * radius < SLIVER:
         pieces.pop(0)
-    while len(pieces) > 1 and math.dist(pieces[-1][0], pieces[-1][3]) * radius < SLIVER:
+        cut.pop(0)
+    if len(pieces) > 1 and cut[-1][1] and math.dist(pieces[-1][0], pieces[-1][3]) * radius < SLIVER:
         pieces.pop()
     return pieces
 
@@ -577,12 +580,18 @@ def grid_backdrop(lines=(256, 512, 768), width=10, inset=25, radius=189, turn=30
              ((inset, last, first, 1024 - inset), (small, 0, small, radius)))
     shapes = []
     for (x0, y0, x1, y1), radii in cells:
-        # The edge is the band between the cell's outline grown and shrunk by half the width.
-        outer = continuous_rect(x0 - half, y0 - half, x1 - x0 + width, y1 - y0 + width,
-                                tuple(r + half if r else 0 for r in radii))
-        inner = continuous_rect(x0 + half, y0 + half, x1 - x0 - width, y1 - y0 - width,
-                                tuple(max(r - half, 0) for r in radii))
-        shapes.append(f'<path fill-rule="evenodd" d="{outer}{inner}"/>')
+        # The edge is the band between the cell's outline grown and shrunk by half the width; both
+        # contours offset the same fitted radii, so neither may need scaling of its own.
+        top_right, bottom_right, bottom_left, top_left = continuous_corners(x1 - x0, y1 - y0, radii)[0]
+        fitted = (top_left, top_right, bottom_right, bottom_left)
+        contours = []
+        for grow, offset in ((half, tuple(r + half if r else 0 for r in fitted)),
+                             (-half, tuple(max(r - half, 0) for r in fitted))):
+            size = (x1 - x0 + 2 * grow, y1 - y0 + 2 * grow)
+            if continuous_corners(*size, offset)[1] < 1:
+                fail("grid backdrop radius and turn do not fit the corner cells at this width; reduce them")
+            contours.append(continuous_rect(x0 - grow, y0 - grow, *size, offset))
+        shapes.append(f'<path fill-rule="evenodd" d="{"".join(contours)}"/>')
     for position in sorted(lines):
         start, end = (inset + turn, 1024 - inset - turn) if position in (first, last) else (0, 1024)
         for x0, y0, x1, y1 in ((position - half, start, position + half, end),
