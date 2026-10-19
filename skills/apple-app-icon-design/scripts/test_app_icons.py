@@ -7,6 +7,7 @@ import io
 from contextlib import redirect_stdout
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -304,6 +305,311 @@ class StyleTests(unittest.TestCase):
         self.assertIn(f'rx="{app_icons.GLOSS_RADIUS * 1024:.2f}"', svg)
 
 
+def naive_continuous_square(x, y, side, radius):
+    """Continuous corners joined by straight lines even when they overrun the edge."""
+    departure, segments = app_icons.CONTINUOUS
+    return app_icons.rounded_path(x, y, side, departure * radius,
+                                  tuple(tuple((u * radius, v * radius) for u, v in s) for s in segments))
+
+
+def layer(*paths):
+    return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">' +
+            "".join(f'<path d="{d}"/>' for d in paths) + "</svg>")
+
+
+def path_cubics(d):
+    """Cubics of absolute M/C/L/Z path data, with lines as degenerate cubics."""
+    cubics, current, start = [], None, None
+    for command, numbers in re.findall(r"([MCLZ])([^MCLZ]*)", d):
+        values = [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", numbers)]
+        points = list(zip(values[::2], values[1::2]))
+        if command == "M":
+            current = start = points[0]
+        elif command == "C":
+            cubics.append((current, *points))
+            current = points[2]
+        else:
+            end = points[0] if command == "L" else start
+            if end != current:
+                cubics.append((current, current, end, end))
+            current = end
+    return cubics
+
+
+class ContinuousRectTests(unittest.TestCase):
+    shapes = [(0, 0, 300, 100, 50), (0, 0, 100, 100, 40), (10, 20, 300, 100, (10, 50, 30, 0)),
+              (0, 0, 300, 100, (45, 45, 20, 20)), (5, 5, 80, 300, (40, 10, 40, 10)), (0, 0, 120, 100, 49),
+              (0, 0, 100, 100, 50), (0, 0, 100, 100, (50, 0, 50, 0)), (0, 0, 100, 100, (80, 10, 0, 20)),
+              (25, 25, 231, 231, (189, 30 / app_icons.CONTINUOUS[0], 0, 30 / app_icons.CONTINUOUS[0])),
+              (0, 0, 300, 100, (40, 60, 40, 60)), (0, 0, 950, 850, (70, 830, 4, 730))]
+
+    def test_feasible_corners_meet_each_edge_at_their_departure(self):
+        k = app_icons.CONTINUOUS[0]
+        path = app_icons.continuous_rect(10, 20, 400, 200, (0, 60, 20, 40))
+        for point in ((410 - k * 60, 20), (410, 20 + k * 60), (410, 220 - k * 20), (410 - k * 20, 220),
+                      (10 + k * 40, 220), (10, 220 - k * 40), (10, 20)):
+            self.assertIn(f"{point[0]:.2f} {point[1]:.2f}", path)
+        self.assertEqual(path.count("C"), 9)
+        self.assertEqual(app_icons.continuous_path(3, 7, 500, 100), app_icons.continuous_rect(3, 7, 500, 500, 100))
+        for radius in (0.5, 1, 2, 30):
+            with self.subTest(radius=radius):
+                self.assertEqual(app_icons.continuous_rect(0, 0, 100, 100, radius),
+                                 naive_continuous_square(0, 0, 100, radius))
+
+    def test_overrunning_corners_blend_without_doubling_back(self):
+        for x, y, width, height, radii in self.shapes:
+            with self.subTest(shape=(width, height, radii)):
+                path = app_icons.continuous_rect(x, y, width, height, radii)
+                self.assertEqual(app_icons.doubled_back(layer(path)), [])
+                cubics = path_cubics(path)
+                for cubic in cubics:
+                    for px, py in cubic:
+                        self.assertTrue(x - 0.005 <= px <= x + width + 0.005 and y - 0.005 <= py <= y + height + 0.005)
+                points = [app_icons.cubic_point(c, t / 40) for c in cubics for t in range(40)]
+                turns = [(b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0])
+                         for a, b, c in zip(points, points[1:] + points[:1], points[2:] + points[:2])]
+                self.assertGreaterEqual(min(turns), -1e-3, "outline must stay convex")
+                vertices = {(x, y), (x + width, y), (x + width, y + height), (x, y + height)}
+                segments = app_icons.path_segments(path)[0][0]
+                for (_, _, joint, incoming), (_, outgoing, _, _) in zip(segments, segments[1:] + segments[:1]):
+                    cosine = ((incoming[0] * outgoing[0] + incoming[1] * outgoing[1]) /
+                              (math.hypot(*incoming) * math.hypot(*outgoing)))
+                    if joint not in vertices:
+                        self.assertGreater(cosine, 0.999, f"joint at {joint} must be tangent")
+
+    def test_overrun_is_measured_per_edge(self):
+        radii, scale, excess = app_icons.continuous_corners(300, 100, (10, 50, 30, 0))
+        k = app_icons.CONTINUOUS[0]
+        self.assertEqual((radii, scale), ((50, 30, 0, 10), 1))
+        self.assertEqual(app_icons.continuous_corners(100, 100, (80, 80, 0, 0))[:2], ((50, 0, 0, 50), 0.625))
+        self.assertAlmostEqual(excess[0], k * 80 - 100)
+        self.assertTrue(all(e < 0 for e in excess[1:]))
+        self.assertEqual(app_icons.continuous_rect(0, 0, 300, 100, 80), app_icons.continuous_rect(0, 0, 300, 100, 50))
+        for origin, size, radii in (((0, 0), (0, 10), 1), ((0, 0), (10, -1), 1), ((0, 0), (10, 10), -1),
+                                    ((0, 0), (10, 10), float("nan")), ((0, 0), (10, 10), float("inf")),
+                                    ((0, 0), (10, 10), True), ((0, 0), (10, 10), (1, 2, 3)), ((0, 0), (10, 10), "1"),
+                                    ((float("nan"), 0), (10, 10), 1), ((0, float("inf")), (10, 10), 1),
+                                    ((True, 0), (10, 10), 1), ((1e308, 0), (1e308, 10), 1)):
+            with self.subTest(origin=origin, size=size, radii=radii), self.assertRaises(ValueError):
+                app_icons.continuous_rect(*origin, *size, radii)
+
+    def test_large_corners_consume_small_neighbours(self):
+        k = app_icons.CONTINUOUS[0]
+        cell = app_icons.continuous_rect(25, 25, 231, 231, (189, 30 / k, 0, 30 / k))
+        segments = app_icons.path_segments(cell)[0][0]
+        ends = [segment[2] for segment in segments]
+        # The small corners leave only the points where they meet the inner edges.
+        self.assertIn((256.0, 55.0), ends)
+        self.assertIn((55.0, 256.0), ends)
+        self.assertIn((256.0, 256.0), ends)
+        sharp = app_icons.continuous_rect(0, 0, 231, 231, (189, 0, 0, 0))
+        top = [s for s in app_icons.path_segments(sharp)[0][0] if s[2][0] == 231.0 and s[0][0] < 231.0]
+        self.assertEqual(len(top), 1, "the corner meets the sharp corner's other edge, then follows it")
+        self.assertLess(top[0][2][1], 1.0)
+        for size, radii in (((100, 5), (0, 5, 0, 0)), ((5, 100), (0, 0, 5, 0)), ((100, 5), (0, 0, 0, 5)),
+                            ((5, 100), (5, 0, 0, 0))):
+            with self.subTest(size=size, radii=radii):
+                straight = [segment for segment in path_cubics(app_icons.continuous_rect(0, 0, *size, radii))
+                            if segment[0] == segment[1] and segment[2] == segment[3]]
+                self.assertTrue(all(abs(a[0] - b[0]) < 0.02 or abs(a[1] - b[1]) < 0.02 for a, _, _, b in straight))
+        random = __import__("random").Random(11)
+        for _ in range(200):
+            width, height = random.uniform(1, 600), random.uniform(1, 600)
+            radii = tuple(random.choice((0, random.uniform(0, 20), random.uniform(0, 700))) for _ in range(4))
+            with self.subTest(size=(width, height), radii=radii):
+                path = app_icons.continuous_rect(0, 0, width, height, radii)
+                self.assertEqual(app_icons.doubled_back(layer(path)), [])
+                points = [app_icons.cubic_point(c, t / 20) for c in path_cubics(path) for t in range(20)]
+                # Overlaps below OVERRUN are left uncut, so the outline may pass its box by that much.
+                tolerance = app_icons.OVERRUN + 0.005
+                self.assertTrue(all(-tolerance <= px <= width + tolerance and -tolerance <= py <= height + tolerance
+                                    for px, py in points))
+                turns = [(b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0])
+                         for a, b, c in zip(points, points[1:] + points[:1], points[2:] + points[:2])]
+                self.assertGreaterEqual(min(turns), -0.05, "outline must stay convex")
+                cubics = path_cubics(path)
+                for start, _, _, end in (c for c in cubics if c[0] == c[1] and c[2] == c[3]):
+                    self.assertTrue(abs(start[0] - end[0]) < 0.05 or abs(start[1] - end[1]) < 0.05,
+                                    f"line {start}-{end} must follow an edge")
+                for before, after in zip(cubics, cubics[1:] + cubics[:1]):
+                    joint = before[3]
+                    # Creases belong only where a corner meets a sharp neighbour's edge.
+                    if min(abs(joint[0]), abs(joint[0] - width), abs(joint[1]), abs(joint[1] - height)) < 0.05:
+                        continue
+                    arrive = (before[3][0] - before[2][0], before[3][1] - before[2][1])
+                    leave = (after[1][0] - after[0][0], after[1][1] - after[0][1])
+                    if math.hypot(*arrive) > 1 and math.hypot(*leave) > 1:
+                        self.assertGreater((arrive[0] * leave[0] + arrive[1] * leave[1]) /
+                                           (math.hypot(*arrive) * math.hypot(*leave)), 0.995, f"kink at {joint}")
+
+    def test_barely_overrunning_corners_stay_well_formed_at_any_scale(self):
+        k = app_icons.CONTINUOUS[0]
+        for x, side, radius in ((0, 100, (100 + 0.011) / (2 * k)), (0, 1e6, 327082.78468467586),
+                                (5e6, 1000, (1000 + 0.02) / (2 * k)), (0, 1e308, 5e307)):
+            with self.subTest(side=side, radius=radius):
+                path = app_icons.continuous_rect(x, x, side, side, radius)
+                self.assertNotRegex(path, "nan|inf")
+                self.assertEqual(app_icons.doubled_back(layer(path)), [])
+                for cubic in path_cubics(path):
+                    for point in cubic:
+                        self.assertTrue(all(x - 0.005 <= v <= x + side + 0.005 for v in point), point)
+
+    def test_command_prints_path_and_notes(self):
+        run = subprocess.run([sys.executable, str(SCRIPT), "--continuous-rect", "0", "0", "300", "100", "60"],
+                             capture_output=True, text=True, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(run.stdout, app_icons.continuous_rect(0, 0, 300, 100, 50) + "\n")
+        self.assertEqual([line.split(":")[0] for line in run.stderr.splitlines()],
+                         ["info\tradii scaled by 0.8333 so that each edge holds its two radii", "info\tright edge",
+                          "info\tleft edge"])
+        sharp = subprocess.run([sys.executable, str(SCRIPT), "--continuous-rect", "0", "0", "100", "100", "100", "0", "0", "0"],
+                               capture_output=True, text=True, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+        self.assertNotIn("tangent cubic", sharp.stderr)
+        self.assertIn("cut where it meets the sharp corner's other edge", sharp.stderr)
+        for args, code in ((["--continuous-rect", "0", "0", "3", "3"], 1), (["--list"], 2),
+                           (["--continuous-rect", "nan", "0", "100", "100", "20"], 1),
+                           (["design.md", "--continuous-rect", "0", "0", "3", "3", "1"], 2)):
+            with self.subTest(args=args):
+                run = subprocess.run([sys.executable, str(SCRIPT), *args], capture_output=True, text=True,
+                                     env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+                self.assertEqual(run.returncode, code, run.stderr)
+
+
+class GridBackdropTests(unittest.TestCase):
+    def test_default_backdrop(self):
+        svg = app_icons.grid_backdrop()
+        app_icons.validate_svg(svg.encode())
+        self.assertEqual(app_icons.doubled_back(svg), [])
+        paths = re.findall(r'<path( fill-rule="evenodd")? d="([^"]+)"/>', svg)
+        self.assertEqual(sum(bool(rule) for rule, _ in paths), 4)
+        lines = [d for rule, d in paths if not rule]
+        self.assertIn("M507 0H517V1024H507Z", lines)
+        self.assertIn("M251 55H261V969H251Z", lines)
+        self.assertIn("M55 763H969V773H55Z", lines)
+        self.assertEqual(len(lines), 6)
+        self.assertNotIn("opacity", svg)
+        self.assertIn('<g fill="#FFFFFF" opacity="0.2">', app_icons.grid_backdrop(opacity=0.2))
+
+    def test_corner_edge_peels_out_of_the_glass_rim(self):
+        k = app_icons.CONTINUOUS[0]
+        edge = path_cubics(app_icons.continuous_rect(25, 25, 231, 231, (189, 30 / k, 0, 30 / k)))
+        l, c1, c2, d = (v * 1024 for v in app_icons.CORNER)
+        rim = [app_icons.cubic_point(c, t / 400) for c in (((0, l), (0, c1), (0, c2), (d, d)),
+                                                            ((d, d), (c2, 0), (c1, 0), (l, 0))) for t in range(401)]
+        points = [app_icons.cubic_point(c, t / 200) for c in edge for t in range(201)]
+
+        def gap(point):
+            return min(math.dist(point, r) for r in rim)
+        turn = min((p for p in points if 225 <= p[0] <= 227 and p[1] < 100), key=lambda p: p[1])
+        diagonal = min(points, key=lambda p: abs(p[0] - p[1]) + p[0])
+        self.assertGreater(gap(turn), 18)
+        self.assertLess(gap(diagonal), 4)
+
+    def test_corner_edges_are_nested_bands_for_any_accepted_override(self):
+        def inside(point, polygon):
+            crossings = 0
+            for (x0, y0), (x1, y1) in zip(polygon, polygon[1:] + polygon[:1]):
+                if (y0 > point[1]) != (y1 > point[1]):
+                    crossings += point[0] < x0 + (point[1] - y0) * (x1 - x0) / (y1 - y0)
+            return crossings % 2 == 1
+
+        accepted = 0
+        for radius in (60, 150, 189, 220, 250):
+            for turn in (0, 8, 30, 60):
+                for width in (4, 10, 20):
+                    try:
+                        svg = app_icons.grid_backdrop(width=width, radius=radius, turn=turn)
+                    except ValueError:
+                        continue
+                    accepted += 1
+                    for d in re.findall(r'fill-rule="evenodd" d="([^"]+)"', svg):
+                        outer, inner = (path_cubics(sub) for sub in re.findall(r"M[^M]+", d))
+                        polygon = [app_icons.cubic_point(c, t / 12) for c in outer for t in range(12)]
+                        for point in (app_icons.cubic_point(c, t / 12) for c in inner for t in range(12)):
+                            with self.subTest(radius=radius, turn=turn, width=width, point=point):
+                                self.assertTrue(inside(point, polygon) or
+                                                min(math.dist(point, q) for q in polygon) < 0.05)
+        self.assertGreater(accepted, 20)
+        svg = app_icons.grid_backdrop(lines=(198, 512, 826), width=4.2, inset=10, radius=129, turn=71)
+        for d in re.findall(r'fill-rule="evenodd" d="([^"]+)"', svg):
+            outer, inner = (path_cubics(sub) for sub in re.findall(r"M[^M]+", d))
+            polygon = [app_icons.cubic_point(c, t / 12) for c in outer for t in range(12)]
+            for point in (app_icons.cubic_point(c, t / 12) for c in inner for t in range(12)):
+                self.assertTrue(inside(point, polygon) or min(math.dist(point, q) for q in polygon) < 0.05, point)
+        with self.assertRaisesRegex(ValueError, "do not fit"):
+            app_icons.grid_backdrop(radius=250, turn=8)
+
+    def test_command_prints_backdrop_with_overrides(self):
+        def run(*args):
+            return subprocess.run([sys.executable, str(SCRIPT), "--grid-backdrop", *args], capture_output=True,
+                                  text=True, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+        result = run("opacity=0.2", "lines=200,512,824", "radius=150")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, app_icons.grid_backdrop(lines=(200, 512, 824), radius=150, opacity=0.2))
+        for args in (["color=red"], ["opacity=0.2", "opacity=0.3"], ["radius=big"], ["inset=300"], ["opacity=0"],
+                     ["lines=512"], ["width=200"]):
+            with self.subTest(args=args):
+                self.assertEqual(run(*args).returncode, 1)
+
+
+class PathReversalTests(unittest.TestCase):
+    def test_path_data_is_parsed_like_svg(self):
+        square = [((10.0, 10.0), (80.0, 0.0), (90.0, 10.0), (80.0, 0.0)),
+                  ((90.0, 10.0), (0.0, 80.0), (90.0, 90.0), (0.0, 80.0)),
+                  ((90.0, 90.0), (-80.0, 0.0), (10.0, 90.0), (-80.0, 0.0)),
+                  ((10.0, 90.0), (0.0, -80.0), (10.0, 10.0), (0.0, -80.0))]
+        for data in ("M10 10H90V90H10Z", "m10 10h80v80h-80z", "M10,10 90,10 90,90 10,90z", "M10 10L90 10 90 90 10 90 10 10Z"):
+            with self.subTest(data=data):
+                self.assertEqual(app_icons.path_segments(data), [(square, True)])
+        smooth = app_icons.path_segments("M0 0C10 0 20 10 20 20S30 40 40 40Q50 40 50 30T60 20")[0][0]
+        self.assertEqual([s[1] for s in smooth], [(10.0, 0.0), (0.0, 10.0), (10.0, 0.0), (0.0, -10.0)])
+        self.assertEqual(app_icons.path_segments("M0 0H10H5H20e")[0][0][-1][2], (5.0, 0.0))
+        for invalid in ("L10 0", "M0 0,,10 0", "M0 0L,10 0", "M0 0L1e 0", "M\u00a00 0L1 1"):
+            with self.subTest(data=invalid):
+                self.assertEqual(app_icons.path_segments(invalid), [])
+        line = [((0.0, 0.0), (10.0, 0.0), (10.0, 0.0), (10.0, 0.0))]
+        for data, expected in (("M0 0H10L L-10 0", [(line, False)]), ("M0 0ZL10 0", [(line, False)]),
+                               ("M0 0H10ZH10", [(line + [((10.0, 0.0), (-10.0, 0.0), (0.0, 0.0), (-10.0, 0.0))], True),
+                                                (line, False)])):
+            with self.subTest(data=data):
+                self.assertEqual(app_icons.path_segments(data), expected)
+        compact = app_icons.path_segments("M1.5.5-2-3e1a5 5 0 0110 0l4 0zM0 0 1 1 x 9 9")
+        self.assertEqual(compact[0][0][0][2], (-2.0, -30.0))
+        self.assertEqual(compact[0][0][1][1:4:2], (None, None))
+        self.assertEqual(compact[0][0][2][0], (8.0, -30.0))
+        self.assertEqual(len(compact), 2)
+        self.assertEqual(compact[1], ([((0.0, 0.0), (1.0, 1.0), (1.0, 1.0), (1.0, 1.0))], False))
+
+    def test_overrunning_corners_are_found_in_any_path(self):
+        excess = 2 * app_icons.CONTINUOUS[0] * 40 - 100
+        found = app_icons.doubled_back(layer(naive_continuous_square(0, 0, 100, 40), "M0 0H10V10H0Z"))
+        self.assertEqual(len(found), 1)
+        x, y, length = found[0]
+        self.assertEqual((x, y), (100.0, 61.15))
+        self.assertAlmostEqual(length, excess, delta=0.02)
+        transformed = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><g transform="scale(2)">'
+                       f'<path d="{naive_continuous_square(0, 0, 100, 40)}"/></g></svg>')
+        self.assertEqual(app_icons.doubled_back(transformed), found)
+        self.assertEqual(app_icons.doubled_back(layer("M0 0H10H5H20")), [(10.0, 0.0, 5.0)])
+        # A curve that leaves far along its chord and returns is not straight, even where its
+        # control values overflow.
+        for far in ("M20 0L0 0C1e308 0 0 0 10 0L0 0", "M20 20L0 0C1.7e308 1.7e308 5 5 10 10L0 0"):
+            with self.subTest(path=far):
+                self.assertEqual(app_icons.doubled_back(layer(far)), [])
+        for line in ("L20 10", "L20 15L20 10", "C20 17 20 13 20 10", "C20 9 20 11 20 10", "Q20 12 20 10"):
+            with self.subTest(line=line):
+                self.assertEqual(app_icons.doubled_back(layer(f"M0 0C10 0 20 10 20 20{line}C20 20 30 30 40 30")),
+                                 [(20.0, 20.0, 10.0)])
+        heart = "M512 320C512 128 192 128 192 384C192 576 512 800 512 800C512 800 832 576 832 384C832 128 512 128 512 320Z"
+        for clean in (naive_continuous_square(0, 0, 100, 30), "M0 0H10H9.6H20", "M0 0L10 0L5 0",
+                      "M0 0A5 5 0 0 1 10 0L0 0", "M0 0H100V100H0Z", "M0 0ZL10 0", heart, "M0 0H10H5H20e",
+                      "M0 0H10\u00a0H5H20", "M0 0C10 0 20 10 20 20C20 17 20 13 20 10",
+                      "M0 0C10 0 20 10 20 20C20 5 20 25 20 10C20 20 30 30 40 30",
+                      app_icons.continuous_rect(0, 0, 100, 100, 40)):
+            with self.subTest(path=clean):
+                self.assertEqual(app_icons.doubled_back(layer(clean)), [])
+
+
 class LintTests(unittest.TestCase):
     size = 64
 
@@ -397,6 +703,34 @@ class StyleRenderingTests(unittest.TestCase):
         for style in ("flat", "mac-tile", "gloss"):
             self.assertIn(f">{style}<", text)
         self.assertEqual(self.invoke("--sheet", sheet).returncode, 1)
+
+    def test_lint_reports_corners_that_overrun_their_edge(self):
+        (self.root / "glyph.svg").write_text(layer(naive_continuous_square(312, 312, 400, 160)).replace(
+            "<path ", '<path fill="white" '))
+        result = self.invoke("--lint", "--style", "flat")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("flat\tgroup 1: layer 1 path doubles back 89.2 units at (712.0, 556.6)", result.stdout)
+        (self.root / "glyph.svg").write_text(layer(app_icons.continuous_rect(312, 312, 400, 400, 160)).replace(
+            "<path ", '<path fill="white" '))
+        result = self.invoke("--lint", "--style", "flat")
+        self.assertEqual((result.returncode, result.stdout), (0, "clean\n"), result.stderr)
+
+
+    def test_lint_reports_backdrop_texture_without_stray_segments(self):
+        (self.root / "grid.svg").write_text(app_icons.grid_backdrop())
+        spec = {"background": "#0A84FF", "groups": [
+            {"name": "Grid", "specular": False, "shadow": {"kind": "none", "opacity": 0},
+             "layers": [{"source": "grid.svg", "opacity": 0.2}]},
+            {"name": "Panel", "layers": [{"source": "glyph.svg"}]}]}
+        self.design.write_text("# Design\n\n## Iconography\n\n```json\n" +
+                               json.dumps({"app_icons": {"example": spec}}) + "\n```\n")
+        result = self.invoke("--lint")
+        self.assertEqual(result.returncode, 1)
+        for expected in ("Grid: 0.8% of the artwork falls outside the shape", "Grid: 1 shape(s) narrower than 1 px",
+                         "Panel: lightness 1.00 is too close to Grid 1.00"):
+            self.assertIn(expected, result.stdout)
+        self.assertNotIn("doubles back", result.stdout)
+
 
 class MaterialTests(unittest.TestCase):
     setUp = DocumentTests.setUp

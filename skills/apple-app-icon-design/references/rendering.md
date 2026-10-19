@@ -131,6 +131,27 @@ full-bleed touch/maskable approximation is generated from the masked export.
 Omitting the option or setting it to false preserves the existing file set
 and bytes. Other styles and document-only runs do not export the dark set.
 
+## Glass Color and Rim
+
+Verified with Icon Composer 27.0 (129) and original art: a white panel group
+with translucency 0.5 over an orange stripe group on a blue background,
+exported as iOS Default at 256 px. Translucency alone barely tints an opaque
+panel: in generation 26 it renders (248, 227, 221) over the stripe and
+(222, 225, 239) over the background. A panel fill of `#FFFFFF80` lets the
+stripe show through at (232, 155, 133). Layer opacity 0.5 transmits like fill
+alpha 0.5; generation 27 renders the two identically. Glass that should show
+the color beneath it needs fill alpha (`#RRGGBBAA`) or opacity below 1, and
+reads as depth only where a colored element lies under it. Refraction is
+visible only in generation 27; see the material table above.
+
+The Liquid Glass rim is wider and softer than the macOS 11–15 tile edge, a
+crisp mask boundary. On macOS Default exports of an original solid background
+at 1024 px, luminance differs from the interior by more than 4/255 within
+14–21 px of the outline in generation 26 and 5–30 px in generation 27,
+widest along the top and at the corners. Keep background line art about
+20 px inside the outline on the 1024 canvas, or taper it deliberately into
+the rim.
+
 ## Liquid Glass Outline
 
 The flat SVG approximation of a Liquid Glass icon, used for its
@@ -214,6 +235,42 @@ Apple's templates are licensed Apple Design Resources. This skill records
 measured values only and does not redistribute template content; repeating a
 measurement requires accepting the license agreement in each disk image.
 
+## Continuous Rectangles
+
+A continuous corner of radius r consumes 1.528665·r of each adjacent edge.
+When an edge is shorter than the sum of its two corners' departures, a
+rounded-rectangle path that joins the corners with straight lines draws that
+line backwards: the path self-intersects and renders a stray straight segment
+along the edge. Equal corners on a square overrun once r exceeds 32.7% of the
+side; mixed radii overrun sooner on short edges.
+
+Draw rounded rectangles for artwork with `continuous_rect(x, y, width, height,
+radii)` in the script, or print the path data with
+`--continuous-rect X Y WIDTH HEIGHT RADIUS [RADIUS RADIUS RADIUS]`. Radii are
+one value or four: top-left, top-right, bottom-right, bottom-left.
+
+- When an edge cannot hold its two radii, all radii shrink by one factor
+  until every edge can, as CSS `border-radius` does; a single radius is
+  therefore at most half the shorter side. They shrink further, still
+  together, while two cut corners cannot be joined by a blend whose handles
+  each span at least a tenth of its chord, or a corner would run past a sharp
+  neighbour into the corner beyond it. A large corner beside a small one
+  otherwise keeps its radius even though its departure exceeds the edge.
+- Where the corners fit, the path is the continuous corner joined by straight
+  edges; for a square it is byte-identical to the style outlines above.
+- Where two departures overrun an edge, each corner's curve is evaluated and
+  cut where the adjoining corner's curve would meet the edge, the ends of the
+  span both corners claim. A cubic joins the two cut ends: its handles run
+  along each end's tangent toward the tangents' intersection, two-thirds of
+  the way as a quadratic would, and stop at the rectangle's edge. The join is
+  tangent-continuous, and the outline stays convex and inside its rectangle.
+- A small corner whose cut falls past its own end is consumed: the larger
+  corner's blend turns straight into the next edge, at the point where the
+  small corner would have met it. A sharp corner beside an overrunning one is
+  consumed the same way, without a blend: the larger corner is cut where it
+  meets the sharp corner's other edge.
+- The command prints `info` lines for scaled radii and each overrun edge.
+
 ## Web Icons
 
 Every style writes the same default web set. Liquid Glass can also opt into
@@ -245,6 +302,17 @@ reports:
 - mean OKLab lightness within 0.10 of the background, or of another group
   covering at least 1% of the smaller group's area;
 - more than three groups.
+
+It also reads the paths of each SVG layer and reports a line that doubles
+back: a straight run at least 0.5 units long, made of lines or straight
+curves in one direction, that runs against the tangents on both its sides
+(cosine at most -0.999). Corners whose departures
+exceed their edge draw exactly this stray segment, whichever tool produced the
+SVG; redraw the shape with [continuous rectangles](#continuous-rectangles) or
+smaller radii. Cusps where two curves meet are not findings. Positions and
+lengths are in the path's own coordinates, and segments next to elliptical
+arcs are not checked. Path data is read as SVG renderers read it, up to its
+first error.
 
 When any layer in a group has a fill or appearance fill override, lint prints
 an `info` line explaining that the Liquid Glass appearance comes from the

@@ -35,6 +35,11 @@ recognize at 32 px, two or three colors, and the layer plan.
 - Depth comes from overlap: Apple suggests "filled, overlapping shapes",
   especially with transparency and blur, to give an icon depth. Shapes that
   never overlap read as flat in every style.
+- In Liquid Glass, depth reads where a colored element lies under a glass
+  element. The color shows through only where the glass layer's fill alpha
+  (`#RRGGBBAA`) or opacity is below 1; translucency alone barely tints it, and
+  refraction needs `design_generation` 27. See
+  [glass color and rim](rendering.md#glass-color-and-rim).
 - Give each foreground shape clearly defined edges. Avoid soft or feathered
   edges, which spoil system highlights and shadows.
 - Avoid extremely thin lines and sharp corners; they lose detail at small
@@ -77,9 +82,59 @@ When the skill drafts artwork:
   translucency and refraction for glass, then verify the result at small sizes
   and across appearances. See the [Apple icon material study](rendering.md#apple-icon-material-study).
   These native controls leave the SVG artwork and other styles unchanged.
+- Draw continuous-corner rectangles with `--continuous-rect`. Corners joined
+  by hand draw a stray segment wherever their departures exceed the edge; see
+  [continuous rectangles](rendering.md#continuous-rectangles).
+- Keep background line art about 20 px inside the outline on the 1024
+  canvas, or taper it deliberately into the rim: the Liquid Glass rim is
+  wider and softer than the macOS 11–15 tile edge.
 - For `mac-tile`, artwork may extend beyond the 1024 box only in a group
   listed in `unclipped`; every other style crops it at the art boundary.
 - Mark drafted art as original and keep it with the owner's assets.
+
+## Grid Backdrop
+
+A design grid behind the foreground suits developer and design tools. It is a
+generic motif, not a copy of any app's icon; the idea and foreground stay
+original. `--grid-backdrop` prints the layer with the defaults below, and
+`KEY=VALUE` arguments override `lines`, `width`, `inset`, `radius`, `turn`,
+and `opacity`.
+
+- Three vertical and three horizontal lines at 25%, 50%, and 75% of the
+  canvas, 10 px wide, in solid white.
+- Only the four corner cells carry an outer edge. The middle lines run into
+  the rim, and the outer lines begin where the corner edges turn into them.
+  A full inner border, or cell edges along the rim, doubles the white edge,
+  because the glass rim already is the edge.
+- Each corner edge is a continuous corner of radius 189 inset 25 px from the
+  canvas edge, cut where it meets the outer lines and turned into them within
+  30 px. Against the Liquid Glass outline its gap tapers from about 22 px at
+  the turn to about 3 px on the diagonal, so the edge seems to peel out of the
+  rim. A constant gap looks stiff; a gap that closes too early fuses the whole
+  edge into the rim.
+- A corner cell spans 231 px, yet radius 189 departs 289 px along each edge;
+  a plain rounded rectangle would draw a stray segment, so the helper builds
+  the cells from [continuous rectangles](rendering.md#continuous-rectangles).
+- Give the grid its own group with specular off and no shadow, and fade the
+  layer natively. With specular on, design generation 27 renders the lines as
+  embossed glass tubes.
+
+```json
+{
+  "name": "Grid",
+  "specular": false,
+  "shadow": {"kind": "none", "opacity": 0},
+  "layers": [{"source": "layers/grid.svg", "opacity": 0.2}]
+}
+```
+
+Style renderings ignore native opacity. When `flat`, `mac-tile`, or `gloss`
+ships too, give that style a `groups` override whose grid layer comes from
+`--grid-backdrop opacity=0.2`. Lint measures the solid artwork, so it reports
+the lines as narrower than 1 px at 32 px, the corner edges as crossing the
+outline on the diagonal, and a light foreground over the grid as too close in
+lightness. The texture is meant to fade at small sizes and to meet the rim;
+record these findings as owner decisions rather than thickening the lines.
 
 ## Families
 

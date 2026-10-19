@@ -1,6 +1,6 @@
 ---
 name: apple-app-icon-design
-description: Design, generate, and review original app icons in the style of each Apple app icon generation - Liquid Glass through Icon Composer, iOS 7-18 flat, macOS 11-15 tiles, and iOS 1-6 gloss - for Apple apps, web apps, or any project that wants an Apple-style icon. Turns a product brief into icon concepts and layered vector artwork, records them in a DESIGN.md Iconography entry, and produces an editable Icon Composer .icon document, native iOS, macOS, and watchOS appearance exports, style renderings, favicons, an apple-touch-icon, PWA and maskable web icons, comparison sheets, lint findings, and drift reports. Use for creating or redesigning app icons, choosing an icon style or generation, tuning glass material groups, and checking generated icons against their design source. Do not use for framework-style repository logos, social card composition, SF Symbols export, photographic or raster illustration, recreating Apple's own icons, or publishing app/store assets.
+description: Design, generate, and review original app icons in the style of each Apple app icon generation - Liquid Glass through Icon Composer, iOS 7-18 flat, macOS 11-15 tiles, and iOS 1-6 gloss - for Apple apps, web apps, or any project that wants an Apple-style icon. Turns a product brief into icon concepts and layered vector artwork, records them in a DESIGN.md Iconography entry, and produces an editable Icon Composer .icon document, native iOS, macOS, and watchOS appearance exports, style renderings, favicons, an apple-touch-icon, PWA and maskable web icons, comparison sheets, lint findings, and drift reports. Use for creating or redesigning app icons, choosing an icon style or generation, tuning glass material groups, matching an existing icon's look by measurement, and checking generated icons against their design source. Do not use for framework-style repository logos, social card composition, SF Symbols export, photographic or raster illustration, recreating Apple's own icons, or publishing app/store assets.
 ---
 
 # Apple App Icon Design
@@ -23,15 +23,20 @@ generations with measured geometry and labels them as style renderings.
 
 Read [design guidance](references/design.md) before drafting concepts or
 layers, [generations](references/generations.md) before choosing styles,
-[the input contract](references/format.md) before editing an entry, and
+[the input contract](references/format.md) before editing an entry,
 [rendering and validation](references/rendering.md) before tuning materials
-or geometry. For a new entry, start from `examples/DESIGN.example.md`.
+or geometry, and [reference matching](references/reference-matching.md)
+before matching an existing icon's look. For a new entry, start from
+`examples/DESIGN.example.md`.
 
 ## Workflow
 
 1. Inspect the owner, existing art, brand tokens, and current icon. Keep
    design parameters in the owner's design document and artwork in its
-   assets directory.
+   assets directory. When the owner wants to match an existing icon's look,
+   capture the rendition the system displays and fit measured parameters
+   with [reference matching](references/reference-matching.md); never
+   estimate them from a screenshot.
 2. Propose two or three concepts. Each names one central idea, a silhouette,
    a palette, and a layer plan: which shapes form the background color and
    each foreground group, back to front.
@@ -81,7 +86,9 @@ releases.
   the gloss highlight is a documented approximation.
 - Use original art. Do not trace, recreate, or imitate Apple's icons, Apple
   hardware, SF Symbols, or another company's logo. Preserve the scope and
-  provenance of explicitly supplied brand assets.
+  provenance of explicitly supplied brand assets. Reference matching measures
+  parameters for original art; its captures are never traced, shipped, or
+  redistributed.
 - Icon Composer ships with Xcode, and Apple's license terms govern native
   renders. Using them outside an Apple-platform app is the owner's decision;
   style renderings do not use Apple software or templates.
@@ -102,6 +109,8 @@ releases.
 - `--check` reports `same` for every file of every delivered style and
   detects missing and extra files.
 - The manifest labels each output `native` or `style-rendering`.
+- A fit to a reference icon agrees in the overlay, junction crops, and
+  luminance cross-sections of [reference matching](references/reference-matching.md#5-verify).
 - After changing geometry, rerun the measurements in
   [rendering](references/rendering.md), and run the
   [behavior fixtures](references/eval-fixtures.md) and package checks before
@@ -120,6 +129,7 @@ logs in the local task report, outside reusable skill material.
 - [Generations](references/generations.md)
 - [Input contract](references/format.md)
 - [Rendering and geometry validation](references/rendering.md)
+- [Reference matching](references/reference-matching.md)
 - [Behavior fixtures](references/eval-fixtures.md)
 - [Commands](scripts/README.md)
 - [Apple Human Interface Guidelines: App icons](https://developer.apple.com/design/human-interface-guidelines/app-icons)

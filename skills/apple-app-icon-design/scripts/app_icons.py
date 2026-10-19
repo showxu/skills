@@ -8,12 +8,14 @@ import base64
 from collections import deque
 import html
 import json
+import math
 import os
 from pathlib import Path
 import re
 import shutil
 import struct
 import subprocess
+import sys
 import tempfile
 import xml.etree.ElementTree as ET
 import zlib
@@ -45,6 +47,11 @@ CORNER = (0.396305, 0.230261, 0.152117, 0.076058)
 CONTINUOUS = (1.528665, (((1.088490, 0), (0.868407, 0), (0.631494, 0.074911)),
                          ((0.372824, 0.169060), (0.169060, 0.372824), (0.074911, 0.631494)),
                          ((0, 0.868407), (0, 1.088490), (0, 1.528665))))
+OVERRUN = 0.01                  # px by which two corners' departures must exceed their edge to need a blend
+BLEND_HANDLE = 2 / 3            # share of the way to the tangents' intersection, as a quadratic would reach
+SLIVER = 2                      # px below which a cut corner's end cubic cannot keep its rounded tangent
+BLEND_REACH = 0.1               # share of a blend's chord each handle must span to set a clear tangent
+EDGES = ("right", "bottom", "left", "top")  # the edge after each corner, clockwise from top-right
 # Legacy geometry on the 1024 px canvas, measured against Apple's production templates
 # (references/rendering.md); the gloss values are documented approximations.
 FLAT_RADIUS = 229 / 1024        # continuous radius per side, iOS 7-18
@@ -62,6 +69,8 @@ MIN_SEPARATION = 0.10           # OKLab lightness between a group and what it si
 MIN_OVERLAP = 0.01              # share of the smaller group that makes two groups adjacent
 CLIP_TOLERANCE = 0.005          # share of a group's artwork allowed outside the shape
 FULL_BLEED = 0.95               # coverage at which a group is a background layer the shape crops
+REVERSAL = -0.999               # cosine between a line and an adjoining tangent at which it turns back
+REVERSAL_LENGTH = 0.5           # path units a doubled-back line must span to be reported
 
 
 def fail(message):
@@ -312,9 +321,305 @@ def glass_path(x=0, y=0, side=1024):
 
 
 def continuous_path(x, y, side, radius):
-    departure, segments = CONTINUOUS
-    return rounded_path(x, y, side, departure * radius,
-                        tuple(tuple((u * radius, v * radius) for u, v in s) for s in segments))
+    return continuous_rect(x, y, side, side, radius)
+
+
+def cubic_point(cubic, t):
+    s = 1 - t
+    return tuple(s * s * s * a + 3 * s * s * t * b + 3 * s * t * t * c + t * t * t * d for a, b, c, d in zip(*cubic))
+
+
+def split_cubic(cubic, t):
+    """The parts of a cubic before and after parameter t (de Casteljau)."""
+    def lerp(a, b):
+        return tuple(p + (q - p) * t for p, q in zip(a, b))
+    p0, p1, p2, p3 = cubic
+    a, b, c = lerp(p0, p1), lerp(p1, p2), lerp(p2, p3)
+    d, e = lerp(a, b), lerp(b, c)
+    f = lerp(d, e)
+    return (p0, a, d, f), (f, e, c, p3)
+
+
+def corner_cubics():
+    """The unit continuous corner as (start, control, control, end) cubics in its (u, v) frame."""
+    start, cubics = (CONTINUOUS[0], 0), []
+    for c1, c2, end in CONTINUOUS[1]:
+        cubics.append((start, c1, c2, end))
+        start = end
+    return cubics
+
+
+def corner_position(axis, target):
+    """Position from 0 to 3 along the unit corner where its u (axis 0, falling) or v (axis 1,
+    rising) equals target; targets beyond the curve clamp to its nearer end."""
+    falling = axis == 0
+    if target <= 0:
+        return 3.0 if falling else 0.0
+    if target >= CONTINUOUS[0]:
+        return 0.0 if falling else 3.0
+    for index, cubic in enumerate(corner_cubics()):
+        first, last = cubic[0][axis], cubic[3][axis]
+        if min(first, last) <= target <= max(first, last):
+            low, high = 0.0, 1.0
+            for _ in range(52):
+                middle = (low + high) / 2
+                if (cubic_point(cubic, middle)[axis] < target) == (last > first):
+                    low = middle
+                else:
+                    high = middle
+            return index + (low + high) / 2
+    fail("corner position outside the curve")
+
+
+def corner_piece(start, end, radius, trim=(False, False)):
+    """The unit corner's cubics between positions start < end, from 0 at its first departure to 3.
+
+    Where `trim` allows it at the start or end, and a cut leaves less than SLIVER px of a cubic
+    while other cubics remain, that sliver is dropped so a blend starts on a cubic boundary rather
+    than on a segment whose tangent rounding would bend. Uncut cubics are always kept.
+    """
+    pieces, cut = [], []
+    for index, cubic in enumerate(corner_cubics()):
+        low, high = max(start - index, 0.0), min(end - index, 1.0)
+        if high - low < 1e-12:
+            continue
+        if high < 1:
+            cubic = split_cubic(cubic, high)[0]
+        if low > 0:
+            cubic = split_cubic(cubic, low / high)[1]
+        pieces.append(cubic)
+        cut.append((low > 0, high < 1))
+    if len(pieces) > 1 and trim[0] and cut[0][0] and math.dist(pieces[0][0], pieces[0][3]) * radius < SLIVER:
+        pieces.pop(0)
+        cut.pop(0)
+    if len(pieces) > 1 and trim[1] and cut[-1][1] and math.dist(pieces[-1][0], pieces[-1][3]) * radius < SLIVER:
+        pieces.pop()
+    return pieces
+
+
+def corner_inset(radius, distance):
+    """How far inside an edge a continuous corner of `radius` runs, `distance` from its vertex."""
+    if not radius or distance >= CONTINUOUS[0] * radius:
+        return 0.0
+    position = corner_position(1, distance / radius)
+    index = min(int(position), 2)
+    return cubic_point(corner_cubics()[index], position - index)[0] * radius
+
+
+def sharp_cuts_fit(radii, lengths):
+    """Whether each corner cut at a sharp neighbour's other edge meets that edge before the corner
+    beyond it begins."""
+    departure = CONTINUOUS[0]
+    for i in range(4):
+        a, b, length = radii[i], radii[(i + 1) % 4], lengths[i]
+        if bool(a) == bool(b) or departure * (a + b) - length <= OVERRUN:
+            continue
+        if a:
+            big, far, other = a, radii[(i + 2) % 4], lengths[(i + 1) % 4]
+        else:
+            big, far, other = b, radii[(i - 1) % 4], lengths[(i - 1) % 4]
+        if corner_inset(big, length) > other - departure * far:
+            return False
+    return True
+
+
+def continuous_corners(width, height, radii):
+    """Radii in drawing order (top-right, bottom-right, bottom-left, top-left), the factor that
+    scaled them, and how far each following edge's two corner departures exceed its length."""
+    values = [radii] * 4 if isinstance(radii, (int, float)) else list(radii)
+    if len(values) != 4 or any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v)
+                               for v in (width, height, *values)):
+        fail("a continuous rectangle needs a finite size and one or four finite radii")
+    if width <= 0 or height <= 0 or min(values) < 0:
+        fail("a continuous rectangle needs a positive size and radii of at least zero")
+    top_left, top_right, bottom_right, bottom_left = values
+    requested = (top_right, bottom_right, bottom_left, top_left)
+    lengths = (height, width, height, width)
+
+    def drawable(scale):
+        scaled = tuple(r * scale for r in requested)
+        return sharp_cuts_fit(scaled, lengths) and continuous_outline(0, 0, width, height, scaled) is not None
+    # As CSS border-radius does, shrink all radii together until every edge holds its two radii,
+    # then further while the cut corners cannot be outlined.
+    scale = min([1.0] + [lengths[i] / (requested[i] + requested[(i + 1) % 4])
+                         for i in range(4) if requested[i] + requested[(i + 1) % 4] > lengths[i]])
+    if not drawable(scale):
+        low, high = 0.0, scale
+        for _ in range(48):
+            middle = (low + high) / 2
+            low, high = (middle, high) if drawable(middle) else (low, middle)
+        scale = low
+    radii = tuple(r * scale for r in requested) if scale < 1 else requested
+    return radii, scale, [CONTINUOUS[0] * (radii[i] + radii[(i + 1) % 4]) - lengths[i] for i in range(4)]
+
+
+def tangent_blend(p, p_direction, q, q_direction, box):
+    """Control points of a cubic joining p, arriving along p_direction, to q, leaving along
+    q_direction; its handles run toward the tangents' intersection and stop at the edge of `box`
+    (x0, y0, x1, y1), so the blend stays inside it.
+
+    Returns () when the tangents are too close to parallel to meet, where a line joins p and q
+    within the path's precision, and None when they meet behind p or ahead of q or a handle would
+    span less than BLEND_REACH of the chord.
+    """
+    (dx, dy), (ex, ey) = p_direction, q_direction
+    rx, ry = q[0] - p[0], q[1] - p[1]
+    determinant = dx * ey - dy * ex
+    if abs(determinant) <= 1e-12 * math.hypot(dx, dy) * math.hypot(ex, ey):
+        return ()
+    a, b = (rx * ey - ry * ex) / determinant, (dx * ry - dy * rx) / determinant
+    if not (a > 0 and b > 0 and math.isfinite(a * math.hypot(dx, dy)) and math.isfinite(b * math.hypot(ex, ey))):
+        return None
+
+    def handle(origin, step):
+        # Steps follow the exact tangents, so an edge-aligned tangent is never clamped by its edge.
+        share = BLEND_HANDLE
+        for axis in (0, 1):
+            if step[axis]:
+                bound = box[axis + 2] if step[axis] > 0 else box[axis]
+                share = min(share, max(0.0, (bound - origin[axis]) / step[axis]))
+        return tuple(o + share * s for o, s in zip(origin, step))
+    handles = handle(p, (a * dx, a * dy)), handle(q, (-b * ex, -b * ey))
+    if min(math.dist(p, handles[0]), math.dist(q, handles[1])) < BLEND_REACH * math.hypot(rx, ry):
+        return None
+    return handles
+
+
+def continuous_outline(x, y, width, height, radii):
+    """Path data for corners of `radii` in drawing order, or None when a blend cannot join two cut
+    corners. Blends are solved relative to the rectangle, so the result does not depend on where
+    it lies."""
+    lengths = (height, width, height, width)
+    overrun = [CONTINUOUS[0] * (radii[i] + radii[(i + 1) % 4]) - lengths[i] > OVERRUN for i in range(4)]
+    # Two rounded corners overrunning their edge are joined by a blend; a sharp corner is not.
+    blended = [overrun[i] and radii[i] > 0 and radii[(i + 1) % 4] > 0 for i in range(4)]
+    vertices = ((width, 0), (width, height), (0, height), (0, 0))
+    axes = (((-1, 0), (0, 1)), ((0, -1), (-1, 0)), ((1, 0), (0, -1)), ((0, 1), (1, 0)))
+    elements = []  # (corner, start, leave, cubics, end, arrive); points as (absolute, relative)
+    for i, ((vx, vy), (e1, e2)) in enumerate(zip(vertices, axes)):
+        radius, cx, cy = radii[i], x + vx, y + vy
+
+        def place(u, v):
+            du, dv = u * radius, v * radius
+            return ((cx + du * e1[0] + dv * e2[0], cy + du * e1[1] + dv * e2[1]),
+                    (vx + du * e1[0] + dv * e2[0], vy + du * e1[1] + dv * e2[1]))
+
+        def direction(a, b):
+            # Directions from the unit frame keep their precision far from the origin.
+            u, v = b[0] - a[0], b[1] - a[1]
+            return (u * e1[0] + v * e2[0], u * e1[1] + v * e2[1])
+        if not radius:
+            if not (overrun[i - 1] or overrun[i]):
+                elements.append((i, ((cx, cy), (vx, vy)), None, [], ((cx, cy), (vx, vy)), None))
+            continue
+        start = corner_position(0, (lengths[i - 1] - CONTINUOUS[0] * radii[i - 1]) / radius) if overrun[i - 1] else 0.0
+        end = corner_position(1, (lengths[i] - CONTINUOUS[0] * radii[(i + 1) % 4]) / radius) if overrun[i] else 3.0
+        # Only an end that a blend replaces may lose a sliver; a cut at a sharp corner's edge must
+        # stay on that edge.
+        pieces = corner_piece(start, end, radius, (blended[i - 1], blended[i])) if start < end else []
+        if pieces:
+            elements.append((i, place(*pieces[0][0]), direction(pieces[0][0], pieces[0][1]),
+                             [tuple(place(*point)[0] for point in cubic) for cubic in pieces],
+                             place(*pieces[-1][3]), direction(pieces[-1][2], pieces[-1][3])))
+        elif overrun[i - 1] != overrun[i]:
+            # Consumed from one side only: keep the end that meets the edge that does not overrun.
+            first, last = corner_cubics()[0], corner_cubics()[-1]
+            point, tangent = ((last[3], direction(last[2], last[3])) if not overrun[i]
+                              else (first[0], direction(first[0], first[1])))
+            elements.append((i, place(*point), tangent, [], place(*point), tangent))
+    if not elements:
+        return None
+
+    def at(point):
+        if not all(map(math.isfinite, point)):
+            fail("a continuous rectangle this large has no finite outline")
+        return f"{point[0]:.2f} {point[1]:.2f}"
+
+    def join(element, after):
+        """The connection from an element's end to the start of the next, or None."""
+        edges = range(element[0], element[0] + ((after[0] - element[0]) % 4 or 4))
+        if any(blended[edge % 4] for edge in edges) and element[5] and after[2]:
+            handles = tangent_blend(element[4][1], element[5], after[1][1], after[2], (0, 0, width, height))
+            if handles is None:
+                return None
+            if handles:
+                h1, h2 = ((x + h[0], y + h[1]) for h in handles)
+                return f"C{at(h1)} {at(h2)} {at(after[1][0])}"
+        return "L" + at(after[1][0])
+
+    path = ["M" + at(elements[0][1][0])]
+    for index, element in enumerate(elements):
+        path.append("".join(f"C{at(b)} {at(c)} {at(d)}" for _, b, c, d in element[3]))
+        connection = join(element, elements[(index + 1) % len(elements)])
+        if connection is None:
+            return None
+        if index < len(elements) - 1 or connection.startswith("C"):
+            path.append(connection)
+    return "".join(path) + "Z"
+
+
+def continuous_rect(x, y, width, height, radii):
+    """Path data for a rectangle with Apple continuous corners of one or four radii.
+
+    `radii` is one radius or (top-left, top-right, bottom-right, bottom-left), scaled together if an
+    edge cannot hold its two radii. Where an edge is shorter than its two corners' departures, each
+    corner stops where the other leaves that edge and a tangent cubic joins them instead of a line
+    that doubles back; a corner that ends before it starts is consumed (references/rendering.md).
+    """
+    radii = continuous_corners(width, height, radii)[0]
+    if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v)
+           for v in (x, y, x + width, y + height)):
+        fail("a continuous rectangle needs a finite position and extent")
+    path = continuous_outline(x, y, width, height, radii)
+    if path is None:
+        fail("a continuous rectangle with these radii has no outline")
+    return path
+
+
+def grid_backdrop(lines=(256, 512, 768), width=10, inset=25, radius=189, turn=30, opacity=1):
+    """SVG layer of a design-grid backdrop on the 1024 px canvas, filled white.
+
+    Vertical and horizontal lines `width` wide cross the canvas at `lines`; the inner ones run
+    into the icon's rim. Only the four corner cells carry an outer edge: a continuous corner of
+    `radius`, `inset` from the canvas edge, that turns into the outer lines within `turn` px.
+    `opacity` fades the whole layer, for styles that ignore native layer opacity.
+    """
+    values = (*lines, width, inset, radius, turn, opacity)
+    if len(lines) < 2 or any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v)
+                             for v in values):
+        fail("a grid backdrop needs at least two finite line positions and finite sizes")
+    first, last, half = min(lines), max(lines), width / 2
+    if not (0 < half <= inset and width < first - inset and 0 <= turn and 0 <= radius and 0 < opacity <= 1
+            and inset + turn < first < last < 1024 - inset - turn):
+        fail("grid backdrop edges must stay on the canvas and lines between the corner turns, "
+             "with opacity above 0 and at most 1")
+    small = turn / CONTINUOUS[0]
+    cells = (((inset, inset, first, first), (radius, small, 0, small)),
+             ((last, inset, 1024 - inset, first), (small, radius, small, 0)),
+             ((last, last, 1024 - inset, 1024 - inset), (0, small, radius, small)),
+             ((inset, last, first, 1024 - inset), (small, 0, small, radius)))
+    shapes = []
+    for (x0, y0, x1, y1), radii in cells:
+        # The edge is the band between the cell's outline grown and shrunk by half the width; both
+        # contours offset the same fitted radii, so neither may need scaling of its own.
+        top_right, bottom_right, bottom_left, top_left = continuous_corners(x1 - x0, y1 - y0, radii)[0]
+        fitted = (top_left, top_right, bottom_right, bottom_left)
+        contours = []
+        for grow, offset in ((half, tuple(r + half if r else 0 for r in fitted)),
+                             (-half, tuple(max(r - half, 0) for r in fitted))):
+            size = (x1 - x0 + 2 * grow, y1 - y0 + 2 * grow)
+            if continuous_corners(*size, offset)[1] < 1:
+                fail("grid backdrop radius and turn do not fit the corner cells at this width; reduce them")
+            contours.append(continuous_rect(x0 - grow, y0 - grow, *size, offset))
+        shapes.append(f'<path fill-rule="evenodd" d="{"".join(contours)}"/>')
+    for position in sorted(lines):
+        start, end = (inset + turn, 1024 - inset - turn) if position in (first, last) else (0, 1024)
+        for x0, y0, x1, y1 in ((position - half, start, position + half, end),
+                               (start, position - half, end, position + half)):
+            shapes.append(f'<path d="M{x0:g} {y0:g}H{x1:g}V{y1:g}H{x0:g}Z"/>')
+    fade = f' opacity="{opacity:g}"' if opacity < 1 else ""
+    return ('<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">'
+            f'<g fill="#FFFFFF"{fade}>{"".join(shapes)}</g></svg>\n')
 
 
 def shape(style):
@@ -702,6 +1007,181 @@ def shape_widths(cover, size):
     return widths
 
 
+PATH_SPACES = " \t\n\f\r"   # whitespace in SVG path data
+PATH_COMMAND = re.compile(r"[ \t\n\f\r]*([MmLlHhVvCcSsQqTtAaZz])")
+PATH_SEPARATOR = re.compile(r"[ \t\n\f\r]*(?:,[ \t\n\f\r]*)?")
+PATH_SPACE = re.compile(r"[ \t\n\f\r]*")
+PATH_NUMBER = re.compile(r"[-+]?(?:[0-9]+\.?[0-9]*|\.[0-9]+)(?:[eE][-+]?[0-9]+)?")
+PATH_FLAG = re.compile(r"[01]")
+PATH_ARITY = {"M": 2, "L": 2, "H": 1, "V": 1, "C": 6, "S": 4, "Q": 4, "T": 2, "A": 7, "Z": 0}
+
+
+def advances(values, tolerance):
+    """Whether a Bezier with these 1D control values never decreases over [0, 1]."""
+    rates = [b - a for a, b in zip(values, values[1:])]
+    scale = max(map(abs, rates))
+    if not math.isfinite(scale):
+        return False
+    if scale:
+        rates, tolerance = [rate / scale for rate in rates], tolerance / scale
+    if len(rates) < 3:
+        return min(rates) >= -tolerance
+    first, middle, last = rates
+    candidates = [first, last]
+    curvature = first - 2 * middle + last
+    if curvature and 0 < (first - middle) / curvature < 1:
+        t = (first - middle) / curvature
+        candidates.append(first * (1 - t) ** 2 + 2 * middle * (1 - t) * t + last * t * t)
+    return min(candidates) >= -tolerance
+
+
+def path_segments(data):
+    """Subpaths of SVG path data as (segments, closed).
+
+    Each segment is (start, start direction, end, end direction); arcs have no directions, and
+    straight curves get the directions of a line. Parsing stops at the first error, where SVG
+    renderers stop drawing.
+    """
+    subpaths, segments, closed = [], [], False
+    command, previous, position, fresh = None, None, 0, False
+    current = start = control = (0.0, 0.0)
+
+    def add(end, *points, directions=True):
+        nonlocal current
+        chain = [current, *points, end]
+        if any(p != current for p in chain):
+            first = next(p for p in chain[1:] if p != current)
+            last = next(p for p in reversed(chain[:-1]) if p != end)
+            leave, arrive = (first[0] - current[0], first[1] - current[1]), (end[0] - last[0], end[1] - last[1])
+            chord = (end[0] - current[0], end[1] - current[1])
+            length = math.hypot(*chord)
+            if 0 < length < math.inf:
+                ux, uy = chord[0] / length, chord[1] / length
+                along = [0.0, *((p[0] - current[0]) * ux + (p[1] - current[1]) * uy for p in points), length]
+                if (all(abs((p[0] - current[0]) * uy - (p[1] - current[1]) * ux) <= 1e-9 * length for p in points)
+                        and advances(along, 1e-9 * length)):
+                    leave = arrive = chord
+            segments.append((current, leave if directions else None, end, arrive if directions else None))
+        current = end
+
+    while True:
+        match = PATH_COMMAND.match(data, position)
+        if match:
+            # A command missing its arguments, or a path not opened by a moveto, is an error.
+            if fresh or (previous is None and match[1] not in "Mm"):
+                break
+            command, position = match[1], match.end()
+            if command in "Zz":
+                add(start)
+                closed, command, previous = True, None, "Z"
+            fresh = command is not None
+            continue
+        if command is None or not data[position:].strip(PATH_SPACES):
+            break
+        values = []
+        for index in range(PATH_ARITY[command.upper()]):
+            position = (PATH_SPACE if fresh and not index else PATH_SEPARATOR).match(data, position).end()
+            match = (PATH_FLAG if command in "Aa" and index in (3, 4) else PATH_NUMBER).match(data, position)
+            if not match or data[match.end():match.end() + 1] in ("e", "E"):
+                break
+            values.append(float(match[0]))
+            position = match.end()
+        if len(values) < PATH_ARITY[command.upper()]:
+            break
+        fresh = False
+        relative = command.islower()
+        kind = command.upper()
+
+        def point(i):
+            return (values[i] + current[0], values[i + 1] + current[1]) if relative else (values[i], values[i + 1])
+        if kind == "M":
+            if segments:
+                subpaths.append((segments, closed))
+            segments, closed = [], False
+            current = start = control = point(0)
+            command, previous = "l" if relative else "L", "M"
+            continue
+        if closed:
+            if segments:
+                subpaths.append((segments, closed))
+            segments, closed, start = [], False, current
+        if kind == "H":
+            add((values[0] + current[0] if relative else values[0], current[1]))
+        elif kind == "V":
+            add((current[0], values[0] + current[1] if relative else values[0]))
+        elif kind == "L":
+            add(point(0))
+        elif kind in "CS":
+            first = point(0) if kind == "C" else (
+                (2 * current[0] - control[0], 2 * current[1] - control[1]) if previous in ("C", "S") else current)
+            second, end = (point(2), point(4)) if kind == "C" else (point(0), point(2))
+            add(end, first, second)
+            control = second
+        elif kind in "QT":
+            middle = point(0) if kind == "Q" else (
+                (2 * current[0] - control[0], 2 * current[1] - control[1]) if previous in ("Q", "T") else current)
+            add(point(2) if kind == "Q" else point(0), middle)
+            control = middle
+        else:
+            add(point(5), directions=not values[0] or not values[1])
+        previous = kind
+    if segments:
+        subpaths.append((segments, closed))
+    return subpaths
+
+
+def doubled_back(data):
+    """(x, y, length) of the longest doubled-back line in each path of an SVG layer.
+
+    A line, or a run of collinear straight segments, doubles back when it runs against the
+    tangents on both its sides, as the line joining two corners whose departures exceed their
+    edge does. Cusps where curves meet are not findings.
+    """
+    def reverses(a, b):
+        return a[0] * b[0] + a[1] * b[1] <= REVERSAL * math.hypot(*a) * math.hypot(*b)
+
+    def straight(segment):
+        begin, leave, end, arrive = segment
+        return leave is not None and leave == arrive == (end[0] - begin[0], end[1] - begin[1])
+
+    found = []
+    for node in ET.fromstring(data).iter():
+        if node.tag.split("}")[-1] != "path":
+            continue
+        worst = None
+        for segments, closed in path_segments(node.get("d", "")):
+            def continues(i):
+                """Whether segment i extends the straight run of the segment before it."""
+                before = segments[i - 1]
+                return (straight(segments[i]) and straight(before) and (closed or i > 0)
+                        and reverses(segments[i][1], (-before[1][0], -before[1][1])))
+            count = len(segments)
+            first = next((i for i in range(count) if not continues(i)), None)
+            if first is None:
+                continue
+            order = [(first + k) % count for k in range(count)] if closed else list(range(count))
+            k = 0
+            while k < count:
+                end = k
+                while end + 1 < count and continues(order[end + 1]):
+                    end += 1
+                run = [segments[i] for i in order[k:end + 1]]
+                head, tail = order[k], order[end]
+                k = end + 1
+                if not straight(run[0]) or not (closed or (head > 0 and tail < count - 1)):
+                    continue
+                direction = (run[-1][2][0] - run[0][0][0], run[-1][2][1] - run[0][0][1])
+                before, after = segments[head - 1][3], segments[(tail + 1) % count][1]
+                length = sum(math.dist(segment[0], segment[2]) for segment in run)
+                if (before and after and any(direction) and reverses(before, direction)
+                        and reverses(direction, after) and length >= REVERSAL_LENGTH
+                        and (not worst or length > worst[2])):
+                    worst = (*run[0][0], length)
+        if worst:
+            found.append(worst)
+    return found
+
+
 def lint_findings(groups, outline, base_lightness, size, display_scale):
     """Findings for rendered groups.
 
@@ -768,7 +1248,14 @@ def lint(spec, base, style, work, information=None):
     fill = spec["background"]
     base_lightness = lightness(*(int(fill[i:i+2], 16) for i in (1, 3, 5)))
     display_scale = MAC_TILE[1] / 1024 if style == "mac-tile" else 1
-    return lint_findings(rendered, outline, base_lightness, LINT_SIZE, display_scale)
+    findings = lint_findings(rendered, outline, base_lightness, LINT_SIZE, display_scale)
+    for group in groups:
+        for li, (suffix, data) in enumerate(group["art"]):
+            if suffix == ".svg":
+                findings += [f"{group['label']}: layer {li + 1} path doubles back {length:.1f} units at ({x:.1f}, {y:.1f}), "
+                             "a stray segment that corners whose departures exceed their edge draw"
+                             for x, y, length in doubled_back(data)]
+    return findings
 
 
 def sheet(entries, names, base, ictool, work):
@@ -821,19 +1308,56 @@ def sheet(entries, names, base, ictool, work):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("design", type=Path)
+    parser.add_argument("design", type=Path, nargs="?")
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--list", action="store_true")
     mode.add_argument("--out", type=Path, help="write a new, dedicated output directory")
     mode.add_argument("--check", type=Path, help="regenerate privately and compare without modifying this directory")
     mode.add_argument("--lint", action="store_true", help="report measurable layer and contrast problems")
     mode.add_argument("--sheet", type=Path, help="write a new comparison SVG of the named entries in every style")
+    mode.add_argument("--continuous-rect", nargs="+", type=float, metavar="N",
+                      help="print path data for X Y WIDTH HEIGHT and one radius or four "
+                           "(top-left, top-right, bottom-right, bottom-left); takes no DESIGN.md")
+    mode.add_argument("--grid-backdrop", nargs="*", metavar="KEY=VALUE",
+                      help="print a grid backdrop SVG layer, overriding lines, width, inset, radius, "
+                           "turn, or opacity; takes no DESIGN.md")
     parser.add_argument("--name", action="append", default=[])
     parser.add_argument("--style", choices=STYLES)
     parser.add_argument("--document-only", action="store_true")
     parser.add_argument("--ictool", help="path to Icon Composer's export-capable ictool")
     args = parser.parse_args()
+    if (args.design is None) != (args.continuous_rect is not None or args.grid_backdrop is not None):
+        parser.error("DESIGN.md is required, except with --continuous-rect or --grid-backdrop, which take none")
     try:
+        if args.grid_backdrop is not None:
+            options = {}
+            for item in args.grid_backdrop:
+                key, _, value = item.partition("=")
+                if key not in ("lines", "width", "inset", "radius", "turn", "opacity") or key in options:
+                    fail(f"--grid-backdrop takes lines, width, inset, radius, turn, or opacity once each, not {item}")
+                try:
+                    options[key] = tuple(map(float, value.split(","))) if key == "lines" else float(value)
+                except ValueError:
+                    fail(f"--grid-backdrop {key} needs numbers")
+            print(grid_backdrop(**options), end="")
+            return 0
+        if args.continuous_rect is not None:
+            if len(args.continuous_rect) not in (5, 8):
+                fail("--continuous-rect takes X Y WIDTH HEIGHT and one or four radii")
+            x, y, width, height, *radii = args.continuous_rect
+            radii = radii[0] if len(radii) == 1 else radii
+            print(continuous_rect(x, y, width, height, radii))
+            _, scale, overruns = continuous_corners(width, height, radii)
+            if scale < 1:
+                print(f"info\tradii scaled by {scale:.4g} so that each edge holds its two radii", file=sys.stderr)
+            fitted = continuous_corners(width, height, radii)[0]
+            for i, (edge, excess) in enumerate(zip(EDGES, overruns)):
+                if excess > OVERRUN:
+                    joined = ("the corners end early and a tangent cubic joins them"
+                              if fitted[i] and fitted[(i + 1) % 4] else
+                              "the rounded corner is cut where it meets the sharp corner's other edge")
+                    print(f"info\t{edge} edge: corner departures exceed it by {excess:.2f}; {joined}", file=sys.stderr)
+            return 0
         entries = read_entries(args.design)
         if args.list:
             print("\n".join(entries))

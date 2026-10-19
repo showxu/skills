@@ -326,3 +326,162 @@ Owner notes:
 
 - Output filenames and source ownership are defined in
   [rendering](rendering.md#optional-dark-web-exports).
+
+## reference-matching
+
+Target behavior: matching an existing icon's look fits measured parameters of
+original artwork to the rendition the system displays.
+
+Input prompt: "Make the lines in our icon's background feel like the ones in
+that app's icon in the Dock."
+
+Context and files:
+
+- An installed reference app on macOS 26 or later whose bundle also carries a
+  legacy `.icns`.
+- The owner's original line artwork, parameterized by width, spacing, and
+  inset; Icon Composer for native candidate exports.
+
+Expected output:
+
+- A 1024 px capture from `NSWorkspace.shared.icon(forFile:)`, mapped from the
+  100..923 px tile to the canvas and kept in ignored validation output.
+- Local-contrast line-art maps of reference and candidates; geometry fitted
+  by normalized cross-correlation in a window without foreground objects that
+  keeps the rim band where lines meet it, then opacity fitted by squared
+  difference with the geometry fixed.
+- An overlay, 4–6x junction crops, and luminance cross-sections in the task
+  report; the fitted values written into the original artwork.
+
+Forbidden behavior:
+
+- Fitting the bundle's `.icns`, estimating parameters from a screenshot,
+  fitting opacity by correlation, masking the rim where lines merge into it,
+  tracing or importing the reference's shapes or pixels, or committing the
+  capture.
+
+Acceptance checks:
+
+- After mapping, the capture's mask matches a native macOS export with alpha
+  intersection-over-union of at least 0.999; the `.icns` tile does not.
+- The overlay shows no systematic fringe, and cross-sections agree in line
+  width, peak, and spacing.
+- A candidate that differs from the reference only in opacity is told apart
+  by the contrast fit, although its correlation score equals the match's.
+- Delivered artwork contains no reference pixels or traced paths.
+
+Baseline expectation:
+
+- Without the method, an agent estimates parameters from a downscaled raster,
+  off by about 2x in practice, or fits the legacy `.icns` tile.
+
+Evidence sources:
+
+- Capture metadata (reference app, system version, appearance), mask
+  comparison, correlation scores, and the verification images.
+
+Owner notes:
+
+- The method is owned by [reference matching](reference-matching.md); rim
+  clearance by [rendering](rendering.md#glass-color-and-rim).
+
+## continuous-corner-overrun
+
+Target behavior: rounded rectangles whose corner departures exceed an edge
+render without a stray segment, and lint finds that defect in any SVG layer.
+
+Input prompt: "Our bar is 160 px tall with continuous corners of radius 70,
+and there's a flat line on its side."
+
+Context and files:
+
+- A layer whose path joins continuous corners with straight lines along an
+  edge shorter than their two departures.
+- The same bar drawn with `--continuous-rect`.
+
+Expected output:
+
+- `--lint` reports the line that doubles back, with its position and
+  length; cusps where curves meet in other artwork stay clean.
+- The helper's path has no reversal, stays convex and inside its rectangle,
+  and joins each blend tangentially; corners that fit keep the existing
+  continuous outline byte-for-byte.
+
+Forbidden behavior:
+
+- Hiding the segment with a stroke or mask, or changing the owner's radii
+  without reporting it.
+
+Acceptance checks:
+
+- The continuous-rectangle, path-reversal, and lint tests in
+  `scripts/test_app_icons.py` pass, and legacy style outputs match the
+  pre-change script byte-for-byte.
+
+Baseline expectation:
+
+- The pre-change script offers no helper and its lint stays clean while the
+  stray segment renders.
+
+Evidence sources:
+
+- Lint output, helper path data and `info` lines, and rendered comparisons of
+  the hand-joined and helper outlines.
+
+Owner notes:
+
+- Geometry and lint rules are owned by
+  [rendering](rendering.md#continuous-rectangles).
+
+## grid-backdrop
+
+Target behavior: a design-grid backdrop is drawn as an original, flat texture
+layer whose corner edges peel out of the glass rim.
+
+Input prompt: "Put a subtle design grid behind our build tool's glyph, like
+the grids behind developer-tool icons."
+
+Context and files:
+
+- An entry with an original foreground and a Liquid Glass style; the layer
+  from `--grid-backdrop`.
+
+Expected output:
+
+- The grid in its own group with specular off, no shadow, and layer opacity
+  near 0.2; lines at 25%, 50%, and 75%, the middle ones running into the rim;
+  corner edges only in the corner cells, turning into the outer lines.
+- Lint findings for thin lines, corner edges crossing the outline, and
+  lightness against a light foreground, recorded as owner decisions.
+- Style renderings, if delivered, use a style layer from
+  `--grid-backdrop opacity=0.2`.
+
+Forbidden behavior:
+
+- Describing or packaging the result as a copy of an existing app icon,
+  pairing the grid with another app's foreground motif, drawing a full inner
+  border or cell edges along the rim, enabling specular on the grid, or
+  drawing the corner edge as a plain rounded rectangle that leaves a stray
+  segment.
+
+Acceptance checks:
+
+- `--lint` reports no doubled-back line; the grid tests in
+  `scripts/test_app_icons.py` pass, including the edge's gap to the glass
+  outline tapering from more than 18 px at the turn to under 4 px on the
+  diagonal.
+- Native Default and Dark exports show flat lines at small and large sizes.
+
+Baseline expectation:
+
+- Without the recipe, an agent draws a uniform inset border, leaves specular
+  on so the lines look like embossed tubes, or hits the corner overrun.
+
+Evidence sources:
+
+- The generated layer, native exports, lint output, and backdrop tests.
+
+Owner notes:
+
+- The recipe is owned by [design](design.md#grid-backdrop); its geometry by
+  [rendering](rendering.md#continuous-rectangles).

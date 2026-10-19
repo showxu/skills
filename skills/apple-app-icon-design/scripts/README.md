@@ -14,6 +14,8 @@ python3 scripts/app_icons.py DESIGN.md --name example-studio --style liquid-glas
 python3 scripts/app_icons.py DESIGN.md --name example-studio --style flat --out .build/icons/flat
 python3 scripts/app_icons.py DESIGN.md --name example-studio --style flat --check .build/icons/flat
 python3 scripts/app_icons.py DESIGN.md --name example-studio --style liquid-glass --out .build/document --document-only
+python3 scripts/app_icons.py --continuous-rect 312 412 400 200 100 100 40 40
+python3 scripts/app_icons.py --grid-backdrop opacity=0.2 > layers/grid-flat.svg
 ```
 
 `--style` selects one of the entry's styles and may be omitted when the entry
@@ -50,17 +52,32 @@ styles at 160 and 32 px on light and dark backgrounds. Without an
 export-capable `ictool`, its Liquid Glass cells say so. Convert it with
 `rsvg-convert SHEET.svg -o SHEET.png` when a raster preview is needed.
 
+`--continuous-rect X Y WIDTH HEIGHT RADIUS [RADIUS RADIUS RADIUS]` takes no
+DESIGN.md and prints SVG path data for a rectangle with continuous corners,
+with one radius or four: top-left, top-right, bottom-right, bottom-left. Use it
+to draw rounded rectangles in artwork. Corners whose departures overrun an
+edge end early: a tangent cubic joins two rounded corners, and a corner beside
+a sharp one is cut on that corner's other edge. `info` lines on standard error
+report scaled radii and each overrun edge. See
+[continuous rectangles](../references/rendering.md#continuous-rectangles).
+
+`--grid-backdrop [KEY=VALUE ...]` also takes no DESIGN.md and prints the SVG
+layer of a [grid backdrop](../references/design.md#grid-backdrop). Keys
+override `lines` (comma-separated positions), `width`, `inset`, `radius`,
+`turn`, and `opacity`; `grid_backdrop()` takes the same keywords.
+
 Optional `--ictool PATH` selects an export-capable Icon Composer renderer.
-Exit 0 means the requested output, comparison, lint, or sheet succeeded.
-Invalid input, render failure, drift, or a lint finding exits 1. A successful
-document-only run does not establish native rendition or visual readiness.
+Exit 0 means the requested output, comparison, lint, sheet, path data, or
+backdrop succeeded. Invalid input, render failure, drift, or a lint finding exits 1. A
+successful document-only run does not establish native rendition or visual
+readiness.
 
 Run `python3 scripts/test_app_icons.py` for document, style, lint, drift,
-preservation, dimension, and failure-path regressions. Rendering tests run
-only when `rsvg-convert` is installed. Native material and appearance tests
-run when export-capable `ictool` is available. They check fill, layer/group
-opacity, and group material specializations across every appearance, plus
-the opt-in dark web set. Set `APP_ICONS_BASELINE` to a
+preservation, dimension, continuous-rectangle, backdrop, and failure-path
+regressions. Rendering tests run only when `rsvg-convert` is installed. Native
+material and appearance tests run when export-capable `ictool` is available.
+They check fill, layer/group opacity, and group material specializations
+across every appearance, plus the opt-in dark web set. Set `APP_ICONS_BASELINE` to a
 pre-change `app_icons.py` to compare all example styles; see the exact-byte and
 native-rounding distinction in [rendering](../references/rendering.md#drift).
 Use native contact sheets for visual quality review.
