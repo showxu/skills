@@ -112,18 +112,10 @@ class SocialIconTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "static SVG|self-contained"):
                     icon_svg(self.svg_icon(content), 0, 0, 384)
 
-    def test_nested_svg_rejects_external_css_urls_and_imports(self):
+    def test_nested_svg_rejects_style_elements_and_attributes(self):
         styles = ['@import url(https://example.test/theme.css);',
-                  '@import "theme.css";', r'@im\70ort/**/"//example.test/theme.css";',
-                  '.logo { fill: URL("https://example.test/paint.svg#paint"); }',
-                  r'@media all { .logo { fill: u\72l(\68ttps://example.test/paint.svg#paint); } }',
-                  '@font-face { src: url(../font.woff2); }',
-                  'fill: var(--paint, url(../paint.svg#paint))',
-                  'background-image: image-set("https://example.test/icon.png" 1x)',
-                  '--source: "https://example.test/icon.png"; background-image: image-set(var(--source) 1x)',
-                  'background-image: image(attr(data-source), red)',
-                  'background-image: -webkit-image-set(env(source) 1x)',
-                  'background-image: image-set(if(style(--ready): "https://example.test/icon.png"; else: "#local") 1x)']
+                  '@import "theme.css";', 'fill: url(https://example.test/paint.svg#paint)',
+                  '.logo { fill: #2468ac; }', 'fill: #2468ac']
         for style in styles:
             for content in (f'<style><![CDATA[{style}]]></style>',
                             f'<path style="{escape(style, quote=True)}"/>'):
@@ -134,25 +126,20 @@ class SocialIconTests(unittest.TestCase):
 
     def test_nested_svg_rejects_external_presentation_urls(self):
         for attribute in ("fill", "stroke", "filter", "clip-path", "mask", "marker",
-                          "marker-start", "marker-mid", "marker-end", "cursor",
-                          "color-profile", "shape-inside", "offset-path"):
+                          "marker-start", "marker-mid", "marker-end", "cursor"):
             with self.subTest(attribute=attribute):
                 path = self.svg_icon('<svg viewBox="0 0 100 100">'
                                      f'<path {attribute}="url(https://example.test/asset.svg#part)"/></svg>')
                 with self.assertRaisesRegex(ValueError, "self-contained"):
                     icon_svg(path, 0, 0, 384)
 
-    def test_nested_svg_rejects_reference_changing_animation(self):
-        for tag in ("set", "animate"):
-            for attribute in ("href", "xlink:href", "fill", "stroke", "filter", "clip-path",
-                              "mask", "marker-start", "marker-mid", "marker-end", "cursor",
-                              "style", "xml:base", "attributeName"):
-                for value in ("https://example.test/asset.svg#part", "#local"):
-                    with self.subTest(tag=tag, attribute=attribute, value=value):
-                        path = self.svg_icon('<svg viewBox="0 0 100 100">'
-                                             f'<{tag} attributeName="{attribute}" to="{value}"/></svg>')
-                        with self.assertRaisesRegex(ValueError, "self-contained"):
-                            icon_svg(path, 0, 0, 384)
+    def test_nested_svg_rejects_animation_elements(self):
+        for content in ('<set attributeName="href" to="https://example.test/icon.svg"/>',
+                        '<animate attributeName="xlink:href" values="#one;#two"/>',
+                        '<animate attributeName="opacity" from="0.5" to="1"/>'):
+            with self.subTest(content=content):
+                with self.assertRaisesRegex(ValueError, "element .* is not allowed"):
+                    icon_svg(self.svg_icon(f'<svg>{content}</svg>'), 0, 0, 384)
 
     def test_nested_svg_rejects_external_base_and_source_attributes(self):
         for attribute in ("xml:base", "src"):
@@ -171,17 +158,147 @@ class SocialIconTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "self-contained"):
                     icon_svg(self.svg_icon(f'<svg>{content}</svg>'), 0, 0, 384)
 
-    def test_nested_svg_preserves_fragment_css_and_presentation_references(self):
+    def test_nested_svg_preserves_fragment_presentation_references(self):
         content = ('<svg viewBox="0 0 100 100"><defs><linearGradient id="paint"/></defs>'
-                   r'<style>@media all { .logo { fill: u\72l(\23 paint); } }</style>'
                    '<path class="logo" fill="url(#paint)" stroke="url(\'#paint\')" '
-                   'style="fill: var(--paint, url(&quot;#paint&quot;)); filter: url(#filter); '
-                   'background-image: image-set(url(#paint) 1x type(&quot;image/svg+xml&quot;))">'
-                   '<animate attributeName="opacity" from="0.5" to="1"/></path></svg>')
+                   r'filter="u\72l(\23 filter)" transform="translate(10 20) scale(2)"/></svg>')
         svg = ET.fromstring(icon_svg(self.svg_icon(content), 0, 0, 384))
         path = svg.find('.//{http://www.w3.org/2000/svg}path')
         self.assertEqual(path.get("fill"), "url(#paint)")
-        self.assertIn('url("#paint")', path.get("style"))
+        self.assertEqual(path.get("stroke"), "url('#paint')")
+        self.assertEqual(path.get("class"), "logo")
+
+    def test_nested_svg_rejects_foreign_namespaces(self):
+        for content in ('<iframe xmlns="http://www.w3.org/1999/xhtml" '
+                        'srcdoc="&lt;script&gt;alert(1)&lt;/script&gt;"/>',
+                        '<img xmlns="http://www.w3.org/1999/xhtml" '
+                        'srcset="https://example.invalid/icon.png 1x"/>',
+                        '<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math>',
+                        '<path xmlns="urn:unknown" d="M0 0h100v100z"/>',
+                        '<path xmlns="" d="M0 0h100v100z"/>'):
+            for wrapper in ('{}', '<svg><defs><g>{}</g></defs></svg>'):
+                with self.subTest(content=content, wrapper=wrapper):
+                    with self.assertRaisesRegex(ValueError, "SVG namespace"):
+                        icon_svg(self.svg_icon(wrapper.format(content)), 0, 0, 384)
+
+    def test_svg_rejects_elements_outside_the_allowlist(self):
+        for tag in ("unknown", "feImage", "feTurbulence", "a", "iframe", "img", "style", "text"):
+            with self.subTest(tag=tag):
+                with self.assertRaisesRegex(ValueError, "element .* is not allowed"):
+                    icon_svg(self.svg_icon(f'<svg><g><{tag}/></g></svg>'), 0, 0, 384)
+
+    def test_svg_drops_metadata_contents(self):
+        path = self.svg_icon('<metadata id="receipt">private text'
+                             '<iframe xmlns="http://www.w3.org/1999/xhtml" srcdoc="active"/>'
+                             '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
+                             '<script xmlns="http://www.w3.org/2000/svg"/></rdf:RDF></metadata>'
+                             '<path d="M0 0h100v100z" fill="red"/>')
+        svg = ET.fromstring(icon_svg(path, 0, 0, 384))
+        metadata = svg.find('{http://www.w3.org/2000/svg}metadata')
+        self.assertEqual(metadata.get("id"), "receipt")
+        self.assertEqual(list(metadata), [])
+        self.assertIsNone(metadata.text)
+        self.assertEqual(len(list(svg)), 2)
+        self.assertNotIn("active", ET.tostring(svg, encoding="unicode"))
+
+    def test_svg_accepts_composed_geometry_and_filter_inputs(self):
+        path = self.svg_icon('''
+          <title>Outlined logo</title><desc>A composed vector icon</desc>
+          <defs>
+            <linearGradient id="paint" gradientUnits="userSpaceOnUse" x1="0" x2="100">
+              <stop offset="0" stop-color="rgb(30, 100, 200)"/><stop offset="1" stop-color="blue"/>
+            </linearGradient>
+            <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5"><stop offset="1" stop-opacity="0"/></radialGradient>
+            <clipPath id="clip" clipPathUnits="userSpaceOnUse"><circle cx="50" cy="50" r="45"/></clipPath>
+            <mask id="mask" maskUnits="userSpaceOnUse"><rect width="100" height="100" fill="white"/></mask>
+            <pattern id="pattern" width="10" height="10" patternUnits="userSpaceOnUse">
+              <ellipse cx="5" cy="5" rx="2" ry="3"/>
+            </pattern>
+            <symbol id="shape" viewBox="0 0 100 100">
+              <line x1="10" y1="10" x2="90" y2="90"/>
+              <polyline points="10,10 50,90 90,10"/><polygon points="10,90 50,10 90,90"/>
+            </symbol>
+            <filter id="effect" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="blur"/>
+              <feOffset in="blur" dx="1" dy="2" result="offset"/>
+              <feBlend in="SourceGraphic" in2="offset" mode="normal"/>
+              <feColorMatrix type="saturate" values="0.8"/>
+              <feComposite in2="SourceAlpha" operator="in"/>
+              <feFlood flood-color="blue" flood-opacity="0.1" result="flood"/>
+              <feMerge><feMergeNode in="flood"/><feMergeNode in="SourceGraphic"/></feMerge>
+              <feMorphology operator="dilate" radius="1"/>
+              <feDropShadow dx="1" dy="1" stdDeviation="1"/>
+              <feComponentTransfer>
+                <feFuncR type="gamma" amplitude="1" exponent="1" offset="0"/>
+                <feFuncG type="linear" slope="1" intercept="0"/>
+                <feFuncB type="table" tableValues="0 1"/><feFuncA type="identity"/>
+              </feComponentTransfer>
+            </filter>
+          </defs>
+          <g id="logo" class="logo" fill="url(#paint)" clip-path="url(#clip)" mask="url(#mask)">
+            <use href="#shape" width="100" height="100" filter="url(#effect)"/>
+          </g>''')
+        result = ET.fromstring(icon_svg(path, 0, 0, 384))
+        self.assertIsNotNone(result.find('.//{http://www.w3.org/2000/svg}feComponentTransfer'))
+        self.assertEqual(result.find('.//{http://www.w3.org/2000/svg}use').get("href"), "#shape")
+
+    def test_svg_rejects_attributes_outside_the_allowlist(self):
+        for attribute in ('unknown="value"', 'srcdoc="active"', 'srcset="image.png 1x"',
+                          'style="fill:red"', 'onload="alert(1)"',
+                          'xml:base="https://example.test/"',
+                          'xmlns:custom="urn:custom" custom:fill="red"',
+                          'xmlns:custom="urn:custom" custom:href="#local"'):
+            with self.subTest(attribute=attribute):
+                with self.assertRaisesRegex(ValueError, "attribute .* is not allowed"):
+                    icon_svg(self.svg_icon(f'<svg><path {attribute}/></svg>'), 0, 0, 384)
+
+    def test_svg_limits_href_by_element(self):
+        for content in ('<image href="#local"/>', '<path href="#local"/>',
+                        '<linearGradient xlink:href="#base"/>', '<use href="other.svg#local"/>'):
+            with self.subTest(content=content):
+                with self.assertRaisesRegex(ValueError, "self-contained"):
+                    icon_svg(self.svg_icon(content), 0, 0, 384)
+
+    def test_svg_rejects_escaped_external_urls_and_unlisted_value_functions(self):
+        for value in (r'u\72l(\68ttps://example.test/icon.svg#paint)',
+                      'URL("https://example.test/icon.svg#paint")', 'url(#local) url(../paint.svg)',
+                      'url("https://example.test/icon.svg")', 'url(not a URL)',
+                      '"url(https://example.test/icon.svg)"',
+                      'image-set("https://example.test/icon.png" 1x)', 'unknown(#local)'):
+            with self.subTest(value=value):
+                with self.assertRaisesRegex(ValueError, "self-contained"):
+                    icon_svg(self.svg_icon(f'<path fill="{escape(value, quote=True)}"/>'), 0, 0, 384)
+
+    def test_svg_rejects_doctype_entities_and_processing_instructions(self):
+        sources = ('<!DOCTYPE svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"/>',
+                   '<!DOCTYPE svg [<!ENTITY payload "expanded">]>'
+                   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><title>&payload;</title></svg>',
+                   '<!DOCTYPE svg SYSTEM "https://example.test/external.dtd">'
+                   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"/>',
+                   '<?xml-stylesheet href="https://example.test/theme.css"?>'
+                   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"/>',
+                   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+                   '<metadata><?instruction ignored?></metadata></svg>')
+        for encoding in ("utf-8", "utf-16"):
+            for source in sources:
+                with self.subTest(encoding=encoding, source=source[:50]):
+                    path = self.root / "icon.svg"
+                    path.write_bytes(source.encode(encoding))
+                    with self.assertRaisesRegex(ValueError, "DOCTYPE|entity|processing instructions"):
+                        icon_svg(path, 0, 0, 384)
+        path = self.root / "icon.svg"
+        path.write_text('<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" '
+                        'viewBox="0 0 100 100"><title>Icon &amp; logo &#35;1</title></svg>')
+        self.assertIn("Icon & logo #1", "".join(ET.fromstring(icon_svg(path, 0, 0, 384)).itertext()))
+
+    def test_project_icon_assets_pass_validation(self):
+        skills = Path(__file__).resolve().parents[2]
+        for asset in (skills / "apple-app-icon-design/assets/icon-large.png",
+                      skills / "apple-framework-icon-design/assets/icon-large.svg"):
+            with self.subTest(asset=asset.name, skill=asset.parent.parent.name):
+                image = ET.fromstring(icon_svg(asset, 64, 128, 384))
+                self.assertEqual([image.get(key) for key in ("x", "y", "width", "height")],
+                                 ["64", "128", "384", "384"])
 
     def test_rasters_with_valid_structure_but_corrupt_pixels_are_rejected(self):
         def chunk(kind, data):

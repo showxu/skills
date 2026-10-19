@@ -98,12 +98,44 @@ def raster_info(data):
     return mime, dimensions
 
 
-DIRECT_REFERENCES = {"href", "src", "base", "data", "poster", "action", "formaction", "handler"}
-URL_PRESENTATION = {"fill", "stroke", "filter", "clip-path", "mask", "marker", "marker-start",
-                    "marker-mid", "marker-end", "cursor", "color-profile", "background",
-                    "background-image", "list-style", "list-style-image", "shape-inside",
-                    "shape-outside", "shape-subtract", "offset-path"}
-CSS_IMAGE_FUNCTIONS = {"image", "image-set", "-webkit-image-set"}
+SVG_NAMESPACE = "http://www.w3.org/2000/svg"
+XLINK_HREF = "{http://www.w3.org/1999/xlink}href"
+SVG_ELEMENTS = {
+    "svg", "g", "defs", "title", "desc", "metadata", "path", "rect", "circle", "ellipse",
+    "line", "polyline", "polygon", "linearGradient", "radialGradient", "stop", "clipPath",
+    "mask", "pattern", "symbol", "use", "image", "filter", "feGaussianBlur", "feOffset",
+    "feBlend", "feColorMatrix", "feComposite", "feFlood", "feMerge", "feMergeNode",
+    "feMorphology", "feDropShadow", "feComponentTransfer", "feFuncR", "feFuncG", "feFuncB", "feFuncA",
+}
+SVG_ATTRIBUTES = {
+    "id", "class", "x", "y", "width", "height", "viewBox", "preserveAspectRatio", "transform",
+    "d", "pathLength", "rx", "ry", "cx", "cy", "r", "x1", "y1", "x2", "y2", "points",
+    "gradientUnits", "gradientTransform", "spreadMethod", "fx", "fy", "fr", "offset",
+    "clipPathUnits", "maskUnits", "maskContentUnits", "patternUnits", "patternContentUnits",
+    "patternTransform", "filterUnits", "primitiveUnits", "in", "in2", "result", "stdDeviation",
+    "dx", "dy", "mode", "type", "values", "operator", "k1", "k2", "k3", "k4", "radius",
+    "edgeMode", "tableValues", "slope", "intercept", "amplitude", "exponent", "color", "fill",
+    "fill-opacity", "fill-rule", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin",
+    "stroke-miterlimit", "stroke-dasharray", "stroke-dashoffset", "stroke-opacity", "opacity",
+    "clip-path", "clip-rule", "mask", "filter", "marker", "marker-start", "marker-mid", "marker-end",
+    "cursor", "display", "visibility", "overflow", "paint-order", "vector-effect", "color-interpolation",
+    "color-interpolation-filters", "color-rendering", "shape-rendering", "image-rendering",
+    "stop-color", "stop-opacity", "flood-color", "flood-opacity",
+}
+SVG_VALUE_FUNCTIONS = {
+    "matrix", "translate", "scale", "rotate", "skewx", "skewy", "calc", "min", "max", "clamp",
+    "rgb", "rgba", "hsl", "hsla", "hwb", "lab", "lch", "oklab", "oklch", "color", "color-mix",
+    "blur", "brightness", "contrast", "drop-shadow", "grayscale", "hue-rotate", "invert",
+    "opacity", "saturate", "sepia", "circle", "ellipse", "inset", "path", "polygon", "rect", "xywh",
+}
+
+
+class IconTreeBuilder(ET.TreeBuilder):
+    def doctype(self, name, pubid, system):
+        raise ValueError("SVG icons must not contain DOCTYPE or entity declarations")
+
+    def pi(self, target, data):
+        raise ValueError("SVG icons must not contain processing instructions")
 
 
 def fragment_reference(value):
@@ -111,46 +143,71 @@ def fragment_reference(value):
         raise ValueError("Icon must be self-contained SVG; only fragment URLs are allowed")
 
 
-def css_references(value, strict=False):
+def attribute_urls(value):
     from tinycss2 import parse_component_value_list
 
-    def check(tokens, image_context=False):
+    def check(tokens):
         tokens = [token for token in tokens if token.type not in {"whitespace", "comment"}]
-        for index, token in enumerate(tokens):
-            if token.type == "error" and (strict or token.kind == "bad-url"):
-                raise ValueError("Icon must be self-contained SVG with valid CSS references")
-            if token.type == "string" and image_context:
-                fragment_reference(token.value)
+        for token in tokens:
             if token.type == "url":
                 fragment_reference(token.value)
-            elif token.type == "at-keyword" and token.lower_value == "import":
-                target = tokens[index + 1] if index + 1 < len(tokens) else None
-                if target is not None and target.type == "string":
-                    fragment_reference(target.value)
-                elif not (target is not None and (target.type == "url" or
-                          (target.type == "function" and target.lower_name == "url"))):
-                    raise ValueError("Icon must be self-contained SVG with a fragment CSS import")
             elif token.type == "function":
                 arguments = [item for item in token.arguments if item.type not in {"whitespace", "comment"}]
-                if image_context and token.lower_name in {"var", "env", "attr"}:
-                    raise ValueError("Icon must be self-contained SVG with literal fragment URLs")
-                if token.lower_name in {"url", "src"}:
+                if token.lower_name == "url":
                     if len(arguments) != 1 or arguments[0].type != "string":
                         raise ValueError("Icon must be self-contained SVG with literal fragment URLs")
                     fragment_reference(arguments[0].value)
-                # type() strings describe MIME types, rather than image sources.
-                sources = token.lower_name in CSS_IMAGE_FUNCTIONS or (image_context and token.lower_name != "type")
-                check(arguments, sources)
-            elif hasattr(token, "content"):
-                check(token.content, image_context)
+                elif token.lower_name not in SVG_VALUE_FUNCTIONS:
+                    raise ValueError(f"Icon must be self-contained SVG; function {token.name} is not allowed")
+                check(arguments)
+            elif token.type == "string":
+                check(parse_component_value_list(token.value, skip_comments=True))
+            elif token.type not in {"ident", "hash", "number", "percentage", "dimension", "literal"}:
+                raise ValueError("Icon must be self-contained SVG with valid attribute values")
 
     check(parse_component_value_list(value, skip_comments=True))
+
+
+def validate_svg(node):
+    namespace = "{" + SVG_NAMESPACE + "}"
+    if not node.tag.startswith(namespace):
+        raise ValueError("Icon must be self-contained SVG; elements must use the SVG namespace")
+    tag = node.tag[len(namespace):]
+    if tag not in SVG_ELEMENTS:
+        raise ValueError(f"Icon must be self-contained static SVG with outlined lettering; element {tag} is not allowed")
+    for key, value in node.attrib.items():
+        if key in {"href", XLINK_HREF}:
+            if tag == "use":
+                fragment_reference(value)
+            elif tag == "image":
+                match = re.fullmatch(r"data:(image/(?:png|jpeg|webp));base64,(.+)", value)
+                if not match:
+                    raise ValueError("Icon must be self-contained SVG; image links need raster base64 data URIs")
+                try:
+                    embedded = base64.b64decode(match[2], validate=True)
+                except binascii.Error as error:
+                    raise ValueError("Embedded raster image needs valid base64 data") from error
+                mime, _ = raster_info(embedded)
+                if mime != match[1]:
+                    raise ValueError("Embedded raster image format must match its data URI")
+            else:
+                raise ValueError("Icon must be self-contained SVG; links are allowed only on use and image")
+        elif key in SVG_ATTRIBUTES:
+            attribute_urls(value)
+        else:
+            raise ValueError(f"Icon must be self-contained SVG; attribute {key} is not allowed")
+    if tag == "metadata":
+        node[:] = []
+        node.text = None
+    else:
+        for child in node:
+            validate_svg(child)
 
 
 def icon_svg(path, x, y, size):
     data = path.read_bytes()
     try:
-        root = ET.fromstring(data)
+        root = ET.fromstring(data, parser=ET.XMLParser(target=IconTreeBuilder()))
     except ET.ParseError:
         mime, (width, height) = raster_info(data)
         if width != height:
@@ -159,39 +216,9 @@ def icon_svg(path, x, y, size):
             raise ValueError(f"Raster icon must be at least {size:g}x{size:g} pixels; got {width}x{height}")
         uri = f"data:{mime};base64," + base64.b64encode(data).decode("ascii")
         return f'<image x="{x}" y="{y}" width="{size}" height="{size}" href="{uri}"/>'
-    if root.tag.rsplit("}", 1)[-1] != "svg":
-        raise ValueError("Icon must be SVG, PNG, JPEG or WebP")
-    for node in root.iter():
-        tag = node.tag.rsplit("}", 1)[-1]
-        if tag in {"script", "foreignObject", "text"}:
-            raise ValueError("Icon must be static SVG with outlined lettering")
-        if tag == "style":
-            css_references("".join(node.itertext()), strict=True)
-        if tag in {"set", "animate", "animateColor", "animateMotion", "animateTransform"}:
-            target = node.get("attributeName", "").strip().rsplit(":", 1)[-1].lower()
-            if (target in DIRECT_REFERENCES | URL_PRESENTATION | {"style", "attributename"}
-                    or target.startswith(("marker-", "on"))):
-                raise ValueError("Icon must be self-contained SVG; animation cannot change references")
-        for key, value in node.attrib.items():
-            attribute = key.rsplit("}", 1)[-1]
-            if attribute.lower().startswith("on"):
-                raise ValueError("Icon must be self-contained SVG")
-            if attribute != "href":
-                if attribute in DIRECT_REFERENCES and not (attribute == "base" and not value):
-                    fragment_reference(value)
-                # Metadata and geometry need URL checks without requiring valid CSS.
-                css_references(value, strict=attribute == "style" or attribute in URL_PRESENTATION)
-            if attribute == "href" and not value.startswith("#"):
-                match = re.fullmatch(r"data:(image/(?:png|jpeg|webp));base64,(.+)", value)
-                if tag != "image" or not match:
-                    raise ValueError("Icon must be self-contained SVG")
-                try:
-                    embedded = base64.b64decode(match[2], validate=True)
-                except binascii.Error as error:
-                    raise ValueError("Embedded raster image needs valid base64 data") from error
-                mime, _ = raster_info(embedded)
-                if mime != match[1]:
-                    raise ValueError("Embedded raster image format must match its data URI")
+    if root.tag != "{" + SVG_NAMESPACE + "}svg":
+        raise ValueError("Icon must be self-contained SVG with a root svg element in the SVG namespace")
+    validate_svg(root)
     if "viewBox" not in root.attrib:
         raise ValueError("Icon needs a viewBox")
     root.attrib.update(x=str(x), y=str(y), width=str(size), height=str(size))
