@@ -75,8 +75,9 @@ reference and every candidate.
    line-art maps inside a window free of foreground objects. Glyphs and panels
    change the local contrast around them and bias the fit.
 4. Do not mask regions whose behavior matters. Where lines merge into the rim,
-   keep that band inside the window; a fit that excludes it can match the
-   interior and still end the lines wrongly at the edge.
+   keep that band inside the window and inspect it in enhanced crops. A fit
+   that excludes it can match the interior and still end the lines wrongly:
+   it drifts toward a constant gap where the reference tapers into the rim.
 5. Search coarse to fine: a grid over plausible values, then refinement
    around the best score.
 6. Fit opacity and contrast last, with the geometry fixed. Correlation ignores

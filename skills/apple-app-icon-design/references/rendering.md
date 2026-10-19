@@ -249,7 +249,12 @@ radii)` in the script, or print the path data with
 `--continuous-rect X Y WIDTH HEIGHT RADIUS [RADIUS RADIUS RADIUS]`. Radii are
 one value or four: top-left, top-right, bottom-right, bottom-left.
 
-- Radii above half the shorter side are reduced to it, as SVG does for `rx`.
+- When an edge cannot hold its two radii, all radii shrink by one factor
+  until every edge can, as CSS `border-radius` does; a single radius is
+  therefore at most half the shorter side. They shrink further, still
+  together, while a corner would swallow a rounded neighbour or run past a
+  sharp neighbour into the corner beyond it. A large corner beside a small one
+  otherwise keeps its radius even though its departure exceeds the edge.
 - Where the corners fit, the path is the continuous corner joined by straight
   edges; for a square it is byte-identical to the style outlines above.
 - Where two departures overrun an edge, each corner's curve is evaluated and
@@ -258,7 +263,12 @@ one value or four: top-left, top-right, bottom-right, bottom-left.
   along each end's tangent toward the tangents' intersection, two-thirds of
   the way as a quadratic would, and stop at the rectangle's edge. The join is
   tangent-continuous, and the outline stays convex and inside its rectangle.
-- The command prints `info` lines for each reduced radius and blended edge.
+- A small corner whose cut falls past its own end is consumed: the larger
+  corner's blend turns straight into the next edge, at the point where the
+  small corner would have met it. A sharp corner beside an overrunning one is
+  consumed the same way, without a blend: the larger corner is cut where it
+  meets the sharp corner's other edge.
+- The command prints `info` lines for scaled radii and each overrun edge.
 
 ## Web Icons
 

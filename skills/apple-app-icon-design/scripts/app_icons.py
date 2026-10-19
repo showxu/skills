@@ -49,6 +49,7 @@ CONTINUOUS = (1.528665, (((1.088490, 0), (0.868407, 0), (0.631494, 0.074911)),
                          ((0, 0.868407), (0, 1.088490), (0, 1.528665))))
 OVERRUN = 0.01                  # px by which two corners' departures must exceed their edge to need a blend
 BLEND_HANDLE = 2 / 3            # share of the way to the tangents' intersection, as a quadratic would reach
+SLIVER = 2                      # px below which a cut corner's end cubic cannot keep its rounded tangent
 EDGES = ("right", "bottom", "left", "top")  # the edge after each corner, clockwise from top-right
 # Legacy geometry on the 1024 px canvas, measured against Apple's production templates
 # (references/rendering.md); the gloss values are documented approximations.
@@ -348,7 +349,13 @@ def corner_cubics():
 
 
 def corner_position(axis, target):
-    """(cubic index, t) where the unit corner's u (axis 0, falling) or v (axis 1, rising) equals target."""
+    """Position from 0 to 3 along the unit corner where its u (axis 0, falling) or v (axis 1,
+    rising) equals target; targets beyond the curve clamp to its nearer end."""
+    falling = axis == 0
+    if target <= 0:
+        return 3.0 if falling else 0.0
+    if target >= CONTINUOUS[0]:
+        return 0.0 if falling else 3.0
     for index, cubic in enumerate(corner_cubics()):
         first, last = cubic[0][axis], cubic[3][axis]
         if min(first, last) <= target <= max(first, last):
@@ -359,40 +366,89 @@ def corner_position(axis, target):
                     low = middle
                 else:
                     high = middle
-            return index, (low + high) / 2
+            return index + (low + high) / 2
     fail("corner position outside the curve")
 
 
-def corner_piece(start, end):
-    """The unit corner's cubics between two (cubic index, t) positions."""
+def corner_piece(start, end, radius):
+    """The unit corner's cubics between positions start < end, from 0 at its first departure to 3.
+
+    A cubic shorter than SLIVER px at either end is dropped when others remain, so a cut corner
+    ends on a cubic boundary rather than on a sliver whose tangent rounding would bend.
+    """
     pieces = []
     for index, cubic in enumerate(corner_cubics()):
-        low = start[1] if index == start[0] else 0.0
-        high = end[1] if index == end[0] else 1.0
-        if not start[0] <= index <= end[0] or high - low < 1e-12:
+        low, high = max(start - index, 0.0), min(end - index, 1.0)
+        if high - low < 1e-12:
             continue
         if high < 1:
             cubic = split_cubic(cubic, high)[0]
         if low > 0:
             cubic = split_cubic(cubic, low / high)[1]
         pieces.append(cubic)
+    while len(pieces) > 1 and math.dist(pieces[0][0], pieces[0][3]) * radius < SLIVER:
+        pieces.pop(0)
+    while len(pieces) > 1 and math.dist(pieces[-1][0], pieces[-1][3]) * radius < SLIVER:
+        pieces.pop()
     return pieces
 
 
+def corner_inset(radius, distance):
+    """How far inside an edge a continuous corner of `radius` runs, `distance` from its vertex."""
+    if not radius or distance >= CONTINUOUS[0] * radius:
+        return 0.0
+    position = corner_position(1, distance / radius)
+    index = min(int(position), 2)
+    return cubic_point(corner_cubics()[index], position - index)[0] * radius
+
+
+def drawable(radii, lengths):
+    """Whether cutting and blending overrunning corners outlines these radii without a notch."""
+    departure = CONTINUOUS[0]
+    for i in range(4):
+        a, b, length = radii[i], radii[(i + 1) % 4], lengths[i]
+        if departure * (a + b) - length <= OVERRUN:
+            continue
+        if a and b:
+            # Neither corner may run deeper past the other's vertex than that corner reaches.
+            if corner_inset(a, length) > departure * b or corner_inset(b, length) > departure * a:
+                return False
+            continue
+        # A corner cut at a sharp neighbour's other edge must meet that edge before the corner
+        # beyond it begins.
+        if a:
+            big, far, other = a, radii[(i + 2) % 4], lengths[(i + 1) % 4]
+        else:
+            big, far, other = b, radii[(i - 1) % 4], lengths[(i - 1) % 4]
+        if corner_inset(big, length) > other - departure * far:
+            return False
+    return True
+
+
 def continuous_corners(width, height, radii):
-    """Radii in drawing order (top-right, bottom-right, bottom-left, top-left), each capped at half
-    the shorter side, and how far each following edge's two corner departures exceed its length."""
+    """Radii in drawing order (top-right, bottom-right, bottom-left, top-left), the factor that
+    scaled them, and how far each following edge's two corner departures exceed its length."""
     values = [radii] * 4 if isinstance(radii, (int, float)) else list(radii)
     if len(values) != 4 or any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v)
                                for v in (width, height, *values)):
         fail("a continuous rectangle needs a finite size and one or four finite radii")
     if width <= 0 or height <= 0 or min(values) < 0:
         fail("a continuous rectangle needs a positive size and radii of at least zero")
-    limit = min(width, height) / 2
-    top_left, top_right, bottom_right, bottom_left = (min(v, limit) for v in values)
-    radii = (top_right, bottom_right, bottom_left, top_left)
+    top_left, top_right, bottom_right, bottom_left = values
+    requested = (top_right, bottom_right, bottom_left, top_left)
     lengths = (height, width, height, width)
-    return radii, [CONTINUOUS[0] * (radii[i] + radii[(i + 1) % 4]) - lengths[i] for i in range(4)]
+    # As CSS border-radius does, shrink all radii together until every edge holds its two radii,
+    # then further while a corner would swallow its neighbour.
+    scale = min([1.0] + [lengths[i] / (requested[i] + requested[(i + 1) % 4])
+                         for i in range(4) if requested[i] + requested[(i + 1) % 4] > lengths[i]])
+    if not drawable(tuple(r * scale for r in requested), lengths):
+        low, high = 0.0, scale
+        for _ in range(48):
+            middle = (low + high) / 2
+            low, high = (middle, high) if drawable(tuple(r * middle for r in requested), lengths) else (low, middle)
+        scale = low
+    radii = tuple(r * scale for r in requested) if scale < 1 else requested
+    return radii, scale, [CONTINUOUS[0] * (radii[i] + radii[(i + 1) % 4]) - lengths[i] for i in range(4)]
 
 
 def tangent_blend(p, p_direction, q, q_direction, box):
@@ -426,61 +482,115 @@ def tangent_blend(p, p_direction, q, q_direction, box):
 def continuous_rect(x, y, width, height, radii):
     """Path data for a rectangle with Apple continuous corners of one or four radii.
 
-    `radii` is one radius or (top-left, top-right, bottom-right, bottom-left), each capped at half
-    the shorter side. Where an edge is shorter than its two corners' departures, each corner stops
-    where the other leaves that edge and a tangent cubic joins them instead of a line that doubles
-    back (references/rendering.md).
+    `radii` is one radius or (top-left, top-right, bottom-right, bottom-left), scaled together if an
+    edge cannot hold its two radii. Where an edge is shorter than its two corners' departures, each
+    corner stops where the other leaves that edge and a tangent cubic joins them instead of a line
+    that doubles back; a corner that ends before it starts is consumed (references/rendering.md).
     """
-    radii, excess = continuous_corners(width, height, radii)
+    radii, _, excess = continuous_corners(width, height, radii)
     if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v)
            for v in (x, y, x + width, y + height)):
         fail("a continuous rectangle needs a finite position and extent")
     lengths = (height, width, height, width)
     frames = (((x + width, y), (-1, 0), (0, 1)), ((x + width, y + height), (0, -1), (-1, 0)),
               ((x, y + height), (1, 0), (0, -1)), ((x, y), (0, 1), (1, 0)))
-    corners, tangents = [], []
+    overrun = [e > OVERRUN for e in excess]
+    # Two rounded corners overrunning their edge are joined by a blend; a sharp corner is not.
+    blended = [overrun[i] and radii[i] > 0 and radii[(i + 1) % 4] > 0 for i in range(4)]
+    elements = []  # (corner, start, leave, cubics, end, arrive) in drawing order
     for i, ((cx, cy), e1, e2) in enumerate(frames):
         radius = radii[i]
+
+        def place(u, v):
+            return (cx + u * radius * e1[0] + v * radius * e2[0], cy + u * radius * e1[1] + v * radius * e2[1])
+
+        def direction(u, v):
+            # Directions from the unit frame keep their precision far from the origin.
+            return (u * e1[0] + v * e2[0], u * e1[1] + v * e2[1])
         if not radius:
-            corners.append([])
-            tangents.append(None)
+            if not (overrun[i - 1] or overrun[i]):
+                elements.append((i, (cx, cy), None, [], (cx, cy), None))
             continue
-        start, end = (0, 0.0), (len(CONTINUOUS[1]) - 1, 1.0)
-        if excess[i - 1] > OVERRUN:
-            start = corner_position(0, (lengths[i - 1] - CONTINUOUS[0] * radii[i - 1]) / radius)
-        if excess[i] > OVERRUN:
-            end = corner_position(1, (lengths[i] - CONTINUOUS[0] * radii[(i + 1) % 4]) / radius)
-        pieces = corner_piece(start, end)
-        corners.append([tuple((cx + u * radius * e1[0] + v * radius * e2[0], cy + u * radius * e1[1] + v * radius * e2[1])
-                              for u, v in cubic) for cubic in pieces])
-        # Directions from the unit frame keep their precision far from the origin.
-        leave = (pieces[0][1][0] - pieces[0][0][0], pieces[0][1][1] - pieces[0][0][1])
-        arrive = (pieces[-1][3][0] - pieces[-1][2][0], pieces[-1][3][1] - pieces[-1][2][1])
-        tangents.append(tuple((u * e1[0] + v * e2[0], u * e1[1] + v * e2[1]) for u, v in (leave, arrive)))
+        start = corner_position(0, (lengths[i - 1] - CONTINUOUS[0] * radii[i - 1]) / radius) if overrun[i - 1] else 0.0
+        end = corner_position(1, (lengths[i] - CONTINUOUS[0] * radii[(i + 1) % 4]) / radius) if overrun[i] else 3.0
+        pieces = corner_piece(start, end, radius) if start < end else []
+        if pieces:
+            elements.append((i, place(*pieces[0][0]), direction(*(b - a for a, b in zip(pieces[0][0], pieces[0][1]))),
+                             [tuple(place(*point) for point in cubic) for cubic in pieces],
+                             place(*pieces[-1][3]), direction(*(b - a for a, b in zip(pieces[-1][2], pieces[-1][3])))))
+        elif overrun[i - 1] != overrun[i]:
+            # Consumed from one side only: keep the end that meets the edge that does not overrun.
+            first, last = corner_cubics()[0], corner_cubics()[-1]
+            point, tangent = ((last[3], (b - a for a, b in zip(last[2], last[3]))) if not overrun[i]
+                              else (first[0], (b - a for a, b in zip(first[0], first[1]))))
+            tangent = direction(*tangent)
+            elements.append((i, place(*point), tangent, [], place(*point), tangent))
+    if not elements:
+        fail("a continuous rectangle with these radii has no outline")
 
     def at(point):
         if not all(map(math.isfinite, point)):
             fail("a continuous rectangle this large has no finite outline")
         return f"{point[0]:.2f} {point[1]:.2f}"
 
-    def join(i):
-        """The connection from corner i to the start of the next corner."""
-        after = corners[(i + 1) % 4]
-        target = after[0][0] if after else frames[(i + 1) % 4][0]
-        if excess[i] <= OVERRUN:
-            return "L" + at(target)
-        p, q = corners[i][-1][3], after[0][0]
-        handles = tangent_blend(p, tangents[i][1], q, tangents[(i + 1) % 4][0], (x, y, x + width, y + height))
-        return f"C{at(handles[0])} {at(handles[1])} {at(q)}" if handles else "L" + at(q)
+    def join(element, after):
+        """The connection from an element's end to the start of the next."""
+        edges = range(element[0], element[0] + ((after[0] - element[0]) % 4 or 4))
+        if any(blended[edge % 4] for edge in edges) and element[5] and after[2]:
+            handles = tangent_blend(element[4], element[5], after[1], after[2], (x, y, x + width, y + height))
+            if handles:
+                return f"C{at(handles[0])} {at(handles[1])} {at(after[1])}"
+        return "L" + at(after[1])
 
-    path = ["M" + at(corners[0][0][0] if corners[0] else frames[0][0])]
-    for i, cubics in enumerate(corners):
-        path.append("".join(f"C{at(b)} {at(c)} {at(d)}" for _, b, c, d in cubics))
-        if i < 3:
-            path.append(join(i))
-    if excess[3] > OVERRUN:
-        path.append(join(3))
+    path = ["M" + at(elements[0][1])]
+    for index, element in enumerate(elements):
+        path.append("".join(f"C{at(b)} {at(c)} {at(d)}" for _, b, c, d in element[3]))
+        if index < len(elements) - 1:
+            path.append(join(element, elements[index + 1]))
+    closing = join(elements[-1], elements[0])
+    if closing.startswith("C"):
+        path.append(closing)
     return "".join(path) + "Z"
+
+
+def grid_backdrop(lines=(256, 512, 768), width=10, inset=25, radius=189, turn=30, opacity=1):
+    """SVG layer of a design-grid backdrop on the 1024 px canvas, filled white.
+
+    Vertical and horizontal lines `width` wide cross the canvas at `lines`; the inner ones run
+    into the icon's rim. Only the four corner cells carry an outer edge: a continuous corner of
+    `radius`, `inset` from the canvas edge, that turns into the outer lines within `turn` px.
+    `opacity` fades the whole layer, for styles that ignore native layer opacity.
+    """
+    values = (*lines, width, inset, radius, turn, opacity)
+    if len(lines) < 2 or any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v)
+                             for v in values):
+        fail("a grid backdrop needs at least two finite line positions and finite sizes")
+    first, last, half = min(lines), max(lines), width / 2
+    if not (0 < half <= inset and width < first - inset and 0 <= turn and 0 <= radius and 0 < opacity <= 1
+            and inset + turn < first < last < 1024 - inset - turn):
+        fail("grid backdrop edges must stay on the canvas and lines between the corner turns, "
+             "with opacity above 0 and at most 1")
+    small = turn / CONTINUOUS[0]
+    cells = (((inset, inset, first, first), (radius, small, 0, small)),
+             ((last, inset, 1024 - inset, first), (small, radius, small, 0)),
+             ((last, last, 1024 - inset, 1024 - inset), (0, small, radius, small)),
+             ((inset, last, first, 1024 - inset), (small, 0, small, radius)))
+    shapes = []
+    for (x0, y0, x1, y1), radii in cells:
+        # The edge is the band between the cell's outline grown and shrunk by half the width.
+        outer = continuous_rect(x0 - half, y0 - half, x1 - x0 + width, y1 - y0 + width,
+                                tuple(r + half if r else 0 for r in radii))
+        inner = continuous_rect(x0 + half, y0 + half, x1 - x0 - width, y1 - y0 - width,
+                                tuple(max(r - half, 0) for r in radii))
+        shapes.append(f'<path fill-rule="evenodd" d="{outer}{inner}"/>')
+    for position in sorted(lines):
+        start, end = (inset + turn, 1024 - inset - turn) if position in (first, last) else (0, 1024)
+        for x0, y0, x1, y1 in ((position - half, start, position + half, end),
+                               (start, position - half, end, position + half)):
+            shapes.append(f'<path d="M{x0:g} {y0:g}H{x1:g}V{y1:g}H{x0:g}Z"/>')
+    fade = f' opacity="{opacity:g}"' if opacity < 1 else ""
+    return ('<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">'
+            f'<g fill="#FFFFFF"{fade}>{"".join(shapes)}</g></svg>\n')
 
 
 def shape(style):
@@ -1159,24 +1269,39 @@ def main():
     mode.add_argument("--continuous-rect", nargs="+", type=float, metavar="N",
                       help="print path data for X Y WIDTH HEIGHT and one radius or four "
                            "(top-left, top-right, bottom-right, bottom-left); takes no DESIGN.md")
+    mode.add_argument("--grid-backdrop", nargs="*", metavar="KEY=VALUE",
+                      help="print a grid backdrop SVG layer, overriding lines, width, inset, radius, "
+                           "turn, or opacity; takes no DESIGN.md")
     parser.add_argument("--name", action="append", default=[])
     parser.add_argument("--style", choices=STYLES)
     parser.add_argument("--document-only", action="store_true")
     parser.add_argument("--ictool", help="path to Icon Composer's export-capable ictool")
     args = parser.parse_args()
-    if (args.design is None) == (args.continuous_rect is None):
-        parser.error("DESIGN.md is required, except with --continuous-rect, which takes none")
+    if (args.design is None) != (args.continuous_rect is not None or args.grid_backdrop is not None):
+        parser.error("DESIGN.md is required, except with --continuous-rect or --grid-backdrop, which take none")
     try:
+        if args.grid_backdrop is not None:
+            options = {}
+            for item in args.grid_backdrop:
+                key, _, value = item.partition("=")
+                if key not in ("lines", "width", "inset", "radius", "turn", "opacity") or key in options:
+                    fail(f"--grid-backdrop takes lines, width, inset, radius, turn, or opacity once each, not {item}")
+                try:
+                    options[key] = tuple(map(float, value.split(","))) if key == "lines" else float(value)
+                except ValueError:
+                    fail(f"--grid-backdrop {key} needs numbers")
+            print(grid_backdrop(**options), end="")
+            return 0
         if args.continuous_rect is not None:
             if len(args.continuous_rect) not in (5, 8):
                 fail("--continuous-rect takes X Y WIDTH HEIGHT and one or four radii")
             x, y, width, height, *radii = args.continuous_rect
             radii = radii[0] if len(radii) == 1 else radii
             print(continuous_rect(x, y, width, height, radii))
-            limit = min(width, height) / 2
-            for radius in sorted({r for r in args.continuous_rect[4:] if r > limit}):
-                print(f"info\tradius {radius:g} exceeds half the shorter side; using {limit:g}", file=sys.stderr)
-            for edge, excess in zip(EDGES, continuous_corners(width, height, radii)[1]):
+            _, scale, overruns = continuous_corners(width, height, radii)
+            if scale < 1:
+                print(f"info\tradii scaled by {scale:.4g} so that each edge holds its two radii", file=sys.stderr)
+            for edge, excess in zip(EDGES, overruns):
                 if excess > OVERRUN:
                     print(f"info\t{edge} edge: corner departures exceed it by {excess:.2f}; "
                           "the corners end early and a tangent cubic joins them", file=sys.stderr)

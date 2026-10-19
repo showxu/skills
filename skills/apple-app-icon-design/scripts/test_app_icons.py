@@ -339,7 +339,9 @@ def path_cubics(d):
 class ContinuousRectTests(unittest.TestCase):
     shapes = [(0, 0, 300, 100, 50), (0, 0, 100, 100, 40), (10, 20, 300, 100, (10, 50, 30, 0)),
               (0, 0, 300, 100, (45, 45, 20, 20)), (5, 5, 80, 300, (40, 10, 40, 10)), (0, 0, 120, 100, 49),
-              (0, 0, 100, 100, 50), (0, 0, 100, 100, (50, 0, 50, 0))]
+              (0, 0, 100, 100, 50), (0, 0, 100, 100, (50, 0, 50, 0)), (0, 0, 100, 100, (80, 10, 0, 20)),
+              (25, 25, 231, 231, (189, 30 / app_icons.CONTINUOUS[0], 0, 30 / app_icons.CONTINUOUS[0])),
+              (0, 0, 300, 100, (40, 60, 40, 60))]
 
     def test_feasible_corners_meet_each_edge_at_their_departure(self):
         k = app_icons.CONTINUOUS[0]
@@ -372,9 +374,10 @@ class ContinuousRectTests(unittest.TestCase):
                         self.assertGreater(cosine, 0.999, f"joint at {joint} must be tangent")
 
     def test_overrun_is_measured_per_edge(self):
-        radii, excess = app_icons.continuous_corners(300, 100, (10, 50, 30, 0))
+        radii, scale, excess = app_icons.continuous_corners(300, 100, (10, 50, 30, 0))
         k = app_icons.CONTINUOUS[0]
-        self.assertEqual(radii, (50, 30, 0, 10))
+        self.assertEqual((radii, scale), ((50, 30, 0, 10), 1))
+        self.assertEqual(app_icons.continuous_corners(100, 100, (80, 80, 0, 0))[:2], ((50, 0, 0, 50), 0.625))
         self.assertAlmostEqual(excess[0], k * 80 - 100)
         self.assertTrue(all(e < 0 for e in excess[1:]))
         self.assertEqual(app_icons.continuous_rect(0, 0, 300, 100, 80), app_icons.continuous_rect(0, 0, 300, 100, 50))
@@ -385,6 +388,33 @@ class ContinuousRectTests(unittest.TestCase):
                                     ((True, 0), (10, 10), 1), ((1e308, 0), (1e308, 10), 1)):
             with self.subTest(origin=origin, size=size, radii=radii), self.assertRaises(ValueError):
                 app_icons.continuous_rect(*origin, *size, radii)
+
+    def test_large_corners_consume_small_neighbours(self):
+        k = app_icons.CONTINUOUS[0]
+        cell = app_icons.continuous_rect(25, 25, 231, 231, (189, 30 / k, 0, 30 / k))
+        segments = app_icons.path_segments(cell)[0][0]
+        ends = [segment[2] for segment in segments]
+        # The small corners leave only the points where they meet the inner edges.
+        self.assertIn((256.0, 55.0), ends)
+        self.assertIn((55.0, 256.0), ends)
+        self.assertIn((256.0, 256.0), ends)
+        sharp = app_icons.continuous_rect(0, 0, 231, 231, (189, 0, 0, 0))
+        top = [s for s in app_icons.path_segments(sharp)[0][0] if s[2][0] == 231.0 and s[0][0] < 231.0]
+        self.assertEqual(len(top), 1, "the corner meets the sharp corner's other edge, then follows it")
+        self.assertLess(top[0][2][1], 1.0)
+        random = __import__("random").Random(11)
+        for _ in range(200):
+            width, height = random.uniform(1, 600), random.uniform(1, 600)
+            radii = tuple(random.choice((0, random.uniform(0, 20), random.uniform(0, 700))) for _ in range(4))
+            with self.subTest(size=(width, height), radii=radii):
+                path = app_icons.continuous_rect(0, 0, width, height, radii)
+                self.assertEqual(app_icons.doubled_back(layer(path)), [])
+                points = [app_icons.cubic_point(c, t / 20) for c in path_cubics(path) for t in range(20)]
+                self.assertTrue(all(-0.005 <= px <= width + 0.005 and -0.005 <= py <= height + 0.005
+                                    for px, py in points))
+                turns = [(b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0])
+                         for a, b, c in zip(points, points[1:] + points[:1], points[2:] + points[:2])]
+                self.assertGreaterEqual(min(turns), -0.05, "outline must stay convex")
 
     def test_barely_overrunning_corners_stay_well_formed_at_any_scale(self):
         k = app_icons.CONTINUOUS[0]
@@ -404,7 +434,7 @@ class ContinuousRectTests(unittest.TestCase):
         self.assertEqual(run.returncode, 0, run.stderr)
         self.assertEqual(run.stdout, app_icons.continuous_rect(0, 0, 300, 100, 50) + "\n")
         self.assertEqual([line.split(":")[0] for line in run.stderr.splitlines()],
-                         ["info\tradius 60 exceeds half the shorter side; using 50", "info\tright edge",
+                         ["info\tradii scaled by 0.8333 so that each edge holds its two radii", "info\tright edge",
                           "info\tleft edge"])
         for args, code in ((["--continuous-rect", "0", "0", "3", "3"], 1), (["--list"], 2),
                            (["--continuous-rect", "nan", "0", "100", "100", "20"], 1),
@@ -413,6 +443,49 @@ class ContinuousRectTests(unittest.TestCase):
                 run = subprocess.run([sys.executable, str(SCRIPT), *args], capture_output=True, text=True,
                                      env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
                 self.assertEqual(run.returncode, code, run.stderr)
+
+
+class GridBackdropTests(unittest.TestCase):
+    def test_default_backdrop(self):
+        svg = app_icons.grid_backdrop()
+        app_icons.validate_svg(svg.encode())
+        self.assertEqual(app_icons.doubled_back(svg), [])
+        paths = re.findall(r'<path( fill-rule="evenodd")? d="([^"]+)"/>', svg)
+        self.assertEqual(sum(bool(rule) for rule, _ in paths), 4)
+        lines = [d for rule, d in paths if not rule]
+        self.assertIn("M507 0H517V1024H507Z", lines)
+        self.assertIn("M251 55H261V969H251Z", lines)
+        self.assertIn("M55 763H969V773H55Z", lines)
+        self.assertEqual(len(lines), 6)
+        self.assertNotIn("opacity", svg)
+        self.assertIn('<g fill="#FFFFFF" opacity="0.2">', app_icons.grid_backdrop(opacity=0.2))
+
+    def test_corner_edge_peels_out_of_the_glass_rim(self):
+        k = app_icons.CONTINUOUS[0]
+        edge = path_cubics(app_icons.continuous_rect(25, 25, 231, 231, (189, 30 / k, 0, 30 / k)))
+        l, c1, c2, d = (v * 1024 for v in app_icons.CORNER)
+        rim = [app_icons.cubic_point(c, t / 400) for c in (((0, l), (0, c1), (0, c2), (d, d)),
+                                                            ((d, d), (c2, 0), (c1, 0), (l, 0))) for t in range(401)]
+        points = [app_icons.cubic_point(c, t / 200) for c in edge for t in range(201)]
+
+        def gap(point):
+            return min(math.dist(point, r) for r in rim)
+        turn = min((p for p in points if 225 <= p[0] <= 227 and p[1] < 100), key=lambda p: p[1])
+        diagonal = min(points, key=lambda p: abs(p[0] - p[1]) + p[0])
+        self.assertGreater(gap(turn), 18)
+        self.assertLess(gap(diagonal), 4)
+
+    def test_command_prints_backdrop_with_overrides(self):
+        def run(*args):
+            return subprocess.run([sys.executable, str(SCRIPT), "--grid-backdrop", *args], capture_output=True,
+                                  text=True, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+        result = run("opacity=0.2", "lines=200,512,824", "radius=150")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, app_icons.grid_backdrop(lines=(200, 512, 824), radius=150, opacity=0.2))
+        for args in (["color=red"], ["opacity=0.2", "opacity=0.3"], ["radius=big"], ["inset=300"], ["opacity=0"],
+                     ["lines=512"], ["width=200"]):
+            with self.subTest(args=args):
+                self.assertEqual(run(*args).returncode, 1)
 
 
 class PathReversalTests(unittest.TestCase):
@@ -571,6 +644,22 @@ class StyleRenderingTests(unittest.TestCase):
             "<path ", '<path fill="white" '))
         result = self.invoke("--lint", "--style", "flat")
         self.assertEqual((result.returncode, result.stdout), (0, "clean\n"), result.stderr)
+
+
+    def test_lint_reports_backdrop_texture_without_stray_segments(self):
+        (self.root / "grid.svg").write_text(app_icons.grid_backdrop())
+        spec = {"background": "#0A84FF", "groups": [
+            {"name": "Grid", "specular": False, "shadow": {"kind": "none", "opacity": 0},
+             "layers": [{"source": "grid.svg", "opacity": 0.2}]},
+            {"name": "Panel", "layers": [{"source": "glyph.svg"}]}]}
+        self.design.write_text("# Design\n\n## Iconography\n\n```json\n" +
+                               json.dumps({"app_icons": {"example": spec}}) + "\n```\n")
+        result = self.invoke("--lint")
+        self.assertEqual(result.returncode, 1)
+        for expected in ("Grid: 0.8% of the artwork falls outside the shape", "Grid: 1 shape(s) narrower than 1 px",
+                         "Panel: lightness 1.00 is too close to Grid 1.00"):
+            self.assertIn(expected, result.stdout)
+        self.assertNotIn("doubles back", result.stdout)
 
 
 class MaterialTests(unittest.TestCase):

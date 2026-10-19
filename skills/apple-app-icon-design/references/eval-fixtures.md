@@ -432,3 +432,56 @@ Owner notes:
 
 - Geometry and lint rules are owned by
   [rendering](rendering.md#continuous-rectangles).
+
+## grid-backdrop
+
+Target behavior: a design-grid backdrop is drawn as an original, flat texture
+layer whose corner edges peel out of the glass rim.
+
+Input prompt: "Put a subtle design grid behind our build tool's glyph, like
+the grids behind developer-tool icons."
+
+Context and files:
+
+- An entry with an original foreground and a Liquid Glass style; the layer
+  from `--grid-backdrop`.
+
+Expected output:
+
+- The grid in its own group with specular off, no shadow, and layer opacity
+  near 0.2; lines at 25%, 50%, and 75%, the middle ones running into the rim;
+  corner edges only in the corner cells, turning into the outer lines.
+- Lint findings for thin lines, corner edges crossing the outline, and
+  lightness against a light foreground, recorded as owner decisions.
+- Style renderings, if delivered, use a style layer generated with
+  `opacity=0.2`.
+
+Forbidden behavior:
+
+- Describing or packaging the result as a copy of an existing app icon,
+  pairing the grid with another app's foreground motif, drawing a full inner
+  border or cell edges along the rim, enabling specular on the grid, or
+  drawing the corner edge as a plain rounded rectangle that leaves a stray
+  segment.
+
+Acceptance checks:
+
+- `--lint` reports no doubled-back line; the grid tests in
+  `scripts/test_app_icons.py` pass, including the edge's gap to the glass
+  outline tapering from more than 18 px at the turn to under 4 px on the
+  diagonal.
+- Native Default and Dark exports show flat lines at small and large sizes.
+
+Baseline expectation:
+
+- Without the recipe, an agent draws a uniform inset border, leaves specular
+  on so the lines look like embossed tubes, or hits the corner overrun.
+
+Evidence sources:
+
+- The generated layer, native exports, lint output, and backdrop tests.
+
+Owner notes:
+
+- The recipe is owned by [design](design.md#grid-backdrop); its geometry by
+  [rendering](rendering.md#continuous-rectangles).
