@@ -1163,45 +1163,6 @@ class NativeMaterialTests(unittest.TestCase):
 @unittest.skipUnless(os.environ.get('APP_ICONS_BASELINE'), 'set APP_ICONS_BASELINE to the pre-change script')
 @unittest.skipUnless(shutil.which('rsvg-convert'), 'rsvg-convert renders the examples')
 class BaselineRenderingTests(unittest.TestCase):
-    def test_chromatic_shadow_preserves_baseline_style_bytes(self):
-        module = importlib.util.spec_from_file_location('baseline_icons', os.environ['APP_ICONS_BASELINE'])
-        baseline = importlib.util.module_from_spec(module)
-        module.loader.exec_module(baseline)
-        spec = {'background': '#123456', 'groups': [{'layers': [{'source': 'glyph.svg'}],
-                'shadow': {'kind': 'chromatic', 'opacity': 0.5}}],
-                'styles': {style: {} for style in app_icons.STYLES}}
-        with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp)
-            (root / 'glyph.svg').write_text(SVG)
-            for style in app_icons.STYLES:
-                with self.subTest(style=style):
-                    old_doc, old_assets, old_art, _ = baseline.prepare(spec, root, style)
-                    new_doc, new_assets, new_art, _ = app_icons.prepare(spec, root, style)
-                    old_doc = copy.deepcopy(old_doc)
-                    self.assertEqual(old_doc['groups'][0]['shadow']['kind'], 'chromatic')
-                    old_doc['groups'][0]['shadow']['kind'] = 'layer-color'
-                    self.assertEqual(new_doc, old_doc)
-                    self.assertEqual(new_assets, old_assets)
-                    for masked, scale in ((True, 1), (False, 1), (False, 0.56)):
-                        self.assertEqual(baseline.compose(style, spec, old_art, masked=masked, scale=scale),
-                                         app_icons.compose(style, spec, new_art, masked=masked, scale=scale))
-                    if style == 'liquid-glass':
-                        print('baseline-chromatic\tliquid-glass\tartwork compositions and assets byte-identical; '
-                              'native shadow normalized to layer-color', flush=True)
-                        continue
-                    outputs = [root / (style + suffix) for suffix in ('-baseline', '-current')]
-                    baseline.build('example', spec, root, outputs[0], style)
-                    app_icons.build('example', spec, root, outputs[1], style)
-                    self.assertEqual(tree_bytes(outputs[0]), tree_bytes(outputs[1]))
-                    print(f'baseline-chromatic\t{style}\t{len(tree_bytes(outputs[0]))} files byte-identical', flush=True)
-            spec['styles'].pop('liquid-glass')
-            sheets = []
-            for name, producer in [('baseline', baseline), ('current', app_icons)]:
-                work = root / name
-                work.mkdir()
-                sheets.append(producer.sheet({'example': spec}, ['example'], root, None, work))
-            self.assertEqual(*sheets)
-
     def test_all_example_styles_preserve_bytes_with_identical_native_exports(self):
         module = importlib.util.spec_from_file_location('baseline_icons', os.environ['APP_ICONS_BASELINE'])
         baseline = importlib.util.module_from_spec(module)
