@@ -1,0 +1,24 @@
+{
+  "kind": "app",
+  "components": ["bundled CLI"],
+  "source": "open",
+  "visibility": "public",
+  "summary": "Keep every display in step from the menu bar.",
+  "statements": [
+    {"item": "download", "value": "Parcel-1.4.0-universal.dmg with SHA256SUMS from the latest release", "owner": "swiftpm-macos-app-packaging"},
+    {"item": "download", "value": "brew install --cask example-team/tap/parcel", "owner": "homebrew"},
+    {"item": "requirements", "value": "macOS 14 or later; Apple silicon or Intel", "owner": "swiftpm-macos-app-packaging"},
+    {"item": "capabilities", "value": ["Match brightness across displays", "Switch inputs from the menu bar", "Schedule warmth by time of day"], "owner": "product"},
+    {"item": "getting started", "value": ["Install", "Open Parcel from Applications", "Grant Accessibility", "Move the brightness slider and watch every display follow"], "owner": "product"},
+    {"item": "permissions", "value": [{"permission": "Accessibility", "feature": "keyboard shortcuts"}], "owner": "macos-tcc-permissions-patterns"},
+    {"item": "privacy", "value": "No data leaves the Mac", "owner": "product"},
+    {"item": "privacy policy", "value": "PRIVACY.md", "owner": "product"},
+    {"item": "support", "value": "GitHub issues with app version and build, macOS version, Mac model and `parcel doctor --json` output", "owner": "repository-docs"},
+    {"item": "release notes", "value": "CHANGELOG.md", "owner": "release skill"},
+    {"item": "bundled CLI", "value": "Install from Settings > Command Line; run `parcel status`", "owner": "cli-creator"},
+    {"item": "build from source", "value": "swift build -c release; Scripts/package-app", "owner": "swiftpm-readme"},
+    {"item": "license", "value": "Apache-2.0", "owner": "repository"}
+  ],
+  "quick_look": "the menu with three displays at matched brightness",
+  "design": null
+}

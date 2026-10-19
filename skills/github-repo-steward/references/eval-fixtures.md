@@ -72,102 +72,6 @@ Owner notes:
 
 - Fixture values are synthetic inputs, not reusable project conventions.
 
-## long-card-title
-
-Target behavior: long card title.
-
-Input prompt: "Render a social card for sample-appstoreconnect. Keep its full name and summary readable."
-
-Context and files:
-
-- Use a licensed input font and fixture icon; default text width. Also test a longer multi-segment name and adjacent separators.
-
-Expected output:
-
-- Try a single-line title from maximum down to the stated minimum; use balanced separator boundaries only when necessary. Never leave a dangling hyphen or split arbitrary letters.
-
-Forbidden behavior:
-
-- Special-case a repository name, split off a short prefix ending in a hyphen, truncate text or shrink About.
-
-Acceptance checks:
-
-- Layout receipt shows one-line sample-appstoreconnect within its width, title at least minimum, complete About at 32 px in at most three lines; narrower multi-segment names wrap legibly.
-
-Baseline expectation:
-
-- A fixed-size title renderer can produce an orphaned prefix or clipping.
-
-Evidence sources:
-
-- Executor output, command trace, generated artifacts and captured observations.
-
-Owner notes:
-
-- Fixture values are synthetic inputs, not reusable project conventions.
-
-## social-card-icon
-
-Target behavior: social card icon validation and embedding.
-
-Input prompt: "Render our social preview using this accepted PNG app icon, then check that the exported card is current."
-
-Context and files:
-
-- A project recipe, licensed fonts and a square 1024 px PNG app icon. Exercise
-  JPEG and WebP variants, an outlined SVG containing an embedded raster, nested
-  XHTML iframe/srcdoc and img/srcset, MathML, unknown SVG elements and attributes,
-  style declarations, external presentation URLs, animation and metadata with
-  foreign children. Include a real app-icon PNG and a generated framework-logo
-  SVG, a nonsquare raster, an unsupported format and a 256 px raster at the
-  default icon size. Include corrupt PNG pixel streams with valid chunk
-  checksums, truncated JPEGs and a corrupt later animation frame, both as files
-  and embedded SVG images.
-
-Expected output:
-
-- Preserve the accepted icon's exact bytes in a base64 image data URI at the
-  recipe's icon position and size. Accept self-contained SVGs with PNG, JPEG or
-  WebP base64 images; report clear validation failures for invalid inputs.
-
-Forbidden behavior:
-
-- Replace the icon's style, upscale a small raster, allow other non-fragment
-  references or active SVG content, or overwrite exports during `--check`.
-
-Acceptance checks:
-
-- Decoding the card's raster data URI reproduces the input file byte for byte;
-  the layout receipt records that file's SHA-256.
-- Square rasters at or above `icon_size` pass; nonsquare, too-small, unsupported
-  and corrupt rasters fail. Each raster is verified and fully decoded in every
-  frame. SVGs retain only allowlisted SVG-namespace elements, attributes and
-  value functions. Metadata contents are dropped. Only `use` accepts fragment
-  links and only `image` accepts matching PNG, JPEG or WebP base64 data links;
-  attribute `url()` references must be fragments. Foreign namespaces outside
-  metadata, unknown elements/attributes, styles, animation, scripts and live
-  text fail at every depth. DOCTYPE/entity declarations and processing
-  instructions fail in UTF-8 and UTF-16 input.
-- Both real icon types still render complete social cards with deterministic
-  receipts and unchanged icon pixels compared with their source exports.
-- Repeated renders and `--check` are deterministic. Changing icon bytes,
-  including metadata alone, causes `--check` to fail without changing exports.
-
-Baseline expectation:
-
-- A blocklist can admit foreign-namespace elements or attributes carrying
-  active content; structure-only raster checks can accept undecodable pixels.
-
-Evidence sources:
-
-- Input bytes, generated SVG and layout receipt, validation errors and command
-  exit codes.
-
-Owner notes:
-
-- Fixture images are synthetic; their dimensions are case inputs. The minimum
-  accepted raster dimensions come from the recipe's rendered icon size.
-
 ## audit-drift
 
 Target behavior: audit drift.
@@ -353,10 +257,10 @@ Context and files:
 Expected output:
 
 - Route Swift facts to swiftpm-readme with the repository, accepted
-  revision and section skeleton; use its reported badge values, Install line
-  and snippet check result; compose the header, badge selection, order and
-  styling, navigation and skeleton from the applicable DESIGN; keep social
-  cards and terminal demos on this skill's renderers.
+  revision and the section skeleton of the README layout; use its reported
+  badge values, Install line and snippet check result; hand the information
+  set and the applicable DESIGN to github-readme-design for the header, badge
+  styling, navigation, layout and images; keep settings and uploads here.
 
 Forbidden behavior:
 
@@ -367,8 +271,8 @@ Forbidden behavior:
 Acceptance checks:
 
 - The response names swiftpm-readme as the source of badge values, the
-  Install requirement and the snippet check, and DESIGN as the source of
-  layout and styling.
+  Install requirement and the snippet check, and github-readme-design with
+  DESIGN as the owner of layout and styling.
 
 Baseline expectation:
 
@@ -396,12 +300,12 @@ Context and files:
 
 Expected output:
 
-- Compose the first screen and skeleton from DESIGN and render the light/dark
-  terminal demo; take the Homebrew line from homebrew, release download and
-  checksum steps from the release skill, the commands shown from cli-creator
-  checked against the released --help, MCP client configuration from
-  mcp-server-patterns, and build-from-source and Swift badge values from
-  swiftpm-readme; show only channels that exist.
+- Take the Homebrew line from homebrew, release download and checksum steps
+  from the release skill, the commands shown from cli-creator checked against
+  the released --help, MCP client configuration from mcp-server-patterns, and
+  build-from-source and Swift badge values from swiftpm-readme; hand
+  the information set and DESIGN to github-readme-design for layout and the
+  light/dark terminal demo; show only channels that exist.
 
 Forbidden behavior:
 
@@ -411,7 +315,8 @@ Forbidden behavior:
 Acceptance checks:
 
 - The response names an owner for each install channel, the command
-  reference and the MCP configuration, and DESIGN for layout and styling.
+  reference and the MCP configuration, and github-readme-design with DESIGN
+  for layout and styling.
 
 Baseline expectation:
 

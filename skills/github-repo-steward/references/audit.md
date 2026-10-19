@@ -12,7 +12,7 @@ do not quietly audit an organization member against personal defaults.
 | Commit history | Signature verification and Conventional Commit subject for every accepted commit; exact ancestry scope, signer/type policy, legacy exceptions and coverage gaps |
 | CI | Policy/validation events, concurrency, explicit permissions, full action/shared pins, pin-drift observation and real required contexts |
 | Release hygiene | Version source, Unreleased changelog, tag type/signature and remote peeled SHA; immutable protections; no published ref rewrite |
-| Presentation | About/tagline agreement, supported badges, nonrepeating first screen, working Quick look, light/dark images, outlined card, recording provenance and font rights |
+| Presentation | About/tagline agreement, stated information against its owners and the released artifact (channels, requirements, commands, tool lists), supported badges, layout for the product kind, nonrepeating first screen, working Quick look, light/dark images, outlined card, recording provenance and font rights |
 | Publication | Merged accepted head, latest applicable runs by workflow ID, resolved review findings, current served preview bytes and dimensions |
 
 For each finding report: area, expected value and its owning standard, observed

@@ -56,9 +56,10 @@ permission to spawn agents or message other sessions.
    before dispatch. Version rules stay in VERSIONING; visual tokens stay in DESIGN.
 4. **Apply per repository.** Invoke `github-repo-steward` with the repository,
    standard revision, accepted source and scope. It owns settings, inherited
-   community health, CI patterns, release hygiene, headers, Quick looks, social
-   cards, terminal demos, upload verification and the repository audit. Each
-   consumer advances through its own PR; record its accepted head and merge.
+   community health, CI patterns, release hygiene, README information, preview
+   upload verification and the repository audit, and hands layout and rendering
+   to `github-readme-design`. Each consumer advances through its own PR; record
+   its accepted head and merge.
 5. **Deliver organization surfaces.** Apply [family and profile](references/brand.md),
    [website integration](references/website.md) and
    [coordinated publication](references/release.md). Keep catalog membership
@@ -82,6 +83,7 @@ domain artifacts or their implementation procedures:
 | Work | Owner |
 | --- | --- |
 | One repository's complete GitHub-side standard, presentation or audit | `github-repo-steward` |
+| Layout and rendering of READMEs, social cards, terminal demos and the organization profile | `github-readme-design` |
 | Documentation roles, review-rule format and community-file text, including the shared defaults in `.github` | `repository-docs` |
 | Filing, implementing and closing issues; PR flow | `github-flow` |
 | Homebrew formulae, tap operations or installation | `homebrew` |
