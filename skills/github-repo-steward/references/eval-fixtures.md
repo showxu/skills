@@ -338,6 +338,94 @@ Owner notes:
 
 - Fixture values are synthetic inputs, not reusable project conventions.
 
+## ecosystem-readme-boundary
+
+Target behavior: ecosystem README boundary.
+
+Input prompt: "Redo the README first screen of example-team/swift-parcel, a Swift package, with badges and a Quick look."
+
+Context and files:
+
+- No checked-in package; a qualitative routing case. The organization's
+  DESIGN defines the header, badge style and section order. Compiling the
+  Quick look against a published tag is the ecosystem skill's own check.
+
+Expected output:
+
+- Route Swift facts to swiftpm-readme with the repository, accepted
+  revision and section skeleton; use its reported badge values, Install line
+  and snippet check result; compose the header, badge selection, order and
+  styling, navigation and skeleton from the applicable DESIGN; keep social
+  cards and terminal demos on this skill's renderers.
+
+Forbidden behavior:
+
+- Type badge values or a version by hand, present an unchecked Swift snippet
+  as working, or hand the first-screen layout, cards or demos to the
+  ecosystem skill.
+
+Acceptance checks:
+
+- The response names swiftpm-readme as the source of badge values, the
+  Install requirement and the snippet check, and DESIGN as the source of
+  layout and styling.
+
+Baseline expectation:
+
+- A presentation skill may derive Swift facts from memory, or an ecosystem
+  skill may impose its own header and section order.
+
+Evidence sources:
+
+- Executor output, command trace, generated artifacts and captured observations.
+
+Owner notes:
+
+- Fixture values are synthetic inputs, not reusable project conventions.
+
+## installed-product-readme
+
+Target behavior: installed product README facts.
+
+Input prompt: "Redo the README of example-team/parcel-cli, a Swift command-line tool with an MCP server, distributed through our Homebrew tap and release archives."
+
+Context and files:
+
+- No checked-in product; a qualitative routing case. The organization's
+  DESIGN defines the first screen, and the tool has a recorded session.
+
+Expected output:
+
+- Compose the first screen and skeleton from DESIGN and render the light/dark
+  terminal demo; take the Homebrew line from homebrew, release download and
+  checksum steps from the release skill, the commands shown from cli-creator
+  checked against the released --help, MCP client configuration from
+  mcp-server-patterns, and build-from-source and Swift badge values from
+  swiftpm-readme; show only channels that exist.
+
+Forbidden behavior:
+
+- Type install lines, asset names or command options from memory, or route
+  every product fact to the language skill.
+
+Acceptance checks:
+
+- The response names an owner for each install channel, the command
+  reference and the MCP configuration, and DESIGN for layout and styling.
+
+Baseline expectation:
+
+- A presentation skill may copy install commands from another project, or a
+  language skill may assert distribution channels it does not own.
+
+Evidence sources:
+
+- Executor output, command trace, generated artifacts and captured observations.
+
+Owner notes:
+
+- Fixture values are synthetic inputs, not reusable project conventions.
+
 ## unknown-standard
 
 Target behavior: unknown standard.

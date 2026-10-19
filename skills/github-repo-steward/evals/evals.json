@@ -86,6 +86,18 @@
       "prompt": "Render our social preview using this accepted PNG app icon, then check that the exported card is current.",
       "expected_output": "Embed the accepted raster icon's exact bytes at the recipe's icon position and size, and record the file's SHA-256. Accept square PNG, JPEG and WebP inputs at or above icon_size; verify and fully decode every raster frame. SVGs retain only allowlisted SVG-namespace elements, attributes and value functions, and drop metadata contents. Only use accepts fragment links; only image accepts matching raster base64 data links. Reject foreign namespaces, unknown elements or attributes, styles, animation, non-fragment url() values, DOCTYPE/entity declarations and processing instructions at every depth. Real app PNG and generated framework SVG icons still render. Repeated renders and --check are deterministic; icon byte drift fails --check without writing.",
       "files": []
+    },
+    {
+      "id": 14,
+      "prompt": "Redo the README first screen of example-team/swift-parcel, a Swift package, with badges and a Quick look.",
+      "expected_output": "Route Swift facts to swiftpm-readme with the repository, accepted revision and section skeleton; use its reported badge values, Install line and snippet check result; compose the header, badge selection, order and styling, navigation and skeleton from the applicable DESIGN; keep social cards and terminal demos on this skill's renderers.",
+      "files": []
+    },
+    {
+      "id": 15,
+      "prompt": "Redo the README of example-team/parcel-cli, a Swift command-line tool with an MCP server, distributed through our Homebrew tap and release archives.",
+      "expected_output": "Compose the first screen and skeleton from DESIGN and render the light/dark terminal demo; take the Homebrew line from homebrew, release download and checksum steps from the release skill, the commands shown from cli-creator checked against the released --help, MCP client configuration from mcp-server-patterns, and build-from-source and Swift badge values from swiftpm-readme; show only channels that exist.",
+      "files": []
     }
   ]
 }

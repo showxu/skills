@@ -27,8 +27,14 @@ applicable badges and a concise navigation row. Default sections are Overview,
 Quick look, Install, Usage, Requirements, Documentation, Contributing, License;
 adapt for the actual artifact instead of adding empty sections.
 
+Install lines, release downloads, commands and MCP configuration come from
+their owners in the skill's routing table. Show only channels and integrations
+that exist.
+
 Badge order defaults to CI, language/toolchain, platforms, license. Show a
 badge only if an actual workflow, supported requirement or license backs it.
+Take badge values from the ecosystem's README skill when one applies; this
+skill owns the selection, order, labels and styling.
 Non-package repositories omit compiler/platform claims. Use accessible labels
 and link each badge to its evidence. Logo sizes, hues and layout tokens come
 from DESIGN when present; absent it, choose and document project defaults.
@@ -38,6 +44,7 @@ Quick look depends on what the visitor uses:
 
 - A library: a short working snippet showing the core result. Default to at
   most twelve lines; validate against current API and keep imports meaningful.
+  An ecosystem README skill supplies and builds the snippet when one applies.
 - A CLI: a real recorded session rendered as light/dark SVGs, selected with a
   `<picture>` using `prefers-color-scheme`. Record successful commands and
   representative output; build chatter and operator paths do not belong in it.
