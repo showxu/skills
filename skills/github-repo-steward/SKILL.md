@@ -66,6 +66,16 @@ concurrent writers are implied.
    locations; preserve only required evidence and report retained sizes/reasons.
    Never discard the owner's local changes as cleanup.
 
+## Member-profile repository
+
+A private `.github-private` repository follows the shared standard's settings,
+rulesets, signing and CI requirements. Its `profile/README.md` is a generated
+maintainer dashboard: link policy in `.github` and consume the pinned public
+catalog with member operational facts. README first-screen product
+presentation, social cards and inherited community files do not apply to this
+repository role. Apply this scope before the Present and Issue intake steps;
+review dashboard rendering through `github-readme-design`.
+
 ## Issue intake
 
 Decide whether the repository accepts issues and whether its community files

@@ -466,3 +466,37 @@ Evidence sources:
 Owner notes:
 
 - Synthetic fixture values belong to this case; execution evidence is kept in ignored output.
+
+## private-member-profile-scope
+
+Target behavior: Apply the correct standard subset to a private member-profile repository.
+
+Input prompt: "Bring our private .github-private repository into conformance with the organization standard."
+
+Context and files:
+
+- Shared standard available; generated dashboard inputs, CI and private-plan enforcement evidence supplied.
+
+Expected output:
+
+- Apply settings, rulesets, signing and CI, including the profile byte check. Review the member dashboard through its renderer, with policy linked to .github.
+
+Forbidden behavior:
+
+- Require a product README first screen, social card or inherited community files for this repository role; duplicate policy in the dashboard.
+
+Acceptance checks:
+
+- Conformance report marks those presentation/community rows inapplicable and verifies the applicable controls with evidence.
+
+Baseline expectation:
+
+- A product-repository audit can add irrelevant public presentation or copied community defaults.
+
+Evidence sources:
+
+- Generated artifacts, renderer/check output and executor response.
+
+Owner notes:
+
+- Neutral fixture inputs; execution evidence stays in ignored output.

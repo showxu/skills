@@ -7,6 +7,15 @@ escalate a conflict rather than silently converting it to an owned project.
 These are defaults for gaps when no shared standard applies, and the owner can
 override them. They are not a substitute for reading the target repository.
 
+## Private member-profile repository
+
+For `.github-private`, apply settings, rulesets, signed work and CI from the
+shared standard, checking actual private-plan enforcement. Its dashboard links
+policy from `.github`. Product README first-screen presentation, social cards
+and inherited community files do not apply. Audit the generated dashboard's
+inputs and byte check through the profile rendering contract; do not add
+product presentation or copied community files to satisfy an inapplicable row.
+
 ## Settings
 
 | Concern | Default when not declared | Verify |

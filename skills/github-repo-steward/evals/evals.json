@@ -86,6 +86,12 @@
       "prompt": "Redo the README of example-team/parcel-cli, a Swift command-line tool with an MCP server, distributed through our Homebrew tap and release archives.",
       "expected_output": "Take the Homebrew line from homebrew, release download and checksum steps from the release skill, the commands shown from cli-creator checked against the released --help, MCP client configuration from mcp-server-patterns, and build-from-source and Swift badge values from swiftpm-readme; hand the information set and DESIGN to github-readme-design for layout and the light/dark terminal demo; show only channels that exist.",
       "files": []
+    },
+    {
+      "id": 14,
+      "prompt": "Bring our private .github-private repository into conformance with the organization standard.",
+      "expected_output": "Apply settings, rulesets, signing and CI, including the profile byte check. Review the member dashboard through its renderer, with policy linked to .github.",
+      "files": []
     }
   ]
 }
