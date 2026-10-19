@@ -2,15 +2,18 @@
 
 import base64
 import hashlib
+from html import escape
 from io import BytesIO
 import json
 import os
 from pathlib import Path
+import struct
 import sys
 import tempfile
 import unittest
 from unittest.mock import patch
 from xml.etree import ElementTree as ET
+import zlib
 
 from PIL import Image, PngImagePlugin
 
@@ -108,6 +111,117 @@ class SocialIconTests(unittest.TestCase):
             with self.subTest(content=content):
                 with self.assertRaisesRegex(ValueError, "static SVG|self-contained"):
                     icon_svg(self.svg_icon(content), 0, 0, 384)
+
+    def test_nested_svg_rejects_external_css_urls_and_imports(self):
+        styles = ['@import url(https://example.test/theme.css);',
+                  '@import "theme.css";', r'@im\70ort/**/"//example.test/theme.css";',
+                  '.logo { fill: URL("https://example.test/paint.svg#paint"); }',
+                  r'@media all { .logo { fill: u\72l(\68ttps://example.test/paint.svg#paint); } }',
+                  '@font-face { src: url(../font.woff2); }',
+                  'fill: var(--paint, url(../paint.svg#paint))',
+                  'background-image: image-set("https://example.test/icon.png" 1x)',
+                  '--source: "https://example.test/icon.png"; background-image: image-set(var(--source) 1x)',
+                  'background-image: image(attr(data-source), red)',
+                  'background-image: -webkit-image-set(env(source) 1x)',
+                  'background-image: image-set(if(style(--ready): "https://example.test/icon.png"; else: "#local") 1x)']
+        for style in styles:
+            for content in (f'<style><![CDATA[{style}]]></style>',
+                            f'<path style="{escape(style, quote=True)}"/>'):
+                with self.subTest(content=content):
+                    path = self.svg_icon(f'<svg viewBox="0 0 100 100">{content}</svg>')
+                    with self.assertRaisesRegex(ValueError, "self-contained"):
+                        icon_svg(path, 0, 0, 384)
+
+    def test_nested_svg_rejects_external_presentation_urls(self):
+        for attribute in ("fill", "stroke", "filter", "clip-path", "mask", "marker",
+                          "marker-start", "marker-mid", "marker-end", "cursor",
+                          "color-profile", "shape-inside", "offset-path"):
+            with self.subTest(attribute=attribute):
+                path = self.svg_icon('<svg viewBox="0 0 100 100">'
+                                     f'<path {attribute}="url(https://example.test/asset.svg#part)"/></svg>')
+                with self.assertRaisesRegex(ValueError, "self-contained"):
+                    icon_svg(path, 0, 0, 384)
+
+    def test_nested_svg_rejects_reference_changing_animation(self):
+        for tag in ("set", "animate"):
+            for attribute in ("href", "xlink:href", "fill", "stroke", "filter", "clip-path",
+                              "mask", "marker-start", "marker-mid", "marker-end", "cursor",
+                              "style", "xml:base", "attributeName"):
+                for value in ("https://example.test/asset.svg#part", "#local"):
+                    with self.subTest(tag=tag, attribute=attribute, value=value):
+                        path = self.svg_icon('<svg viewBox="0 0 100 100">'
+                                             f'<{tag} attributeName="{attribute}" to="{value}"/></svg>')
+                        with self.assertRaisesRegex(ValueError, "self-contained"):
+                            icon_svg(path, 0, 0, 384)
+
+    def test_nested_svg_rejects_external_base_and_source_attributes(self):
+        for attribute in ("xml:base", "src"):
+            with self.subTest(attribute=attribute):
+                path = self.svg_icon(f'<svg {attribute}="https://example.test/asset.svg">'
+                                     '<use href="#local"/></svg>')
+                with self.assertRaisesRegex(ValueError, "self-contained"):
+                    icon_svg(path, 0, 0, 384)
+
+    def test_raster_data_uris_are_only_allowed_in_image_href(self):
+        uri = 'data:image/png;base64,' + base64.b64encode(self.image_data()).decode("ascii")
+        for content in (f'<style>.logo {{ fill: url({uri}); }}</style>',
+                        f'<path style="fill: url({uri})"/>', f'<path fill="url({uri})"/>',
+                        f'<image src="{uri}"/>'):
+            with self.subTest(content=content[:60]):
+                with self.assertRaisesRegex(ValueError, "self-contained"):
+                    icon_svg(self.svg_icon(f'<svg>{content}</svg>'), 0, 0, 384)
+
+    def test_nested_svg_preserves_fragment_css_and_presentation_references(self):
+        content = ('<svg viewBox="0 0 100 100"><defs><linearGradient id="paint"/></defs>'
+                   r'<style>@media all { .logo { fill: u\72l(\23 paint); } }</style>'
+                   '<path class="logo" fill="url(#paint)" stroke="url(\'#paint\')" '
+                   'style="fill: var(--paint, url(&quot;#paint&quot;)); filter: url(#filter); '
+                   'background-image: image-set(url(#paint) 1x type(&quot;image/svg+xml&quot;))">'
+                   '<animate attributeName="opacity" from="0.5" to="1"/></path></svg>')
+        svg = ET.fromstring(icon_svg(self.svg_icon(content), 0, 0, 384))
+        path = svg.find('.//{http://www.w3.org/2000/svg}path')
+        self.assertEqual(path.get("fill"), "url(#paint)")
+        self.assertIn('url("#paint")', path.get("style"))
+
+    def test_rasters_with_valid_structure_but_corrupt_pixels_are_rejected(self):
+        def chunk(kind, data):
+            return (struct.pack(">I", len(data)) + kind + data
+                    + struct.pack(">I", zlib.crc32(kind + data)))
+        bad_png = (b"\x89PNG\r\n\x1a\n"
+                   + chunk(b"IHDR", struct.pack(">IIBBBBB", 384, 384, 8, 6, 0, 0, 0))
+                   + chunk(b"IDAT", b"invalid compressed pixels") + chunk(b"IEND", b""))
+        bad_jpeg = self.image_data("JPEG")[:-2]
+        animation = BytesIO()
+        Image.new("RGBA", (384, 384), "red").save(
+            animation, format="PNG", save_all=True,
+            append_images=[Image.new("RGBA", (384, 384), "blue")], duration=100)
+        original = animation.getvalue()
+        offset, bad_animation = 8, original[:8]
+        while offset < len(original):
+            length = struct.unpack(">I", original[offset:offset + 4])[0]
+            kind, pixels = original[offset + 4:offset + 8], original[offset + 8:offset + 8 + length]
+            if kind == b"fdAT":
+                pixels = pixels[:4] + b"invalid compressed pixels"
+            bad_animation += chunk(kind, pixels)
+            offset += length + 12
+        for format, mime, data in (("PNG", "image/png", bad_png), ("JPEG", "image/jpeg", bad_jpeg),
+                                  ("APNG", "image/png", bad_animation)):
+            with self.subTest(format=format):
+                with Image.open(BytesIO(data)) as image:
+                    image.verify()
+                if format == "APNG":
+                    with Image.open(BytesIO(data)) as image:
+                        self.assertEqual(image.n_frames, 2)
+                        image.load()
+                path = self.root / ("corrupt." + format.lower())
+                path.write_bytes(data)
+                with self.assertRaisesRegex(ValueError, "valid PNG, JPEG or WebP"):
+                    icon_svg(path, 0, 0, 384)
+                uri = f'data:{mime};base64,' + base64.b64encode(data).decode("ascii")
+                for attribute in ("href", "xlink:href"):
+                    path = self.svg_icon(f'<svg><image {attribute}="{uri}"/></svg>')
+                    with self.assertRaisesRegex(ValueError, "valid PNG, JPEG or WebP"):
+                        icon_svg(path, 0, 0, 384)
 
     def test_raster_icons_must_be_square(self):
         path = self.root / "icon.png"

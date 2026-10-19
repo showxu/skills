@@ -115,9 +115,12 @@ Input prompt: "Render our social preview using this accepted PNG app icon, then 
 Context and files:
 
 - A project recipe, licensed fonts and a square 1024 px PNG app icon. Exercise
-  JPEG and WebP variants, an outlined SVG containing an embedded raster, an SVG
-  with an external image reference, a nonsquare raster, an unsupported format
-  and a 256 px raster at the default icon size.
+  JPEG and WebP variants, an outlined SVG containing an embedded raster, nested
+  SVGs with external CSS/imports, presentation URLs and reference-changing
+  animation, a nonsquare raster, an unsupported format and a 256 px raster at
+  the default icon size. Include corrupt PNG pixel streams with valid chunk
+  checksums, truncated JPEGs and a corrupt later animation frame, both as files
+  and embedded SVG images.
 
 Expected output:
 
@@ -135,15 +138,18 @@ Acceptance checks:
 - Decoding the card's raster data URI reproduces the input file byte for byte;
   the layout receipt records that file's SHA-256.
 - Square rasters at or above `icon_size` pass; nonsquare, too-small, unsupported
-  and corrupt rasters fail. SVGs accept only matching PNG, JPEG or WebP base64
-  image data and fragment references; scripts, `foreignObject`, event
-  attributes and live text still fail.
+  and corrupt rasters fail. Each raster is verified and fully decoded in every
+  frame. SVGs accept matching PNG, JPEG or WebP base64 data only in image links;
+  all other references must be fragments, including CSS and presentation URLs.
+  Reference-changing animation, scripts, `foreignObject`, event attributes and
+  live text fail, including inside nested SVGs.
 - Repeated renders and `--check` are deterministic. Changing icon bytes,
   including metadata alone, causes `--check` to fail without changing exports.
 
 Baseline expectation:
 
-- An SVG-only renderer rejects a valid app icon or its embedded raster wrapper.
+- A validator limited to `href` and raster structure can preserve external CSS
+  or animation references and accept pixels that cannot be decoded.
 
 Evidence sources:
 

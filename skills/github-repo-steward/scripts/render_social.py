@@ -89,9 +89,62 @@ def raster_info(data):
         with Image.open(BytesIO(data), formats=list(mime_types)) as image:
             mime, dimensions = mime_types[image.format], image.size
             image.verify()
-    except (OSError, SyntaxError) as error:
+        with Image.open(BytesIO(data), formats=list(mime_types)) as image:
+            for frame in range(getattr(image, "n_frames", 1)):
+                image.seek(frame)
+                image.load()
+    except (OSError, SyntaxError, EOFError) as error:
         raise ValueError("Raster icon must be a valid PNG, JPEG or WebP image") from error
     return mime, dimensions
+
+
+DIRECT_REFERENCES = {"href", "src", "base", "data", "poster", "action", "formaction", "handler"}
+URL_PRESENTATION = {"fill", "stroke", "filter", "clip-path", "mask", "marker", "marker-start",
+                    "marker-mid", "marker-end", "cursor", "color-profile", "background",
+                    "background-image", "list-style", "list-style-image", "shape-inside",
+                    "shape-outside", "shape-subtract", "offset-path"}
+CSS_IMAGE_FUNCTIONS = {"image", "image-set", "-webkit-image-set"}
+
+
+def fragment_reference(value):
+    if not value.startswith("#"):
+        raise ValueError("Icon must be self-contained SVG; only fragment URLs are allowed")
+
+
+def css_references(value, strict=False):
+    from tinycss2 import parse_component_value_list
+
+    def check(tokens, image_context=False):
+        tokens = [token for token in tokens if token.type not in {"whitespace", "comment"}]
+        for index, token in enumerate(tokens):
+            if token.type == "error" and (strict or token.kind == "bad-url"):
+                raise ValueError("Icon must be self-contained SVG with valid CSS references")
+            if token.type == "string" and image_context:
+                fragment_reference(token.value)
+            if token.type == "url":
+                fragment_reference(token.value)
+            elif token.type == "at-keyword" and token.lower_value == "import":
+                target = tokens[index + 1] if index + 1 < len(tokens) else None
+                if target is not None and target.type == "string":
+                    fragment_reference(target.value)
+                elif not (target is not None and (target.type == "url" or
+                          (target.type == "function" and target.lower_name == "url"))):
+                    raise ValueError("Icon must be self-contained SVG with a fragment CSS import")
+            elif token.type == "function":
+                arguments = [item for item in token.arguments if item.type not in {"whitespace", "comment"}]
+                if image_context and token.lower_name in {"var", "env", "attr"}:
+                    raise ValueError("Icon must be self-contained SVG with literal fragment URLs")
+                if token.lower_name in {"url", "src"}:
+                    if len(arguments) != 1 or arguments[0].type != "string":
+                        raise ValueError("Icon must be self-contained SVG with literal fragment URLs")
+                    fragment_reference(arguments[0].value)
+                # type() strings describe MIME types, rather than image sources.
+                sources = token.lower_name in CSS_IMAGE_FUNCTIONS or (image_context and token.lower_name != "type")
+                check(arguments, sources)
+            elif hasattr(token, "content"):
+                check(token.content, image_context)
+
+    check(parse_component_value_list(value, skip_comments=True))
 
 
 def icon_svg(path, x, y, size):
@@ -112,10 +165,22 @@ def icon_svg(path, x, y, size):
         tag = node.tag.rsplit("}", 1)[-1]
         if tag in {"script", "foreignObject", "text"}:
             raise ValueError("Icon must be static SVG with outlined lettering")
+        if tag == "style":
+            css_references("".join(node.itertext()), strict=True)
+        if tag in {"set", "animate", "animateColor", "animateMotion", "animateTransform"}:
+            target = node.get("attributeName", "").strip().rsplit(":", 1)[-1].lower()
+            if (target in DIRECT_REFERENCES | URL_PRESENTATION | {"style", "attributename"}
+                    or target.startswith(("marker-", "on"))):
+                raise ValueError("Icon must be self-contained SVG; animation cannot change references")
         for key, value in node.attrib.items():
             attribute = key.rsplit("}", 1)[-1]
             if attribute.lower().startswith("on"):
                 raise ValueError("Icon must be self-contained SVG")
+            if attribute != "href":
+                if attribute in DIRECT_REFERENCES and not (attribute == "base" and not value):
+                    fragment_reference(value)
+                # Metadata and geometry need URL checks without requiring valid CSS.
+                css_references(value, strict=attribute == "style" or attribute in URL_PRESENTATION)
             if attribute == "href" and not value.startswith("#"):
                 match = re.fullmatch(r"data:(image/(?:png|jpeg|webp));base64,(.+)", value)
                 if tag != "image" or not match:

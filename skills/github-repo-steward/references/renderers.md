@@ -4,9 +4,9 @@ Use a repository-owned renderer when it implements the accepted standard.
 Otherwise the helpers here provide portable rendering primitives. Run them
 from the repository being served. Python 3 is required; social outlines need
 `fonttools`. Raster icon validation and pixel verification use Pillow; PNG
-conversion uses `rsvg-convert`. Install dependencies in that repository's
-producer-owned ignored location, not in the skill source or the owner's global
-environment.
+conversion uses `rsvg-convert`. SVG CSS reference validation uses `tinycss2`.
+Install dependencies in that repository's producer-owned ignored location,
+not in the skill source or the owner's global environment.
 
 ## Project inputs
 
@@ -50,8 +50,13 @@ smaller inputs fail rather than being upscaled. The renderer embeds the file's
 exact bytes in an `<image>` data URI at the same position and size as an SVG.
 SVG icons need a `viewBox` and outlined lettering. Their `<image>` elements may
 use base64 `data:image/png`, `data:image/jpeg` or `data:image/webp` URIs whose
-payload matches the declared format. All other non-fragment `href` references,
-scripts, `foreignObject`, event attributes and live text are rejected.
+payload matches the declared format. Standalone and embedded rasters are
+verified, then reopened and fully decoded, including every animation frame,
+before their original bytes are embedded. All other non-fragment references
+are rejected, including CSS `url()` and `@import`, presentation attributes and
+base URLs. Animation cannot target references, styles or URL-valued attributes.
+Raster data URIs are allowed only in `<image>` links. Scripts, `foreignObject`,
+event attributes and live text are rejected.
 
 ```sh
 python3 <skill>/scripts/render_social.py --spec <recipe.json> --output <card.svg>
