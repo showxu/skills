@@ -67,8 +67,8 @@ MIN_SEPARATION = 0.10           # OKLab lightness between a group and what it si
 MIN_OVERLAP = 0.01              # share of the smaller group that makes two groups adjacent
 CLIP_TOLERANCE = 0.005          # share of a group's artwork allowed outside the shape
 FULL_BLEED = 0.95               # coverage at which a group is a background layer the shape crops
-REVERSAL = -0.999               # cosine between joined tangents at which a path turns back on itself
-REVERSAL_LENGTH = 0.5           # path units a reversal must retrace to be reported
+REVERSAL = -0.999               # cosine between a line and an adjoining tangent at which it turns back
+REVERSAL_LENGTH = 0.5           # path units a doubled-back line must span to be reported
 
 
 def fail(message):
@@ -399,11 +399,17 @@ def tangent_blend(p, p_direction, q, q_direction, box):
     """Cubic control points joining p, arriving along p_direction, to q, leaving along q_direction.
 
     Handles run toward the tangents' intersection and stop at the edge of `box` (x0, y0, x1, y1),
-    so the blend stays inside it.
+    so the blend stays inside it. Returns None when the tangents are too close to parallel to meet
+    ahead of p and behind q; a straight line then joins them within the path's precision.
     """
     (dx, dy), (ex, ey) = p_direction, q_direction
     rx, ry = q[0] - p[0], q[1] - p[1]
-    a = (rx * ey - ry * ex) / (dx * ey - dy * ex)
+    determinant = dx * ey - dy * ex
+    if abs(determinant) <= 1e-12 * math.hypot(dx, dy) * math.hypot(ex, ey):
+        return None
+    a, b = (rx * ey - ry * ex) / determinant, (dx * ry - dy * rx) / determinant
+    if a <= 0 or b <= 0:
+        return None
     meet = (p[0] + a * dx, p[1] + a * dy)
 
     def handle(origin):
@@ -426,22 +432,31 @@ def continuous_rect(x, y, width, height, radii):
     back (references/rendering.md).
     """
     radii, excess = continuous_corners(width, height, radii)
+    if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v)
+           for v in (x, y, x + width, y + height)):
+        fail("a continuous rectangle needs a finite position and extent")
     lengths = (height, width, height, width)
     frames = (((x + width, y), (-1, 0), (0, 1)), ((x + width, y + height), (0, -1), (-1, 0)),
               ((x, y + height), (1, 0), (0, -1)), ((x, y), (0, 1), (1, 0)))
-    corners = []
+    corners, tangents = [], []
     for i, ((cx, cy), e1, e2) in enumerate(frames):
         radius = radii[i]
         if not radius:
             corners.append([])
+            tangents.append(None)
             continue
         start, end = (0, 0.0), (len(CONTINUOUS[1]) - 1, 1.0)
         if excess[i - 1] > OVERRUN:
             start = corner_position(0, (lengths[i - 1] - CONTINUOUS[0] * radii[i - 1]) / radius)
         if excess[i] > OVERRUN:
             end = corner_position(1, (lengths[i] - CONTINUOUS[0] * radii[(i + 1) % 4]) / radius)
+        pieces = corner_piece(start, end)
         corners.append([tuple((cx + u * radius * e1[0] + v * radius * e2[0], cy + u * radius * e1[1] + v * radius * e2[1])
-                              for u, v in cubic) for cubic in corner_piece(start, end)])
+                              for u, v in cubic) for cubic in pieces])
+        # Directions from the unit frame keep their precision far from the origin.
+        leave = (pieces[0][1][0] - pieces[0][0][0], pieces[0][1][1] - pieces[0][0][1])
+        arrive = (pieces[-1][3][0] - pieces[-1][2][0], pieces[-1][3][1] - pieces[-1][2][1])
+        tangents.append(tuple((u * e1[0] + v * e2[0], u * e1[1] + v * e2[1]) for u, v in (leave, arrive)))
 
     def at(point):
         return f"{point[0]:.2f} {point[1]:.2f}"
@@ -452,10 +467,9 @@ def continuous_rect(x, y, width, height, radii):
         target = after[0][0] if after else frames[(i + 1) % 4][0]
         if excess[i] <= OVERRUN:
             return "L" + at(target)
-        (_, _, c2, p), (q, c1, _, _) = corners[i][-1], after[0]
-        h1, h2 = tangent_blend(p, (p[0] - c2[0], p[1] - c2[1]), q, (c1[0] - q[0], c1[1] - q[1]),
-                               (x, y, x + width, y + height))
-        return f"C{at(h1)} {at(h2)} {at(q)}"
+        p, q = corners[i][-1][3], after[0][0]
+        handles = tangent_blend(p, tangents[i][1], q, tangents[(i + 1) % 4][0], (x, y, x + width, y + height))
+        return f"C{at(handles[0])} {at(handles[1])} {at(q)}" if handles else "L" + at(q)
 
     path = ["M" + at(corners[0][0][0] if corners[0] else frames[0][0])]
     for i, cubics in enumerate(corners):
@@ -852,9 +866,11 @@ def shape_widths(cover, size):
     return widths
 
 
-PATH_COMMAND = re.compile(r"[\s,]*([MmLlHhVvCcSsQqTtAaZz])")
-PATH_NUMBER = re.compile(r"[\s,]*([-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?)")
-PATH_FLAG = re.compile(r"[\s,]*([01])")
+PATH_COMMAND = re.compile(r"\s*([MmLlHhVvCcSsQqTtAaZz])")
+PATH_SEPARATOR = re.compile(r"\s*(?:,\s*)?")
+PATH_SPACE = re.compile(r"\s*")
+PATH_NUMBER = re.compile(r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?")
+PATH_FLAG = re.compile(r"[01]")
 PATH_ARITY = {"M": 2, "L": 2, "H": 1, "V": 1, "C": 6, "S": 4, "Q": 4, "T": 2, "A": 7, "Z": 0}
 
 
@@ -865,7 +881,7 @@ def path_segments(data):
     Parsing stops at the first error, where SVG renderers stop drawing.
     """
     subpaths, segments, closed = [], [], False
-    command, previous, position = None, None, 0
+    command, previous, position, fresh = None, None, 0, False
     current = start = control = (0.0, 0.0)
 
     def add(end, *points, directions=True):
@@ -881,22 +897,28 @@ def path_segments(data):
     while True:
         match = PATH_COMMAND.match(data, position)
         if match:
+            # A command missing its arguments, or a path not opened by a moveto, is an error.
+            if fresh or (previous is None and match[1] not in "Mm"):
+                break
             command, position = match[1], match.end()
             if command in "Zz":
                 add(start)
                 closed, command, previous = True, None, "Z"
+            fresh = command is not None
             continue
-        if command is None or not data[position:].strip(" \t\r\n,"):
+        if command is None or not data[position:].strip():
             break
         values = []
         for index in range(PATH_ARITY[command.upper()]):
+            position = (PATH_SPACE if fresh and not index else PATH_SEPARATOR).match(data, position).end()
             match = (PATH_FLAG if command in "Aa" and index in (3, 4) else PATH_NUMBER).match(data, position)
             if not match:
                 break
-            values.append(float(match[1]))
+            values.append(float(match[0]))
             position = match.end()
         if len(values) < PATH_ARITY[command.upper()]:
             break
+        fresh = False
         relative = command.islower()
         kind = command.upper()
 
@@ -910,7 +932,8 @@ def path_segments(data):
             command, previous = "l" if relative else "L", "M"
             continue
         if closed:
-            subpaths.append((segments, closed))
+            if segments:
+                subpaths.append((segments, closed))
             segments, closed, start = [], False, current
         if kind == "H":
             add((values[0] + current[0] if relative else values[0], current[1]))
@@ -938,23 +961,29 @@ def path_segments(data):
 
 
 def doubled_back(data):
-    """(x, y, length) of the longest reversal in each path of an SVG layer: a joint where the
-    outline turns back on itself, retracing at least REVERSAL_LENGTH path units."""
+    """(x, y, length) of the longest doubled-back line in each path of an SVG layer.
+
+    A line doubles back when it runs against the tangents on both its sides, as the line joining
+    two corners whose departures exceed their edge does. Cusps where curves meet are not findings.
+    """
+    def reverses(a, b):
+        return a[0] * b[0] + a[1] * b[1] <= REVERSAL * math.hypot(*a) * math.hypot(*b)
+
     found = []
     for node in ET.fromstring(data).iter():
         if node.tag.split("}")[-1] != "path":
             continue
         worst = None
         for segments, closed in path_segments(node.get("d", "")):
-            joints = list(zip(segments, segments[1:])) + ([(segments[-1], segments[0])] if closed else [])
-            for (a0, _, a1, incoming), (b0, outgoing, b1, _) in joints:
-                if not incoming or not outgoing:
+            for i, (begin, leave, end, arrive) in enumerate(segments):
+                chord = (end[0] - begin[0], end[1] - begin[1])
+                if leave != chord or arrive != chord or not (closed or 0 < i < len(segments) - 1):
                     continue
-                cosine = ((incoming[0] * outgoing[0] + incoming[1] * outgoing[1]) /
-                          (math.hypot(*incoming) * math.hypot(*outgoing)))
-                length = min(math.dist(a0, a1), math.dist(b0, b1))
-                if cosine <= REVERSAL and length >= REVERSAL_LENGTH and (not worst or length > worst[2]):
-                    worst = (*a1, length)
+                before, after = segments[i - 1][3], segments[(i + 1) % len(segments)][1]
+                length = math.hypot(*chord)
+                if (before and after and reverses(before, chord) and reverses(chord, after)
+                        and length >= REVERSAL_LENGTH and (not worst or length > worst[2])):
+                    worst = (*begin, length)
         if worst:
             found.append(worst)
     return found

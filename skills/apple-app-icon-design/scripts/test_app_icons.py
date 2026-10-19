@@ -378,10 +378,24 @@ class ContinuousRectTests(unittest.TestCase):
         self.assertAlmostEqual(excess[0], k * 80 - 100)
         self.assertTrue(all(e < 0 for e in excess[1:]))
         self.assertEqual(app_icons.continuous_rect(0, 0, 300, 100, 80), app_icons.continuous_rect(0, 0, 300, 100, 50))
-        for size, radii in (((0, 10), 1), ((10, -1), 1), ((10, 10), -1), ((10, 10), float("nan")),
-                            ((10, 10), float("inf")), ((10, 10), True), ((10, 10), (1, 2, 3)), ((10, 10), "1")):
-            with self.subTest(size=size, radii=radii), self.assertRaises(ValueError):
-                app_icons.continuous_rect(0, 0, *size, radii)
+        for origin, size, radii in (((0, 0), (0, 10), 1), ((0, 0), (10, -1), 1), ((0, 0), (10, 10), -1),
+                                    ((0, 0), (10, 10), float("nan")), ((0, 0), (10, 10), float("inf")),
+                                    ((0, 0), (10, 10), True), ((0, 0), (10, 10), (1, 2, 3)), ((0, 0), (10, 10), "1"),
+                                    ((float("nan"), 0), (10, 10), 1), ((0, float("inf")), (10, 10), 1),
+                                    ((True, 0), (10, 10), 1), ((1e308, 0), (1e308, 10), 1)):
+            with self.subTest(origin=origin, size=size, radii=radii), self.assertRaises(ValueError):
+                app_icons.continuous_rect(*origin, *size, radii)
+
+    def test_barely_overrunning_corners_stay_well_formed_at_any_scale(self):
+        k = app_icons.CONTINUOUS[0]
+        for x, side, radius in ((0, 100, (100 + 0.011) / (2 * k)), (0, 1e6, 327082.78468467586),
+                                (5e6, 1000, (1000 + 0.02) / (2 * k))):
+            with self.subTest(side=side, radius=radius):
+                path = app_icons.continuous_rect(x, x, side, side, radius)
+                self.assertEqual(app_icons.doubled_back(layer(path)), [])
+                for cubic in path_cubics(path):
+                    for point in cubic:
+                        self.assertTrue(all(x - 0.005 <= v <= x + side + 0.005 for v in point), point)
 
     def test_command_prints_path_and_notes(self):
         run = subprocess.run([sys.executable, str(SCRIPT), "--continuous-rect", "0", "0", "300", "100", "60"],
@@ -392,6 +406,7 @@ class ContinuousRectTests(unittest.TestCase):
                          ["info\tradius 60 exceeds half the shorter side; using 50", "info\tright edge",
                           "info\tleft edge"])
         for args, code in ((["--continuous-rect", "0", "0", "3", "3"], 1), (["--list"], 2),
+                           (["--continuous-rect", "nan", "0", "100", "100", "20"], 1),
                            (["design.md", "--continuous-rect", "0", "0", "3", "3", "1"], 2)):
             with self.subTest(args=args):
                 run = subprocess.run([sys.executable, str(SCRIPT), *args], capture_output=True, text=True,
@@ -410,6 +425,15 @@ class PathReversalTests(unittest.TestCase):
                 self.assertEqual(app_icons.path_segments(data), [(square, True)])
         smooth = app_icons.path_segments("M0 0C10 0 20 10 20 20S30 40 40 40Q50 40 50 30T60 20")[0][0]
         self.assertEqual([s[1] for s in smooth], [(10.0, 0.0), (0.0, 10.0), (10.0, 0.0), (0.0, -10.0)])
+        for invalid in ("L10 0", "M0 0,,10 0", "M0 0L,10 0"):
+            with self.subTest(data=invalid):
+                self.assertEqual(app_icons.path_segments(invalid), [])
+        line = [((0.0, 0.0), (10.0, 0.0), (10.0, 0.0), (10.0, 0.0))]
+        for data, expected in (("M0 0H10L L-10 0", [(line, False)]), ("M0 0ZL10 0", [(line, False)]),
+                               ("M0 0H10ZH10", [(line + [((10.0, 0.0), (-10.0, 0.0), (0.0, 0.0), (-10.0, 0.0))], True),
+                                                (line, False)])):
+            with self.subTest(data=data):
+                self.assertEqual(app_icons.path_segments(data), expected)
         compact = app_icons.path_segments("M1.5.5-2-3e1a5 5 0 0110 0l4 0zM0 0 1 1 x 9 9")
         self.assertEqual(compact[0][0][0][2], (-2.0, -30.0))
         self.assertEqual(compact[0][0][1][1:4:2], (None, None))
@@ -427,8 +451,11 @@ class PathReversalTests(unittest.TestCase):
         transformed = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><g transform="scale(2)">'
                        f'<path d="{naive_continuous_square(0, 0, 100, 40)}"/></g></svg>')
         self.assertEqual(app_icons.doubled_back(transformed), found)
-        for clean in (naive_continuous_square(0, 0, 100, 30), "M0 0L10 0L9.6 0", "M0 0A5 5 0 0 1 10 0L0 0",
-                      "M0 0H100V100H0Z", app_icons.continuous_rect(0, 0, 100, 100, 40)):
+        self.assertEqual(app_icons.doubled_back(layer("M0 0H10H5H20")), [(10.0, 0.0, 5.0)])
+        heart = "M512 320C512 128 192 128 192 384C192 576 512 800 512 800C512 800 832 576 832 384C832 128 512 128 512 320Z"
+        for clean in (naive_continuous_square(0, 0, 100, 30), "M0 0H10H9.6H20", "M0 0L10 0L5 0",
+                      "M0 0A5 5 0 0 1 10 0L0 0", "M0 0H100V100H0Z", "M0 0ZL10 0", heart,
+                      app_icons.continuous_rect(0, 0, 100, 100, 40)):
             with self.subTest(path=clean):
                 self.assertEqual(app_icons.doubled_back(layer(clean)), [])
 

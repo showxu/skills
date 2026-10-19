@@ -346,17 +346,19 @@ Expected output:
 
 - A 1024 px capture from `NSWorkspace.shared.icon(forFile:)`, mapped from the
   100..923 px tile to the canvas and kept in ignored validation output.
-- Local-contrast line-art maps of reference and candidates, and parameters
-  fitted by normalized cross-correlation in a window without foreground
-  objects that keeps the rim band where lines meet it.
+- Local-contrast line-art maps of reference and candidates; geometry fitted
+  by normalized cross-correlation in a window without foreground objects that
+  keeps the rim band where lines meet it, then opacity fitted by squared
+  difference with the geometry fixed.
 - An overlay, 4–6x junction crops, and luminance cross-sections in the task
   report; the fitted values written into the original artwork.
 
 Forbidden behavior:
 
 - Fitting the bundle's `.icns`, estimating parameters from a screenshot,
-  masking the rim where lines merge into it, tracing or importing the
-  reference's shapes or pixels, or committing the capture.
+  fitting opacity by correlation, masking the rim where lines merge into it,
+  tracing or importing the reference's shapes or pixels, or committing the
+  capture.
 
 Acceptance checks:
 
@@ -364,6 +366,8 @@ Acceptance checks:
   intersection-over-union of at least 0.999; the `.icns` tile does not.
 - The overlay shows no systematic fringe, and cross-sections agree in line
   width, peak, and spacing.
+- A candidate that differs from the reference only in opacity is told apart
+  by the contrast fit, although its correlation score equals the match's.
 - Delivered artwork contains no reference pixels or traced paths.
 
 Baseline expectation:
@@ -397,8 +401,8 @@ Context and files:
 
 Expected output:
 
-- `--lint` reports the path that doubles back, with its position and the
-  retraced length.
+- `--lint` reports the line that doubles back, with its position and
+  length; cusps where curves meet in other artwork stay clean.
 - The helper's path has no reversal, stays convex and inside its rectangle,
   and joins each blend tangentially; corners that fit keep the existing
   continuous outline byte-for-byte.

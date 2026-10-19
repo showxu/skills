@@ -63,14 +63,15 @@ the line-art map: positive for light lines, negative for dark ones. Choose a
 blur several times wider than the lines. Apply the identical extraction to the
 reference and every candidate.
 
-## 4. Fit Parameters by Normalized Cross-Correlation
+## 4. Fit Parameters
 
-1. Parameterize the original artwork: for example line width, spacing,
-   offset, angle, opacity, inset, and corner radius.
+1. Parameterize the original artwork: geometry such as line width,
+   spacing, offset, angle, inset, and corner radius, and contrast such as
+   opacity.
 2. Render each candidate the way the reference is shown: a native export of
    the candidate `.icon` for the same platform, appearance, and design
    generation, mapped to the same canvas and extracted the same way.
-3. Score candidates by zero-mean normalized cross-correlation of the two
+3. Score geometry by zero-mean normalized cross-correlation of the two
    line-art maps inside a window free of foreground objects. Glyphs and panels
    change the local contrast around them and bias the fit.
 4. Do not mask regions whose behavior matters. Where lines merge into the rim,
@@ -78,6 +79,9 @@ reference and every candidate.
    interior and still end the lines wrongly at the edge.
 5. Search coarse to fine: a grid over plausible values, then refinement
    around the best score.
+6. Fit opacity and contrast last, with the geometry fixed. Correlation ignores
+   amplitude: a map and any positive multiple of it score the same. Minimize
+   the squared difference of the line-art maps over the same window instead.
 
 Write the fitted values into the owner's artwork or generator and regenerate.
 Keep the values and their scores in the task report; they belong to the

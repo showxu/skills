@@ -292,14 +292,15 @@ reports:
   covering at least 1% of the smaller group's area;
 - more than three groups.
 
-It also reads the paths of each SVG layer and reports a path that doubles
-back: a joint where the outgoing direction reverses the incoming one (cosine
-at most -0.999) and both joined segments span at least 0.5 units. Corners whose
-departures exceed their edge draw exactly this stray segment, whichever tool
-produced the SVG; redraw the shape with
-[continuous rectangles](#continuous-rectangles) or smaller radii. Positions and
-lengths are in the path's own coordinates, and joints at elliptical arcs are
-not checked.
+It also reads the paths of each SVG layer and reports a line that doubles
+back: a straight segment at least 0.5 units long that runs against the
+tangents on both its sides (cosine at most -0.999). Corners whose departures
+exceed their edge draw exactly this stray segment, whichever tool produced the
+SVG; redraw the shape with [continuous rectangles](#continuous-rectangles) or
+smaller radii. Cusps where two curves meet are not findings. Positions and
+lengths are in the path's own coordinates, and segments next to elliptical
+arcs are not checked. Path data is read as SVG renderers read it, up to its
+first error.
 
 When any layer in a group has a fill or appearance fill override, lint prints
 an `info` line explaining that the Liquid Glass appearance comes from the
