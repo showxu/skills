@@ -587,7 +587,7 @@ class PathReversalTests(unittest.TestCase):
                        f'<path d="{naive_continuous_square(0, 0, 100, 40)}"/></g></svg>')
         self.assertEqual(app_icons.doubled_back(transformed), found)
         self.assertEqual(app_icons.doubled_back(layer("M0 0H10H5H20")), [(10.0, 0.0, 5.0)])
-        for line in ("L20 10", "L20 15L20 10", "C20 17 20 13 20 10"):
+        for line in ("L20 10", "L20 15L20 10", "C20 17 20 13 20 10", "C20 9 20 11 20 10", "Q20 12 20 10"):
             with self.subTest(line=line):
                 self.assertEqual(app_icons.doubled_back(layer(f"M0 0C10 0 20 10 20 20{line}C20 20 30 30 40 30")),
                                  [(20.0, 20.0, 10.0)])
@@ -595,6 +595,7 @@ class PathReversalTests(unittest.TestCase):
         for clean in (naive_continuous_square(0, 0, 100, 30), "M0 0H10H9.6H20", "M0 0L10 0L5 0",
                       "M0 0A5 5 0 0 1 10 0L0 0", "M0 0H100V100H0Z", "M0 0ZL10 0", heart, "M0 0H10H5H20e",
                       "M0 0H10\u00a0H5H20", "M0 0C10 0 20 10 20 20C20 17 20 13 20 10",
+                      "M0 0C10 0 20 10 20 20C20 5 20 25 20 10C20 20 30 30 40 30",
                       app_icons.continuous_rect(0, 0, 100, 100, 40)):
             with self.subTest(path=clean):
                 self.assertEqual(app_icons.doubled_back(layer(clean)), [])

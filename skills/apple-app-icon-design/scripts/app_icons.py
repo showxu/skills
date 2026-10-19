@@ -1016,6 +1016,20 @@ PATH_FLAG = re.compile(r"[01]")
 PATH_ARITY = {"M": 2, "L": 2, "H": 1, "V": 1, "C": 6, "S": 4, "Q": 4, "T": 2, "A": 7, "Z": 0}
 
 
+def advances(values, tolerance):
+    """Whether a Bezier with these 1D control values never decreases over [0, 1]."""
+    rates = [b - a for a, b in zip(values, values[1:])]
+    if len(rates) < 3:
+        return min(rates) >= -tolerance
+    first, middle, last = rates
+    candidates = [first, last]
+    curvature = first - 2 * middle + last
+    if curvature and 0 < (first - middle) / curvature < 1:
+        t = (first - middle) / curvature
+        candidates.append(first * (1 - t) ** 2 + 2 * middle * (1 - t) * t + last * t * t)
+    return min(candidates) >= -tolerance
+
+
 def path_segments(data):
     """Subpaths of SVG path data as (segments, closed).
 
@@ -1038,8 +1052,9 @@ def path_segments(data):
             length = math.hypot(*chord)
             if 0 < length < math.inf:
                 ux, uy = chord[0] / length, chord[1] / length
-                if all(abs((p[0] - current[0]) * uy - (p[1] - current[1]) * ux) <= 1e-9 * length
-                       and 0 <= (p[0] - current[0]) * ux + (p[1] - current[1]) * uy <= length for p in points):
+                along = [0.0, *((p[0] - current[0]) * ux + (p[1] - current[1]) * uy for p in points), length]
+                if (all(abs((p[0] - current[0]) * uy - (p[1] - current[1]) * ux) <= 1e-9 * length for p in points)
+                        and advances(along, 1e-9 * length)):
                     leave = arrive = chord
             segments.append((current, leave if directions else None, end, arrive if directions else None))
         current = end
