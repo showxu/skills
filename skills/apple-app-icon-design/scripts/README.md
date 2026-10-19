@@ -57,7 +57,7 @@ DESIGN.md and prints SVG path data for a rectangle with continuous corners,
 with one radius or four: top-left, top-right, bottom-right, bottom-left. Use it
 to draw rounded rectangles in artwork. Corners whose departures overrun an
 edge end early and a tangent cubic joins them; `info` lines on standard error
-name each reduced radius and blended edge. See
+report scaled radii and each overrun edge. See
 [continuous rectangles](../references/rendering.md#continuous-rectangles).
 
 `--grid-backdrop [KEY=VALUE ...]` also takes no DESIGN.md and prints the SVG
