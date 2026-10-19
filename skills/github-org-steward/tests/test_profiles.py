@@ -217,5 +217,30 @@ class ProfileObservationsTests(unittest.TestCase):
         self.assertFalse(any(row[0] in {"FAIL", "REVIEW"} for row in self.rows))
 
 
+    def test_account_description_is_compared_only_when_declared(self):
+        self.scan()
+        self.assertFalse(any("account description" in row[2] for row in self.rows))
+        for observed, status in (("Useful tools for careful work.", "INFO"), ("Something else", "FAIL")):
+            with self.subTest(observed=observed):
+                self.setUp()
+                self.catalog["description"] = "Useful tools for careful work."
+                self.catalog_bytes = json.dumps(self.catalog).encode()
+                self.member["catalog"]["sha256"] = hashlib.sha256(self.catalog_bytes).hexdigest()
+                api = lambda endpoint: {"description": observed} if endpoint == "orgs/example-team" else self.api(endpoint)
+                self.scan(api=api)
+                rows = [row for row in self.rows if "account description" in row[2]]
+                self.assertEqual([row[0] for row in rows], [status])
+        self.setUp()
+        self.catalog["description"] = "Useful tools for careful work."
+        self.catalog_bytes = json.dumps(self.catalog).encode()
+        self.member["catalog"]["sha256"] = hashlib.sha256(self.catalog_bytes).hexdigest()
+        def unreadable(endpoint):
+            if endpoint == "orgs/example-team":
+                raise profiles.Unreadable("organization unavailable")
+            return self.api(endpoint)
+        self.scan(api=unreadable)
+        self.assertIn(("REVIEW", ".github", "Account description unavailable: organization unavailable"), self.rows)
+
+
 if __name__ == "__main__":
     unittest.main()

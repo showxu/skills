@@ -30,7 +30,7 @@ Treat the profile as a visitor entry organized by the reader's job, not a list
 of internal repository types. It states the organization promise and a
 secondary line, uses the accepted umbrella icon, and links documentation,
 contributing, security and support where available. The account description
-expresses the same promise. `github-readme-design` lays out the profile from
+expresses the same promise and is declared as the catalog's `description`. `github-readme-design` lays out the profile from
 these inputs and the catalog.
 
 The public `.github/profile/catalog.json` owns the promise, umbrella mark,

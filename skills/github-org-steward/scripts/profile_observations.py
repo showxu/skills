@@ -115,6 +115,14 @@ def inspect_profiles(owner, repos, report, renderer_path=None, member_path="prof
                     if repo["visibility"] == "public" and not repo["isArchived"] and name != ".github"}
         membership(expected, set(members), report, ".github", "public catalog membership")
     inspect_icons(renderer, catalog, branch, report)
+    if "description" in catalog:
+        try:
+            observed = api(f"orgs/{owner}").get("description")
+            report("INFO" if observed == catalog["description"] else "FAIL", ".github",
+                   "account description matches the catalog" if observed == catalog["description"]
+                   else f"account description differs: catalog {catalog['description']!r}, GitHub {observed!r}")
+        except (Unreadable, AttributeError) as error:
+            report("REVIEW", ".github", f"Account description unavailable: {error}")
     if private is None:
         return
     try:
