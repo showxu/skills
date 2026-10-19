@@ -326,3 +326,105 @@ Owner notes:
 
 - Output filenames and source ownership are defined in
   [rendering](rendering.md#optional-dark-web-exports).
+
+## reference-matching
+
+Target behavior: matching an existing icon's look fits measured parameters of
+original artwork to the rendition the system displays.
+
+Input prompt: "Make the lines in our icon's background feel like the ones in
+that app's icon in the Dock."
+
+Context and files:
+
+- An installed reference app on macOS 26 or later whose bundle also carries a
+  legacy `.icns`.
+- The owner's original line artwork, parameterized by width, spacing, and
+  inset; Icon Composer for native candidate exports.
+
+Expected output:
+
+- A 1024 px capture from `NSWorkspace.shared.icon(forFile:)`, mapped from the
+  100..923 px tile to the canvas and kept in ignored validation output.
+- Local-contrast line-art maps of reference and candidates, and parameters
+  fitted by normalized cross-correlation in a window without foreground
+  objects that keeps the rim band where lines meet it.
+- An overlay, 4–6x junction crops, and luminance cross-sections in the task
+  report; the fitted values written into the original artwork.
+
+Forbidden behavior:
+
+- Fitting the bundle's `.icns`, estimating parameters from a screenshot,
+  masking the rim where lines merge into it, tracing or importing the
+  reference's shapes or pixels, or committing the capture.
+
+Acceptance checks:
+
+- After mapping, the capture's mask matches a native macOS export with alpha
+  intersection-over-union of at least 0.999; the `.icns` tile does not.
+- The overlay shows no systematic fringe, and cross-sections agree in line
+  width, peak, and spacing.
+- Delivered artwork contains no reference pixels or traced paths.
+
+Baseline expectation:
+
+- Without the method, an agent estimates parameters from a downscaled raster,
+  off by about 2x in practice, or fits the legacy `.icns` tile.
+
+Evidence sources:
+
+- Capture metadata (reference app, system version, appearance), mask
+  comparison, correlation scores, and the verification images.
+
+Owner notes:
+
+- The method is owned by [reference matching](reference-matching.md); rim
+  clearance by [rendering](rendering.md#glass-color-and-rim).
+
+## continuous-corner-overrun
+
+Target behavior: rounded rectangles whose corner departures exceed an edge
+render without a stray segment, and lint finds that defect in any SVG layer.
+
+Input prompt: "Our bar is 160 px tall with continuous corners of radius 70,
+and there's a flat line on its side."
+
+Context and files:
+
+- A layer whose path joins continuous corners with straight lines along an
+  edge shorter than their two departures.
+- The same bar drawn with `--continuous-rect`.
+
+Expected output:
+
+- `--lint` reports the path that doubles back, with its position and the
+  retraced length.
+- The helper's path has no reversal, stays convex and inside its rectangle,
+  and joins each blend tangentially; corners that fit keep the existing
+  continuous outline byte-for-byte.
+
+Forbidden behavior:
+
+- Hiding the segment with a stroke or mask, or changing the owner's radii
+  without reporting it.
+
+Acceptance checks:
+
+- The continuous-rectangle, path-reversal, and lint tests in
+  `scripts/test_app_icons.py` pass, and legacy style outputs match the
+  pre-change script byte-for-byte.
+
+Baseline expectation:
+
+- The pre-change script offers no helper and its lint stays clean while the
+  stray segment renders.
+
+Evidence sources:
+
+- Lint output, helper path data and `info` lines, and rendered comparisons of
+  the hand-joined and helper outlines.
+
+Owner notes:
+
+- Geometry and lint rules are owned by
+  [rendering](rendering.md#continuous-rectangles).

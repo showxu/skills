@@ -35,6 +35,11 @@ recognize at 32 px, two or three colors, and the layer plan.
 - Depth comes from overlap: Apple suggests "filled, overlapping shapes",
   especially with transparency and blur, to give an icon depth. Shapes that
   never overlap read as flat in every style.
+- In Liquid Glass, depth reads where a colored element lies under a glass
+  element. The color shows through only where the glass layer's fill alpha
+  (`#RRGGBBAA`) or opacity is below 1; translucency alone barely tints it, and
+  refraction needs `design_generation` 27. See
+  [glass color and rim](rendering.md#glass-color-and-rim).
 - Give each foreground shape clearly defined edges. Avoid soft or feathered
   edges, which spoil system highlights and shadows.
 - Avoid extremely thin lines and sharp corners; they lose detail at small
@@ -77,6 +82,12 @@ When the skill drafts artwork:
   translucency and refraction for glass, then verify the result at small sizes
   and across appearances. See the [Apple icon material study](rendering.md#apple-icon-material-study).
   These native controls leave the SVG artwork and other styles unchanged.
+- Draw continuous-corner rectangles with `--continuous-rect`. Corners joined
+  by hand draw a stray segment wherever their departures exceed the edge; see
+  [continuous rectangles](rendering.md#continuous-rectangles).
+- Keep background line art about 20 px inside the outline on the 1024
+  canvas, or taper it deliberately into the rim: the Liquid Glass rim is
+  wider and softer than the macOS 11–15 tile edge.
 - For `mac-tile`, artwork may extend beyond the 1024 box only in a group
   listed in `unclipped`; every other style crops it at the art boundary.
 - Mark drafted art as original and keep it with the owner's assets.

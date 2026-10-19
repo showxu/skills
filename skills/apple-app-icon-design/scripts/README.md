@@ -14,6 +14,7 @@ python3 scripts/app_icons.py DESIGN.md --name example-studio --style liquid-glas
 python3 scripts/app_icons.py DESIGN.md --name example-studio --style flat --out .build/icons/flat
 python3 scripts/app_icons.py DESIGN.md --name example-studio --style flat --check .build/icons/flat
 python3 scripts/app_icons.py DESIGN.md --name example-studio --style liquid-glass --out .build/document --document-only
+python3 scripts/app_icons.py --continuous-rect 312 412 400 200 100 100 40 40
 ```
 
 `--style` selects one of the entry's styles and may be omitted when the entry
@@ -50,17 +51,26 @@ styles at 160 and 32 px on light and dark backgrounds. Without an
 export-capable `ictool`, its Liquid Glass cells say so. Convert it with
 `rsvg-convert SHEET.svg -o SHEET.png` when a raster preview is needed.
 
+`--continuous-rect X Y WIDTH HEIGHT RADIUS [RADIUS RADIUS RADIUS]` takes no
+DESIGN.md and prints SVG path data for a rectangle with continuous corners,
+with one radius or four: top-left, top-right, bottom-right, bottom-left. Use it
+to draw rounded rectangles in artwork. Corners whose departures overrun an
+edge end early and a tangent cubic joins them; `info` lines on standard error
+name each reduced radius and blended edge. See
+[continuous rectangles](../references/rendering.md#continuous-rectangles).
+
 Optional `--ictool PATH` selects an export-capable Icon Composer renderer.
-Exit 0 means the requested output, comparison, lint, or sheet succeeded.
-Invalid input, render failure, drift, or a lint finding exits 1. A successful
-document-only run does not establish native rendition or visual readiness.
+Exit 0 means the requested output, comparison, lint, sheet, or path data
+succeeded. Invalid input, render failure, drift, or a lint finding exits 1. A
+successful document-only run does not establish native rendition or visual
+readiness.
 
 Run `python3 scripts/test_app_icons.py` for document, style, lint, drift,
-preservation, dimension, and failure-path regressions. Rendering tests run
-only when `rsvg-convert` is installed. Native material and appearance tests
-run when export-capable `ictool` is available. They check fill, layer/group
-opacity, and group material specializations across every appearance, plus
-the opt-in dark web set. Set `APP_ICONS_BASELINE` to a
+preservation, dimension, continuous-rectangle, and failure-path regressions.
+Rendering tests run only when `rsvg-convert` is installed. Native material and
+appearance tests run when export-capable `ictool` is available. They check
+fill, layer/group opacity, and group material specializations across every
+appearance, plus the opt-in dark web set. Set `APP_ICONS_BASELINE` to a
 pre-change `app_icons.py` to compare all example styles; see the exact-byte and
 native-rounding distinction in [rendering](../references/rendering.md#drift).
 Use native contact sheets for visual quality review.
