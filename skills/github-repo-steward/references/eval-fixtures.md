@@ -352,7 +352,7 @@ Context and files:
 
 Expected output:
 
-- Route Swift facts to swiftpm-readme-design with the repository, accepted
+- Route Swift facts to swiftpm-readme with the repository, accepted
   revision and section skeleton; use its reported badge values, Install line
   and snippet check result; compose the header, badge selection, order and
   styling, navigation and skeleton from the applicable DESIGN; keep social
@@ -366,7 +366,7 @@ Forbidden behavior:
 
 Acceptance checks:
 
-- The response names swiftpm-readme-design as the source of badge values, the
+- The response names swiftpm-readme as the source of badge values, the
   Install requirement and the snippet check, and DESIGN as the source of
   layout and styling.
 
@@ -401,7 +401,7 @@ Expected output:
   checksum steps from the release skill, the commands shown from cli-creator
   checked against the released --help, MCP client configuration from
   mcp-server-patterns, and build-from-source and Swift badge values from
-  swiftpm-readme-design; show only channels that exist.
+  swiftpm-readme; show only channels that exist.
 
 Forbidden behavior:
 

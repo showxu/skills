@@ -90,13 +90,13 @@
     {
       "id": 14,
       "prompt": "Redo the README first screen of example-team/swift-parcel, a Swift package, with badges and a Quick look.",
-      "expected_output": "Route Swift facts to swiftpm-readme-design with the repository, accepted revision and section skeleton; use its reported badge values, Install line and snippet check result; compose the header, badge selection, order and styling, navigation and skeleton from the applicable DESIGN; keep social cards and terminal demos on this skill's renderers.",
+      "expected_output": "Route Swift facts to swiftpm-readme with the repository, accepted revision and section skeleton; use its reported badge values, Install line and snippet check result; compose the header, badge selection, order and styling, navigation and skeleton from the applicable DESIGN; keep social cards and terminal demos on this skill's renderers.",
       "files": []
     },
     {
       "id": 15,
       "prompt": "Redo the README of example-team/parcel-cli, a Swift command-line tool with an MCP server, distributed through our Homebrew tap and release archives.",
-      "expected_output": "Compose the first screen and skeleton from DESIGN and render the light/dark terminal demo; take the Homebrew line from homebrew, release download and checksum steps from the release skill, the commands shown from cli-creator checked against the released --help, MCP client configuration from mcp-server-patterns, and build-from-source and Swift badge values from swiftpm-readme-design; show only channels that exist.",
+      "expected_output": "Compose the first screen and skeleton from DESIGN and render the light/dark terminal demo; take the Homebrew line from homebrew, release download and checksum steps from the release skill, the commands shown from cli-creator checked against the released --help, MCP client configuration from mcp-server-patterns, and build-from-source and Swift badge values from swiftpm-readme; show only channels that exist.",
       "files": []
     }
   ]

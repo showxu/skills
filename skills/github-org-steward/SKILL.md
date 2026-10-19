@@ -90,7 +90,7 @@ domain artifacts or their implementation procedures:
 | Personal account profile | `github-profile-readme` |
 | Framework icon family or app icons | `apple-framework-icon-design`, `apple-app-icon-design` |
 | Ecosystem release procedures | That ecosystem's release skill, e.g. `swiftpm-github-release` for Swift packages |
-| Facts a member README states: package snippets, install channels, commands and MCP configuration | Their owners, invoked through `github-repo-steward`; e.g. `swiftpm-readme-design` for Swift package snippets |
+| Facts a member README states: package snippets, install channels, commands and MCP configuration | Their owners, invoked through `github-repo-steward`; e.g. `swiftpm-readme` for Swift package snippets |
 | Website implementation and browser QA | `frontend-design`, `webapp-builder`, `webapp-testing` |
 | Interface/marketing copy | `ux-writing`, `market-messaging` |
 | App Store operations | The relevant `app-store-*` skill |

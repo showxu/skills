@@ -98,7 +98,7 @@ rendering/upload evidence. It does not own the following artifacts or decisions:
 | --- | --- |
 | Shared standards, organization settings, placement, profile, catalog, pins or coordinated rollout | The organization's standard owner, through its `.github` repository |
 | Documentation roles, architecture, review-rule format and community-file text | `repository-docs` or the ecosystem's documentation skill |
-| Package facts: badge values, dependency and build-from-source snippets, verified Quick look code, package section content and ecosystem topics | The ecosystem's README skill (for SwiftPM, `swiftpm-readme-design` when installed) |
+| Package facts: badge values, dependency and build-from-source snippets, verified Quick look code, package section content and ecosystem topics | The ecosystem's README skill (for SwiftPM, `swiftpm-readme` when installed) |
 | Homebrew formulae and casks, and the install commands a README shows | `homebrew` |
 | CLI commands, options and output a README shows | `cli-creator` |
 | MCP server commands, client configuration and tool lists a README shows | `mcp-server-patterns` |
