@@ -389,9 +389,10 @@ class ContinuousRectTests(unittest.TestCase):
     def test_barely_overrunning_corners_stay_well_formed_at_any_scale(self):
         k = app_icons.CONTINUOUS[0]
         for x, side, radius in ((0, 100, (100 + 0.011) / (2 * k)), (0, 1e6, 327082.78468467586),
-                                (5e6, 1000, (1000 + 0.02) / (2 * k))):
+                                (5e6, 1000, (1000 + 0.02) / (2 * k)), (0, 1e308, 5e307)):
             with self.subTest(side=side, radius=radius):
                 path = app_icons.continuous_rect(x, x, side, side, radius)
+                self.assertNotRegex(path, "nan|inf")
                 self.assertEqual(app_icons.doubled_back(layer(path)), [])
                 for cubic in path_cubics(path):
                     for point in cubic:
@@ -425,7 +426,8 @@ class PathReversalTests(unittest.TestCase):
                 self.assertEqual(app_icons.path_segments(data), [(square, True)])
         smooth = app_icons.path_segments("M0 0C10 0 20 10 20 20S30 40 40 40Q50 40 50 30T60 20")[0][0]
         self.assertEqual([s[1] for s in smooth], [(10.0, 0.0), (0.0, 10.0), (10.0, 0.0), (0.0, -10.0)])
-        for invalid in ("L10 0", "M0 0,,10 0", "M0 0L,10 0"):
+        self.assertEqual(app_icons.path_segments("M0 0H10H5H20e")[0][0][-1][2], (5.0, 0.0))
+        for invalid in ("L10 0", "M0 0,,10 0", "M0 0L,10 0", "M0 0L1e 0", "M\u00a00 0L1 1"):
             with self.subTest(data=invalid):
                 self.assertEqual(app_icons.path_segments(invalid), [])
         line = [((0.0, 0.0), (10.0, 0.0), (10.0, 0.0), (10.0, 0.0))]
@@ -452,9 +454,14 @@ class PathReversalTests(unittest.TestCase):
                        f'<path d="{naive_continuous_square(0, 0, 100, 40)}"/></g></svg>')
         self.assertEqual(app_icons.doubled_back(transformed), found)
         self.assertEqual(app_icons.doubled_back(layer("M0 0H10H5H20")), [(10.0, 0.0, 5.0)])
+        for line in ("L20 10", "L20 15L20 10", "C20 17 20 13 20 10"):
+            with self.subTest(line=line):
+                self.assertEqual(app_icons.doubled_back(layer(f"M0 0C10 0 20 10 20 20{line}C20 20 30 30 40 30")),
+                                 [(20.0, 20.0, 10.0)])
         heart = "M512 320C512 128 192 128 192 384C192 576 512 800 512 800C512 800 832 576 832 384C832 128 512 128 512 320Z"
         for clean in (naive_continuous_square(0, 0, 100, 30), "M0 0H10H9.6H20", "M0 0L10 0L5 0",
-                      "M0 0A5 5 0 0 1 10 0L0 0", "M0 0H100V100H0Z", "M0 0ZL10 0", heart,
+                      "M0 0A5 5 0 0 1 10 0L0 0", "M0 0H100V100H0Z", "M0 0ZL10 0", heart, "M0 0H10H5H20e",
+                      "M0 0H10\u00a0H5H20", "M0 0C10 0 20 10 20 20C20 17 20 13 20 10",
                       app_icons.continuous_rect(0, 0, 100, 100, 40)):
             with self.subTest(path=clean):
                 self.assertEqual(app_icons.doubled_back(layer(clean)), [])

@@ -408,9 +408,9 @@ def tangent_blend(p, p_direction, q, q_direction, box):
     if abs(determinant) <= 1e-12 * math.hypot(dx, dy) * math.hypot(ex, ey):
         return None
     a, b = (rx * ey - ry * ex) / determinant, (dx * ry - dy * rx) / determinant
-    if a <= 0 or b <= 0:
-        return None
     meet = (p[0] + a * dx, p[1] + a * dy)
+    if not (a > 0 and b > 0 and all(map(math.isfinite, meet))):
+        return None
 
     def handle(origin):
         share = BLEND_HANDLE
@@ -459,6 +459,8 @@ def continuous_rect(x, y, width, height, radii):
         tangents.append(tuple((u * e1[0] + v * e2[0], u * e1[1] + v * e2[1]) for u, v in (leave, arrive)))
 
     def at(point):
+        if not all(map(math.isfinite, point)):
+            fail("a continuous rectangle this large has no finite outline")
         return f"{point[0]:.2f} {point[1]:.2f}"
 
     def join(i):
@@ -866,10 +868,11 @@ def shape_widths(cover, size):
     return widths
 
 
-PATH_COMMAND = re.compile(r"\s*([MmLlHhVvCcSsQqTtAaZz])")
-PATH_SEPARATOR = re.compile(r"\s*(?:,\s*)?")
-PATH_SPACE = re.compile(r"\s*")
-PATH_NUMBER = re.compile(r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?")
+PATH_SPACES = " \t\n\f\r"   # whitespace in SVG path data
+PATH_COMMAND = re.compile(r"[ \t\n\f\r]*([MmLlHhVvCcSsQqTtAaZz])")
+PATH_SEPARATOR = re.compile(r"[ \t\n\f\r]*(?:,[ \t\n\f\r]*)?")
+PATH_SPACE = re.compile(r"[ \t\n\f\r]*")
+PATH_NUMBER = re.compile(r"[-+]?(?:[0-9]+\.?[0-9]*|\.[0-9]+)(?:[eE][-+]?[0-9]+)?")
 PATH_FLAG = re.compile(r"[01]")
 PATH_ARITY = {"M": 2, "L": 2, "H": 1, "V": 1, "C": 6, "S": 4, "Q": 4, "T": 2, "A": 7, "Z": 0}
 
@@ -877,8 +880,9 @@ PATH_ARITY = {"M": 2, "L": 2, "H": 1, "V": 1, "C": 6, "S": 4, "Q": 4, "T": 2, "A
 def path_segments(data):
     """Subpaths of SVG path data as (segments, closed).
 
-    Each segment is (start, start direction, end, end direction); arcs have no directions.
-    Parsing stops at the first error, where SVG renderers stop drawing.
+    Each segment is (start, start direction, end, end direction); arcs have no directions, and
+    straight curves get the directions of a line. Parsing stops at the first error, where SVG
+    renderers stop drawing.
     """
     subpaths, segments, closed = [], [], False
     command, previous, position, fresh = None, None, 0, False
@@ -888,10 +892,17 @@ def path_segments(data):
         nonlocal current
         chain = [current, *points, end]
         if any(p != current for p in chain):
-            first = next((p for p in chain[1:] if p != current), None)
-            last = next((p for p in reversed(chain[:-1]) if p != end), None)
-            segments.append((current, (first[0] - current[0], first[1] - current[1]) if directions else None,
-                             end, (end[0] - last[0], end[1] - last[1]) if directions and last else None))
+            first = next(p for p in chain[1:] if p != current)
+            last = next(p for p in reversed(chain[:-1]) if p != end)
+            leave, arrive = (first[0] - current[0], first[1] - current[1]), (end[0] - last[0], end[1] - last[1])
+            chord = (end[0] - current[0], end[1] - current[1])
+            length = math.hypot(*chord)
+            if 0 < length < math.inf:
+                ux, uy = chord[0] / length, chord[1] / length
+                if all(abs((p[0] - current[0]) * uy - (p[1] - current[1]) * ux) <= 1e-9 * length
+                       and 0 <= (p[0] - current[0]) * ux + (p[1] - current[1]) * uy <= length for p in points):
+                    leave = arrive = chord
+            segments.append((current, leave if directions else None, end, arrive if directions else None))
         current = end
 
     while True:
@@ -906,13 +917,13 @@ def path_segments(data):
                 closed, command, previous = True, None, "Z"
             fresh = command is not None
             continue
-        if command is None or not data[position:].strip():
+        if command is None or not data[position:].strip(PATH_SPACES):
             break
         values = []
         for index in range(PATH_ARITY[command.upper()]):
             position = (PATH_SPACE if fresh and not index else PATH_SEPARATOR).match(data, position).end()
             match = (PATH_FLAG if command in "Aa" and index in (3, 4) else PATH_NUMBER).match(data, position)
-            if not match:
+            if not match or data[match.end():match.end() + 1] in ("e", "E"):
                 break
             values.append(float(match[0]))
             position = match.end()
@@ -963,11 +974,16 @@ def path_segments(data):
 def doubled_back(data):
     """(x, y, length) of the longest doubled-back line in each path of an SVG layer.
 
-    A line doubles back when it runs against the tangents on both its sides, as the line joining
-    two corners whose departures exceed their edge does. Cusps where curves meet are not findings.
+    A line, or a run of collinear straight segments, doubles back when it runs against the
+    tangents on both its sides, as the line joining two corners whose departures exceed their
+    edge does. Cusps where curves meet are not findings.
     """
     def reverses(a, b):
         return a[0] * b[0] + a[1] * b[1] <= REVERSAL * math.hypot(*a) * math.hypot(*b)
+
+    def straight(segment):
+        begin, leave, end, arrive = segment
+        return leave is not None and leave == arrive == (end[0] - begin[0], end[1] - begin[1])
 
     found = []
     for node in ET.fromstring(data).iter():
@@ -975,15 +991,33 @@ def doubled_back(data):
             continue
         worst = None
         for segments, closed in path_segments(node.get("d", "")):
-            for i, (begin, leave, end, arrive) in enumerate(segments):
-                chord = (end[0] - begin[0], end[1] - begin[1])
-                if leave != chord or arrive != chord or not (closed or 0 < i < len(segments) - 1):
+            def continues(i):
+                """Whether segment i extends the straight run of the segment before it."""
+                before = segments[i - 1]
+                return (straight(segments[i]) and straight(before) and (closed or i > 0)
+                        and reverses(segments[i][1], (-before[1][0], -before[1][1])))
+            count = len(segments)
+            first = next((i for i in range(count) if not continues(i)), None)
+            if first is None:
+                continue
+            order = [(first + k) % count for k in range(count)] if closed else list(range(count))
+            k = 0
+            while k < count:
+                end = k
+                while end + 1 < count and continues(order[end + 1]):
+                    end += 1
+                run = [segments[i] for i in order[k:end + 1]]
+                head, tail = order[k], order[end]
+                k = end + 1
+                if not straight(run[0]) or not (closed or (head > 0 and tail < count - 1)):
                     continue
-                before, after = segments[i - 1][3], segments[(i + 1) % len(segments)][1]
-                length = math.hypot(*chord)
-                if (before and after and reverses(before, chord) and reverses(chord, after)
-                        and length >= REVERSAL_LENGTH and (not worst or length > worst[2])):
-                    worst = (*begin, length)
+                direction = (run[-1][2][0] - run[0][0][0], run[-1][2][1] - run[0][0][1])
+                before, after = segments[head - 1][3], segments[(tail + 1) % count][1]
+                length = sum(math.dist(segment[0], segment[2]) for segment in run)
+                if (before and after and any(direction) and reverses(before, direction)
+                        and reverses(direction, after) and length >= REVERSAL_LENGTH
+                        and (not worst or length > worst[2])):
+                    worst = (*run[0][0], length)
         if worst:
             found.append(worst)
     return found

@@ -293,8 +293,9 @@ reports:
 - more than three groups.
 
 It also reads the paths of each SVG layer and reports a line that doubles
-back: a straight segment at least 0.5 units long that runs against the
-tangents on both its sides (cosine at most -0.999). Corners whose departures
+back: a straight run at least 0.5 units long, made of lines or straight
+curves in one direction, that runs against the tangents on both its sides
+(cosine at most -0.999). Corners whose departures
 exceed their edge draw exactly this stray segment, whichever tool produced the
 SVG; redraw the shape with [continuous rectangles](#continuous-rectangles) or
 smaller radii. Cusps where two curves meet are not findings. Positions and
