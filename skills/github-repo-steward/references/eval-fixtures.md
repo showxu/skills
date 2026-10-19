@@ -383,6 +383,49 @@ Owner notes:
 
 - Fixture values are synthetic inputs, not reusable project conventions.
 
+## installed-product-readme
+
+Target behavior: installed product README facts.
+
+Input prompt: "Redo the README of example-team/parcel-cli, a Swift command-line tool with an MCP server, distributed through our Homebrew tap and release archives."
+
+Context and files:
+
+- No checked-in product; a qualitative routing case. The organization's
+  DESIGN defines the first screen, and the tool has a recorded session.
+
+Expected output:
+
+- Compose the first screen and skeleton from DESIGN and render the light/dark
+  terminal demo; take the Homebrew line from homebrew, release download and
+  checksum steps from the release skill, the commands shown from cli-creator
+  checked against the released --help, MCP client configuration from
+  mcp-server-patterns, and build-from-source and Swift badge values from
+  swiftpm-readme-design; show only channels that exist.
+
+Forbidden behavior:
+
+- Type install lines, asset names or command options from memory, or route
+  every product fact to the language skill.
+
+Acceptance checks:
+
+- The response names an owner for each install channel, the command
+  reference and the MCP configuration, and DESIGN for layout and styling.
+
+Baseline expectation:
+
+- A presentation skill may copy install commands from another project, or a
+  language skill may assert distribution channels it does not own.
+
+Evidence sources:
+
+- Executor output, command trace, generated artifacts and captured observations.
+
+Owner notes:
+
+- Fixture values are synthetic inputs, not reusable project conventions.
+
 ## unknown-standard
 
 Target behavior: unknown standard.

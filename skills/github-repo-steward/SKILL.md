@@ -51,10 +51,10 @@ or concurrent writers are implied.
    Ecosystem validation stays with its ecosystem owner.
 4. **Present.** Resolve current About, topics and homepage from the repository's
    product. Prepare its header and Quick look with
-   [presentation](references/presentation.md). Take badge values, Install and
-   Quick look snippets and package section content from the ecosystem's README
-   skill when one applies, and compose them into the first screen and section
-   skeleton. Render social cards and recorded terminal demos using
+   [presentation](references/presentation.md). Take each fact the README states
+   from its owner in the routing table below, and compose the facts into the
+   first screen and section skeleton. Render social cards and recorded terminal
+   demos using
    [renderers](references/renderers.md). Review the exact images in light and
    dark before publication.
 5. **Publish.** Follow the repository's issue/PR workflow; require checks for the
@@ -98,10 +98,14 @@ rendering/upload evidence. It does not own the following artifacts or decisions:
 | --- | --- |
 | Shared standards, organization settings, placement, profile, catalog, pins or coordinated rollout | The organization's standard owner, through its `.github` repository |
 | Documentation roles, architecture, review-rule format and community-file text | `repository-docs` or the ecosystem's documentation skill |
-| Ecosystem README facts: badge values, verified Install and Quick look snippets, package section content and ecosystem topics | The ecosystem's README skill (for SwiftPM, `swiftpm-readme-design` when installed) |
+| Package facts: badge values, dependency and build-from-source snippets, verified Quick look code, package section content and ecosystem topics | The ecosystem's README skill (for SwiftPM, `swiftpm-readme-design` when installed) |
+| Homebrew formulae and casks, and the install commands a README shows | `homebrew` |
+| CLI commands, options and output a README shows | `cli-creator` |
+| MCP server commands, client configuration and tool lists a README shows | `mcp-server-patterns` |
+| macOS privacy permissions a README states | `macos-tcc-permissions-patterns` when installed |
 | Issue filing, triage, implementation and PR lifecycle | `github-flow` |
 | Framework icon family or app icons | `apple-framework-icon-design`, `apple-app-icon-design` |
-| Ecosystem release mechanics | The ecosystem's release skill (for SwiftPM, `swiftpm-github-release` when installed) |
+| Ecosystem release mechanics, and the release downloads, checksums, signing and notarization a README states | The ecosystem's release skill (for SwiftPM, `swiftpm-github-release`; for Apple apps, `apple-platform-release` or `swiftpm-macos-app-packaging`; when installed) |
 
 Hand over the repository, applicable standard revision, accepted source, scoped
 change and evidence. Do not implement another owner's policy by copying it here.

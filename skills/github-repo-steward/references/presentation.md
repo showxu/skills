@@ -27,6 +27,10 @@ applicable badges and a concise navigation row. Default sections are Overview,
 Quick look, Install, Usage, Requirements, Documentation, Contributing, License;
 adapt for the actual artifact instead of adding empty sections.
 
+Install lines, release downloads, commands and MCP configuration come from
+their owners in the skill's routing table. Show only channels and integrations
+that exist.
+
 Badge order defaults to CI, language/toolchain, platforms, license. Show a
 badge only if an actual workflow, supported requirement or license backs it.
 Take badge values from the ecosystem's README skill when one applies; this
