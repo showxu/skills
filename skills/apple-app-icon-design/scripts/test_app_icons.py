@@ -406,6 +406,12 @@ class ContinuousRectTests(unittest.TestCase):
         top = [s for s in app_icons.path_segments(sharp)[0][0] if s[2][0] == 231.0 and s[0][0] < 231.0]
         self.assertEqual(len(top), 1, "the corner meets the sharp corner's other edge, then follows it")
         self.assertLess(top[0][2][1], 1.0)
+        for size, radii in (((100, 5), (0, 5, 0, 0)), ((5, 100), (0, 0, 5, 0)), ((100, 5), (0, 0, 0, 5)),
+                            ((5, 100), (5, 0, 0, 0))):
+            with self.subTest(size=size, radii=radii):
+                straight = [segment for segment in path_cubics(app_icons.continuous_rect(0, 0, *size, radii))
+                            if segment[0] == segment[1] and segment[2] == segment[3]]
+                self.assertTrue(all(abs(a[0] - b[0]) < 0.02 or abs(a[1] - b[1]) < 0.02 for a, _, _, b in straight))
         random = __import__("random").Random(11)
         for _ in range(200):
             width, height = random.uniform(1, 600), random.uniform(1, 600)
@@ -419,6 +425,9 @@ class ContinuousRectTests(unittest.TestCase):
                 turns = [(b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0])
                          for a, b, c in zip(points, points[1:] + points[:1], points[2:] + points[:2])]
                 self.assertGreaterEqual(min(turns), -0.05, "outline must stay convex")
+                for start, _, _, end in (c for c in path_cubics(path) if c[0] == c[1] and c[2] == c[3]):
+                    self.assertTrue(abs(start[0] - end[0]) < 0.05 or abs(start[1] - end[1]) < 0.05,
+                                    f"line {start}-{end} must follow an edge")
 
     def test_barely_overrunning_corners_stay_well_formed_at_any_scale(self):
         k = app_icons.CONTINUOUS[0]

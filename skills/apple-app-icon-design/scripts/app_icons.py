@@ -370,12 +370,12 @@ def corner_position(axis, target):
     fail("corner position outside the curve")
 
 
-def corner_piece(start, end, radius):
+def corner_piece(start, end, radius, trim=(False, False)):
     """The unit corner's cubics between positions start < end, from 0 at its first departure to 3.
 
-    Where a cut leaves less than SLIVER px of a cubic and other cubics remain, that sliver is
-    dropped, so the corner ends on a cubic boundary rather than on a segment whose tangent rounding
-    would bend. Uncut cubics are kept whatever their size.
+    Where `trim` allows it at the start or end, and a cut leaves less than SLIVER px of a cubic
+    while other cubics remain, that sliver is dropped so a blend starts on a cubic boundary rather
+    than on a segment whose tangent rounding would bend. Uncut cubics are always kept.
     """
     pieces, cut = [], []
     for index, cubic in enumerate(corner_cubics()):
@@ -388,10 +388,10 @@ def corner_piece(start, end, radius):
             cubic = split_cubic(cubic, low / high)[1]
         pieces.append(cubic)
         cut.append((low > 0, high < 1))
-    if len(pieces) > 1 and cut[0][0] and math.dist(pieces[0][0], pieces[0][3]) * radius < SLIVER:
+    if len(pieces) > 1 and trim[0] and cut[0][0] and math.dist(pieces[0][0], pieces[0][3]) * radius < SLIVER:
         pieces.pop(0)
         cut.pop(0)
-    if len(pieces) > 1 and cut[-1][1] and math.dist(pieces[-1][0], pieces[-1][3]) * radius < SLIVER:
+    if len(pieces) > 1 and trim[1] and cut[-1][1] and math.dist(pieces[-1][0], pieces[-1][3]) * radius < SLIVER:
         pieces.pop()
     return pieces
 
@@ -516,7 +516,9 @@ def continuous_rect(x, y, width, height, radii):
             continue
         start = corner_position(0, (lengths[i - 1] - CONTINUOUS[0] * radii[i - 1]) / radius) if overrun[i - 1] else 0.0
         end = corner_position(1, (lengths[i] - CONTINUOUS[0] * radii[(i + 1) % 4]) / radius) if overrun[i] else 3.0
-        pieces = corner_piece(start, end, radius) if start < end else []
+        # Only an end that a blend replaces may lose a sliver; a cut at a sharp corner's edge must
+        # stay on that edge.
+        pieces = corner_piece(start, end, radius, (blended[i - 1], blended[i])) if start < end else []
         if pieces:
             elements.append((i, place(*pieces[0][0]), direction(*(b - a for a, b in zip(pieces[0][0], pieces[0][1]))),
                              [tuple(place(*point) for point in cubic) for cubic in pieces],
