@@ -68,13 +68,10 @@ concurrent writers are implied.
 
 ## Member-profile repository
 
-A private `.github-private` repository follows the shared standard's settings,
-rulesets, signing and CI requirements. Its `profile/README.md` is a generated
-maintainer dashboard: link policy in `.github` and consume the pinned public
-catalog with member operational facts. README first-screen product
-presentation, social cards and inherited community files do not apply to this
-repository role. Apply this scope before the Present and Issue intake steps;
-review dashboard rendering through `github-readme-design`.
+For a private `.github-private` repository, apply the scope in
+[standard](references/standard.md#private-member-profile-repository) before the
+Present and Issue intake steps; `github-readme-design` reviews its dashboard
+rendering.
 
 ## Issue intake
 
