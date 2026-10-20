@@ -16,11 +16,12 @@ No compatibility alias or duplicate per-repository procedure belongs here.
 | topology.md | Repository roles and cross-repository placement |
 | governance.md | Shared declarations, organization settings and authorized Apps |
 | brand.md / website.md | Family source, public/member generated profiles, pins and site integration |
-| release.md | Capacity-bound rollout waves, measured development-cache gate, publication dependencies and downstream acceptance |
+| release.md | Organization VERSIONING extensions, capacity-bound rollout waves, measured development-cache gate, publication dependencies and downstream acceptance |
 | operations.md / audit-checklist.md | Local preservation, authorized handoffs and organization acceptance |
 | scripts/scan_org.py | Organization enumeration, delegation to repository observations, license grouping and local snapshot/compare |
 | scripts/profile_observations.py | Public inventory and pinned member-catalog checks, private visibility, default-branch/workflow/release facts and icon resolution; reuses the profile renderer schema |
 | templates/MAINTENANCE.md.tpl | Organization-level declarations, with member settings delegated to their owner |
+| [Repository steward VERSIONING template](../../github-repo-steward/templates/VERSIONING.md.tpl) | Common policy for the organization's VERSIONING; release.md owns its organization-only sections |
 | tests / references/eval-fixtures.md / evals/evals.json | Scanner regressions and behavioral inputs; dated results stay ignored |
 
 The scanner loads `github-repo-steward/scripts/scan_repository.py` from a sibling

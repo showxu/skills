@@ -25,6 +25,7 @@ product presentation or copied community files to satisfy an inapplicable row.
 | Default branch ruleset | Active, no bypass actors; prevent deletion/force push, require signed commits, PRs, resolved threads and actual policy/validation contexts | Include `~DEFAULT_BRANCH`; read full rule parameters and overlapping legacy protection |
 | Reviews | Zero extra approvals for a solo owner; team/code-owner requirements follow ownership policy | Review decisions and threads, not only check conclusions |
 | Release tag ruleset | Active; prevent update and deletion of the repository's release pattern (new SemVer projects default to `v*`) | Pattern covers real releases, no bypass |
+| Version policy | When no shared standard applies, write root `VERSIONING.md` from the [template](../templates/VERSIONING.md.tpl). Versions never tagged or published to users do not constrain the first release, which may start at `0.1.0`; a tagged version is never reused or decreased | Each tag matches the version source at its commit and has a changelog section |
 | Actions | Read default token, no PR approval permission; least permissions per job | Repository Actions permission endpoint and workflow YAML |
 | Private vulnerability reporting | Enabled where supported; private reporting route documented | API plus repository Security page; unsupported is an explicit gap |
 | Discussions | Retain existing setting and content; for a new project enable only with an intended support owner | Never disable without examining existing content |

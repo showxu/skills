@@ -3,6 +3,137 @@
 Durable inputs for qualitative review or isolated paired evals. Results stay in
 the producer-owned ignored eval workspace, outside this package.
 
+## default-versioning-first-release
+
+Target behavior: Establish the default policy for an unpublished first release.
+
+Input prompt: "Prepare root versioning policy and a local release PR candidate for my personal repository parcel. I want its first public release to be 0.1.0. It has no versioning standard. Its VERSION file says 0.8.4, which was never tagged or published. There are no mirrors; MAINTENANCE.md#publication owns its release checks and mechanics. Do not publish."
+
+Context and files:
+
+- A personal repository with no shared standard; the version source, absence
+  of mirrors, release owner and unpublished state are supplied in the prompt.
+
+Expected output:
+
+- Render root `VERSIONING.md` from the shared template with the supplied
+  repository values. Prepare `0.1.0` in the version source and changelog,
+  leaving an empty `## Unreleased` above `## 0.1.0`.
+
+Forbidden behavior:
+
+- Treat the never-tagged, never-published number as a release floor, invent
+  mirrors or ecosystem commands, narrate old manifest numbers in the changelog,
+  or publish tags/assets during local preparation.
+
+Acceptance checks:
+
+- The common policy equals the template after filling its five placeholders;
+  the version source and changelog agree on `0.1.0`.
+- The policy covers signed annotated immutable tags, the repository-specific
+  tag message, squash merge, remote peeled-commit verification and tag/source/
+  changelog agreement. All mutations stay local.
+
+Baseline expectation:
+
+- A version-number-only workflow may reject `0.1.0` or invent release policy
+  instead of resolving published identity and the template owner.
+
+Evidence sources:
+
+- Rendered policy, version source, changelog, executor report and command trace.
+
+Owner notes:
+
+- Repository name, paths and version numbers are synthetic fixture inputs.
+
+## default-version-increments
+
+Target behavior: Apply the default version increments before and after 1.0.
+
+Input prompt: "Our two repositories use the steward's default version policy. One is at 0.4.2 and the other at 1.4.2. For each, determine the next version for three separate candidates: a breaking change, a compatible addition, and a fix. Prepare the release plan only."
+
+Context and files:
+
+- Both current versions are tagged and published. The candidates are
+  independent alternatives, not a sequence of releases.
+
+Expected output:
+
+- For `0.4.2`, propose `0.5.0` for the breaking change and `0.4.3` for each
+  compatible addition or fix. For `1.4.2`, propose `2.0.0`, `1.5.0` and
+  `1.4.3`, respectively. Breaking-change changelog entries include upgrade
+  instructions.
+
+Forbidden behavior:
+
+- Apply the 1.0+ addition rule during 0.x, bump PATCH for a 0.x breaking
+  change, reuse a tagged version, omit upgrade guidance or execute publication.
+
+Acceptance checks:
+
+- All six choices follow the template table and reset less significant
+  components correctly. The plan binds source, mirrors, changelog and tag to
+  the chosen version without changing remote state.
+
+Baseline expectation:
+
+- A generic SemVer summary may leave 0.x unspecified or impose the 1.0+
+  minor increment for a compatible addition.
+
+Evidence sources:
+
+- Release plans, proposed changelog entries and executor report.
+
+Owner notes:
+
+- Versions and candidate changes are case-local inputs.
+
+## existing-version-policy
+
+Target behavior: Preserve a repository's declared 0.x version interpretation.
+
+Input prompt: "Plan the next release of my personal repository at 0.4.2. Its existing VERSIONING.md requires a MINOR increment for a compatible addition during 0.x. This candidate adds a compatible feature."
+
+Context and files:
+
+- No organization standard applies. The repository's current policy is
+  explicit and the task does not authorize changing it.
+
+Expected output:
+
+- Use the declared policy to propose `0.5.0`; keep the repository's policy
+  authoritative and identify its version source and release owner before
+  preparing release artifacts.
+- Still apply the steward's baseline release hygiene the policy does not
+  state: one version source, a CHANGELOG with Unreleased, a signed annotated
+  immutable tag and remote peeled-commit verification.
+
+Forbidden behavior:
+
+- Replace the existing policy with the template, impose its default 0.x
+  PATCH increment on this repository, or drop baseline release hygiene because
+  the declared policy omits it.
+
+Acceptance checks:
+
+- The plan cites the existing policy for the increment and preserves it;
+  missing source/owner facts remain identified rather than invented.
+- The plan keeps one version source, an Unreleased changelog section, a signed
+  annotated tag and remote peeled-commit verification.
+
+Baseline expectation:
+
+- A newly introduced default may accidentally override existing 0.x policy.
+
+Evidence sources:
+
+- Policy comparison, release plan and executor report.
+
+Owner notes:
+
+- This policy is a fixture-owned override, not a reusable default.
+
 ## github-defined-paths
 
 Target behavior: Preserve GitHub's recognized paths and presentation behavior.

@@ -5,6 +5,15 @@ assets belong to its repository steward and ecosystem release owner. The
 organization owns shared version policy and the order/evidence across members.
 Do not duplicate per-component release commands here.
 
+## Shared version policy
+
+Write the organization `.github` root `VERSIONING.md` from the repository
+steward's [VERSIONING template](../../github-repo-steward/templates/VERSIONING.md.tpl).
+Fill its repository, version source, mirrors, release details and ecosystem
+release owner from the organization's declared inputs. Append organization-only
+sections for family release order and the members' release table. Keep the
+common policy in the shared template rather than restating it in this skill.
+
 ## Plan by dependency
 
 Record the accepted revisions and dependency graph. In a product family,

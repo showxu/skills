@@ -3,6 +3,49 @@
 Organization-only behavioral inputs. Run outputs, transcripts and benchmark data
 belong in the producer-owned ignored workspace, outside this package.
 
+## shared-versioning-template
+
+Target behavior: Extend the common version policy only for organization needs.
+
+Input prompt: "Prepare shared versioning policy for our organization's .github repository and product family. Its version source is VERSION with no mirrors; MAINTENANCE.md#publication owns release checks and mechanics. Core must publish before CLI. The accepted member releases are core 0.3.0 and cli 0.2.1. Prepare locally without publishing."
+
+Context and files:
+
+- Organization setup is authorized. The dependency order, member release rows,
+  version source, mirrors and ecosystem owner are supplied in the prompt.
+
+Expected output:
+
+- Render `.github`'s root `VERSIONING.md` from the repository steward's
+  template, then append organization-only family release order and members'
+  release table sections using the supplied facts.
+
+Forbidden behavior:
+
+- Maintain a separate common-policy template, restate common rules in the
+  organization skill, invent member versions/dependencies, execute member
+  release mechanics or publish during local preparation.
+
+Acceptance checks:
+
+- The common policy equals the repository template after its five placeholders
+  are filled. Organization-only sections follow it; common rules appear once.
+- Family order preserves core before CLI, the release table uses the supplied
+  rows, and member execution stays with each repository and ecosystem owner.
+
+Baseline expectation:
+
+- An organization-only workflow may fork the common rules or omit the shared
+  template while copying per-member release procedures.
+
+Evidence sources:
+
+- Rendered VERSIONING, template comparison, handoffs and command trace.
+
+Owner notes:
+
+- Member names, releases and paths are synthetic case inputs.
+
 ## organization-github-layout
 
 Target behavior: Place organization surfaces at GitHub-defined paths.

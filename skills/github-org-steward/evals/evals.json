@@ -84,6 +84,12 @@
       "prompt": "Audit our member dashboard. It has a hand-edited table of repositories, CI results and release versions.",
       "expected_output": "Report drift and the owning catalog/member-input/shared-renderer correction. Require exact catalog membership, live badges or declared fallback links, and a pinned digest. Preserve audit-only scope.",
       "files": []
+    },
+    {
+      "id": 15,
+      "prompt": "Prepare shared versioning policy for our organization's .github repository and product family. Its version source is VERSION with no mirrors; MAINTENANCE.md#publication owns release checks and mechanics. Core must publish before CLI. The accepted member releases are core 0.3.0 and cli 0.2.1. Prepare locally without publishing.",
+      "expected_output": "Render the organization's root VERSIONING.md from the repository steward's common template, filling its five placeholders from declared inputs. Append organization-only family release order and members' release table sections; preserve core before CLI and the supplied releases. Do not fork common rules, duplicate member procedures or publish.",
+      "files": []
     }
   ]
 }
