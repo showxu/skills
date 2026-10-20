@@ -9,10 +9,15 @@ Do not duplicate per-component release commands here.
 
 Write the organization `.github` root `VERSIONING.md` from the repository
 steward's [VERSIONING template](../../github-repo-steward/templates/VERSIONING.md.tpl).
-Fill its repository, version source, mirrors, release details and ecosystem
-release owner from the organization's declared inputs. Append organization-only
-sections for family release order and the members' release table. Keep the
-common policy in the shared template rather than restating it in this skill.
+Fill its repository, tag name, version source, mirrors, release details and
+ecosystem release owner from the organization's declared inputs. Preserve
+published tag formats; new repositories default to `vX.Y.Z`. Append organization
+sections for family release order, the members' release table, the family's
+documented interfaces and dependency rules. Family publication details belong
+with those release requirements. Derive version levels from the common template;
+its 0.x rules, owner-decided 1.0.0 and 1.0+ compatibility promise apply to the
+organization too. Keep the common policy there rather than restating it in
+this skill.
 
 ## Plan by dependency
 

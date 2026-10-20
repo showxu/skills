@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Use MINOR for breaking changes and PATCH otherwise during 0.x; let the owner
+  begin the compatibility promise at 1.0.0, then evolve interfaces compatibly
+  with roughly yearly planned majors, MINOR features and PATCH fixes in the
+  steward's version policy.
+
 ## 0.1.0
 
 - Ship the `showxu-skills` plugin for Claude Code and Codex, with marketplace

@@ -8,11 +8,33 @@ moved, reused or decreased.
 
 ## Choosing the next version
 
-| Change | 0.x | 1.0+ |
-| --- | --- | --- |
-| Breaking change | Bump MINOR | Bump MAJOR |
-| Compatible addition | Bump PATCH | Bump MINOR |
-| Fix | Bump PATCH | Bump PATCH |
+### 0.x (initial development)
+
+Anything may change at any time, without deprecation windows or a release
+cadence. Breaking changes (removing or incompatibly changing a documented
+interface) bump MINOR; everything else bumps PATCH.
+
+Minor-bounded dependency ranges such as `"0.1.1"..<"0.2.0"` and caret semantics
+treat `0.MINOR` as the boundary, so automatic updates never pull a breaking
+change.
+
+### 1.0.0
+
+Release `1.0.0` when the owner decides the interface is stable and
+compatibility is promised.
+
+### 1.0 and later
+
+Change an interface by adding the new form compatibly, keeping the old form
+working and deprecating it. Remove the old form only in a planned major.
+
+Breaking changes appear only in planned majors, on a roughly yearly cadence
+like platform releases. A major may also mark a significant feature release.
+Never cut a major because of a single change.
+
+New features, including value or output changes consumers absorb without
+changing their usage (such as regenerating outputs), bump MINOR. Fixes bump
+PATCH.
 
 Reset less significant components to zero when bumping MAJOR or MINOR.
 Version numbers never tagged or published to users do not constrain the first
@@ -34,10 +56,12 @@ Update the source and its mirrors together in the release PR.
 Keep `CHANGELOG.md` with `## Unreleased` first, followed by `## X.Y.Z`
 sections newest first. Describe what each version ships. Every breaking change
 includes instructions for upgrading.
+From `1.0` onward, record deprecations in the changelog and list a planned
+major's removals beforehand.
 
 ## Release procedure
 
-1. Choose the next version using the table above.
+1. Choose the next version using the rules above.
 2. Prepare a release PR that sets the version source and its mirrors, moves
    the Unreleased entries into the new `## X.Y.Z` section, and leaves an empty
    `## Unreleased` section at the top.
