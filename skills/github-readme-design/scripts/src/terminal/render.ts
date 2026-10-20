@@ -10,7 +10,8 @@ export const THEMES = ["light", "dark"] as const;
 type Theme = typeof THEMES[number];
 
 function xml(value: string): string {
-  return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&apos;");
+  return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&apos;")
+    .replace(/ +(?=\n|$)/g, spaces => "&#32;".repeat(spaces.length));
 }
 
 export function expandTabs(value: string, initialCell = 0): string {
