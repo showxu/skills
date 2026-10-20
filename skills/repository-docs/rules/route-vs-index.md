@@ -62,6 +62,10 @@ Keep long ownership models and architectural explanations in their named
 owner. AGENTS can link to that owner and retain only the boundary needed while
 editing. Repeating the complete model weakens the guide.
 
+When a repository has a `DESIGN.md`, name and link it in `AGENTS.md` as the
+read route for design work. Agents do not load `DESIGN.md` automatically;
+the pointer makes its authority discoverable without copying its contents.
+
 ## Reader Operations And Agent Instructions
 
 Public operational instructions belong in the manual even when imperative:

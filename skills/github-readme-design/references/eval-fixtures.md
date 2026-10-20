@@ -3,6 +3,135 @@
 Durable inputs for qualitative review or isolated paired evals. Results stay in
 the producer-owned ignored eval workspace, outside this package.
 
+## scripted-cli-quick-look
+
+Target behavior: Make the CLI Quick look reproducible from the built product.
+
+Input prompt: "Plan the Quick look assets and README markup for our CLI using the accepted session and DESIGN."
+
+Context and files:
+
+- Supplied CLI information, accepted DESIGN, a freshly built executable and
+  session commands with optional fixture files. Planning only.
+
+Expected output:
+
+- Place `script.yml`, optional `fixture/`, committed `recording.json` and
+  `terminal-light.svg`/`terminal-dark.svg` under `.github/assets/terminal/`.
+  Use the documented recorder and renderer, with CI re-recording against the
+  built executable and comparing the recording and both SVGs byte for byte.
+
+Forbidden behavior:
+
+- Hand-write captured output, treat rendering a stale recording as a CI
+  re-record, or claim a planning response executed the toolchain.
+
+Acceptance checks:
+
+- README markup has `<picture>`, the dark `prefers-color-scheme` source,
+  the light `<img>` fallback and meaningful session alt text at the standard
+  paths. The plan links to the recording/rendering toolchain contract.
+
+Baseline expectation:
+
+- An image-only demo plan may keep plausible but stale output without
+  checking what the current product actually prints.
+
+Evidence sources:
+
+- Asset plan, README markup and toolchain handoff.
+
+Owner notes:
+
+- Session content and DESIGN values arrive as inputs.
+
+## product-kind-assets
+
+Target behavior: Select assets by product kind and preserve source ownership.
+
+Input prompt: "Prepare the presentation asset plan for our CLI, library, app, tap, organization profile and website from the supplied information sets and shared DESIGN."
+
+Context and files:
+
+- Accepted product kinds, icons and content for all six surfaces; the tap
+  distributes the CLI and the website uses the organization identity.
+
+Expected output:
+
+- Apply the product-kind matrix: CLI terminal assets, app screenshots,
+  library logo/social preview, tap product icon, organization profile assets
+  and website organization icon. Use the standard kind directories and names.
+- Describe script → capture → render and the corresponding CI comparison or
+  native-export receipt, with selections owned by the catalog.
+
+Forbidden behavior:
+
+- Give every kind a terminal or screenshots, invent a tap icon, add a website
+  social-preview requirement, or claim native exports were reproduced in CI.
+
+Acceptance checks:
+
+- Every matrix row is represented; reproducible outputs use regeneration
+  checks, local native outputs keep receipts, and logo comparison targets the
+  exports at the pinned standard.
+
+Baseline expectation:
+
+- A one-size asset checklist may generate unnecessary assets or lose native
+  export provenance.
+
+Evidence sources:
+
+- Per-surface asset plan and declared input/CI ownership.
+
+Owner notes:
+
+- This tests selection and production contracts, not renderer execution.
+
+## ui-test-screenshot-scenes
+
+Target behavior: Keep screenshot scenes declarative and driving code in UI tests.
+
+Input prompt: "Plan light and dark README screenshots of the app's editor for two locales and a device our CI cannot run. The accepted DESIGN supplies the frame and background."
+
+Context and files:
+
+- Accepted app information, UI tests, target devices, appearances and locales.
+  Some scenes can run in CI; others require local native capture.
+
+Expected output:
+
+- Define `.github/assets/screenshots/script.yml` scenes naming UI test,
+  device, appearance and locale; record captures in `capture.json`; place
+  driving code in the product's UI tests and apply DESIGN's background/frame
+  to `<scene>-light.png` and `<scene>-dark.png`.
+- Regenerate with tolerance where CI can capture; verify a provenance receipt
+  otherwise. Store screenshot sets may reuse the captures through their owner.
+
+Forbidden behavior:
+
+- Put UI-driving code in assets, invent visual values or tolerance numbers,
+  require unavailable CI capture, or substitute a README video file.
+
+Acceptance checks:
+
+- Each scene has all four selectors, capture metadata and final appearance
+  paths; CI-capable and local-capture scenes have the appropriate evidence
+  contract. App Store screenshot ownership remains distinct.
+
+Baseline expectation:
+
+- A screenshot list may omit reproducible scenes or move product test code
+  into presentation assets.
+
+Evidence sources:
+
+- Scene plan, file layout, UI-test ownership and capture/CI evidence plan.
+
+Owner notes:
+
+- Devices, locales and scene names are supplied case inputs.
+
 ## long-card-title
 
 Target behavior: long card title.

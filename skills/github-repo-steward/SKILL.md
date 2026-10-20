@@ -45,6 +45,8 @@ concurrent writers are implied.
    legal notices and external authorship. For signed owner work, configure only
    the task clone or worktree using [governance](references/governance.md).
    Run repository-owned checks, not a second competing content policy.
+   Use [layout](references/layout.md) for GitHub-defined paths and the shared
+   presentation-asset layout.
 3. **Apply.** Put settings declarations and their live changes together; source
    changes use signed PRs. Use the [CI contract](references/ci.md) for policy and
    validation separation, safe concurrency, full pins and drift observations.
