@@ -41,10 +41,9 @@ enabled. Required policy and validation checks still gate every merge.
 
 ## Publication
 
-Keep the Claude and Codex plugin versions equal to Claude marketplace
-`metadata.version`. Each host publishes one `showxu-skills` plugin. The Claude
-marketplace entry uses `source: "./"`; the Codex marketplace points to the
-repository's `master` branch.
+See [VERSIONING.md](VERSIONING.md) for versions and tags. Each host publishes
+one `showxu-skills` plugin. The Claude marketplace entry uses `source: "./"`;
+the Codex marketplace points to the repository's `master` branch.
 
 After publication, verify the README's marketplace and plugin installation
 commands against the public revision in isolated host configuration directories.
