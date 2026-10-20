@@ -22,9 +22,39 @@ Choose the model before placing artifacts:
 
 Keep shared invariants in `.github` and member-specific facts with their member.
 MAINTENANCE owns declared organization settings and Apps; VERSIONING owns shared
-version policy; DESIGN owns family identity. Documentation roles and layout
-route to `repository-docs`. No fixed directory layout is imported from another
-organization.
+version policy; DESIGN owns family identity. Documentation roles route to
+`repository-docs`. The layout below is the standard, with GitHub-defined paths
+first.
+
+## Organization GitHub layout
+
+| Place | Rule | Source |
+| --- | --- | --- |
+| Public `.github` repository | `profile/README.md` is the public organization profile. Supported default community health files and issue/PR templates apply to members without their own; licenses cannot be defaults. `workflow-templates/` holds organization workflow templates, pairing `<name>.yml` with `<name>.properties.json`. | [Organization profile](https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/customizing-your-organizations-profile), [default community health files](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file), [workflow templates](https://docs.github.com/en/actions/how-tos/reuse-automations/create-workflow-templates) |
+| Private `.github-private` repository | `profile/README.md` is the member-only profile. Members see it by default and switch with **View as**. Public and member views each pin up to six repositories; only organization owners pin. | [Organization profile](https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/customizing-your-organizations-profile) |
+
+Use the [repository layout](../../github-repo-steward/references/layout.md)
+for each repository's `.github/` directory and presentation assets. The local
+organization layout keeps design inputs, catalog selections and generated
+profile outputs with their shared owner:
+
+```text
+DESIGN.md                      tokens and rationale (Google format)
+design/fonts/                  font files, upstream names, OFL.txt
+design/icons/<name>/           layers/*.svg, <name>.icon/, exports/, provenance.json
+profile/catalog.json           repositories, icon selections, outcome text
+profile/README.md              generated public profile
+profile/assets/                generated avatar and marks
+.github/assets/social-preview/ the organization repository's own preview
+```
+
+Each organization owns one DESIGN with its variants. The catalog owns
+per-repository selections, including icon and outcome text; members consume
+the shared design and supply their content. Keep generated catalog membership
+reconciled with the authoritative inventory. The private repository links to
+shared policy in `.github` rather than maintaining another copy.
+
+## Shared defaults and consumers
 
 Default community-file inheritance and repository-local files are applied by
 `github-repo-steward`. Reusable workflows also need explicit pinned callers;

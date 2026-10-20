@@ -3,6 +3,95 @@
 Durable inputs for qualitative review or isolated paired evals. Results stay in
 the producer-owned ignored eval workspace, outside this package.
 
+## github-defined-paths
+
+Target behavior: Preserve GitHub's recognized paths and presentation behavior.
+
+Input prompt: "Review our proposed .github directory and explain which paths GitHub recognizes before we apply it."
+
+Context and files:
+
+- A proposed directory inventory has `issue-template/config.yaml`, root-level
+  `FUNDING.yml`, a `.github/README.md` intended only as an asset index, and
+  a committed social-preview PNG that has not been uploaded. A reusable
+  workflow has both local and remote callers. The repository root README is
+  the intended landing page; review-only scope.
+
+Expected output:
+
+- Cite GitHub's rules before local conventions; identify the exact issue
+  template/config and funding paths, README precedence, the Settings upload
+  requirement and which workflow references Dependabot can update.
+
+Forbidden behavior:
+
+- Treat locally chosen names as GitHub-recognized, claim the PNG is served
+  because it is committed, or change the repository during a review.
+
+Acceptance checks:
+
+- The report names `.github/ISSUE_TEMPLATE/config.yml` and
+  `.github/FUNDING.yml`, explains that `.github/README.md` takes precedence,
+  and distinguishes local workflow references from remote `uses:` pins.
+- Official links support the findings and no upload or mutation is claimed.
+
+Baseline expectation:
+
+- A generic file tidy-up may normalize away GitHub's exact names or miss
+  that committing a preview does not upload it.
+
+Evidence sources:
+
+- Executor report, cited sources and command trace.
+
+Owner notes:
+
+- The proposed paths are case-local mistakes; GitHub defines the corrections.
+
+## presentation-asset-layout
+
+Target behavior: Apply the same asset placement across languages and owners.
+
+Input prompt: "Plan presentation asset placement for my standalone Swift CLI and our organization's Python library. Their accepted design inputs are attached."
+
+Context and files:
+
+- The CLI has repository-owned DESIGN and metadata; the library consumes the
+  organization's DESIGN and catalog. Both have accepted icons and README
+  information; the CLI has a session to demonstrate. Planning is authorized.
+
+Expected output:
+
+- Use `.github/assets/` in both repositories, with kind directories and
+  appearance filenames from the asset contract. Keep the standalone DESIGN
+  and `design/` at root, and the member's shared design authority in its
+  organization. Hand asset production to the README-design owner.
+
+Forbidden behavior:
+
+- Choose language-specific presentation paths, copy organization DESIGN into
+  the member, invent design values, or give the library a terminal demo.
+
+Acceptance checks:
+
+- Both plans place logos and social previews in their kind directories; only
+  the CLI has `terminal/script.yml`, `recording.json` and terminal SVGs.
+- The report explains the GitHub-facing, language-neutral placement and links
+  to the product-kind and production contract rather than duplicating it.
+
+Baseline expectation:
+
+- An ecosystem-specific setup may impose its documentation directory or
+  create a second member design authority.
+
+Evidence sources:
+
+- Placement plans, handoff and executor report.
+
+Owner notes:
+
+- Languages and ownership models are fixture inputs; placement is shared.
+
 ## personal-repository
 
 Target behavior: personal repository.

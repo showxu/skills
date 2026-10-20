@@ -3,6 +3,54 @@
 Organization-only behavioral inputs. Run outputs, transcripts and benchmark data
 belong in the producer-owned ignored workspace, outside this package.
 
+## organization-github-layout
+
+Target behavior: Place organization surfaces at GitHub-defined paths.
+
+Input prompt: "Plan our public organization profile, member dashboard, default contribution templates and a starter workflow. We also need shared design assets and repository selections."
+
+Context and files:
+
+- A public `.github`, private `.github-private`, authoritative inventory and
+  accepted DESIGN exist. The catalog selects icons and supplies outcome copy.
+  A member proposes pinning seven repositories in each view. Planning only.
+
+Expected output:
+
+- State GitHub's rules with official links first: both profiles use
+  `profile/README.md` in their respective repositories, defaults live in public
+  `.github`, licenses cannot be defaults, and starter workflows pair
+  `workflow-templates/<name>.yml` with `<name>.properties.json`.
+- Show the shared layout with root DESIGN, `design/fonts/`,
+  `design/icons/<name>/`, catalog and generated profile/assets. Keep
+  per-repository selections in the catalog and policy in public `.github`.
+
+Forbidden behavior:
+
+- Promise seven pins, let a non-owner pin, make the member profile public,
+  duplicate shared policy or assume a workflow template installs callers.
+
+Acceptance checks:
+
+- The plan gives each view at most six pins, identifies owner-only pinning,
+  and explains members' default view and **View as** switch.
+- It distinguishes workflow templates from explicitly pinned reusable
+  workflows and locates the organization's own preview under
+  `.github/assets/social-preview/`. No remote changes occur.
+
+Baseline expectation:
+
+- A repository-only layout may conflate the two `.github` roles, duplicate
+  shared policy or infer that templates update existing members.
+
+Evidence sources:
+
+- Layout plan, official citations, catalog ownership and command trace.
+
+Owner notes:
+
+- The inventory and proposed pin count are synthetic case inputs.
+
 ## new-organization
 
 Target behavior: new organization.

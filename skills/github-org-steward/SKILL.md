@@ -23,7 +23,7 @@ guides and checks. The shared standard is authoritative for members. Values
 come from this organization, its repositories or explicit owner decisions;
 never import another organization's names, branches, paths, colors or key setup.
 
-Resolve [topology and placement](references/topology.md): a product family has
+Resolve [topology and GitHub layout](references/topology.md): a product family has
 dependency-ordered publication; a package collection has independently released
 members. Both use `.github` for shared standards, with repository-owned code,
 checks and accepted exceptions. A template seeds new members; it does not update

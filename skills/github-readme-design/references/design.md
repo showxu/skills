@@ -31,12 +31,74 @@ status and release values live rather than writing results into labels.
 - A library: a short working snippet showing the core result. Default to at
   most twelve lines; keep imports meaningful. An ecosystem README skill
   supplies and builds the snippet when one applies.
-- A CLI: a real recorded session rendered as light/dark SVGs, selected with a
-  `<picture>` using `prefers-color-scheme`.
+- A CLI: a scripted session at `.github/assets/terminal/script.yml`,
+  re-recorded in CI against the freshly built product and rendered as
+  light/dark SVGs. Use the `<picture>` markup below.
 - An MCP server: the client configuration as a table of command and arguments
   or a code block, followed by the recorded session when it also ships a CLI.
 - A plugin: the capabilities it adds and the host's install step.
 - Another artifact: the smallest accurate working example appropriate to it.
+
+```html
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/terminal/terminal-dark.svg">
+  <img alt="<one sentence describing the session>" src=".github/assets/terminal/terminal-light.svg">
+</picture>
+```
+
+See [renderers](renderers.md) for recording, rendering and CI commands.
+
+## Assets
+
+Use one directory per asset kind under `.github/assets/`, with lowercase
+kebab-case names and `-light`/`-dark` appearance suffixes:
+
+| Kind | Directory | Files |
+| --- | --- | --- |
+| logo | `.github/assets/logo/` | `logo-light.png`, `logo-dark.png` |
+| social-preview | `.github/assets/social-preview/` | `social-preview.png` |
+| terminal | `.github/assets/terminal/` | `script.yml`, optional `fixture/`, `recording.json`, `terminal-light.svg`, `terminal-dark.svg` |
+| screenshots | `.github/assets/screenshots/` | `script.yml`, `capture.json`, `<scene>-light.png`, `<scene>-dark.png` |
+
+### Assets by product kind
+
+| Kind | logo | social-preview | terminal | screenshots |
+| --- | --- | --- | --- | --- |
+| tool (CLI) | yes | yes | yes | no |
+| library | yes | yes | no | no |
+| app | yes | yes | no | yes |
+| distribution (tap) | uses the distributed product's icon | yes | no | no |
+| organization `.github` | profile assets | yes | no | no |
+| website | uses the organization icon | n/a | no | no |
+
+Use the supplied product kind and icon selection with the applicable DESIGN.
+Organization variants belong in its DESIGN and per-repository selections in
+its catalog; a standalone repository uses its own metadata.
+
+### Asset principle
+
+Every asset kind follows script → capture → render. CI regenerates what it
+can reproduce and compares the result. Assets that require native local tools,
+such as Liquid Glass exports from Icon Composer on macOS, and screenshots CI
+cannot capture are committed with a provenance receipt. Commit consumed
+README images, profile output and the social-preview PNG; retain
+`recording.json` for readable review diffs.
+
+| Kind | Script | Capture | CI |
+| --- | --- | --- | --- |
+| terminal | `script.yml` | run commands in a sandbox → `recording.json` | regenerate, byte compare |
+| social-preview | DESIGN + catalog | none | regenerate, byte compare |
+| logo | DESIGN icon entry | native export, receipt | compare to exports at the pinned standard |
+| screenshots | `script.yml` naming UI-test scenes | UI test capture, `capture.json` | regenerate with tolerance where CI can run it, else verify receipt |
+
+### Screenshots
+
+Each scene in `script.yml` names a UI test, device, appearance and locale. The
+driving code lives in the product's UI tests. Capture results are recorded in
+`capture.json`; final images add the DESIGN-defined background and frame.
+App Store screenshot sets belong to `app-store-screenshots` and may reuse the
+captures. Video is outside this asset contract because README video plays only
+from GitHub-hosted uploads.
 
 ## Social preview
 

@@ -5,6 +5,50 @@ Materialize selected cases into the evaluator's evals/evals.json and keep
 execution outputs with that run. The executor receives the prompt and input
 artifacts; expectations remain with the grader.
 
+## design-authority-agent-route
+
+Target behavior: Make an existing DESIGN authority reachable from AGENTS.
+
+Input prompt: "Normalize the agent guide and documentation routes for this standalone repository."
+
+Context and files:
+
+- Root `DESIGN.md` owns accepted design tokens and rationale. README links
+  to it, but AGENTS only routes implementation and tests. Documentation
+  normalization is authorized; no design change is requested.
+- A second named repository has no DESIGN and no accepted design facts.
+
+Expected output:
+
+- Add a concise AGENTS read route linking the existing `DESIGN.md` for design
+  work, explaining that agents do not load that file automatically. Preserve
+  DESIGN as the owner of its contents and the README's reader-facing link.
+- Do not create a DESIGN or speculative route in the second repository.
+
+Forbidden behavior:
+
+- Rely on the README link alone for agent discovery, copy tokens or rationale
+  into AGENTS, or invent a design document in the repository without one.
+
+Acceptance checks:
+
+- The first repository's AGENTS has a resolving DESIGN link and task-relevant
+  read instruction; DESIGN contents are unchanged. The second repository
+  gains no dangling route or fabricated design authority.
+
+Baseline expectation:
+
+- A generic role audit may treat the README link as sufficient or duplicate
+  design content into the agent guide.
+
+Evidence sources:
+
+- Before/after AGENTS and DESIGN, link checks and audit output.
+
+Owner notes:
+
+- The pointer is conditional on an existing repository-owned DESIGN.
+
 ## ownership-index-and-edit-boundary
 
 Target behavior: Classify ownership by its effect on the reader.
