@@ -145,7 +145,7 @@ executable: demo
 env:
   EXAMPLE: fixture
 files:
-  team-rules/README.md: |
+  project/README.md: |
     Shared guidance.
 copy:
   - from: fixture/team-rules
@@ -182,8 +182,15 @@ including symlink targets. `copy.to` is inside the sandbox home. Each `expect`
 requires `file` and exactly one of `contains` or `equals`; `equals` compares
 complete file content, including its final newline.
 
+Copies require a fresh destination and create each descendant exclusively.
+Managed copies and writes refuse existing destination symlinks at any depth,
+including `~/bin/<executable>`, even when a link points inside home. Errors
+name the offending path.
+
 ### Recorder environment and recording
 
+Before creating the sandbox, the recorder resolves `--executable` and checks
+that it is an existing regular file with execute permission.
 The recorder creates a fresh temporary home, `~/project`, `~/tmp`, and a
 `~/bin/<executable>` symlink to the supplied built product. Commands execute
 through `/bin/sh -c` with no inherited environment. This isolates the demo's
@@ -206,7 +213,11 @@ code, not an OS security sandbox.
 with empty stderr within 120 seconds. Failures name the step, command, exit
 code and stderr; timeouts terminate the process group. Assertions run after
 the last step. The sandbox is removed after success, command failure,
-assertion failure, timeout or an interrupt handled by the recorder.
+assertion failure or timeout. SIGINT and SIGTERM are handled throughout sandbox
+creation, fixture copying, managed writes, commands, expectation reads and
+removal. A signal terminates any running command process group, waits for
+pending filesystem work and removes the sandbox before exiting with status
+130 (SIGINT) or 143 (SIGTERM).
 
 Normalization replaces both the created and canonical home paths with `~`,
 longest first, and removes exactly one trailing LF from each output. It makes

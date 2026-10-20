@@ -366,7 +366,9 @@ Context and files:
 - Exercise an edited output line, added/removed steps, an SVG-only difference,
   a broken DESIGN reference, contrast warning, ambiguous fonts, an unsupported
   glyph, width overflow, a non-px dimension, a fixed environment override,
-  stderr, nonzero exit and a timeout.
+  stderr, nonzero exit and a timeout. Include a directory or non-executable
+  file supplied as the executable, nested destination and fixture symlinks,
+  and SIGINT/SIGTERM before the first command and during managed filesystem work.
 
 Expected output:
 
@@ -393,6 +395,11 @@ Acceptance checks:
   drift names the file and DESIGN/renderer change. Usage errors exit two.
 - Failure, assertion and timeout paths remove the sandbox. The fixture's
   `equals` assertion includes its exact final newline.
+- Invalid executable paths fail before sandbox creation. Copies require fresh
+  destinations; managed writes refuse destination symlinks at every depth.
+  Fixture symlinks cannot escape `fixture/`. Errors identify the offending path.
+- SIGINT and SIGTERM remove the sandbox throughout its lifetime, terminate any
+  running command process group and return 130 and 143 respectively.
 
 Baseline expectation:
 

@@ -185,7 +185,7 @@ test("recorder file operations stay inside the sandbox and fixture", async t => 
   await writeFile(script, stringify({ title: "Paths", executable: "demo", steps: [
     { run: "ln -s / project-link", cwd: "~", show: false }, { write: "~/project-link/escape", content: "x" }, { run: "demo empty" },
   ] }));
-  await assert.rejects(record(script, executable, { tempRoot: root }), /step 2:.*path escapes/);
+  await assert.rejects(record(script, executable, { tempRoot: root }), /step 2:.*symlink.*project-link/);
 });
 
 test("check passes, detects changed output and preserves committed bytes while copying complete artifacts", async t => {

@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
 import { check, CLI_PATH, quote, regeneration } from "./check.ts";
 import { readDesign } from "./design.ts";
-import { parseRecording, record, recordingJSON } from "./terminal/record.ts";
+import { parseRecording, record, recordingJSON, RecordingInterrupted } from "./terminal/record.ts";
 import { render, THEMES } from "./terminal/render.ts";
 import { message } from "./validation.ts";
 
@@ -65,6 +65,10 @@ export async function main(args: string[]): Promise<number> {
     }
     return 0;
   } catch (error) {
+    if (error instanceof RecordingInterrupted) {
+      console.error(error.message);
+      return error.exitCode;
+    }
     const context = values.script ?? values.recording ?? values.assets ?? values.design;
     console.error(`${context}: ${message(error)}`);
     const rerun = command === "terminal check"

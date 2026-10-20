@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
-import { cp, lstat, mkdir, mkdtemp, readFile, readdir, realpath, rm, symlink, writeFile } from "node:fs/promises";
+import { constants } from "node:fs";
+import { access, chmod, copyFile, lstat, mkdir, mkdtemp, readFile, readdir, realpath, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { parseDocument } from "yaml";
@@ -8,6 +9,15 @@ import { keys, list, message, object, plain, string } from "../validation.ts";
 export interface Recording {
   title: string;
   steps: { command: string; output: string }[];
+}
+
+export class RecordingInterrupted extends Error {
+  readonly exitCode: number;
+
+  constructor(signal: "SIGINT" | "SIGTERM") {
+    super(`Recording interrupted by ${signal}`);
+    this.exitCode = signal === "SIGINT" ? 130 : 143;
+  }
 }
 
 interface RunStep { run: string; cwd: string; show: boolean }
@@ -117,14 +127,17 @@ function homePath(home: string, path: string): string {
   return inside(home, path === "~" ? "." : path.replace(/^~\//, ""), path);
 }
 
-async function safeDestination(home: string, path: string): Promise<string> {
+async function sandboxPath(home: string, path: string, mode: "read" | "write"): Promise<string> {
   const target = homePath(home, path);
   const canonicalHome = await realpath(home);
   let existing = home;
   for (const part of relative(home, target).split(sep).filter(Boolean)) {
     existing = join(existing, part);
     try {
-      await lstat(existing);
+      const stat = await lstat(existing);
+      if (mode === "write" && stat.isSymbolicLink()) {
+        throw new Error(`${path}: refusing to write through symlink ${existing}`);
+      }
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
       break;
@@ -134,17 +147,33 @@ async function safeDestination(home: string, path: string): Promise<string> {
   return target;
 }
 
-async function validateCopy(path: string, root: string, ancestors = new Set<string>()): Promise<void> {
-  const canonical = await realpath(path);
-  inside(root, canonical, path);
-  if (ancestors.has(canonical)) throw new Error(`${path}: fixture symlink cycle`);
+async function copyFixture(source: string, target: string, fixture: string, home: string, signal: AbortSignal, ancestors = new Set<string>()): Promise<void> {
+  signal.throwIfAborted();
+  const canonical = await realpath(source);
+  inside(fixture, canonical, source);
+  if (ancestors.has(canonical)) throw new Error(`${source}: fixture symlink cycle`);
   const stat = await lstat(canonical);
-  if (stat.isDirectory()) {
-    const next = new Set([...ancestors, canonical]);
-    for (const name of await readdir(canonical)) await validateCopy(join(canonical, name), root, next);
-  } else if (!stat.isFile()) {
-    throw new Error(`${path}: fixture must contain ordinary files and directories`);
+  await sandboxPath(home, relative(home, target), "write");
+  try {
+    await lstat(target);
+    throw new Error(`${target}: copy requires a fresh destination`);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
   }
+  signal.throwIfAborted();
+  if (stat.isDirectory()) {
+    await mkdir(target);
+    const next = new Set([...ancestors, canonical]);
+    for (const name of await readdir(canonical)) {
+      await copyFixture(join(canonical, name), join(target, name), fixture, home, signal, next);
+    }
+    await chmod(target, stat.mode);
+  } else if (stat.isFile()) {
+    await copyFile(canonical, target, constants.COPYFILE_EXCL);
+  } else {
+    throw new Error(`${source}: fixture must contain ordinary files and directories`);
+  }
+  signal.throwIfAborted();
 }
 
 export function normalizeOutput(output: string, home: string, canonicalHome: string): string {
@@ -154,7 +183,8 @@ export function normalizeOutput(output: string, home: string, canonicalHome: str
   return output.endsWith("\n") ? output.slice(0, -1) : output;
 }
 
-async function run(step: RunStep, cwd: string, env: Record<string, string>, label: string, timeout: number): Promise<string> {
+async function run(step: RunStep, cwd: string, env: Record<string, string>, label: string, timeout: number, signal: AbortSignal): Promise<string> {
+  signal.throwIfAborted();
   return new Promise((resolveRun, reject) => {
     const child = spawn("/bin/sh", ["-c", step.run], { cwd, env, detached: true, stdio: ["ignore", "pipe", "pipe"] });
     const stdout: Buffer[] = [];
@@ -168,20 +198,22 @@ async function run(step: RunStep, cwd: string, env: Record<string, string>, labe
       }
     };
     const interrupt = () => kill("interrupted");
-    process.once("SIGINT", interrupt);
-    process.once("SIGTERM", interrupt);
+    signal.addEventListener("abort", interrupt, { once: true });
     const timer = setTimeout(() => kill(`timed out after ${timeout / 1000} s`), timeout);
     child.stdout.on("data", chunk => stdout.push(chunk));
     child.stderr.on("data", chunk => stderr.push(chunk));
     child.once("error", error => { failure = message(error); });
-    child.once("close", (code, signal) => {
+    child.once("close", (code, exitSignal) => {
       clearTimeout(timer);
-      process.removeListener("SIGINT", interrupt);
-      process.removeListener("SIGTERM", interrupt);
+      signal.removeEventListener("abort", interrupt);
+      if (signal.aborted) {
+        reject(signal.reason);
+        return;
+      }
       try {
         const err = new TextDecoder("utf-8", { fatal: true }).decode(Buffer.concat(stderr));
         if (failure || code !== 0 || err.length) {
-          throw new Error(`${label} (${step.run}): ${failure ?? "command failed"}; exit ${code ?? signal}; stderr: ${err || "(empty)"}`);
+          throw new Error(`${label} (${step.run}): ${failure ?? "command failed"}; exit ${code ?? exitSignal}; stderr: ${err || "(empty)"}`);
         }
         resolveRun(new TextDecoder("utf-8", { fatal: true }).decode(Buffer.concat(stdout)));
       } catch (error) { reject(new Error(`${label}: ${message(error)}`)); }
@@ -191,48 +223,84 @@ async function run(step: RunStep, cwd: string, env: Record<string, string>, labe
 
 export async function record(scriptFile: string, executable: string, options: { timeoutMs?: number; tempRoot?: string } = {}): Promise<Recording> {
   const script = parseScript(await readFile(scriptFile, "utf8"), scriptFile);
-  const product = await realpath(executable);
-  const home = await mkdtemp(join(options.tempRoot ?? tmpdir(), "presentation-home-"));
+  let product: string;
   try {
+    product = await realpath(executable);
+    if (!(await lstat(product)).isFile()) throw new Error("not a regular file");
+    await access(product, constants.X_OK);
+  } catch (error) {
+    throw new Error(`${executable}: expected an existing regular executable file (${message(error)})`);
+  }
+  const controller = new AbortController();
+  const { signal } = controller;
+  const interrupt = () => controller.abort(new RecordingInterrupted("SIGINT"));
+  const terminate = () => controller.abort(new RecordingInterrupted("SIGTERM"));
+  // Cover creation and removal too; repeated signals must not bypass cleanup.
+  process.on("SIGINT", interrupt);
+  process.on("SIGTERM", terminate);
+  let createdHome: string | undefined;
+  try {
+    const home = createdHome = await mkdtemp(join(options.tempRoot ?? tmpdir(), "presentation-home-"));
+    signal.throwIfAborted();
     for (const name of ["project", "bin", "tmp"]) await mkdir(join(home, name));
     await symlink(product, join(home, "bin", script.executable));
     const canonicalHome = await realpath(home);
     const put = async (path: string, content: string) => {
-      const target = await safeDestination(home, path);
+      signal.throwIfAborted();
+      const target = await sandboxPath(home, path, "write");
       await mkdir(dirname(target), { recursive: true });
-      await writeFile(target, content, "utf8");
+      await sandboxPath(home, path, "write");
+      try {
+        if (!(await lstat(target)).isFile()) throw new Error(`${path}: write requires an ordinary file`);
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+      }
+      await writeFile(target, content, {
+        encoding: "utf8", signal, flag: constants.O_WRONLY | constants.O_CREAT | constants.O_TRUNC | constants.O_NOFOLLOW,
+      });
+      signal.throwIfAborted();
     };
     for (const [path, content] of Object.entries(script.files)) await put(path, content);
     for (const entry of script.copy) {
+      signal.throwIfAborted();
       const fixture = await realpath(join(dirname(scriptFile), "fixture"));
       const source = inside(resolve(dirname(scriptFile), "fixture"), resolve(dirname(scriptFile), entry.from), entry.from);
-      await validateCopy(source, fixture);
-      const target = await safeDestination(home, entry.to);
+      const target = await sandboxPath(home, entry.to, "write");
       await mkdir(dirname(target), { recursive: true });
-      await cp(source, target, { recursive: true, dereference: true });
+      await copyFixture(source, target, fixture, home, signal);
     }
     const result: Recording = { title: script.title, steps: [] };
     for (const [index, step] of script.steps.entries()) {
       const label = `${scriptFile} step ${index + 1}`;
       try {
+        signal.throwIfAborted();
         if ("write" in step) {
           await put(step.write, step.content);
         } else {
-          const output = await run(step, await safeDestination(home, step.cwd),
-            { ...environment(home), ...script.env }, label, options.timeoutMs ?? 120_000);
+          const output = await run(step, await sandboxPath(home, step.cwd, "read"),
+            { ...environment(home), ...script.env }, label, options.timeoutMs ?? 120_000, signal);
           if (step.show) result.steps.push({ command: step.run, output: normalizeOutput(output, home, canonicalHome) });
         }
       } catch (error) { throw new Error(`${label}: ${message(error)}`); }
     }
     for (const expectation of script.expect) {
-      const actual = await readFile(await safeDestination(home, expectation.file), "utf8");
+      signal.throwIfAborted();
+      const actual = await readFile(await sandboxPath(home, expectation.file, "read"), { encoding: "utf8", signal });
+      signal.throwIfAborted();
       if (expectation.contains !== undefined ? !actual.includes(expectation.contains) : actual !== expectation.equals) {
         throw new Error(`${scriptFile} expect ${expectation.file}: ${expectation.contains !== undefined ? "contains" : "equals"} expectation failed`);
       }
     }
     return result;
   } finally {
-    await rm(home, { recursive: true, force: true });
+    // Await in-flight filesystem work before removal so it cannot recreate home.
+    try {
+      if (createdHome) await rm(createdHome, { recursive: true, force: true });
+    } finally {
+      process.removeListener("SIGINT", interrupt);
+      process.removeListener("SIGTERM", terminate);
+    }
+    signal.throwIfAborted();
   }
 }
 
