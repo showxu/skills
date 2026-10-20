@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Describe the organization standard's reusable presentation and profile
+  workflows: presentation assets follow each caller's catalog `kind`, the
+  social preview icon resolves from the caller or the pinned standard, and
+  member dashboards call the profile workflow from a job named `check`.
 - Render deterministic social-preview PNGs and public/member organization
   profiles in the TypeScript presentation toolchain and Action, with shared
   catalog validation, DESIGN tokens, WebAssembly still-image decoding and byte

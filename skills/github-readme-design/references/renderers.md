@@ -359,19 +359,51 @@ variables and quoted arguments.
 ### Organization standard and member caller
 
 The pin chain is member → organization reusable workflow → toolchain Action.
-The organization workflow at `.github/workflows/presentation.yml` accepts
-`runner` (default `ubuntu-24.04`), `executable-artifact`, `executable-path`, and
-`assets` (default `.github/assets`). It validates `job.workflow_sha`, checks
-out the caller and its own standard repository at that exact workflow SHA,
-downloads the built executable and restores its execute bit. DESIGN and fonts
-come from that pinned standard, not a branch head. It calls the Action with
-`asset: terminal`, the terminal subdirectory, and a dedicated artifact path;
-on failure it uploads that directory as `presentation-terminal`. The runner
-must match the OS that built the product. Organization DESIGN CI calls the
-same Action with `asset: design`, `command: lint` and `design` so linting and
-rendering share the parser lockfile.
+The organization standard owns two reusable workflows. Each validates
+`job.workflow_sha`, checks out the caller and its own standard repository at
+that exact SHA without persisted credentials, and takes DESIGN, fonts and the
+catalog from the pinned standard, never from a branch head.
 
-A member uploads its build and references only the organization standard:
+`.github/workflows/presentation.yml` accepts `runner` (default
+`ubuntu-24.04`), `executable-artifact`, `executable-path` and `assets`
+(default `.github/assets`). It derives the caller's expected assets from its
+catalog `kind`, following
+[assets by product kind](design.md#assets-by-product-kind):
+
+| Caller | Checked assets |
+| --- | --- |
+| `tool` | `terminal`, `social-preview` |
+| `library`, `app`, `distribution`, the organization's `.github` | `social-preview` |
+| `website` | none; calling the workflow fails |
+
+A caller owned by another account or missing from the catalog, a missing
+expected asset directory, a `terminal` directory for a kind without terminal,
+and executable inputs missing for a tool or given for any other kind fail.
+The social preview icon is the catalog entry's light-page image (the catalog
+`mark` for `.github`). Its URL must be exactly
+`https://raw.githubusercontent.com/<organization>/<repository>/HEAD/<path>`,
+with no query or fragment and a relative path without `..` segments. A
+`<repository>` equal to the caller resolves to that file in the caller,
+`.github` to that file in the pinned standard; any other host, owner,
+repository or ref, and a missing file, fail with the URL named. For a tool the workflow downloads the built executable
+and restores its execute bit; the runner must match the OS that built the
+product. On failure it uploads `presentation.tar` as the artifact
+`presentation`, laid out like the asset root (`terminal/`, `social-preview/`)
+with modes and hidden files kept; extract it there, review and commit.
+
+`.github/workflows/profile.yml` accepts `mode` (default `public`), `member`
+(default `profile/member.json`) and `output` (default `profile/README.md`) and
+checks the caller's generated profile, as described in
+[organization profiles](#organization-profiles). It rejects an unknown `mode`
+before any checkout, and `member` and `output` must be caller-relative paths
+without `..` segments, so the check cannot read another checkout. On drift it
+uploads the regenerated file as the artifact `profile`. The `.github` repository calls
+both workflows locally; a `.github-private` repository calls `profile.yml` in
+member mode from a job named `check`, so its context is `check / profile`.
+Organization DESIGN CI calls the Action with `asset: design`, `command: lint`
+and `design` so linting and rendering share the parser lockfile.
+
+A tool uploads its build and references only the organization standard:
 
 ```yaml
 jobs:
@@ -392,10 +424,32 @@ jobs:
       executable-path: demo
 ```
 
-The referenced repositories publish signed SemVer tags after reviewed merges;
-consumers pin the corresponding commit and keep `# vX.Y.Z` comments for
-Dependabot. Standard major versions change the workflow interface, minor
-versions change DESIGN requiring regeneration, and patches preserve output.
+A library, app or distribution calls it without executable inputs:
+
+```yaml
+jobs:
+  presentation:
+    uses: example-org/.github/.github/workflows/presentation.yml@<full-40-character-sha> # vX.Y.Z
+```
+
+The member dashboard calls the profile workflow:
+
+```yaml
+jobs:
+  check:
+    uses: example-org/.github/.github/workflows/profile.yml@<full-40-character-sha> # vX.Y.Z
+    with:
+      mode: member
+```
+
+The referenced repositories publish signed SemVer tags after reviewed merges,
+choosing each version by their own `VERSIONING.md`; consumers pin the
+corresponding commit and keep `# vX.Y.Z` comments for Dependabot. A changed
+shared workflow or toolchain advances through representative consumers at the
+exact candidate commit before tags and pin updates, covering every changed
+path: a change to the tool path needs a tool's run, which downloads its
+executable and checks its terminal
+([organization release](../../github-org-steward/references/release.md)).
 
 ### Local regeneration
 
