@@ -1,4 +1,4 @@
-"""Regression checks for layout bounds, recorded output and stale design inputs."""
+"""Regression checks for layout bounds, social icons and stale design inputs."""
 
 import base64
 import hashlib
@@ -21,7 +21,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import render_social
 from presentation import load_spec, sha256, write_or_check
 from render_social import fit_title, icon_svg, wrap_about
-from render_terminal import cells, render
 
 OUTPUT = Path(os.environ["README_DESIGN_TEST_OUTPUT"])
 OUTPUT.mkdir(parents=True, exist_ok=True)
@@ -471,25 +470,6 @@ class PresentationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "differs"):
                 write_or_check(path, "changed", True)
             self.assertEqual(path.read_text(), "accepted")
-
-    def test_terminal_themes_preserve_real_command_and_output(self):
-        record = {"title": "Inspect data", "commands": [{"command": "tool query '<item>'", "stdout": "ready & complete", "exit_code": 0}]}
-        light = render(record, {}, "light")
-        dark = render(record, {}, "dark")
-        self.assertNotEqual(light, dark)
-        text = "".join(ET.fromstring(light).itertext())
-        self.assertIn(record["commands"][0]["command"], text)
-        self.assertIn(record["commands"][0]["stdout"], text)
-        self.assertEqual(cells("結果"), 4)
-
-    def test_terminal_rejects_fabricated_success_and_control_sequences(self):
-        record = {"title": "Inspect", "commands": [{"command": "tool", "stdout": "failure", "exit_code": 1}]}
-        with self.assertRaisesRegex(ValueError, "successful"):
-            render(record, {}, "dark")
-        record["commands"][0].update(exit_code=0, stdout="\x1b[31mred")
-        with self.assertRaisesRegex(ValueError, "control"):
-            render(record, {}, "dark")
-
 
 if __name__ == "__main__":
     unittest.main()

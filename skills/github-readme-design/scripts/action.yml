@@ -1,0 +1,65 @@
+name: GitHub presentation
+description: Lint DESIGN or record, render and check terminal assets.
+inputs:
+  asset:
+    description: Asset kind (terminal or design).
+    required: true
+  command:
+    description: check or render for terminal; lint for design.
+    default: check
+  design:
+    description: Path to the organization's DESIGN.md.
+    required: true
+  fonts:
+    description: Path to the organization's font directory (terminal).
+  assets:
+    description: Terminal asset directory in the caller checkout.
+  executable:
+    description: Path to the built product (terminal).
+  artifact-dir:
+    description: Dedicated directory for regenerated assets on drift.
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      with:
+        node-version-file: ${{ github.action_path }}/.node-version
+        package-manager-cache: false
+    - name: Install presentation dependencies
+      shell: bash
+      run: npm ci --omit=dev --prefix "$GITHUB_ACTION_PATH"
+    - name: Run presentation command
+      shell: bash
+      env:
+        PRESENTATION_ASSET: ${{ inputs.asset }}
+        PRESENTATION_COMMAND: ${{ inputs.command }}
+        PRESENTATION_DESIGN: ${{ inputs.design }}
+        PRESENTATION_FONTS: ${{ inputs.fonts }}
+        PRESENTATION_ASSETS: ${{ inputs.assets }}
+        PRESENTATION_EXECUTABLE: ${{ inputs.executable }}
+        PRESENTATION_ARTIFACT: ${{ inputs.artifact-dir }}
+      run: |
+        cli="$GITHUB_ACTION_PATH/src/cli.ts"
+        case "$PRESENTATION_ASSET/$PRESENTATION_COMMAND" in
+          design/lint)
+            node "$cli" design lint --design "$PRESENTATION_DESIGN"
+            ;;
+          terminal/check)
+            args=(--assets "$PRESENTATION_ASSETS" --design "$PRESENTATION_DESIGN"
+                  --fonts "$PRESENTATION_FONTS" --executable "$PRESENTATION_EXECUTABLE")
+            if [[ -n "$PRESENTATION_ARTIFACT" ]]; then
+              args+=(--artifact-dir "$PRESENTATION_ARTIFACT")
+            fi
+            node "$cli" terminal check "${args[@]}"
+            ;;
+          terminal/render)
+            node "$cli" terminal record --script "$PRESENTATION_ASSETS/script.yml" \
+              --executable "$PRESENTATION_EXECUTABLE" --out "$PRESENTATION_ASSETS/recording.json"
+            node "$cli" terminal render --recording "$PRESENTATION_ASSETS/recording.json" \
+              --design "$PRESENTATION_DESIGN" --fonts "$PRESENTATION_FONTS" --out-dir "$PRESENTATION_ASSETS"
+            ;;
+          *)
+            echo "Unsupported asset/command: $PRESENTATION_ASSET/$PRESENTATION_COMMAND" >&2
+            exit 2
+            ;;
+        esac

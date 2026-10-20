@@ -4,6 +4,7 @@
 __pycache__/
 *.py[cod]
 .build/
+node_modules/
 .codex/
 /plans/
 skills/interaction-design/references/research/artifacts/

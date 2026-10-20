@@ -79,8 +79,27 @@ jobs:
       - name: Exercise organization governance
         run: python3 -B -m unittest discover -s skills/github-org-steward/tests -v
 
+  presentation-toolchain:
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, macos-26]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: skills/github-readme-design/scripts/.node-version
+          package-manager-cache: false
+      - name: Check presentation toolchain and golden SVGs
+        working-directory: skills/github-readme-design/scripts
+        run: npm ci && npm test
+
   result:
-    needs: [policy, validate]
+    needs: [policy, validate, presentation-toolchain]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -89,6 +108,8 @@ jobs:
         env:
           POLICY: ${{ needs.policy.result }}
           VALIDATE: ${{ needs.validate.result }}
+          PRESENTATION: ${{ needs.presentation-toolchain.result }}
         run: |
           test "$POLICY" = success
           test "$VALIDATE" = success
+          test "$PRESENTATION" = success
