@@ -1,21 +1,36 @@
 name: GitHub presentation
-description: Lint DESIGN or record, render and check terminal assets.
+description: Lint DESIGN or render and check terminal, social-preview and profile assets.
 inputs:
   asset:
-    description: Asset kind (terminal or design).
+    description: Asset kind (terminal, social-preview, profile or design).
     required: true
   command:
-    description: check or render for terminal; lint for design.
+    description: check or render for assets; lint for design.
     default: check
   design:
     description: Path to the organization's DESIGN.md.
     required: true
   fonts:
-    description: Path to the organization's font directory (terminal).
+    description: Path to the organization's font directory (terminal and social-preview).
   assets:
-    description: Terminal asset directory in the caller checkout.
+    description: Terminal or social-preview asset directory in the caller checkout.
   executable:
     description: Path to the built product (terminal).
+  catalog:
+    description: Organization catalog JSON (social-preview and profile).
+  repository:
+    description: Catalog repository name, or .github for the organization card.
+  icon:
+    description: Local icon shown on light pages (social-preview).
+  mode:
+    description: Profile mode (public or member).
+    default: public
+  member:
+    description: Member operational input JSON (member profile).
+  catalog-revision:
+    description: Full standard commit SHA (required for member profile, rejected for public).
+  output:
+    description: Output file for profile (default profile/README.md) or social-preview render (default assets/social-preview.png).
   artifact-dir:
     description: Dedicated directory for regenerated assets on drift.
 runs:
@@ -27,7 +42,7 @@ runs:
         package-manager-cache: false
     - name: Install presentation dependencies
       shell: bash
-      run: npm ci --omit=dev --prefix "$GITHUB_ACTION_PATH"
+      run: npm ci --ignore-scripts --omit=dev --prefix "$GITHUB_ACTION_PATH"
     - name: Run presentation command
       shell: bash
       env:
@@ -38,6 +53,13 @@ runs:
         PRESENTATION_ASSETS: ${{ inputs.assets }}
         PRESENTATION_EXECUTABLE: ${{ inputs.executable }}
         PRESENTATION_ARTIFACT: ${{ inputs.artifact-dir }}
+        PRESENTATION_CATALOG: ${{ inputs.catalog }}
+        PRESENTATION_REPOSITORY: ${{ inputs.repository }}
+        PRESENTATION_ICON: ${{ inputs.icon }}
+        PRESENTATION_MODE: ${{ inputs.mode }}
+        PRESENTATION_MEMBER: ${{ inputs.member }}
+        PRESENTATION_REVISION: ${{ inputs.catalog-revision }}
+        PRESENTATION_OUTPUT: ${{ inputs.output }}
       run: |
         cli="$GITHUB_ACTION_PATH/src/cli.ts"
         case "$PRESENTATION_ASSET/$PRESENTATION_COMMAND" in
@@ -57,6 +79,47 @@ runs:
               --executable "$PRESENTATION_EXECUTABLE" --out "$PRESENTATION_ASSETS/recording.json"
             node "$cli" terminal render --recording "$PRESENTATION_ASSETS/recording.json" \
               --design "$PRESENTATION_DESIGN" --fonts "$PRESENTATION_FONTS" --out-dir "$PRESENTATION_ASSETS"
+            ;;
+          social-preview/check|social-preview/render)
+            args=(--design "$PRESENTATION_DESIGN" --fonts "$PRESENTATION_FONTS"
+                  --catalog "$PRESENTATION_CATALOG" --repository "$PRESENTATION_REPOSITORY"
+                  --icon "$PRESENTATION_ICON")
+            if [[ "$PRESENTATION_COMMAND" == check ]]; then
+              args+=(--assets "$PRESENTATION_ASSETS")
+              if [[ -n "$PRESENTATION_ARTIFACT" ]]; then
+                args+=(--artifact-dir "$PRESENTATION_ARTIFACT")
+              fi
+            else
+              output="$PRESENTATION_OUTPUT"
+              if [[ -z "$output" && -n "$PRESENTATION_ASSETS" ]]; then
+                output="$PRESENTATION_ASSETS/social-preview.png"
+              fi
+              args+=(--out "$output")
+            fi
+            node "$cli" social-preview "$PRESENTATION_COMMAND" "${args[@]}"
+            ;;
+          profile/check|profile/render)
+            args=(--design "$PRESENTATION_DESIGN" --catalog "$PRESENTATION_CATALOG"
+                  --out "${PRESENTATION_OUTPUT:-profile/README.md}")
+            case "$PRESENTATION_MODE" in
+              member)
+                args+=(--member "$PRESENTATION_MEMBER" --catalog-revision "$PRESENTATION_REVISION")
+                ;;
+              public)
+                if [[ -n "$PRESENTATION_REVISION" || -n "$PRESENTATION_MEMBER" ]]; then
+                  echo "Member input and catalog-revision are only allowed in member mode" >&2
+                  exit 2
+                fi
+                ;;
+              *)
+                echo "Unsupported profile mode: $PRESENTATION_MODE" >&2
+                exit 2
+                ;;
+            esac
+            if [[ "$PRESENTATION_COMMAND" == check && -n "$PRESENTATION_ARTIFACT" ]]; then
+              args+=(--artifact-dir "$PRESENTATION_ARTIFACT")
+            fi
+            node "$cli" profile "$PRESENTATION_COMMAND" "${args[@]}"
             ;;
           *)
             echo "Unsupported asset/command: $PRESENTATION_ASSET/$PRESENTATION_COMMAND" >&2

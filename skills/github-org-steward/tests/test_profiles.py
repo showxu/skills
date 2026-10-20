@@ -1,8 +1,9 @@
 """Captured GitHub evidence for public/member profile acceptance."""
 
 from copy import deepcopy
-import hashlib
+import builtins
 from http.client import InvalidURL
+from importlib.util import find_spec
 import json
 from pathlib import Path
 import sys
@@ -24,7 +25,6 @@ class ProfileObservationsTests(unittest.TestCase):
         }
         self.catalog_bytes = json.dumps(self.catalog).encode()
         self.member = {
-            "catalog": {"revision": "a" * 40, "sha256": hashlib.sha256(self.catalog_bytes).hexdigest()},
             "maintenance": {role: {"label": role, "url": "https://example.test/" + role}
                             for role in ("maintenance", "versioning", "settings", "design")},
             "repositories": {"library": {"default_branch": "development", "workflow": "verify.yml", "releases": "published"},
@@ -34,6 +34,8 @@ class ProfileObservationsTests(unittest.TestCase):
                       self.repo("library"), self.repo("tool"), self.repo("old", archived=True),
                       self.repo("internal", "private")]
         self.rows = []
+        self.workflow = "jobs:\n  profile:\n    uses: example-team/.github/.github/workflows/profile.yml@" + "a" * 40 + " # v0.1.0\n"
+        self.workflow_tree = {"tree": [{"path": ".github/workflows/check.yml", "type": "blob"}], "truncated": False}
 
     def repo(self, name, visibility="public", archived=False):
         return dict(name=name, visibility=visibility, isArchived=archived,
@@ -44,10 +46,15 @@ class ProfileObservationsTests(unittest.TestCase):
             self.assertIn(revision, ("development", "a" * 40))
             return self.catalog_bytes
         if repository == ".github-private":
+            if path == ".github/workflows/check.yml":
+                return self.workflow.encode()
+            self.assertEqual(path, "profile/member.json")
             return json.dumps(self.member).encode()
         self.fail(f"unexpected file request: {repository}/{path}")
 
     def api(self, endpoint):
+        if "/.github-private/git/trees/" in endpoint:
+            return self.workflow_tree
         if "git/trees/development?recursive=1" in endpoint:
             return {"tree": [{"path": ".github/workflows/verify.yml", "type": "blob"}], "truncated": False}
         if "library/releases?" in endpoint:
@@ -58,10 +65,18 @@ class ProfileObservationsTests(unittest.TestCase):
 
     def scan(self, api=None, content=None, icons=True):
         with patch.object(profiles, "content", side_effect=content or self.content), \
-             patch.object(profiles, "api", side_effect=api or self.api), \
+             patch.object(profiles, "api", side_effect=lambda endpoint: self.api(endpoint) if "/.github-private/git/trees/" in endpoint else (api or self.api)(endpoint)), \
              patch.object(profiles, "image_resolves", return_value=icons) as images:
             profiles.inspect_profiles("example-team", self.repos, lambda *row: self.rows.append(row))
         return images
+
+    def scan_workflows(self, workflows):
+        self.workflow_tree["tree"] = [{"path": path, "type": "blob"} for path in workflows]
+        def content(owner, repository, path, revision):
+            if repository == ".github-private" and path in workflows:
+                return workflows[path].encode()
+            return self.content(owner, repository, path, revision)
+        return self.scan(content=content)
 
     def test_icon_urls_encode_unicode_and_bound_transport_failures(self):
         response = MagicMock()
@@ -90,9 +105,84 @@ class ProfileObservationsTests(unittest.TestCase):
     def test_complete_private_profile_has_verified_pin_membership_and_live_facts(self):
         images = self.scan()
         self.assertFalse([row for row in self.rows if row[0] in {"FAIL", "REVIEW"}], self.rows)
-        self.assertTrue(any("digest verified" in row[2] for row in self.rows))
+        self.assertTrue(any("workflow pin " in row[2] for row in self.rows))
         self.assertTrue(any("default branch development" in row[2] for row in self.rows))
         self.assertTrue(any('/.github/' + 'a' * 40 + '/assets/mark.svg' in call.args[0] for call in images.call_args_list))
+
+    def test_missing_pyyaml_reports_owned_requirements(self):
+        original_import = builtins.__import__
+        def missing_pyyaml(name, *args, **kwargs):
+            if name == "yaml":
+                raise ImportError("No PyYAML installed")
+            return original_import(name, *args, **kwargs)
+        if find_spec("yaml") is None:
+            self.scan()
+        else:
+            with patch("builtins.__import__", side_effect=missing_pyyaml):
+                self.scan()
+        reviews = [row[2] for row in self.rows if row[0] == "REVIEW"]
+        self.assertEqual(len(reviews), 1, self.rows)
+        self.assertIn("PyYAML", reviews[0])
+        self.assertIn(str(Path(profiles.__file__).with_name("requirements.txt")), reviews[0])
+        self.assertFalse(any(row[0] == "FAIL" or "workflow pin " + "a" * 40 in row[2] for row in self.rows))
+
+    def test_workflow_pin_reads_yaml_callers(self):
+        self.scan_workflows({".github/workflows/check.yaml": self.workflow})
+        self.assertFalse([row for row in self.rows if row[0] in {"FAIL", "REVIEW"}], self.rows)
+        self.assertTrue(any("workflow pin " + "a" * 40 in row[2] for row in self.rows))
+
+    def test_workflow_pin_conflicts_name_all_files_and_shas(self):
+        callers = {".github/workflows/check.yml": self.workflow,
+                   ".github/workflows/check.yaml": self.workflow.replace("a" * 40, "b" * 40)}
+        self.scan_workflows(callers)
+        reviews = [row[2] for row in self.rows if row[0] == "REVIEW"]
+        self.assertEqual(len(reviews), 1, self.rows)
+        for value in [*callers, "a" * 40, "b" * 40, "conflicting"]:
+            self.assertIn(value, reviews[0])
+
+    def test_workflow_pin_shared_by_several_callers_is_one_observation(self):
+        self.scan_workflows({".github/workflows/check.yml": self.workflow,
+                             ".github/workflows/check.yaml": self.workflow})
+        self.assertFalse([row for row in self.rows if row[0] in {"FAIL", "REVIEW"}], self.rows)
+        self.assertEqual(sum("workflow pin " + "a" * 40 in row[2] for row in self.rows), 1)
+
+    def test_workflow_pin_ignores_run_scalars_env_and_step_uses(self):
+        target = "example-team/.github/.github/workflows/profile.yml@" + "a" * 40
+        for workflow in (
+            'jobs:\n  demo:\n    steps:\n      - run: \'echo "{uses: ' + target + '}"\'\n',
+            'env:\n  uses: ' + target + '\njobs: {}\n',
+            'jobs:\n  demo:\n    env:\n      uses: ' + target + '\n',
+            'jobs:\n  demo:\n    steps:\n      - uses: ' + target + '\n',
+        ):
+            with self.subTest(workflow=workflow):
+                for caller in (False, True):
+                    with self.subTest(real_caller=caller):
+                        self.rows = []
+                        files = {".github/workflows/example.yml": workflow}
+                        if caller:
+                            files[".github/workflows/check.yml"] = self.workflow
+                        self.scan_workflows(files)
+                        if caller:
+                            self.assertFalse([row for row in self.rows if row[0] in {"FAIL", "REVIEW"}], self.rows)
+                        else:
+                            self.assertTrue(any(row[0] == "REVIEW" and "no matching workflow caller" in row[2] for row in self.rows), self.rows)
+
+    def test_invalid_workflow_yaml_is_review_naming_the_file(self):
+        for workflow in ("jobs: [", "jobs: !!python/object:unexpected {}", "jobs: []"):
+            with self.subTest(workflow=workflow):
+                self.rows = []
+                self.scan_workflows({".github/workflows/broken.yaml": workflow})
+                self.assertTrue(any(row[0] == "REVIEW" and "broken.yaml" in row[2] for row in self.rows), self.rows)
+
+    def test_workflow_pin_ignores_comments_and_block_scalar_examples(self):
+        self.workflow = (
+            '# uses: example-team/.github/.github/workflows/profile.yml@' + 'b' * 40 + '\n'
+            'jobs:\n  example:\n    steps:\n      - run: |\n'
+            '          uses: example-team/.github/.github/workflows/profile.yml@' + 'b' * 40 + '\n'
+            '  profile:\n    uses: "example-team/.github/.github/workflows/profile.yml@' + 'a' * 40 + '"'
+            ' # uses: example-team/.github/.github/workflows/profile.yml@' + 'b' * 40 + '\n')
+        self.scan()
+        self.assertFalse([row for row in self.rows if row[0] in {"FAIL", "REVIEW"}], self.rows)
 
     def test_absent_member_repository_is_optional_and_inaccessible_input_is_review(self):
         self.repos = [repo for repo in self.repos if repo["name"] != ".github-private"]
@@ -128,16 +218,14 @@ class ProfileObservationsTests(unittest.TestCase):
         self.assertEqual(len(failures), 1)
         self.assertIn("missing ['fork']", failures[0][2])
 
-    def test_member_missing_extra_and_stale_digest_fail(self):
-        for mutation in ("missing", "extra", "digest"):
+    def test_member_missing_and_extra_fail(self):
+        for mutation in ("missing", "extra"):
             with self.subTest(mutation=mutation):
                 self.setUp()
                 if mutation == "missing":
                     del self.member["repositories"]["tool"]
                 elif mutation == "extra":
                     self.member["repositories"]["other"] = {"default_branch": "development", "workflow": None, "releases": "none"}
-                else:
-                    self.member["catalog"]["sha256"] = "0" * 64
                 self.scan()
                 self.assertTrue(any(row[0] == "FAIL" and "Invalid member input" in row[2] for row in self.rows))
 
@@ -225,7 +313,6 @@ class ProfileObservationsTests(unittest.TestCase):
                 self.setUp()
                 self.catalog["description"] = "Useful tools for careful work."
                 self.catalog_bytes = json.dumps(self.catalog).encode()
-                self.member["catalog"]["sha256"] = hashlib.sha256(self.catalog_bytes).hexdigest()
                 api = lambda endpoint: {"description": observed} if endpoint == "orgs/example-team" else self.api(endpoint)
                 self.scan(api=api)
                 rows = [row for row in self.rows if "account description" in row[2]]
@@ -233,13 +320,63 @@ class ProfileObservationsTests(unittest.TestCase):
         self.setUp()
         self.catalog["description"] = "Useful tools for careful work."
         self.catalog_bytes = json.dumps(self.catalog).encode()
-        self.member["catalog"]["sha256"] = hashlib.sha256(self.catalog_bytes).hexdigest()
         def unreadable(endpoint):
             if endpoint == "orgs/example-team":
                 raise profiles.Unreadable("organization unavailable")
             return self.api(endpoint)
         self.scan(api=unreadable)
         self.assertIn(("REVIEW", ".github", "Account description unavailable: organization unavailable"), self.rows)
+
+
+    def test_workflow_pin_is_unknown_without_a_caller_or_with_conflicting_pins(self):
+        for workflow in ("jobs: {}", "# uses: example-team/.github/.github/workflows/profile.yml@" + "a" * 40,
+                         "jobs:\n  build:\n    steps:\n      - run: |\n          uses: example-team/.github/.github/workflows/profile.yml@" + "a" * 40,
+                         self.workflow + "  other:\n    uses: example-team/.github/.github/workflows/profile.yml@" + "b" * 40):
+            with self.subTest(workflow=workflow):
+                self.workflow = workflow
+                self.rows = []
+                self.scan()
+                self.assertTrue(any(row[0] == "REVIEW" and "pin unknown" in row[2] for row in self.rows), self.rows)
+
+    def test_workflow_pin_accepts_quoted_yaml_but_rejects_branch_refs(self):
+        self.workflow = 'jobs: {check: {uses: "example-team/.github/.github/workflows/profile.yml@' + 'a' * 40 + '"}}'
+        self.scan()
+        self.assertFalse(any(row[0] in {"FAIL", "REVIEW"} for row in self.rows), self.rows)
+        self.workflow = self.workflow.replace('a' * 40, "master")
+        self.rows = []
+        self.scan()
+        self.assertTrue(any(row[0] == "FAIL" and "full commit SHA" in row[2] for row in self.rows))
+
+    def test_unreadable_workflow_tree_is_review(self):
+        self.workflow_tree["truncated"] = True
+        self.scan()
+        self.assertTrue(any(row[0] == "REVIEW" and "workflow tree is incomplete" in row[2] for row in self.rows))
+
+    def test_observation_uses_only_observed_fields_and_rejects_missing_structure(self):
+        self.catalog["new_schema_field"] = "owned by the renderer"
+        self.catalog["groups"][0]["repositories"][0]["kind"] = "library"
+        self.catalog_bytes = json.dumps(self.catalog).encode()
+        self.scan()
+        self.assertFalse(any(row[0] in {"FAIL", "REVIEW"} for row in self.rows), self.rows)
+        for target, field in ((self.catalog["organization"], "login"),
+                              (self.catalog["groups"][0]["repositories"][0], "icon")):
+            value = target.pop(field)
+            self.catalog_bytes = json.dumps(self.catalog).encode()
+            self.rows = []
+            self.scan()
+            self.assertTrue(any(row[0] == "FAIL" and "Invalid public catalog" in row[2] for row in self.rows))
+            target[field] = value
+
+    def test_unsafe_icon_urls_do_not_reach_the_network(self):
+        for value in ("http://example.test/icon.svg", "//example.test/icon.svg", "../../../outside",
+                      "https://user:password@example.test/icon.svg", "%2f%2fexample.test/icon.svg"):
+            with self.subTest(value=value):
+                self.catalog["mark"] = value
+                self.catalog_bytes = json.dumps(self.catalog).encode()
+                self.rows = []
+                images = self.scan()
+                self.assertFalse(images.called)
+                self.assertTrue(any(row[0] == "FAIL" and "Invalid observed icon" in row[2] for row in self.rows))
 
 
 if __name__ == "__main__":

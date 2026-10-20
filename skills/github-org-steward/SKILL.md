@@ -159,11 +159,10 @@ artifacts; an empty word search is not an ownership proof.
   --identity <owner-email> --allowed-signers <file>
   --work-dir <ignored-empty-directory>`. Per-repository observations execute
   from the repository steward package. Use `--repo-steward <skill-dir>` when
-  the skills are installed separately. Profile checks also use
-  `github-readme-design`; pass `--readme-design <skill-dir>` for a separate
-  installation and `--member-input <path>` when its input is not
-  `profile/member.json`. Observe `.github-private` visibility, pinned-catalog
-  membership/digest, declared default branches against GitHub, workflow files,
+  the skills are installed separately. Pass `--member-input <path>` when its
+  input is not `profile/member.json`. Observe `.github-private` visibility,
+  catalog membership at the reusable profile workflow pin, declared default
+  branches against GitHub, workflow files,
   releases and icons. Absence is optional;
   unreadable input is REVIEW. Explain all REVIEW lines and pending runs.
 - Local preservation: `python3 scripts/scan_org.py compare --root <checkouts>

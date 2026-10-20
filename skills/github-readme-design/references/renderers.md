@@ -2,8 +2,8 @@
 
 ## Toolchain
 
-Terminal assets and DESIGN lint use the TypeScript package in `scripts/`,
-with Node 24 at the exact version in `.node-version`. Node runs the erasable
+Terminal, social-preview and profile assets and DESIGN lint use the TypeScript
+package in `scripts/`, with Node 24 at the exact version in `.node-version`. Node runs the erasable
 TypeScript directly; there is no compiled distribution. `package-lock.json`
 pins all dependencies. DESIGN is read through `@google/design.md/linter`
 0.4.0: `lint(text)` must return zero errors and zero warnings; informational
@@ -16,60 +16,67 @@ Consumers run the composite Action at a full commit SHA, or use a package copy
 at that commit in their ignored build directory as described under
 [local regeneration](#local-regeneration). Never install into an installed
 skill directory or the global environment. In this skill's development
-worktree, `npm ci && npm test` installs into ignored `scripts/node_modules`
+worktree, `npm ci --ignore-scripts && npm test` installs into ignored `scripts/node_modules`
 and runs TypeScript checking and `node:test`. `npm run golden` deliberately
-updates the golden SVGs; ordinary tests only compare them. The licensed font
-in `scripts/test/fixtures/fonts/` is test data, not a default consumer font.
+updates the golden terminal SVGs and social-preview PNG; ordinary tests only
+compare them. The licensed font in `scripts/test/fixtures/fonts/` is test data,
+not a default consumer font.
 
-Social cards and organization profiles use the Python helpers below, or a
-repository-owned renderer implementing the accepted standard. Python 3 is
-required; social outlines need `fonttools`. Raster icon validation and pixel
-verification use Pillow; PNG conversion uses `rsvg-convert`. SVG CSS reference
-validation uses `tinycss2`. Install Python dependencies in the consumer's
-producer-owned ignored location.
+## Social preview
 
-## Social card inputs
+The toolchain renders `.github/assets/social-preview/social-preview.png` from
+DESIGN, the organization catalog, a selected repository and its light-page
+icon. The card's owner is `organization.login`; title and About come from the
+repository's `title` and `about`. `--repository .github` uses the organization's
+`name` and `about`. Nothing is fetched during rendering.
 
-Resolve the project's actual DESIGN.md into a small JSON presentation recipe;
-do not assume any particular token key paths. Set `design_source` to its path
-and `design_sha256` to the reviewed file's digest. The helper rejects a stale
-binding. Commit this mapping with the project's renderer inputs. If DESIGN is
-absent, omit both fields and use or override the neutral defaults below.
-Paths are relative to the recipe. Source paths, font choices, output paths and
-all project colors are inputs. Consumer fonts and project assets are explicit inputs.
-If a font is bundled by the served project, include its redistribution license
-and source/digest; the card recipe requires a license file for the chosen fonts.
+DESIGN components `social-preview`, `social-preview-owner`,
+`social-preview-about` and `social-preview-gap` own all styling. The first
+three reference typography `social-preview-title`, `social-preview-owner` and
+`social-preview-body`. Font selection and one-character-to-one-glyph outlining
+follow the terminal rules below, with each typography's weight and variation.
+Each social typography entry must declare `fontVariation` and select a variable
+font; a missing declaration fails with the token named.
+Missing components, typography or dimensions fail; there are no fallback styles.
+Fonts are explicit inputs; keep their source and redistribution license with
+any bundled font files.
 
-Card recipe fields:
+The canvas is 1280×640, a GitHub platform constant, filled with
+`social-preview.backgroundColor`. The icon is a square of `social-preview.size`
+at `x = social-preview.padding`, vertically centered. The text starts after
+that square plus `social-preview-gap.width` and ends one padding from the
+right edge. Owner, title and About use their component text colors.
 
-```json
-{
-  "owner": "example-owner",
-  "title": "example-tool",
-  "about": "Inspect your data before shipping it.",
-  "icon": "assets/logo.svg",
-  "font_title": "fonts/title.ttf",
-  "font_body": "fonts/body.ttf",
-  "font_license": "fonts/LICENSE.txt"
-}
-```
+Title fitting tries one line at its DESIGN font size, decreasing in 1 px steps
+to the 40 px legibility floor. If none fits, it replaces one hyphen/slash
+separator run with a line break, choosing balanced widths at the largest
+fitting size, at most two lines. It never truncates or breaks arbitrary letters.
+About wraps at word boundaries at its DESIGN font size, at most three lines;
+an unbreakable word or fourth line fails. The owner must fit on one line.
 
-The literals above are example inputs only. Defaults: canvas 1280×640, padding
-64, icon square 384, text start x=512, text width=704, owner 28 px, title range
-72 down to 40 px in integer steps, title maximum two lines, About 32 px and at
-most three lines with a 44 px line height. Default background is white, title
-and owner black, summary dark gray. Override `background`, `ink`, `muted`,
-`title_max`, `title_min`, `font_owner`, `owner_size`, `text_x`, `text_width`, `icon_size` and `padding`
-with accepted DESIGN values. `font_owner` defaults to the body font; supply a
-distinct face when DESIGN specifies one. Canvas and About size remain the card
-contract. Unbreakable overflow fails instead of clipping or silently reducing type.
+The text block contains the owner's line height, a `social-preview-gap.height`
+gap, title line heights, the same gap and About line heights. Title line height
+scales with its fitted size. The block is vertically centered and must fit
+inside the padded canvas. Each baseline is at the bottom of its line box,
+preserving the card composition. Geometry and overflow errors identify the
+input or token; change the owning input rather than clipping the output.
 
-`icon` accepts a self-contained SVG or a PNG, JPEG or WebP image. Raster icons
-must be square and at least `icon_size` pixels on each side (384 by default);
-smaller inputs fail rather than being upscaled. The renderer embeds the file's
-exact bytes in an `<image>` data URI at the same position and size as an SVG.
-Standalone and embedded rasters are verified, then reopened and fully decoded,
-including every animation frame, before their original bytes are embedded.
+`@resvg/resvg-wasm` 2.6.2 rasterizes the internal outlined SVG with no fonts
+loaded. Output is 1280×640, 8-bit RGBA PNG, with no text or timestamp chunks.
+Only the consumed PNG is committed. The internal SVG is not an output artifact.
+The same pinned renderer and inputs are checked against a byte golden on
+macOS and Linux.
+
+Icons accept single still PNG, JPEG or WebP raster images, square and at least
+the rendered icon size, or a self-contained SVG under the allowlist below.
+Pinned `@jsquash/png`, `@jsquash/jpeg` and `@jsquash/webp` WebAssembly decoders
+fully decode every raster before embedding. Decoder warnings and recovered
+errors reject the input with its file named. APNG and animated WebP fail with
+the icon file named, including when embedded in SVG. PNG/JPEG bytes are embedded
+as data URIs; WebP uses a lossless internal PNG because this resvg version does
+not decode WebP.
+The rasterizer resamples the image at the specified size. SVG images have their
+own document scope so icon IDs cannot collide with card glyph IDs.
 
 ### SVG input allowlists
 
@@ -120,15 +127,16 @@ predefined/numeric character references are accepted.
 ### Render and check
 
 ```sh
-python3 <skill>/scripts/render_social.py --spec <recipe.json> --output <card.svg>
-rsvg-convert -w 1280 -h 640 <card.svg> -o <card.png>
-python3 <skill>/scripts/render_social.py --spec <recipe.json> --output <card.svg> --check
+node <toolchain>/src/cli.ts social-preview render --design <DESIGN.md> --fonts <dir> --catalog <catalog.json> --repository <name> --icon <logo.png> --out .github/assets/social-preview/social-preview.png
+node <toolchain>/src/cli.ts social-preview check --design <DESIGN.md> --fonts <dir> --catalog <catalog.json> --repository <name> --icon <logo.png> --assets .github/assets/social-preview --artifact-dir .build/social-preview-artifact
 ```
 
-The SVG uses glyph outlines. A sibling `.layout.json` records title/About
-lines, actual font size, dimensions and input digests, including the icon file's
-SHA-256 for either input type. `--check` compares both outputs and fails on drift
-without writing. Inspect both output images.
+`check` compares PNG bytes without overwriting the committed file. On drift it
+names the output, prints a regeneration command and optionally copies the
+regenerated PNG to a separate dedicated artifact directory. Review that exact
+PNG at 1× and link-preview size; byte checks do not establish visual acceptance.
+Only pixel changes affect the rendered PNG; icon metadata is not carried into
+it. Settings uploads remain with the caller.
 
 ## Terminal
 
@@ -318,16 +326,22 @@ placeholders to resolve to reviewed releases, not mutable references.
 
 | Input | Meaning |
 | --- | --- |
-| `asset` | Required: `terminal` or `design` |
-| `command` | Default `check`; terminal supports `check` and `render`, design supports `lint` |
+| `asset` | Required: `terminal`, `social-preview`, `profile` or `design` |
+| `command` | Default `check`; assets support `check` and `render`, design supports `lint` |
 | `design` | Required path to the applicable DESIGN.md |
-| `fonts` | Organization fonts directory, required for terminal |
-| `assets` | Terminal asset directory, required for terminal |
+| `fonts` | Organization fonts directory, required for terminal and social-preview |
+| `assets` | Terminal or social-preview asset directory in the caller |
 | `executable` | Built product, required for terminal |
-| `artifact-dir` | Optional dedicated failure-artifact directory, separate from assets |
+| `catalog` | Organization catalog, required for social-preview and profile |
+| `repository`, `icon` | Catalog repository selector and local light-page icon, required for social-preview |
+| `mode` | Profile mode: `public` (default) or `member` |
+| `member` | Operational JSON input, required for member profile |
+| `catalog-revision` | Full standard commit SHA, required for member profile; rejected in public mode |
+| `output` | Profile file (default `profile/README.md`) or social-preview render file (defaults to `assets/social-preview.png`) |
+| `artifact-dir` | Optional dedicated failure-artifact directory, separate from the checked output |
 
 The Action sets up the Node version from its `.node-version`, installs with
-`npm ci --omit=dev`, and runs `src/cli.ts`. `terminal/render` records and
+`npm ci --ignore-scripts --omit=dev`, and runs `src/cli.ts`. `terminal/render` records and
 renders into `assets`; `terminal/check` regenerates in a temporary directory
 and compares recording and SVG bytes without overwriting committed files.
 It reports changed commands pairwise by index, plus added and removed steps,
@@ -337,6 +351,10 @@ differs, it names the file and says DESIGN or the renderer changed. On drift,
 `fixture/` if present, `recording.json` and both SVGs. Copy those files from the
 CI artifact, review and commit them together. Exit codes are 0 for success,
 1 for drift or validation failure and 2 for command usage errors.
+Social-preview drift artifacts contain the regenerated PNG; profile artifacts
+contain the regenerated Markdown file. Public profile mode rejects member input
+and a catalog revision. All Action values reach the shell through environment
+variables and quoted arguments.
 
 ### Organization standard and member caller
 
@@ -397,7 +415,7 @@ tar -xzf "$toolchain_dir/source.tar.gz" -C "$toolchain_dir" --strip-components=4
 tar -xzf "$toolchain_dir/source.tar.gz" -C "$toolchain_dir" --strip-components=1 \
   "$archive_root/LICENSE"
 node --version # Must match the copied .node-version; use that runtime below.
-npm ci --omit=dev --prefix "$toolchain_dir"
+npm ci --ignore-scripts --omit=dev --prefix "$toolchain_dir"
 node "$toolchain_dir/src/cli.ts" terminal record \
   --script .github/assets/terminal/script.yml --executable .build/release/demo \
   --out .github/assets/terminal/recording.json
@@ -418,107 +436,93 @@ Remove download, dependency and review outputs when no longer needed.
 
 ## Organization profiles
 
-`render_profile.py` produces `.github/profile/README.md` from the public
-`.github/profile/catalog.json`, and `.github-private/profile/README.md` from
-that same catalog plus member input. It uses only the Python standard library
-and `presentation.py`. Generation is offline, deterministic UTF-8 with LF line
-endings; `--check` compares exact bytes and never writes. Validation finishes
-before writing. Links accept `https:` URLs or repository-relative paths, never
-protocol-relative URLs, credentials, active schemes or control characters.
-Text is escaped HTML text, not embedded Markdown or trusted HTML.
+`profile render` produces the public `.github` repository's `profile/README.md`
+from its catalog and DESIGN. Member mode adds the dashboard repository's
+operational input and the pinned catalog revision. Generation is offline,
+deterministic UTF-8 with LF line endings. `profile check` compares exact bytes
+without overwriting the output; validation finishes before any output is written.
 
-The runnable neutral inputs and golden outputs are under
-`tests/fixtures/profile/`. Their placeholder hosts and synthetic revision are
-fixtures, not live acceptance evidence.
+The neutral inputs and unchanged public/member parity goldens live under
+`scripts/test/fixtures/profile/`. Placeholder hosts and the synthetic revision
+are test inputs, not live acceptance evidence.
 
-### Catalog contract
+### Shared catalog contract
 
-The catalog owns these fields:
+The catalog module validates both social-preview and profile inputs once per
+command. Unknown fields, duplicate JSON keys and case-insensitive duplicate
+repository names fail. Required fields:
 
-| Field | Value and owner |
+| Field | Meaning |
 | --- | --- |
-| `organization` | `login` and display `name`, supplied by the organization |
+| `organization` | `login`, display `name` and the organization's repository `about` sentence |
 | `promise`, `secondary` | Accepted visitor promise and secondary line |
 | `mark` | Umbrella image URL or `{light, dark}` image URLs |
-| `website` | Optional public website URL; member header otherwise links the public organization profile |
-| `navigation` | Optional roles `documentation`, `contributing`, `security`, `support`; each has `label`, `url` |
-| `groups` | Ordered array of `{title, repositories}`; each repository has `name`, `outcome`, `icon` |
-| `maintainer` | Optional `{label, url}` public-profile closing line |
-| `description` | Optional one-line organization account description expressing the promise; validated, never rendered |
-| `quickstart` | Optional `{title, commands}` rendered on the public profile after the navigation as a heading and an `sh` code block; commands are single lines without code fences |
+| `navigation` | Roles `documentation`, `contributing`, `security`, `support`, each optional with `label`, `url` |
+| `groups` | Ordered `{title, repositories}` groups; each group has a nonempty repository array |
+| Repository | `name`, `outcome`, `icon`, `kind`, `title`, `about` |
 
-Each repository occurs once. Names identify repositories within the catalog's
-organization. An `icon` is a URL or `{light, dark}` URLs for the logo shown in
-that repository's README header; a repository without its own logo uses the
-product it distributes. Groups contain at least one repository; an empty
-catalog has an empty groups array. GitHub inventory supplies public,
-non-archived membership except `.github`; the organization steward reconciles
-it online rather than the renderer fetching or inventing members.
+Repository `kind` is `tool`, `library`, `app`, `distribution` or `website`.
+`title` and `about` supply the social preview; they do not add profile markup.
+The organization repository is implicit and cannot be a group member, nor can
+`.github-private`. Empty catalogs use an empty `groups` array. Icons use the
+repository README header logo; distributions can use their product's icon.
 
-Catalog relative links are relative to `.github/profile/README.md`. Public
-output preserves them. Member output resolves them against the pinned `.github`
-revision: images use raw content URLs, other links use GitHub file URLs.
-They must remain within that repository. Member maintenance links are relative
-to `.github-private/profile/README.md`; use HTTPS links for shared `.github`
-documents. The organization declares the document paths and labels.
+Optional catalog fields:
 
-### Member input contract
+- `website`: public website URL; the member header otherwise links to the
+  public organization profile.
+- `maintainer`: `{label, url}` public-profile closing line.
+- `description`: one-line organization account description, validated but not
+  rendered.
+- `quickstart`: `{title, commands}`, rendered only on the public profile after
+  navigation. Commands form a nonempty array of single lines without code fences.
 
-The member repository owns a small input, conventionally `profile/member.json`:
+Text is escaped HTML text, not embedded Markdown or trusted HTML. Links accept
+HTTPS or repository-relative paths, never protocol-relative URLs, credentials,
+active schemes, controls or paths escaping the repository. Catalog relative
+links are relative to `.github/profile/README.md`; public output preserves them.
+Member output resolves them against `--catalog-revision`, using raw content
+URLs for images and GitHub blob URLs for other links. Member maintenance links
+are relative to `.github-private/profile/README.md`; use HTTPS for shared docs.
 
-- `catalog`: `revision` (full 40-character commit SHA) and `sha256` of the exact
-  catalog bytes downloaded from that revision of `.github`. Keep the fetched
-  file in a producer-owned ignored directory and pass it with `--catalog`.
-  Record the pin and digest, never fork the catalog into another maintained
-  group/row list. The renderer checks the digest; the online steward verifies
-  the file at the recorded revision and compares membership with current truth.
-- `maintenance`: required roles `maintenance`, `versioning`, `settings`,
-  `design`, each with the organization's declared `label` and `url`.
-- `repositories`: object keyed by exact catalog repository name. Each value
-  contains only `default_branch` (the declared nonempty GitHub default branch
-  name), `workflow` (workflow filename, such as `validate.yml`, or `null`),
-  and `releases` (`published`, `channel` or `none`). These release
-  states respectively render a live latest-release badge, a Releases link or
-  an em dash. They encode publication/channel facts, never a version or status.
+### DESIGN and member inputs
 
-Unknown fields, duplicate catalog members, and missing or extra operational
-members fail. Input does not carry a status, copied group, outcome or policy.
-Release badges sort published releases by date and include prereleases; drafts
-are excluded. They link to the repository Releases page. See the
-[Shields release badge parameters](https://shields.io/badges/git-hub-release).
-The renderer includes the declared `default_branch` as an explicit CI badge
-query parameter and filters the workflow evidence link to that branch. Branch
-names are URL-encoded, including slashes and non-ASCII characters. The
-organization steward verifies each declared default branch against GitHub,
-checks workflows on the observed default branch, release presence, icon
-resolution and public inventory; unreadable evidence stays
-REVIEW. Badge values remain live and may be cached by their provider.
+The `size` properties of `profile-header`, `profile-member-header`, `profile-row`
+and `profile-member-row` are required positive integer px dimensions. The badge
+style is the renderer constant `flat`. Profile order, escaping, table markup,
+`<picture>` behavior and final newline are covered by byte-parity goldens.
+
+Member JSON contains only:
+
+- `maintenance`: required `maintenance`, `versioning`, `settings` and `design`
+  roles, each with declared `label` and `url`.
+- `repositories`: object keyed by each exact catalog repository name. Each
+  entry contains `default_branch` (nonempty), `workflow` (a `.yml`/`.yaml`
+  filename or null) and `releases` (`published`, `channel` or `none`). These
+  render a live latest-release badge, Releases link or em dash respectively.
+
+Missing or extra operational members fail. CI badge URLs explicitly include
+and encode each declared default branch. Release badges sort by date and include
+prereleases. The renderer does not fetch live status; the organization's online
+observations verify default branches, workflow existence, releases, inventory
+and icons. Unreadable evidence remains REVIEW.
 
 ```sh
-python3 <renderer-dir>/render_profile.py --catalog <catalog.json> --spec <profile-recipe.json> --output profile/README.md
-python3 <renderer-dir>/render_profile.py --catalog <pinned-catalog.json> --member profile/member.json --spec <profile-recipe.json> --output profile/README.md
-python3 <renderer-dir>/render_profile.py --catalog <pinned-catalog.json> --member profile/member.json --spec <profile-recipe.json> --output profile/README.md --check
+node <toolchain>/src/cli.ts profile render --design <DESIGN.md> --catalog <catalog.json> --out profile/README.md
+node <toolchain>/src/cli.ts profile render --design <DESIGN.md> --catalog <catalog.json> --member profile/member.json --catalog-revision <full-40-hex-sha> --out profile/README.md
+node <toolchain>/src/cli.ts profile check --design <DESIGN.md> --catalog <catalog.json> --member profile/member.json --catalog-revision <full-40-hex-sha> --out profile/README.md --artifact-dir .build/profile-artifact
 ```
 
-Omit `--member` for public mode. Omit `--spec` only when the documented defaults
-apply; otherwise use the DESIGN-bound recipe described above with the
-[profile tokens](design.md#profile-tokens). Fetch the pinned catalog before CI
-runs `--check`; do not silently substitute branch HEAD when a pin is unreadable.
-
-### Vendoring shared renderers
-
-Vendor `render_profile.py` and `presentation.py` beside the profile inputs in
-an organization-owned renderer directory, and record the
-source repository, full source commit, source paths, and SHA-256 of each copied
-file in the consumer's existing source receipt. Copy accepted bytes, preserve
-the source license, and verify those digests in consumer CI. A renderer update
-is a reviewed pin/digest change with regenerated output and `--check`, not a
-local layout fork. Keep the renderer pin distinct from the catalog pin and
-DESIGN digest. Commit inputs, receipt and generated README together.
+The organization reusable `profile.yml` checks out the catalog and DESIGN at
+`job.workflow_sha` and supplies that same SHA as `catalog-revision` in member
+mode. Consumers pin the workflow by full SHA with a version comment. This one
+pin selects the inputs and the transitive toolchain version. Local invocations
+must supply that same standard revision explicitly. Public mode omits both
+member input and catalog revision.
 
 The output uses GitHub-supported HTML tables, anchors, headings and images;
 `<picture>` switches declared light/dark images with a fallback. See GitHub's
-[organization profile paths and private visibility requirement](https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/customizing-your-organizations-profile)
-and [theme-aware Markdown images](https://github.blog/changelog/2022-08-15-specify-theme-context-for-images-in-markdown-ga/).
-Read both generated files for markup correctness and review actual served
-light/dark appearances before publication. No renderer performs uploads.
+[organization profile contract](https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/customizing-your-organizations-profile)
+and [theme-aware images](https://github.blog/changelog/2022-08-15-specify-theme-context-for-images-in-markdown-ga/).
+Review actual served profiles in light and dark before publication. No renderer
+performs uploads.

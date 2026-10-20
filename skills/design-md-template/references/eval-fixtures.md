@@ -12,15 +12,15 @@ Context and files:
 
 Expected output:
 
-- Adapt the checked-in template, preserving Typography, Social card, Website, Terminal and Profile subsections and owner/title/about/icon source roles; report local source revision and resolved placeholders.
+- Adapt the checked-in template, preserving its DESIGN.md format, every renderer token, the Social preview and Website subsections and owner/title/about/icon source roles; report local source revision and resolved placeholders.
 
 Forbidden behavior:
 
-- Import an app template brand, invent an upstream source receipt, claim unresolved placeholders are complete or publish GitHub surfaces.
+- Import an app template brand, invent an upstream source receipt, claim the stand-in palette or unresolved placeholders are complete or publish GitHub surfaces.
 
 Acceptance checks:
 
-- Profile recipe fields map to documented tokens; copy and operational sources retain their owners; no unrelated brand names, hues or fonts appear.
+- The adapted file lints with zero errors and warnings and renders the terminal, social preview and profile outputs; copy and operational sources retain their owners; no unrelated brand names, hues or fonts appear.
 
 Baseline expectation:
 

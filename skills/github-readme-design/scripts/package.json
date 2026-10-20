@@ -11,12 +11,19 @@
   },
   "dependencies": {
     "@google/design.md": "0.4.0",
+    "@jsquash/jpeg": "1.6.0",
+    "@jsquash/png": "3.1.1",
+    "@jsquash/webp": "1.5.0",
+    "@resvg/resvg-wasm": "2.6.2",
+    "@xmldom/xmldom": "0.9.12",
+    "css-tree": "3.2.1",
     "fontkit": "2.0.4",
     "yaml": "2.9.1"
   },
   "devDependencies": {
+    "@types/css-tree": "2.3.11",
     "@types/fontkit": "2.0.9",
     "@types/node": "24.19.2",
-    "typescript": "7.0.2"
+    "typescript": "6.0.3"
   }
 }

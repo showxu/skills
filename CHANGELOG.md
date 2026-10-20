@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Render deterministic social-preview PNGs and public/member organization
+  profiles in the TypeScript presentation toolchain and Action, with shared
+  catalog validation, DESIGN tokens, WebAssembly still-image decoding and byte
+  checks. Require explicit social font variations and reject decoder warnings
+  or recovered raster errors. Replace the Python renderers and recipes; member
+  rendering takes an explicit standard commit.
+- Observe member-profile catalog pins from reusable workflow callers in the
+  organization steward through parsed YAML workflows, independently of the
+  renderer implementation, with caller files and SHAs reported for conflicts.
+
 ## 0.1.1
 
 - Use MINOR for breaking changes and PATCH otherwise during 0.x; let the owner

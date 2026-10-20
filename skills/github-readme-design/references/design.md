@@ -103,22 +103,23 @@ from GitHub-hosted uploads.
 ## Social preview
 
 Use a 1280×640 canvas, the accepted icon, owner label, title and complete About
-sentence. Derive colors and fonts from DESIGN. If absent, the bundled renderer
-has documented neutral defaults. Keep font rights and licenses with bundled
-fonts; do not copy a system font into artwork without permission.
+sentence. The toolchain reads colors, fonts, sizes and spacing from the
+applicable DESIGN components; missing values must be resolved by that owner.
+Keep font rights and licenses with bundled fonts; do not copy a system font into artwork without permission. Raster icons
+are single still images; APNG and animated WebP fail with the file named.
 
 Title fitting first shrinks toward a stated minimum on one line. Only when
 that fails, wrap at hyphen or slash boundaries and balance line widths. Treat
 adjacent separators as a run; a line must not consist of a prefix plus a
 trailing hyphen while the next begins with a slash. Do not truncate a title or
 invent a literal-name exception. A line break replaces the whole separator
-run; the receipt retains the exact original title. Fail and revise the composition if no legible
-fit exists. About stays at 32 px, at most three lines; never drop words or
-shrink it to conceal overflow. Outline social-card lettering so font lookup
-cannot change published rendering. The helper's layout receipt records the
-actual lines and sizes for review.
+run; the catalog retains the exact original title. Fail and revise the
+composition if no legible fit exists. About stays at its DESIGN font size, at
+most three lines; never drop words or shrink it to conceal overflow. Outline social-card lettering so font lookup
+cannot change published rendering. The toolchain rasterizes the internal SVG
+to the consumed PNG; review that exact export.
 
-Review exact SVG/PNG exports in light and dark and in the reported browser.
+Review the exact PNG at 1× and at link-preview size in the reported browser.
 Equivalent geometry can render differently across engines. Merge accepted
 source and exports together; the uploaded preview is exactly those accepted
 bytes. The renderer and byte checks do not replace visual review.
@@ -156,22 +157,18 @@ paths or unpublished plans. The shared standard remains linked in `.github`.
 
 ### Profile tokens
 
-Resolve these named tokens from the accepted DESIGN when present into the
-profile recipe, with its DESIGN path and digest. These are recipe names, not
-assumed key paths in an arbitrary DESIGN file. Record defaults when DESIGN is
-silent.
+The toolchain reads the `size` property of these DESIGN components. Each must
+resolve to a positive integer px dimension; missing values fail.
 
-| Token | Default | Meaning |
-| --- | --- | --- |
-| `public_header_icon_size` | 128 px | Public umbrella mark square |
-| `member_header_icon_size` | 64 px | Member umbrella mark square |
-| `public_row_icon_size` | 40 px | Public repository icon square |
-| `member_row_icon_size` | 24 px | Member repository icon square |
-| `badge_style` | `flat` | Badge style under the Badges rules above |
+| Component | Meaning |
+| --- | --- |
+| `profile-header` | Public umbrella mark square |
+| `profile-member-header` | Member umbrella mark square |
+| `profile-row` | Public repository icon square |
+| `profile-member-row` | Member repository icon square |
 
-Sizes are positive integer pixels. Badge styles are the supported Shields
-styles: flat, flat-square, plastic, for-the-badge or social. Review both served
-profiles in light and dark. Use HTML tables for rows and `<picture>` with a
-dark `<source>` and fallback `<img>` when input declares both appearances.
+Profile badges use the renderer constant `flat`. Review both served profiles in
+light and dark. Use HTML tables for rows and `<picture>` with a dark `<source>`
+and fallback `<img>` when input declares both appearances.
 Do not put Markdown syntax inside HTML tables or depend on CSS, scripts, inline
 SVG, or embedded fonts in GitHub's renderer.

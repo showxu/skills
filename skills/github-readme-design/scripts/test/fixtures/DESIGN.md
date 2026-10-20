@@ -28,24 +28,49 @@ typography:
     fontVariation: "'MONO' 1"
   social-preview-title:
     fontFamily: Google Sans Code
+    fontSize: 72px
+    lineHeight: 82.8px
     fontWeight: 700
     fontVariation: "'MONO' 0"
   social-preview-owner:
     fontFamily: Google Sans Code
+    fontSize: 28px
+    lineHeight: 28px
     fontWeight: 500
     fontVariation: "'MONO' 0"
   social-preview-body:
     fontFamily: Google Sans Code
+    fontSize: 32px
+    lineHeight: 44px
     fontWeight: 400
     fontVariation: "'MONO' 0"
 rounded:
   terminal: 10px
 spacing:
+  social-preview-padding: 64px
+  social-preview-gap: 64px
+  social-preview-stack: 24px
+  social-preview-icon: 384px
+  profile-header-icon: 128px
+  profile-member-header-icon: 64px
+  profile-row-icon: 40px
+  profile-member-row-icon: 24px
   terminal-padding: 20px
   terminal-title-bar: 34px
   terminal-min-width: 560px
   hairline: 1px
 components:
+  social-preview-gap:
+    width: "{spacing.social-preview-gap}"
+    height: "{spacing.social-preview-stack}"
+  profile-header:
+    size: "{spacing.profile-header-icon}"
+  profile-member-header:
+    size: "{spacing.profile-member-header-icon}"
+  profile-row:
+    size: "{spacing.profile-row-icon}"
+  profile-member-row:
+    size: "{spacing.profile-member-row-icon}"
   terminal:
     backgroundColor: "{colors.terminal-surface}"
     textColor: "{colors.terminal-output}"
@@ -81,6 +106,8 @@ components:
     backgroundColor: "{colors.terminal-surface-dark}"
     textColor: "{colors.ink-dark}"
   social-preview:
+    padding: "{spacing.social-preview-padding}"
+    size: "{spacing.social-preview-icon}"
     backgroundColor: "{colors.social-preview-background}"
     textColor: "{colors.ink}"
     typography: "{typography.social-preview-title}"
@@ -98,4 +125,4 @@ components:
 
 ## Overview
 
-Terminal rendering fixture for the agents-tools visual identity.
+Presentation rendering fixture for the agents-tools visual identity.

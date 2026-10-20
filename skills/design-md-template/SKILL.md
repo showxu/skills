@@ -40,7 +40,7 @@ local template files, adaptation boundaries, validation, and handoff notes.
   the source of truth for reviewed, included, and unreviewed upstream paths.
 - Authored templates under `templates/`, including
   `github-organization-family/DESIGN.md` for shared organization identity,
-  social cards, website, terminal demos and public/member profiles.
+  social previews, website, terminal demos and public/member profiles.
 - Local included templates under `templates/<template-id>/DESIGN.md`.
 - Current `DESIGN.md` external spec only when validation or format details
   matter.
@@ -123,9 +123,10 @@ and exercise [fixtures](references/eval-fixtures.md).
   have a checked-in `DESIGN.md` and a repository revision.
 - Exact mode does not rewrite template content.
 - Adapted mode keeps a clear source kind, path and commit in the handoff.
-- For the organization family template, all brand/font/path placeholders are
-  resolved from accepted input before claiming an applied DESIGN is complete.
-  Unresolved values remain explicit missing inputs; do not invent identity.
+- For the organization family template, its stand-in palette and all
+  brand/font/path placeholders are replaced from accepted input before
+  claiming an applied DESIGN is complete. Unresolved values remain explicit
+  missing inputs; do not invent identity.
 - If available, run `npx @google/design.md lint DESIGN.md` from the target
   project. If unavailable, at minimum inspect frontmatter fences and major
   section headings.

@@ -1,149 +1,277 @@
 ---
+version: alpha
 name: Organization family
-description: Shared visual identity and presentation contract for an organization and its repositories.
+description: Shared visual identity and presentation tokens for an organization and its repositories.
+colors:
+  primary: "#2F5BD3"
+  primary-dark: "#8AB4F8"
+  ink: "#1A1A1A"
+  ink-dark: "#F2F2F2"
+  terminal-surface: "#FCFCFC"
+  terminal-surface-dark: "#14161A"
+  terminal-bar: "#F0F0F0"
+  terminal-bar-dark: "#1E2126"
+  terminal-border: "#DADADA"
+  terminal-border-dark: "#33373F"
+  terminal-output: "#404040"
+  terminal-output-dark: "#C8CACF"
+  terminal-dim: "#666666"
+  terminal-dim-dark: "#8E929B"
+  social-preview-background: "#F5F5F5"
+  social-preview-muted: "#555555"
+typography:
+  terminal:
+    fontFamily: Google Sans Code
+    fontSize: 14px
+    fontWeight: 400
+    lineHeight: 21px
+    fontVariation: "'MONO' 1"
+  social-preview-title:
+    fontFamily: Google Sans Code
+    fontSize: 72px
+    fontWeight: 700
+    lineHeight: 82.8px
+    fontVariation: "'MONO' 0"
+  social-preview-owner:
+    fontFamily: Google Sans Code
+    fontSize: 28px
+    fontWeight: 500
+    lineHeight: 28px
+    fontVariation: "'MONO' 0"
+  social-preview-body:
+    fontFamily: Google Sans Code
+    fontSize: 32px
+    fontWeight: 400
+    lineHeight: 44px
+    fontVariation: "'MONO' 0"
+rounded:
+  terminal: 10px
+spacing:
+  terminal-padding: 20px
+  terminal-title-bar: 34px
+  terminal-min-width: 560px
+  hairline: 1px
+  social-preview-padding: 64px
+  social-preview-gap: 64px
+  social-preview-stack: 24px
+  social-preview-icon: 384px
+  profile-header-icon: 128px
+  profile-member-header-icon: 64px
+  profile-row-icon: 40px
+  profile-member-row-icon: 24px
+components:
+  terminal:
+    backgroundColor: "{colors.terminal-surface}"
+    textColor: "{colors.terminal-output}"
+    typography: "{typography.terminal}"
+    rounded: "{rounded.terminal}"
+    padding: "{spacing.terminal-padding}"
+    width: "{spacing.terminal-min-width}"
+  terminal-dark:
+    backgroundColor: "{colors.terminal-surface-dark}"
+    textColor: "{colors.terminal-output-dark}"
+  terminal-frame:
+    backgroundColor: "{colors.terminal-border}"
+    size: "{spacing.hairline}"
+  terminal-frame-dark:
+    backgroundColor: "{colors.terminal-border-dark}"
+  terminal-title-bar:
+    backgroundColor: "{colors.terminal-bar}"
+    textColor: "{colors.terminal-dim}"
+    height: "{spacing.terminal-title-bar}"
+  terminal-title-bar-dark:
+    backgroundColor: "{colors.terminal-bar-dark}"
+    textColor: "{colors.terminal-dim-dark}"
+  terminal-prompt:
+    backgroundColor: "{colors.terminal-surface}"
+    textColor: "{colors.primary}"
+  terminal-prompt-dark:
+    backgroundColor: "{colors.terminal-surface-dark}"
+    textColor: "{colors.primary-dark}"
+  terminal-command:
+    backgroundColor: "{colors.terminal-surface}"
+    textColor: "{colors.ink}"
+  terminal-command-dark:
+    backgroundColor: "{colors.terminal-surface-dark}"
+    textColor: "{colors.ink-dark}"
+  social-preview:
+    backgroundColor: "{colors.social-preview-background}"
+    textColor: "{colors.ink}"
+    typography: "{typography.social-preview-title}"
+    padding: "{spacing.social-preview-padding}"
+    size: "{spacing.social-preview-icon}"
+  social-preview-gap:
+    width: "{spacing.social-preview-gap}"
+    height: "{spacing.social-preview-stack}"
+  social-preview-owner:
+    backgroundColor: "{colors.social-preview-background}"
+    textColor: "{colors.ink}"
+    typography: "{typography.social-preview-owner}"
+  social-preview-about:
+    backgroundColor: "{colors.social-preview-background}"
+    textColor: "{colors.social-preview-muted}"
+    typography: "{typography.social-preview-body}"
+  profile-header:
+    size: "{spacing.profile-header-icon}"
+  profile-member-header:
+    size: "{spacing.profile-member-header-icon}"
+  profile-row:
+    size: "{spacing.profile-row-icon}"
+  profile-member-row:
+    size: "{spacing.profile-member-row-icon}"
 ---
+
+# Organization family Design
 
 ## Overview
 
-Replace the bracketed placeholders with accepted organization inputs before
-applying this template. This file owns family visual decisions; each product
-owns its meaning, interface and claims. Consumers record this file's accepted
-revision and digest when resolving rendering recipes.
+This file owns the family's visual decisions; each repository owns its
+meaning, interface and claims, and the organization catalog owns copy,
+membership, order and icon selection. Replace `name`, `description` and the
+bracketed placeholders with accepted organization inputs before applying it.
 
 - Organization display name: `<organization-display-name>`
 - Visitor promise: `<accepted-organization-promise>`
 - Umbrella mark: `<accepted-umbrella-mark-source>`
 - Account avatar: `<accepted-avatar-source>`
-- Supported appearances: light and dark
 
 Keep the umbrella mark distinct from the account avatar where the identity
-system defines both. A distribution repository without its own logo uses the
-logo of the product it distributes. Inputs and exports have one owner.
+system defines both.
+
+This file follows Google's [DESIGN.md format](https://github.com/google-labs-code/design.md)
+(`version: alpha`). Every token lives in the front matter; the sections below
+explain intent and cite token names instead of values. CI lints this file
+with the official `@google/design.md` parser and rejects any error or warning.
+`github-readme-design`'s toolchain renders terminal demos, social previews and
+organization profiles from these tokens through the same parser.
 
 ## Colors
 
-| Role | Light | Dark | Owner |
-| --- | --- | --- | --- |
-| Surface | `<light-surface>` | `<dark-surface>` | Family identity |
-| Primary text | `<light-ink>` | `<dark-ink>` | Family identity |
-| Secondary text | `<light-muted>` | `<dark-muted>` | Family identity |
-| Accent | `<light-accent>` | `<dark-accent>` | Family identity |
-| Border | `<light-border>` | `<dark-border>` | Family identity |
+The palette is a neutral stand-in: replace every color with accepted identity
+evidence before an applied DESIGN counts as complete. The linter checks
+contrast for each component pair.
 
-Choose actual values from accepted identity evidence. Verify contrast in each
-appearance. Consumers do not import another organization's palette.
+`primary` marks what a reader acts on: the terminal prompt and, on the
+website, links and accents. `primary-dark` carries the same hue on dark
+surfaces. `ink` and `ink-dark` carry titles and commands.
+
+The `terminal-*` colors build a quiet window around a session: surface, a
+slightly deeper title bar and a hairline border. Output is one step softer
+than commands, so the eye goes to what was typed; `terminal-dim` is reserved
+for the window title.
+
+The `social-preview-*` colors are the card's ground and the muted tone of its
+About sentence. Icon colors belong to the icon entries in Iconography.
 
 ## Typography
 
-Family faces and their licensed sources are declared in Presentation below.
-GitHub profile text uses GitHub's own typography; artwork does not impose fonts
-on the rendered README.
+The default family is one variable font that carries every lettering role
+through its axes; each typography token selects a weight and a variation.
+Terminal sessions and code are set monospaced so output keeps its column grid;
+titles, labels and body text are set proportional. Keep the default or
+replace it with the organization's licensed variable family and the axis
+values that select each design.
+
+- Font file: `<organization-fonts-directory>/<variable-font-file>`
+- Source and license: `<font-source-and-license>`
+
+Rendered lettering is converted to glyph outlines from that file, so every
+reader sees the same letterforms whatever fonts they have installed. Bundle
+the font only when its license permits redistribution, with the license
+beside it.
 
 ## Layout
 
-Keep member icon geometry, spacing and alignment consistent across the family.
-Presentation dimensions below are renderer defaults to accept or override;
-product names, descriptions and source paths remain inputs.
+A terminal window is never narrower than `terminal-min-width` and grows with
+its widest line, up to the width of GitHub's README column; a session that
+does not fit is shortened, never scaled down. The title bar is
+`terminal-title-bar` tall and the session sits `terminal-padding` from every
+edge.
+
+A social preview fills GitHub's 1280×640 canvas: an icon square of
+`social-preview-icon` set `social-preview-padding` from the left edge, then
+the text column after `social-preview-gap`, with `social-preview-stack`
+between owner, title and About.
+
+The public profile and the member dashboard size the umbrella mark with
+`profile-header-icon` and `profile-member-header-icon`, and repository icons
+with `profile-row-icon` and `profile-member-row-icon`.
+
+## Elevation & Depth
+
+Presentation surfaces are flat: no shadows, gradients or blur. A terminal
+window stands apart from the page by its hairline frame alone.
+
+## Shapes
+
+Terminal windows use the `terminal` corner radius. The title bar carries no
+window buttons: the session is the subject, not a desktop.
 
 ## Components
 
-Use the accepted umbrella and repository marks. Do not redraw icons during a
-profile or social-card refresh. Keep textual claims as text wherever the
-surface supports it.
+Each component is a presentation role. The light appearance carries the base
+name; the dark appearance adds `-dark` and lists only the properties that
+change, which renderers merge over the base. The social preview has no `-dark`
+variants: GitHub shows one image.
 
-## Presentation
+| Component | Role |
+| --- | --- |
+| `terminal` | Window body, output text and the terminal typography |
+| `terminal-frame` | Hairline outline and the separator under the title bar |
+| `terminal-title-bar` | Title band and the session title |
+| `terminal-prompt` | The `$ ` before each command |
+| `terminal-command` | Command text |
+| `social-preview` | Card ground, padding, icon square and repository title |
+| `social-preview-gap` | Icon-to-text gap and the gap between text blocks |
+| `social-preview-owner` | Owner label |
+| `social-preview-about` | About sentence |
+| `profile-header`, `profile-member-header` | Umbrella mark on the public profile and the member dashboard |
+| `profile-row`, `profile-member-row` | Repository icons on the public profile and the member dashboard |
 
-### Typography
-
-| Role | Accepted family | Source and license |
-| --- | --- | --- |
-| Artwork owner label | `<owner-label-font-family>` | `<font-source-and-license>` |
-| Artwork title | `<title-font-family>` | `<font-source-and-license>` |
-| Artwork About sentence | `<body-font-family>` | `<font-source-and-license>` |
-| Terminal | `<monospace-font-family>` | `<font-source-and-license>` |
-| Website | `<website-font-family-and-fallbacks>` | `<font-source-and-license>` |
-
-Resolve fonts into the renderer recipe. Bundle fonts only when redistribution
-is permitted; outline social-card lettering and retain the layout receipt.
-
-### Social card
-
-Default canvas: 1280 × 640 px. Show owner, icon, title and complete About
-sentence. Default About size: 32 px, at most three lines. Default title range:
-72 to 40 px; wrap at meaningful separators only after one-line fitting fails.
-Use accepted colors above. Review exact exported bytes in light and dark.
-
-| Field | Source | Adaptation rule |
-| --- | --- | --- |
-| Owner | Repository's actual account/organization owner | Use the accepted display label |
-| Title | Product/repository information set | Preserve its complete accepted title |
-| About | Repository's accepted About sentence | Preserve all words; no truncation |
-| Icon | Logo shown in the repository README header | Use the product logo for a distribution repository with no own logo |
-
-### Website
-
-Use the public catalog's promise, job groups, ordering and umbrella identity.
-Resolve typography, colors, spacing and responsive layout from this DESIGN.
-The website owns its implementation and routes; link to accepted documentation
-and release channels. Do not maintain a second membership list.
+### Social preview
 
 | Field | Source |
 | --- | --- |
-| Owner | Organization identity |
-| Title | Public catalog promise |
-| About | Public catalog secondary line; member outcome sentences in rows |
-| Icon | Catalog umbrella mark and repository icons |
+| Owner | The catalog's organization login |
+| Title | The catalog entry's `title`, the repository's README title |
+| About | The catalog entry's `about`, the repository's About sentence, complete and unchanged |
+| Icon | The catalog entry's icon for light pages: the logo in the repository's README header; a distribution without its own logo uses its product's |
 
-### Terminal
+### Website
 
-Render actual recorded commands and successful output, with source revision,
-executable/input digests, toolchain and normalization evidence kept outside
-public prose. Use light and dark exports through `<picture>` with a fallback.
-Resolve surface, bar, border, prompt, command, output and dim colors from the
-accepted palette, and the terminal family from Typography. Defaults are 14 px
-type, 21 px line height, 20 px padding and 10 px corner radius. Keep private
-paths out of the recording; do not fabricate command output.
+The website maps its roles to tokens and defines no colors or faces of its own.
 
-### Profile
-
-The public profile lives in `.github/profile/README.md`; the member profile
-lives in private `.github-private/profile/README.md`. Both use the shared
-profile renderer. The public catalog owns presentation copy, navigation,
-groups, order and repository icons. Member input contains maintenance links,
-a pinned catalog revision/digest and each repository's operational
-`default_branch`, CI workflow and release facts.
-
-| Token | Value | Role |
+| Role | Light | Dark |
 | --- | --- | --- |
-| `public_header_icon_size` | 128 px | Public umbrella mark |
-| `member_header_icon_size` | 64 px | Member umbrella mark |
-| `public_row_icon_size` | 40 px | Public repository rows |
-| `member_row_icon_size` | 24 px | Member repository rows |
-| `badge_style` | `flat` | Live badges linked to their evidence |
+| `page` | `social-preview-background` | `terminal-surface-dark` |
+| `surface` | `terminal-surface` | `terminal-bar-dark` |
+| `border` | `terminal-border` | `terminal-border-dark` |
+| `text` | `ink` | `ink-dark` |
+| `muted` | `social-preview-muted` | `terminal-output-dark` |
+| `accent` | `primary` | `primary-dark` |
 
-Accept or replace these defaults and resolve them into a DESIGN-bound JSON
-recipe. Token names are renderer fields, independent of this document's
-Markdown layout. Use positive integer pixel sizes and a supported badge style.
+| Use | Typography |
+| --- | --- |
+| Headings | `social-preview-title` |
+| Body | `social-preview-body` |
+| Labels and navigation | `social-preview-owner` |
+| Code and terminal | `terminal` |
 
-| Field | Public profile source | Member profile source |
-| --- | --- | --- |
-| Owner | Catalog organization login/display name | Same pinned catalog |
-| Title | Catalog visitor promise | Catalog display name plus “maintainer dashboard” |
-| About | Catalog secondary line and repository outcomes | Public website/profile link and member maintenance navigation |
-| Icon | Catalog umbrella mark and repository README-header icons | Same catalog icons at member sizes |
+## Do's and Don'ts
 
-Public layout: centered umbrella mark, promise heading, secondary line,
-documentation/contributing/security/support navigation, an optional quick
-start, then job-grouped rows with icon, linked name and outcome; optional
-maintainer line from input.
+- Do change a value only in the front matter, then regenerate every output
+  that reads it.
+- Do keep a terminal session short enough to fit GitHub's README column at
+  actual size.
+- Do select light and dark images with `<picture>` and
+  `prefers-color-scheme`.
+- Do keep textual claims as text wherever the surface supports it.
+- Don't restate token values in prose; cite token names.
+- Don't ship live text in rendered images; outline it.
+- Don't redraw icons during a profile or social preview refresh.
+- Don't import another organization's palette, fonts or marks.
 
-Member layout: smaller umbrella mark and dashboard title, public entry link,
-maintenance navigation, catalog-ordered groups with icon/name/CI/release rows,
-then organization-wide open-PR, open-issue and Dependabot-PR searches. Link
-shared policy in `.github`; keep status live. Content must be shareable with
-any member. No credentials, private paths or unpublished plans belong here.
+## Iconography
 
-Render HTML tables and theme-aware `<picture>` only on supported GitHub
-surfaces. Keep text as text, check exact generated bytes, reconcile membership
-with public non-archived inventory except `.github`, and review both profiles
-in light and dark.
+Add the organization's icon entries here as one JSON block: `app_icons` for
+`apple-app-icon-design` and `icons` for `apple-framework-icon-design`.

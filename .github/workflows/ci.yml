@@ -40,7 +40,6 @@ jobs:
       OVERLAP_TEST_OUTPUT: ${{ github.workspace }}/.build/fork-dog-tests
       ORG_TEST_OUTPUT: ${{ github.workspace }}/.build/governance-tests
       REPO_STEWARD_TEST_OUTPUT: ${{ github.workspace }}/.build/repo-steward-tests
-      README_DESIGN_TEST_OUTPUT: ${{ github.workspace }}/.build/readme-design-tests
       REPOSITORY_TEST_OUTPUT: ${{ github.workspace }}/.build/repository-tests
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -71,13 +70,11 @@ jobs:
           python3 -m venv .build/repo-audit-venv
           .build/repo-audit-venv/bin/python -m pip install --disable-pip-version-check -r skills/github-repo-steward/scripts/requirements.txt
           .build/repo-audit-venv/bin/python -B -m unittest discover -s skills/github-repo-steward/tests -v
-      - name: Exercise README design
-        run: |
-          python3 -m venv .build/readme-design-venv
-          .build/readme-design-venv/bin/python -m pip install --disable-pip-version-check -r skills/github-readme-design/scripts/requirements.txt
-          .build/readme-design-venv/bin/python -B -m unittest discover -s skills/github-readme-design/tests -v
       - name: Exercise organization governance
-        run: python3 -B -m unittest discover -s skills/github-org-steward/tests -v
+        run: |
+          python3 -m venv .build/org-audit-venv
+          .build/org-audit-venv/bin/python -m pip install --disable-pip-version-check -r skills/github-org-steward/scripts/requirements.txt
+          .build/org-audit-venv/bin/python -B -m unittest discover -s skills/github-org-steward/tests -v
 
   presentation-toolchain:
     strategy:
@@ -94,9 +91,9 @@ jobs:
         with:
           node-version-file: skills/github-readme-design/scripts/.node-version
           package-manager-cache: false
-      - name: Check presentation toolchain and golden SVGs
+      - name: Check presentation toolchain and goldens
         working-directory: skills/github-readme-design/scripts
-        run: npm ci && npm test
+        run: npm ci --ignore-scripts && npm test
 
   result:
     needs: [policy, validate, presentation-toolchain]

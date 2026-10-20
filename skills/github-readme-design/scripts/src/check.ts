@@ -128,3 +128,40 @@ export async function check(options: CheckOptions, log: (line: string) => void =
     await rm(temporary, { recursive: true, force: true });
   }
 }
+
+export async function checkFile(options: {
+  file: string; bytes: Buffer; regenerate: string; artifactDir?: string; text?: boolean;
+}, log: (line: string) => void = console.log): Promise<boolean> {
+  const before = await optionalRead(options.file);
+  if (before?.equals(options.bytes)) {
+    log(`${options.file}: matches its inputs`);
+    return true;
+  }
+  log(`${options.file}: ${before === undefined ? "missing" : "differs from its inputs"}`);
+  if (options.text) log(unifiedDiff(before?.toString("utf8") ?? "", options.bytes.toString("utf8"), options.file));
+  if (options.artifactDir) {
+    const canonical = async (path: string): Promise<string> => {
+      try { return await realpath(path); }
+      catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+        return join(await canonical(dirname(path)), basename(path));
+      }
+    };
+    const name = basename(options.file);
+    const target = join(options.artifactDir, name);
+    if (await canonical(resolve(target)) === await canonical(resolve(options.file))) {
+      throw new Error(`${options.artifactDir}: artifact must be separate from the checked output ${options.file}`);
+    }
+    await mkdir(options.artifactDir, { recursive: true });
+    for (const entry of await readdir(options.artifactDir)) {
+      if (entry !== name) throw new Error(`${options.artifactDir}: artifact directory contains unrelated entry ${entry}`);
+    }
+    // Replace the artifact's directory entry so an old hard link cannot
+    // overwrite the checked output or another input through its inode.
+    await rm(target, { force: true });
+    await writeFile(target, options.bytes, { flag: "wx" });
+    log(`Regenerated output: ${target}`);
+  }
+  log(`Regenerate from the current directory:\n${options.regenerate}`);
+  return false;
+}

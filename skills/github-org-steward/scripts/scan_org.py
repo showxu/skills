@@ -64,8 +64,7 @@ def remote(args):
         findings.append((level, repo, message))
         print(f"{level} {repo}: {message}", flush=True)
 
-    inspect_profiles(args.org, repos, report, getattr(args, "readme_design", None),
-                     getattr(args, "member_input", "profile/member.json"))
+    inspect_profiles(args.org, repos, report, getattr(args, "member_input", "profile/member.json"))
 
     for repo in sorted((r for r in repos if not r["isArchived"]), key=lambda r: r["name"]):
         try:
@@ -139,7 +138,6 @@ def main():
     scan.add_argument("--commit-type", action="append", default=[],
                       help="accepted type when the shared standard applies to every scanned member; repeatable")
     scan.add_argument("--repo-steward", type=Path, help="github-repo-steward skill directory; defaults to sibling installation")
-    scan.add_argument("--readme-design", type=Path, help="github-readme-design skill directory; defaults to sibling installation")
     scan.add_argument("--member-input", default="profile/member.json", help="member input path in .github-private")
     scan.add_argument("--work-dir", type=Path, required=True,
                       help="empty producer-owned ignored directory, reused and left empty after scanning")

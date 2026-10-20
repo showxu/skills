@@ -10,7 +10,7 @@
     {
       "id": 2,
       "prompt": "Render our social preview using this accepted PNG app icon, then check that the exported card is current.",
-      "expected_output": "Embed the accepted raster icon's exact bytes at the recipe's icon position and size, and record the file's SHA-256. Accept square PNG, JPEG and WebP inputs at or above icon_size; verify and fully decode every raster frame. SVGs retain only allowlisted SVG-namespace elements, attributes and value functions, and drop metadata contents. Only use accepts fragment links; only image accepts matching raster base64 data links. Reject foreign namespaces, unknown elements or attributes, styles, animation, non-fragment url() values, DOCTYPE/entity declarations and processing instructions at every depth. Real app PNG and generated framework SVG icons still render. Repeated renders and --check are deterministic; icon byte drift fails --check without writing.",
+      "expected_output": "Render a 1280×640 RGBA PNG from the supplied DESIGN, catalog and accepted icon with the pinned WebAssembly rasterizer. Accept square PNG, JPEG and WebP inputs at or above DESIGN's icon size; fully decode still images using WebAssembly. Reject APNG and animated WebP, including SVG embeddings, with the icon file named. SVGs retain only allowlisted SVG-namespace elements, attributes and value functions, and drop metadata contents. Only use accepts fragment links; only image accepts matching raster base64 data links. Reject foreign namespaces, unknown elements or attributes, styles, animation, non-fragment url() values, DOCTYPE/entity declarations and processing instructions at every depth. Real app PNG and generated framework SVG icons still render without clipping. Repeated renders and social-preview check are deterministic; pixel drift fails check without writing exports. Return the PNG and validation results.",
       "files": []
     },
     {
@@ -31,8 +31,8 @@
     },
     {
       "id": 5,
-      "prompt": "Render our public and maintainer profiles from the supplied catalog, member input and DESIGN recipe.",
-      "expected_output": "Use render_profile.py for both layouts with one icon per row, the four documented sizes unless overridden, live badges/fallbacks and correct relative-link rebasing. Return byte checks and light/dark review scope. Member input owns default_branch; CI badge URLs carry it and the online steward reports mismatches with GitHub.",
+      "prompt": "Render our public and maintainer profiles from the supplied catalog, member input, pinned standard revision and DESIGN.",
+      "expected_output": "Use the TypeScript profile command for both layouts with one icon per row, the four required DESIGN component sizes, live badges/fallbacks and correct relative-link rebasing. Return byte checks and light/dark review scope. Member rendering requires --catalog-revision with the full standard commit; public rendering rejects it. Member input contains maintenance and repository operations only, including default_branch; CI badge URLs carry that branch and the online steward reports mismatches with GitHub.",
       "files": []
     }
   ]
