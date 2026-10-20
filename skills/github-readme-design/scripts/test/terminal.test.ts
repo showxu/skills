@@ -40,6 +40,13 @@ function cli(...args: string[]) {
   return spawnSync(process.execPath, [fileURLToPath(new URL("../src/cli.ts", import.meta.url)), ...args], { encoding: "utf8" });
 }
 
+function decodeXMLText(value: string): string {
+  const entities: Record<string, string> = {
+    "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&apos;": "'", "&#32;": " ",
+  };
+  return value.replace(/&(?:amp|lt|gt|quot|apos|#32);/g, entity => entities[entity]);
+}
+
 test("official DESIGN parser resolves tokens and merges only listed dark properties", async () => {
   const design = await readDesign(designPath);
   assert.equal(design.components.light.get("terminal")!.get("width"), design.components.dark.get("terminal")!.get("width"));
@@ -76,6 +83,42 @@ test("tabs use eight-cell stops, empty outputs add no line, transcript is escape
   assert.match(result.light, /height="116"/);
   assert.match(result.light, /<title id="title">A &amp; B/);
   assert.match(result.light, /\$ x {5}y\n&lt;a&gt; {5}&amp;/);
+});
+
+test("SVG descriptions encode trailing spaces and preserve transcript text", async () => {
+  const recording = { title: "Whitespace", steps: [{
+    command: "demo  diff  ",
+    output: " \n   \n  <a> & \"b\" 'c' &#32;  \n  leading  and interior\nlast  ",
+  }] };
+  const transcript = `$ ${recording.steps[0].command}\n${recording.steps[0].output}`;
+  const encoded = [
+    "$ demo  diff&#32;&#32;",
+    "&#32;",
+    "&#32;&#32;&#32;",
+    "  &lt;a&gt; &amp; &quot;b&quot; &apos;c&apos; &amp;#32;&#32;&#32;",
+    "  leading  and interior",
+    "last&#32;&#32;",
+  ].join("\n");
+  const result = await render(recording, await readDesign(designPath), fonts);
+  for (const theme of THEMES) {
+    assert.doesNotMatch(result[theme], /[ \t]+$/m, theme);
+    const description = result[theme].match(/<desc id="desc">([\s\S]*?)<\/desc>/);
+    assert.ok(description, theme);
+    assert.equal(description[1], encoded, theme);
+    assert.equal(decodeXMLText(description[1]), transcript, theme);
+  }
+});
+
+test("SVG titles encode trailing spaces and preserve title text", async () => {
+  const title = `  A & <B> "C" 'D' &#32; `;
+  const result = await render({ title, steps: [{ command: "demo", output: "" }] }, await readDesign(designPath), fonts);
+  for (const theme of THEMES) {
+    assert.doesNotMatch(result[theme], /[ \t]+$/m, theme);
+    const element = result[theme].match(/<title id="title">([\s\S]*?)<\/title>/);
+    assert.ok(element, theme);
+    assert.equal(element[1], "  A &amp; &lt;B&gt; &quot;C&quot; &apos;D&apos; &amp;#32;&#32;", theme);
+    assert.equal(decodeXMLText(element[1]), title, theme);
+  }
 });
 
 test("font selection uses variation cmap advances without shaping", async () => {

@@ -296,7 +296,9 @@ With padding `p`, frame size `s`, corner radius `r` and title-bar height `bar`:
   `bar + p + i×lineHeight + (lineHeight−(A+D))/2 + A`.
 
 The SVG has `role="img"`, `<title>` and a `<desc>` containing the rendered
-transcript joined by LF and XML-escaped. Every distinct nonempty glyph path
+transcript joined by LF and XML-escaped. In `<title>` and `<desc>`, each space
+in a U+0020 run immediately before LF or the end of the text is encoded as
+`&#32;`, preserving the parsed text. Every distinct nonempty glyph path
 is defined once, sorted by glyph ID, in font-size pixels with its y axis
 flipped. Runs place glyphs using SVG 2 `<use href>` with x and baseline y;
 there are no live text elements, styles, transforms or external font lookups.
