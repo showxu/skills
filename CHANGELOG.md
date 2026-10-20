@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.1
+
 - Use MINOR for breaking changes and PATCH otherwise during 0.x; let the owner
   begin the compatibility promise at 1.0.0, then evolve interfaces compatibly
   with roughly yearly planned majors, MINOR features and PATCH fixes in the
