@@ -53,7 +53,10 @@ permission to spawn agents or message other sessions.
    workflow changes require syntax validation and an accepted consumer run at
    the proposed pin before a broad rollout. Plan capacity-bound waves and the
    measured cache-adoption gate in [coordinated publication](references/release.md)
-   before dispatch. Version rules stay in VERSIONING; visual tokens stay in DESIGN.
+   before dispatch. Write the organization `.github` root `VERSIONING.md` from
+   the repository steward's [template](../github-repo-steward/templates/VERSIONING.md.tpl),
+   with the [organization-only sections](references/release.md#shared-version-policy).
+   Visual tokens stay in DESIGN.
 4. **Apply per repository.** Invoke `github-repo-steward` with the repository,
    standard revision, accepted source and scope. It owns settings, inherited
    community health, CI patterns, release hygiene, README information, preview

@@ -58,11 +58,12 @@ merged PR or other tree evidence; never discard unproven local work.
 
 Follow the repository/organization versioning policy, including its rules for
 0.x. Do not impose a new minor/patch interpretation from another project.
-Signed annotated tags bind release identity to one commit. New projects use
-SemVer tags unless another version contract is chosen. Protect their actual
-pattern against update and deletion. A wrong tagged release needs a new version;
-an untagged candidate can be corrected at its intended version. Existing
-lightweight or unsigned tags are reported, not moved.
+Signed annotated tags bind release identity to one commit under every policy.
+Where neither declares a policy, use the [Version policy default](standard.md#settings)
+and [VERSIONING template](../templates/VERSIONING.md.tpl). Protect the declared
+release-tag pattern against update and deletion. An untagged candidate can be
+corrected at its intended version. Existing lightweight or unsigned tags are
+reported, not moved.
 
 Release evidence must identify the exact accepted source, configuration and
 checker. Keep private build paths out of attachments. Verify downloaded bytes,

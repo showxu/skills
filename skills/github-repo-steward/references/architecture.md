@@ -8,6 +8,7 @@ repositories and organization members through the same contract.
 | --- | --- |
 | SKILL.md | Triggers, authority, serial stages, participation, routing, output |
 | standard.md / governance.md | Overridable defaults, inheritance, signed work and immutable publication |
+| templates/VERSIONING.md.tpl | Shared version policy template; repository values fill its placeholders |
 | ci.md | Ecosystem-neutral CI and pin observation patterns |
 | information.md | What each product kind states, value owners, copy and demonstration content |
 | upload.md | Owner browser procedure, temporary Apple Events fallback, independent receipt |

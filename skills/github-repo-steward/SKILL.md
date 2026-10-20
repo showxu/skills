@@ -88,10 +88,13 @@ filed issue. Route filing and working issues to that skill.
 
 ## Version and release hygiene
 
-Use the applicable version policy and one version source. Keep a CHANGELOG with
-Unreleased. New release tags are signed, annotated and immutable; verify their
-remote peeled commit. Preserve published legacy tags and history. A tagged
-mistake ships as a new patch, or the larger version required by compatibility.
+Use the applicable version policy. The [Version policy default](references/standard.md#settings)
+and [VERSIONING template](templates/VERSIONING.md.tpl) supply one when no
+repository or organization policy is declared. Under any policy, keep one
+version source and a CHANGELOG with Unreleased; new release tags are signed,
+annotated and immutable, and their remote peeled commit is verified after
+publication. Preserve published legacy tags and history. A tagged mistake ships as a new patch, or the larger version
+required by compatibility.
 Retry interrupted publication against the same accepted tag without replacing
 existing assets. Release builds, platform matrices, packages, stores and consumer
 installation procedures belong to the ecosystem's release skill.
