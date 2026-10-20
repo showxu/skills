@@ -2,19 +2,44 @@
 
 ## Unreleased
 
-- Describe the organization standard's reusable presentation and profile
-  workflows: presentation assets follow each caller's catalog `kind`, the
-  social preview icon resolves from the caller or the pinned standard, and
-  member dashboards call the profile workflow from a job named `check`.
+## 0.2.0
+
 - Render deterministic social-preview PNGs and public/member organization
   profiles in the TypeScript presentation toolchain and Action, with shared
   catalog validation, DESIGN tokens, WebAssembly still-image decoding and byte
   checks. Require explicit social font variations and reject decoder warnings
   or recovered raster errors. Replace the Python renderers and recipes; member
   rendering takes an explicit standard commit.
+- Describe the organization standard's reusable presentation and profile
+  workflows: presentation assets follow each caller's catalog `kind`, the
+  social preview icon resolves from the caller or the pinned standard, and
+  member dashboards call the profile workflow from a job named `check`.
 - Observe member-profile catalog pins from reusable workflow callers in the
   organization steward through parsed YAML workflows, independently of the
   renderer implementation, with caller files and SHAs reported for conflicts.
+- Provide the organization family DESIGN template in Google's DESIGN.md format,
+  carrying every terminal, social preview and profile token the toolchain
+  reads.
+
+Upgrading from 0.1.x, following the
+[renderer reference](skills/github-readme-design/references/renderers.md):
+
+- Replace vendored copies of `render_profile.py`, `render_social.py` and
+  `presentation.py` and their recipe files with the Action's `profile` and
+  `social-preview` assets, or the `src/cli.ts` commands, pinned by full commit
+  SHA.
+- Move profile icon sizes and social preview geometry from recipes into DESIGN
+  front matter: the `profile-*` and `social-preview-*` spacing and components,
+  and `fontSize`, `lineHeight` and `fontVariation` on each `social-preview-*`
+  typography token, as in the organization family template. Social previews
+  read the variable font; static instances are no longer needed for them.
+- Add `organization.about` and each repository's `kind`, `title` and `about`
+  to the catalog.
+- Remove `catalog` from member profile input and pass the standard commit as
+  `--catalog-revision`; the reusable profile workflow supplies
+  `job.workflow_sha`.
+- Commit each card as `.github/assets/social-preview/social-preview.png`, and
+  remove card SVGs and layout receipts.
 
 ## 0.1.1
 
