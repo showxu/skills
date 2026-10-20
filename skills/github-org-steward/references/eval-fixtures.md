@@ -18,7 +18,9 @@ Expected output:
 
 - Render `.github`'s root `VERSIONING.md` from the repository steward's
   template, then append organization-only family release order and members'
-  release table sections using the supplied facts.
+  release table sections using the supplied facts. Add documented interfaces
+  and dependency rules from declared family inputs; identify missing facts
+  rather than inventing them.
 
 Forbidden behavior:
 
@@ -28,8 +30,9 @@ Forbidden behavior:
 
 Acceptance checks:
 
-- The common policy equals the repository template after its five placeholders
+- The common policy equals the repository template after its six placeholders
   are filled. Organization-only sections follow it; common rules appear once.
+- Preserve published tag formats; new repositories default to `vX.Y.Z`.
 - Family order preserves core before CLI, the release table uses the supplied
   rows, and member execution stays with each repository and ecosystem owner.
 
@@ -45,6 +48,55 @@ Evidence sources:
 Owner notes:
 
 - Member names, releases and paths are synthetic case inputs.
+
+## organization-version-levels
+
+Target behavior: Derive organization version levels from the common template.
+
+Input prompt: "Replace our organization's VERSIONING.md with the steward's current default policy. It currently assigns its own levels to reusable workflow changes, DESIGN regeneration and changes preserving output. The .github repository uses VERSION with no mirrors and published vX.Y.Z tags; MAINTENANCE.md#publication owns its checks and release mechanics. Core must release before CLI. Core uses Git tags X.Y.Z; CLI uses VERSION and tags vX.Y.Z; each member's MAINTENANCE.md#publication owns its release checklist. Our documented interfaces are core's public API, CLI flags and the standard's workflow inputs, outputs, caller contexts and DESIGN token names. CLI dependencies are minor-bounded during core 0.x and stop at the next major from 1.x. Prepare locally without publishing."
+
+Context and files:
+
+- Replacing the shared policy is authorized. Repository values, interfaces,
+  dependency rules and release order are supplied in the prompt.
+
+Expected output:
+
+- Render the common sections from the repository steward template, including
+  its 0.x rules, owner-decided 1.0.0 and 1.0+ compatibility policy. Append family
+  release order, member release values, documented interfaces and dependency
+  rules.
+- Preserve the supplied version sources, tag formats and release owners.
+  Treat DESIGN regeneration that preserves usage as a feature: PATCH during
+  0.x, MINOR after 1.0. During 0.x, breaks increment MINOR without deprecation
+  or cadence requirements; after 1.0, use compatible additions and deprecation,
+  with removals only in roughly yearly planned majors.
+
+Forbidden behavior:
+
+- Retain a separate organization version-level table, choose levels by output
+  byte equality, invent member procedures or release versions, or publish.
+
+Acceptance checks:
+
+- Common policy equals the filled template and appears once. Organization
+  extensions contain the declared family facts; all version choices use the
+  common phase-specific rules.
+- The member table keeps `X.Y.Z` for core and `vX.Y.Z` for CLI; release order
+  and both dependency bounds survive the derivation.
+
+Baseline expectation:
+
+- An organization-specific workflow may preserve its own table while linking
+  to the common template, leaving two incompatible authorities.
+
+Evidence sources:
+
+- Rendered VERSIONING, template comparison, member table and executor report.
+
+Owner notes:
+
+- Member names, paths and published tag formats belong to this case.
 
 ## organization-github-layout
 

@@ -88,7 +88,13 @@
     {
       "id": 15,
       "prompt": "Prepare shared versioning policy for our organization's .github repository and product family. Its version source is VERSION with no mirrors; MAINTENANCE.md#publication owns release checks and mechanics. Core must publish before CLI. The accepted member releases are core 0.3.0 and cli 0.2.1. Prepare locally without publishing.",
-      "expected_output": "Render the organization's root VERSIONING.md from the repository steward's common template, filling its five placeholders from declared inputs. Append organization-only family release order and members' release table sections; preserve core before CLI and the supplied releases. Do not fork common rules, duplicate member procedures or publish.",
+      "expected_output": "Render the organization's root VERSIONING.md from the repository steward's common template, filling its six placeholders from declared inputs and preserving published tag formats (new repositories default to vX.Y.Z). Append family release order and members' release table sections; preserve core before CLI and the supplied releases. Add documented interfaces and dependency rules from declared family inputs, identifying missing facts. Derive version levels from the common template; do not duplicate member procedures or publish.",
+      "files": []
+    },
+    {
+      "id": 16,
+      "prompt": "Replace our organization's VERSIONING.md with the steward's current default policy. It currently assigns its own levels to reusable workflow changes, DESIGN regeneration and changes preserving output. The .github repository uses VERSION with no mirrors and published vX.Y.Z tags; MAINTENANCE.md#publication owns its checks and release mechanics. Core must release before CLI. Core uses Git tags X.Y.Z; CLI uses VERSION and tags vX.Y.Z; each member's MAINTENANCE.md#publication owns its release checklist. Our documented interfaces are core's public API, CLI flags and the standard's workflow inputs, outputs, caller contexts and DESIGN token names. CLI dependencies are minor-bounded during core 0.x and stop at the next major from 1.x. Prepare locally without publishing.",
+      "expected_output": "Replace the organization's separate version-level scheme with the filled repository steward template: 0.x breaks use MINOR and other changes PATCH, 1.0.0 starts the owner's stability promise, and 1.0+ uses compatible additions and deprecation with roughly yearly planned majors. Append declared family release order, member values, documented interfaces and dependency rules. Preserve each version source, tag format, release owner, core-before-CLI order, minor-bounded core 0.x dependencies and next-major bounds from 1.x. Absorbable DESIGN regeneration is a feature (PATCH during 0.x, MINOR after 1.0); do not invent versions or member procedures, or publish.",
       "files": []
     }
   ]

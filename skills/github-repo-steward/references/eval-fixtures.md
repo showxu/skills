@@ -28,8 +28,10 @@ Forbidden behavior:
 
 Acceptance checks:
 
-- The common policy equals the template after filling its five placeholders;
+- The common policy equals the template after filling its six placeholders;
   the version source and changelog agree on `0.1.0`.
+- A new repository defaults to tag name `vX.Y.Z`; the tag message uses the
+  supplied repository name and version.
 - The policy covers signed annotated immutable tags, the repository-specific
   tag message, squash merge, remote peeled-commit verification and tag/source/
   changelog agreement. All mutations stay local.
@@ -51,7 +53,7 @@ Owner notes:
 
 Target behavior: Apply the default version increments before and after 1.0.
 
-Input prompt: "Our two repositories use the steward's default version policy. One is at 0.4.2 and the other at 1.4.2. For each, determine the next version for three separate candidates: a breaking change, a compatible addition, and a fix. Prepare the release plan only."
+Input prompt: "Our two repositories use the steward's default version policy. One is at 0.4.2 and the other at 1.4.2. For each, determine the next version for three independent candidates: a breaking change, a new feature, and a fix. The 0.x breaking candidate removes a documented flag immediately, without prior deprecation or a planned release cadence. The 1.x breaking candidate belongs to the owner's planned yearly major. Prepare the release plan only."
 
 Context and files:
 
@@ -61,18 +63,22 @@ Context and files:
 Expected output:
 
 - For `0.4.2`, propose `0.5.0` for the breaking change and `0.4.3` for each
-  compatible addition or fix. For `1.4.2`, propose `2.0.0`, `1.5.0` and
-  `1.4.3`, respectively. Breaking-change changelog entries include upgrade
-  instructions.
+  new feature or fix. No deprecation window or release cadence is required
+  during initial development; minor-bounded dependencies exclude the break.
+- For `1.4.2`, propose `2.0.0` for the planned major, `1.5.0` for the new
+  feature and `1.4.3` for the fix. Announce the major's removals in the
+  changelog beforehand and include upgrade instructions.
 
 Forbidden behavior:
 
-- Apply the 1.0+ addition rule during 0.x, bump PATCH for a 0.x breaking
-  change, reuse a tagged version, omit upgrade guidance or execute publication.
+- Require deprecation or planned-major cadence during 0.x, apply the 1.0+
+  feature increment during 0.x, bump PATCH for a breaking 0.x change, reuse a
+  tagged version, omit the planned major's advance notice or upgrade guidance,
+  or execute publication.
 
 Acceptance checks:
 
-- All six choices follow the template table and reset less significant
+- All six choices follow the phase-specific rules and reset less significant
   components correctly. The plan binds source, mirrors, changelog and tag to
   the chosen version without changing remote state.
 
@@ -88,6 +94,171 @@ Evidence sources:
 Owner notes:
 
 - Versions and candidate changes are case-local inputs.
+
+## stable-interface-release
+
+Target behavior: Start the compatibility promise by the owner's decision.
+
+Input prompt: "Two libraries use the steward's default version policy and are at 0.8.4. For one, the owner confirms that its interface is stable and promises compatibility. The other adds a compatible feature, with no stability decision from its owner. Determine the next version for each and prepare the release plan only."
+
+Context and files:
+
+- Both current versions are published. Only the first owner has made the
+  stability and compatibility commitment.
+
+Expected output:
+
+- Plan `1.0.0` for the library with the owner's stability decision and
+  `0.8.5` for the initial-development feature release.
+- Apply the compatibility promise and roughly yearly planned-major policy
+  from `1.0` onward; the other library remains under the 0.x rules.
+
+Forbidden behavior:
+
+- Infer a compatibility promise from feature size or a version number, impose
+  the 1.0+ cadence on the second library, or publish.
+
+Acceptance checks:
+
+- The version choices depend on the owner's explicit stability decision;
+  `1.0.0` resets the lower components and the 0.x feature increments PATCH.
+
+Baseline expectation:
+
+- A generic feature-based bump may omit the owner's transition decision or
+  apply stable-interface obligations before the promise begins.
+
+Evidence sources:
+
+- Version choices, release plans and executor report.
+
+Owner notes:
+
+- Versions and the two owners' decisions belong to this case.
+
+## interface-change-in-place
+
+Target behavior: Evolve a documented interface through addition and deprecation.
+
+Input prompt: "Our CLI is at 1.4.2 and uses the steward's default version policy. Published tags use X.Y.Z. In the next release, replace the documented --config flag with --settings and remove --config immediately. We have not announced a deprecation, and this release is outside our planned yearly major. Prepare the release plan only."
+
+Context and files:
+
+- The current flag is a documented interface. This is a single requested
+  change outside the planned major; release planning is authorized.
+
+Expected output:
+
+- Keep `--config` working, add `--settings` compatibly and plan `1.5.0` for
+  the addition and deprecation. Record the deprecation in the changelog.
+- Preserve the published `X.Y.Z` tag format. Put eventual removals in a
+  planned major on the roughly yearly cadence, with advance changelog notice
+  and upgrade instructions.
+
+Forbidden behavior:
+
+- Remove or change the old flag in this release, trigger an immediate major
+  for the single request, switch tags to `vX.Y.Z`, or publish.
+
+Acceptance checks:
+
+- The next-release plan supports both flags and uses the compatible-feature
+  increment; its changelog records the deprecation.
+- Removal belongs only to a planned major whose removals are announced
+  beforehand, with the published tag format retained.
+
+Baseline expectation:
+
+- A version-bump-only workflow may call the requested removal breaking and
+  schedule `2.0.0` without first preserving existing usage.
+
+Evidence sources:
+
+- Release plan, compatibility and deprecation steps, and executor report.
+
+Owner notes:
+
+- Flag names, current version and published tag format belong to this case.
+
+## planned-major-feature-release
+
+Target behavior: Allow a significant feature release at a planned major.
+
+Input prompt: "Our library is at 1.4.2 and uses the steward's default version policy. The owner has scheduled its roughly yearly major, covering a significant suite of features with no interface removals. May the planned release use 2.0.0? Prepare the release plan only."
+
+Context and files:
+
+- This is an owner-planned major containing a significant feature suite,
+  rather than an immediate release triggered by one change.
+
+Expected output:
+
+- Permit `2.0.0` for the planned significant feature release and preserve
+  interface compatibility. Keep single feature changes outside planned majors
+  on the MINOR path.
+
+Forbidden behavior:
+
+- Require an interface break to justify every major, cut an immediate major
+  because of one feature, or publish.
+
+Acceptance checks:
+
+- The plan permits a significant feature major on the declared cadence and
+  resets both lower components, without inventing removals or deprecations.
+
+Baseline expectation:
+
+- A breaking-change-only interpretation may reject a planned significant
+  feature major or manufacture a break to justify it.
+
+Evidence sources:
+
+- Release plan, proposed notes and executor report.
+
+Owner notes:
+
+- The current version and owner's scheduled feature suite are case inputs.
+
+## regenerated-output-change
+
+Target behavior: Classify a value change by whether consumers must change usage.
+
+Input prompt: "Our two organization standards use the steward's default version policy and are at 0.4.2 and 1.4.2. An accepted DESIGN value update changes rendered colors. Members only regenerate their assets; token names, workflow inputs and outputs, and caller contexts stay the same. Determine each next version and prepare the release plan only."
+
+Context and files:
+
+- The accepted design values are inputs; this case asks for version selection,
+  not a visual decision. The two candidates are independent.
+
+Expected output:
+
+- Treat the value/output change as compatible and propose `0.4.3` and `1.5.0`.
+  Describe the regeneration in release notes without calling it a breaking
+  interface removal.
+
+Forbidden behavior:
+
+- Bump to `0.5.0` or `2.0.0` solely because outputs change, require a
+  deprecation for the value update, invent design values, or publish.
+
+Acceptance checks:
+
+- Both choices follow the phase-specific feature rules; the rationale
+  identifies unchanged consumer usage rather than unchanged generated bytes.
+
+Baseline expectation:
+
+- An output-difference rule may label regeneration breaking or apply a
+  separate organization version-level scheme.
+
+Evidence sources:
+
+- Version choices, proposed notes and executor report.
+
+Owner notes:
+
+- Versions and the accepted color update are case-local inputs.
 
 ## existing-version-policy
 

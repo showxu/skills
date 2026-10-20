@@ -60,8 +60,11 @@ Follow the repository/organization versioning policy, including its rules for
 0.x. Do not impose a new minor/patch interpretation from another project.
 Signed annotated tags bind release identity to one commit under every policy.
 Where neither declares a policy, use the [Version policy default](standard.md#settings)
-and [VERSIONING template](../templates/VERSIONING.md.tpl). Protect the declared
-release-tag pattern against update and deletion. An untagged candidate can be
+and [VERSIONING template](../templates/VERSIONING.md.tpl) for 0.x version
+increments, owner-decided 1.0.0 and compatible evolution with planned majors
+after 1.0. Preserve the repository's published tag-name format; new repositories
+default to `vX.Y.Z`. Protect the declared release-tag pattern against update and deletion.
+An untagged candidate can be
 corrected at its intended version. Existing lightweight or unsigned tags are
 reported, not moved.
 
