@@ -1,6 +1,6 @@
 ---
 name: github-readme-design
-description: Lay out and render GitHub repository READMEs and public or member-only organization profiles from a supplied information set and the applicable DESIGN. Use for README first screens and section layout for libraries, CLIs, MCP servers, plugins and apps, open or closed source; badge styling; Quick look form; app download blocks and screenshot plans; public and member-only organization profile layout; deterministic catalog-driven profiles and social cards with layout receipts; and scripted light/dark terminal demos with CI byte checks. Produces README layouts, image exports, terminal scripts and recordings, social/profile recipes and review evidence. Does not decide what a README states or source its values, change repository settings, upload previews, assign documentation roles, design icons, or build personal profile READMEs.
+description: Lay out and render GitHub repository READMEs and public or member-only organization profiles from a supplied information set and the applicable DESIGN. Use for README first screens and section layout for libraries, CLIs, MCP servers, plugins and apps, open or closed source; badge styling; Quick look form; app download blocks and screenshot plans; public and member-only organization profile layout; deterministic catalog-driven profiles and social previews; and scripted light/dark terminal demos with CI byte checks. Produces README layouts, image exports, terminal scripts and recordings, catalog-driven social/profile exports and review evidence. Does not decide what a README states or source its values, change repository settings, upload previews, assign documentation roles, design icons, or build personal profile READMEs.
 ---
 
 # GitHub README Design
@@ -17,13 +17,14 @@ it takes and how it looks, and renders the images that carry it.
   incomplete, lay out nothing that depends on the missing part and report
   what is needed.
 - **DESIGN:** the applicable DESIGN file at its reviewed revision, usually the
-  organization's `.github/DESIGN.md`. Terminal rendering requires the Google
-  format and complete terminal tokens; report missing values to the DESIGN
-  owner. For other surfaces, where DESIGN is silent, choose project defaults
-  and record them for that owner.
-- **Profile inputs:** the public catalog; for a member dashboard, its pinned
-  catalog bytes and member operational input. Missing or extra members fail.
-- **Existing surface:** the current README, assets, recordings, recipes and
+  organization's `.github/DESIGN.md`. Toolchain rendering requires the Google
+  format and complete components for the selected asset; report missing values
+  to the DESIGN owner. For manual README layout, where DESIGN is silent,
+  choose project defaults and record them for that owner.
+- **Profile inputs:** the public catalog; for a member dashboard, the catalog
+  and DESIGN from the pinned standard workflow commit, that explicit revision
+  and member operational input. Missing or extra members fail.
+- **Existing surface:** the current README, assets, recordings and
   any repository-owned renderer.
 
 Values are used exactly as supplied. A layout never adds a channel,
@@ -41,15 +42,18 @@ requirement, command or claim the information set does not contain.
    shared profile renderer in [renderers](references/renderers.md).
 3. **Produce images.** Use the pinned [toolchain](references/renderers.md) to
    record terminal `script.yml` against the built product and render its
-   recording with the applicable DESIGN and fonts. Use the social-card helper
-   or a repository-owned renderer implementing its accepted standard for
-   social cards. Plan app screenshots from the released build, in light and dark.
+   recording with the applicable DESIGN and fonts. Render social previews from
+   DESIGN, the catalog and the accepted light-page icon; render profiles from
+   DESIGN and the catalog, adding operational input and the catalog revision
+   for member dashboards. Plan app screenshots from the released build, in
+   light and dark.
 4. **Review.** Inspect the exact exports in light and dark and in the reported
    browser. Run `terminal check` to re-record and compare the recording and both
-   SVGs; use the documented Action pin chain in CI. Run the Python renderers'
-   `--check` for social cards and profiles.
+   SVGs; run `social-preview check` and `profile check` for those outputs. Use
+   the documented Action pin chain in CI.
 5. **Hand back.** Return the README layout, exports, terminal scripts and
-   recordings, social/profile recipes and receipts, and review evidence.
+   recordings, catalog/member input paths, the pinned standard revision and
+   review evidence.
    Committing follows the repository's workflow;
    settings and uploads stay with the caller.
 
@@ -69,8 +73,8 @@ repository settings and preview uploads belong to the caller.
 
 - Every value on the page equals the information set; layouts invent nothing.
 - Terminal recordings and exports pass `terminal check`; social/profile
-  exports pass their renderer's `--check`. Social layout receipts record the
-  actual lines and sizes.
+  exports pass `social-preview check` and `profile check`. Review the exact
+  consumed PNG and generated profile markup.
 - Images are reviewed in light and dark; unbreakable overflow fails instead of
   clipping or shrinking text.
 

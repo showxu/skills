@@ -15,29 +15,38 @@ with the caller.
 | scripts/src/terminal/ | Validated scripted recording in a fixed environment and deterministic light/dark SVG rendering |
 | scripts/src/check.ts / cli.ts | Byte comparison, complete failure artifacts, commands and exit codes |
 | scripts/action.yml / package.json / package-lock.json / .node-version | Composite Action, locked Node package and runtime |
-| scripts/render_social.py | Outlined card layout |
-| scripts/render_profile.py | Deterministic public/member profiles, catalog/member validation and pinned catalog binding |
-| scripts/presentation.py | Shared design binding, digest and control-character validation |
-| scripts/requirements.txt | Pinned Pillow for raster validation and tinycss2 for SVG attribute URL validation |
-| scripts/test/ / tests / references/eval-fixtures.md / evals/evals.json | Node terminal and Python social/profile regressions, golden outputs and durable behavioral inputs; execution output is ignored |
+| scripts/src/catalog.ts | Shared catalog/member schemas, safe links and revision-based URL resolution |
+| scripts/src/social-preview/ | DESIGN-driven outlined card composition, icon validation and deterministic PNG rasterization |
+| scripts/src/profile/render.ts | Public/member markup with parity goldens and required DESIGN sizes |
+| scripts/test/ / references/eval-fixtures.md / evals/evals.json | Terminal, social and profile regressions, goldens and durable behavioral inputs; execution output is ignored |
 
-Terminal DESIGN uses Google's format and the locked official parser; errors
-and warnings stop rendering. Components own colors and geometry, typography
-owns font selection, and the renderer reference owns the platform width
-limit. Terminal rendering has no fallback style. Social and profile recipes
-bind resolved values to a reviewed DESIGN digest. The terminal golden fixture
-includes the specified agents-tools front matter and Google Sans Code v7.001
-under its accompanying SIL OFL; these are test inputs, not consumer defaults.
+All renderer DESIGN input uses Google's format and the locked official parser;
+errors and warnings stop rendering. Components own colors and geometry;
+typography owns font selection. Renderers have no fallback style. Platform
+constants (canvas dimensions, title legibility floor and README width limit)
+are documented in the renderer reference. The catalog owns repository content;
+member input owns operational facts. The caller's pinned standard workflow
+commit supplies the catalog revision for member relative links.
 
-Validate with the skill-creator package validator and
-`npm ci && npm test` in `skills/github-readme-design/scripts`, and
-`python3 -B -m unittest discover -s skills/github-readme-design/tests -v` from
-the collection root, in an ignored virtual environment with
-`scripts/requirements.txt` installed. Tests use `README_DESIGN_TEST_OUTPUT`
-under the collection's ignored `.build/`. Node tests also use `.build/` and
-compare both SVGs to committed goldens on macOS and Linux. `npm run golden`
-updates those expected bytes deliberately. Social font rendering smoke checks
-additionally need fonttools and a licensed input font. Run the behavior fixtures as qualitative
-review or isolated paired evals and label the evidence correctly. Static
-checks and local renders do not establish served GitHub visual acceptance or
-host installation evidence.
+The font fixture is Google Sans Code v7.001 under its accompanying SIL OFL.
+Fixture DESIGN values and synthetic catalogs/icons are test inputs, not consumer
+defaults. The JPEG/WebP fixtures are encoded variants of the synthetic PNG.
+Pinned WebAssembly codecs fully decode still-image inputs; resvg WebAssembly
+supplies PNG rendering. WebP inputs are normalized losslessly to an internal
+PNG. Animated PNG/WebP inputs fail before embedding, with the file named.
+Dependencies, including the development compiler, use JavaScript/WebAssembly;
+installation disables lifecycle scripts.
+The icon namespace, CSS URL/function and raster checks protect offline,
+self-contained rendering without active content or system font lookup.
+
+Validate with the skill-creator package validator and `npm ci --ignore-scripts && npm test` in
+`skills/github-readme-design/scripts`. Tests use the collection's ignored
+`.build/`; the CI matrix compares terminal SVGs and social-preview PNG bytes on
+macOS and Linux. `npm run golden` deliberately updates those image goldens.
+Profile Markdown goldens preserve the established public/member bytes and are
+not rewritten by that command. Keep the organization observation tests passing
+when changing the catalog/member contract.
+
+Run the behavior fixtures as qualitative review or isolated paired evals and
+label the evidence correctly. Static checks and local renders do not establish
+served GitHub visual acceptance or host installation evidence.

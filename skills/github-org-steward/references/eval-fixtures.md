@@ -567,7 +567,7 @@ Context and files:
 
 Expected output:
 
-- Prepare private .github-private/profile/README.md with the shared renderer, pinned catalog revision/digest, declared maintenance navigation, identical groups/order/membership, icons, live operational rows and organization searches. Apply settings/rulesets/signing/CI and review both profiles in light and dark.
+- Prepare private .github-private/profile/README.md with the shared renderer, catalog at the reusable profile workflow commit, declared maintenance navigation, identical groups/order/membership, icons, live operational rows and organization searches. Apply settings/rulesets/signing/CI and review both profiles in light and dark.
 
 Forbidden behavior:
 
@@ -598,10 +598,13 @@ Input prompt: "Audit our member dashboard. It has a hand-edited table of reposit
 Context and files:
 
 - The public catalog has a new member absent from the dashboard; its copied status and release version are stale. Audit-only scope.
+- Dashboard workflows include `.yml` and `.yaml` callers and apparent caller
+  text inside `run` scalars and `env` values. Exercise one shared pin,
+  conflicting pins across files and an environment without PyYAML.
 
 Expected output:
 
-- Report drift and the owning catalog/member-input/shared-renderer correction. Require exact catalog membership, live badges or declared fallback links, and a pinned digest. Preserve audit-only scope.
+- Report drift and the owning catalog/member-input/shared-renderer correction. Require exact catalog membership, live badges or declared fallback links, and a full commit pin on the reusable profile workflow. Preserve audit-only scope.
 
 Forbidden behavior:
 
@@ -610,6 +613,9 @@ Forbidden behavior:
 Acceptance checks:
 
 - Findings identify missing membership and hand-recorded state separately, explain generated replacement and retain unreadable evidence as REVIEW.
+- Only parsed `jobs.<id>.uses` values supply pins. Conflicts report REVIEW with
+  the files and SHAs; absent callers leave the pin unknown. Missing PyYAML
+  reports REVIEW naming this skill's requirements file to install.
 
 Baseline expectation:
 

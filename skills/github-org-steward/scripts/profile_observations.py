@@ -1,15 +1,14 @@
 """Read-only profile observations; schema and rendering remain renderer-owned."""
 
 import base64
-import importlib.util
 from http.client import HTTPException
 import json
 from pathlib import Path
 import re
+import posixpath
 import subprocess
-import sys
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote, urlencode, urlsplit, urlunsplit
+from urllib.parse import quote, unquote, urlencode, urlsplit, urlunsplit
 from urllib.request import Request, urlopen
 
 
@@ -32,19 +31,102 @@ def content(owner, repository, path, revision):
     return base64.b64decode(value["content"])
 
 
-def load_renderer(path=None):
-    root = path or Path(__file__).resolve().parents[2] / "github-readme-design"
-    script = root / "scripts/render_profile.py"
-    if not script.is_file():
-        raise Unreadable("Install github-readme-design or pass --readme-design <skill-directory>")
-    spec = importlib.util.spec_from_file_location("organization_profile_renderer", script)
-    module = importlib.util.module_from_spec(spec)
-    sys.path.insert(0, str(script.parent))
+def observed_text(value, context):
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{context} must be a nonempty string")
+    return value
+
+
+def observed_icon(value):
+    if isinstance(value, str):
+        observed_text(value, "icon URL")
+    elif isinstance(value, dict):
+        for appearance in ("light", "dark"):
+            observed_text(value[appearance], f"icon.{appearance}")
+    else:
+        raise ValueError("icon must be a URL or light/dark URLs")
+
+
+def observed_catalog(catalog):
+    if not isinstance(catalog, dict):
+        raise ValueError("catalog must be an object")
+    observed_text(catalog["organization"]["login"], "organization.login")
+    observed_icon(catalog["mark"])
+    if not isinstance(catalog["groups"], list):
+        raise ValueError("catalog.groups must be an array")
+    members = {}
+    for group in catalog["groups"]:
+        if not isinstance(group["repositories"], list):
+            raise ValueError("group.repositories must be an array")
+        for repo in group["repositories"]:
+            name = observed_text(repo["name"], "repository.name")
+            observed_icon(repo["icon"])
+            if name.lower() in members:
+                raise ValueError(f"Duplicate observed repository: {name}")
+            members[name.lower()] = repo
+    return members
+
+
+def profile_revision(owner, branch):
     try:
-        spec.loader.exec_module(module)
-    finally:
-        sys.path.pop(0)
-    return module
+        import yaml
+    except ImportError as error:
+        requirements = Path(__file__).with_name("requirements.txt")
+        raise Unreadable(f"Profile standard pin unknown: PyYAML is missing; install requirements from {requirements}") from error
+    tree = api(f"repos/{owner}/.github-private/git/trees/{quote(branch, safe='')}?recursive=1")
+    if tree.get("truncated") or not isinstance(tree.get("tree"), list):
+        raise Unreadable("Profile standard pin unknown: workflow tree is incomplete")
+    target = f"{owner}/.github/.github/workflows/profile.yml@"
+    revisions = {}
+    for entry in tree["tree"]:
+        path = entry["path"]
+        if entry["type"] != "blob" or not re.fullmatch(r"\.github/workflows/[^/]+\.ya?ml", path):
+            continue
+        try:
+            workflow = yaml.safe_load(content(owner, ".github-private", path, branch))
+        except (yaml.YAMLError, UnicodeError) as error:
+            raise Unreadable(f"Profile standard pin unknown: cannot parse {path}") from error
+        jobs = workflow.get("jobs", {}) if isinstance(workflow, dict) else {}
+        if not isinstance(jobs, dict):
+            raise Unreadable(f"Profile standard pin unknown: invalid jobs in {path}")
+        for job in jobs.values():
+            use = job.get("uses") if isinstance(job, dict) else None
+            if not isinstance(use, str) or not use.lower().startswith(target.lower()):
+                continue
+            revision = use[len(target):]
+            if not re.fullmatch(r"[0-9a-fA-F]{40}", revision):
+                raise ValueError(f"{path}: profile workflow must pin a full commit SHA")
+            revisions.setdefault(revision.lower(), set()).add(path)
+    if not revisions:
+        raise Unreadable("Profile standard pin unknown: no matching workflow caller")
+    if len(revisions) > 1:
+        callers = "; ".join(f"{path}: {revision}" for revision, paths in sorted(revisions.items()) for path in sorted(paths))
+        raise Unreadable(f"Profile standard pin unknown: conflicting workflow caller pins: {callers}")
+    return next(iter(revisions))
+
+
+def catalog_image_url(value, catalog, revision):
+    value = observed_text(value, "icon URL")
+    decoded = unquote(value)
+    if any(c.isspace() for c in value) or any(ord(c) < 32 or ord(c) == 127 for c in decoded) or "\\" in decoded:
+        raise ValueError("Invalid icon URL")
+    parsed = urlsplit(decoded)
+    if parsed.scheme:
+        parsed.port
+        if parsed.scheme.lower() != "https" or not parsed.hostname or parsed.username or parsed.password:
+            raise ValueError("Icon URLs must use HTTPS or be repository-relative")
+        return value
+    if decoded.startswith("/") or ":" in parsed.path.split("/")[0]:
+        raise ValueError("Icon URLs must use HTTPS or be repository-relative")
+    path = posixpath.normpath(posixpath.join("profile", unquote(parsed.path) or "README.md"))
+    if path == ".." or path.startswith("../"):
+        raise ValueError("Icon path escapes the profile repository")
+    original = urlsplit(value)
+    path = posixpath.normpath(posixpath.join("profile", unquote(original.path) or "README.md"))
+    owner = catalog["organization"]["login"]
+    return urlunsplit(("https", "raw.githubusercontent.com",
+                       f"/{owner}/.github/{quote(revision, safe='')}/{quote(path, safe='/')}",
+                       original.query, original.fragment))
 
 
 def image_resolves(url):
@@ -78,7 +160,7 @@ def membership(expected, observed, report, repository, label):
         report("INFO", repository, f"{label}: {len(expected)} repositories match")
 
 
-def inspect_profiles(owner, repos, report, renderer_path=None, member_path="profile/member.json"):
+def inspect_profiles(owner, repos, report, member_path="profile/member.json"):
     inventory = {repo["name"].lower(): repo for repo in repos}
     private = inventory.get(".github-private")
     if private is None:
@@ -95,11 +177,10 @@ def inspect_profiles(owner, repos, report, renderer_path=None, member_path="prof
     report("REVIEW" if visibility is None else "INFO" if visibility == "public" else "FAIL",
            ".github", f"public profile repository visibility is {visibility or 'unknown'} (requires public)")
     try:
-        renderer = load_renderer(renderer_path)
         branch = public["defaultBranchRef"]["name"]
         catalog_bytes = content(owner, ".github", "profile/catalog.json", branch)
-        catalog = renderer.load_json(catalog_bytes)
-        members = renderer.validate_catalog(catalog)
+        catalog = json.loads(catalog_bytes)
+        members = observed_catalog(catalog)
         if catalog["organization"]["login"].lower() != owner.lower():
             raise ValueError("Catalog organization differs from scanned organization")
     except Unreadable as error:
@@ -114,7 +195,7 @@ def inspect_profiles(owner, repos, report, renderer_path=None, member_path="prof
         expected = {name for name, repo in inventory.items()
                     if repo["visibility"] == "public" and not repo["isArchived"] and name != ".github"}
         membership(expected, set(members), report, ".github", "public catalog membership")
-    inspect_icons(renderer, catalog, branch, report)
+    inspect_icons(catalog, branch, report)
     if "description" in catalog:
         try:
             observed = api(f"orgs/{owner}").get("description")
@@ -126,26 +207,34 @@ def inspect_profiles(owner, repos, report, renderer_path=None, member_path="prof
     if private is None:
         return
     try:
-        member = renderer.load_json(content(owner, ".github-private", member_path, private["defaultBranchRef"]["name"]))
-        revision = member["catalog"]["revision"]
-        # Validate the pin before using it in an API request.
-        if not isinstance(revision, str) or not re.fullmatch(r"[0-9a-f]{40}", revision):
-            raise ValueError("Catalog revision must be a full commit SHA")
+        member = json.loads(content(owner, ".github-private", member_path, private["defaultBranchRef"]["name"]))
+        revision = profile_revision(owner, private["defaultBranchRef"]["name"])
         pinned_bytes = content(owner, ".github", "profile/catalog.json", revision)
-        pinned = renderer.load_json(pinned_bytes)
-        pinned_members = renderer.validate_catalog(pinned)
-        operations = renderer.validate_member(member, pinned_members, pinned_bytes)
+        pinned = json.loads(pinned_bytes)
+        pinned_members = observed_catalog(pinned)
+        operations = member["repositories"]
+        if not isinstance(operations, dict):
+            raise ValueError("Member repositories must be an object")
+        expected = {repo["name"] for repo in pinned_members.values()}
+        missing, extra = expected - operations.keys(), operations.keys() - expected
+        if missing or extra:
+            raise ValueError(f"Member membership mismatch: missing {sorted(missing)}, extra {sorted(extra)}")
+        for name, facts in operations.items():
+            observed_text(facts["default_branch"], f"{name}.default_branch")
+            if facts["workflow"] is not None:
+                observed_text(facts["workflow"], f"{name}.workflow")
+            observed_text(facts["releases"], f"{name}.releases")
         if pinned["organization"]["login"].lower() != owner.lower():
             raise ValueError("Pinned catalog organization differs from scanned organization")
         membership(set(members), set(pinned_members), report, ".github-private", "pinned/current catalog membership")
-        report("INFO", ".github-private", f"member input covers all {len(pinned_members)} pinned catalog repositories; digest verified at {revision}")
+        report("INFO", ".github-private", f"member input covers all {len(pinned_members)} pinned catalog repositories; workflow pin {revision}")
     except Unreadable as error:
         report("REVIEW", ".github-private", str(error))
         return
     except (ValueError, KeyError, TypeError) as error:
-        report("FAIL", ".github-private", f"Invalid member input or catalog binding: {error}")
+        report("FAIL", ".github-private", f"Invalid member input or workflow pin: {error}")
         return
-    inspect_icons(renderer, pinned, revision, report)
+    inspect_icons(pinned, revision, report)
     for name, facts in operations.items():
         repo = inventory.get(name.lower())
         if repo is None:
@@ -187,10 +276,14 @@ def inspect_profiles(owner, repos, report, renderer_path=None, member_path="prof
             report("REVIEW", name, f"Release observation unavailable: {error}")
 
 
-def inspect_icons(renderer, catalog, revision, report):
+def inspect_icons(catalog, revision, report):
     images = [catalog["mark"]] + [repo["icon"] for group in catalog["groups"] for repo in group["repositories"]]
-    urls = {renderer.catalog_url(url, catalog, revision, image=True)
-            for value in images for url in ([value] if isinstance(value, str) else value.values())}
+    try:
+        urls = {catalog_image_url(url, catalog, revision)
+                for value in images for url in ([value] if isinstance(value, str) else (value["light"], value["dark"]))}
+    except (ValueError, TypeError, KeyError) as error:
+        report("FAIL", ".github", f"Invalid observed icon: {error}")
+        return
     for url in sorted(urls):
         try:
             report("INFO" if image_resolves(url) else "FAIL", ".github", f"icon resolution: {url}")
