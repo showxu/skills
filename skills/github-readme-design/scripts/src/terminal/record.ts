@@ -176,6 +176,20 @@ async function copyFixture(source: string, target: string, fixture: string, home
   signal.throwIfAborted();
 }
 
+async function restoreDirectoryPermissions(path: string): Promise<void> {
+  let stat;
+  try {
+    stat = await lstat(path);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return;
+    throw error;
+  }
+  // lstat excludes symlinks; owner read permission allows traversal for cleanup.
+  if (!stat.isDirectory()) return;
+  if ((stat.mode & 0o700) !== 0o700) await chmod(path, stat.mode | 0o700);
+  for (const name of await readdir(path)) await restoreDirectoryPermissions(join(path, name));
+}
+
 export function normalizeOutput(output: string, home: string, canonicalHome: string): string {
   for (const path of [...new Set([home, canonicalHome])].sort((a, b) => b.length - a.length)) {
     output = output.replaceAll(path, "~");
@@ -285,7 +299,11 @@ export async function record(scriptFile: string, executable: string, options: { 
     }
     for (const expectation of script.expect) {
       signal.throwIfAborted();
-      const actual = await readFile(await sandboxPath(home, expectation.file, "read"), { encoding: "utf8", signal });
+      const target = await sandboxPath(home, expectation.file, "read");
+      if (!(await lstat(target)).isFile()) {
+        throw new Error(`${scriptFile} expect ${expectation.file}: expected a regular file`);
+      }
+      const actual = await readFile(target, { encoding: "utf8", signal });
       signal.throwIfAborted();
       if (expectation.contains !== undefined ? !actual.includes(expectation.contains) : actual !== expectation.equals) {
         throw new Error(`${scriptFile} expect ${expectation.file}: ${expectation.contains !== undefined ? "contains" : "equals"} expectation failed`);
@@ -295,7 +313,14 @@ export async function record(scriptFile: string, executable: string, options: { 
   } finally {
     // Await in-flight filesystem work before removal so it cannot recreate home.
     try {
-      if (createdHome) await rm(createdHome, { recursive: true, force: true });
+      if (createdHome) {
+        try {
+          await restoreDirectoryPermissions(createdHome);
+          await rm(createdHome, { recursive: true, force: true });
+        } catch (error) {
+          throw new Error(`${(error as NodeJS.ErrnoException).path ?? createdHome}: sandbox cleanup failed: ${message(error)}`);
+        }
+      }
     } finally {
       process.removeListener("SIGINT", interrupt);
       process.removeListener("SIGTERM", terminate);

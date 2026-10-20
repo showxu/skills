@@ -117,6 +117,29 @@ test("ambiguous or absent font selection names candidates", async t => {
   await assert.rejects(resolveFont(root, { ...typography, fontFamily: "Absent" }), /matched 0:.*candidates:.*one.ttf.*two.ttf/);
 });
 
+test("fontVariation accepts CSS numbers with signs, fractions and exponents", async () => {
+  for (const [text, expected] of [
+    ["1e0", 1], ["+1", 1], [".5", 0.5], ["-.5", -0.5],
+    ["+1.25E-2", 0.0125], ["-2e+1", -20], ["5E-1", 0.5], ["0", 0],
+  ] as const) {
+    assert.deepEqual(variations(`'MONO' ${text}`, "fontVariation"), { MONO: expected });
+  }
+  assert.deepEqual(variations(`"MONO" +.5e0, 'slnt' -1e1`, "fontVariation"), { MONO: 0.5, slnt: -10 });
+  const typography = (await readDesign(designPath)).typography.get("terminal")!;
+  const scientific = await resolveFont(fonts, { ...typography, fontVariation: "'MONO' 1e0" });
+  const ordinary = await resolveFont(fonts, typography);
+  assert.equal(scientific.run("mono", "test").advance, ordinary.run("mono", "test").advance);
+});
+
+test("fontVariation rejects malformed numbers and keeps weight in fontWeight", () => {
+  for (const value of ["1.", ".", "+", "1e", "1e+", "1e--2", "1 e0", "+ 1", "1e2px", "0x1", "NaN", "Infinity", "1e999"]) {
+    assert.throws(() => variations(`'MONO' ${value}`, "fontVariation"), /fontVariation: expected CSS/);
+  }
+  for (const value of ["400", "+400", "4e2"]) {
+    assert.throws(() => variations(`'wght' ${value}`, "fontVariation"), /wght must come only from fontWeight/);
+  }
+});
+
 test("width, missing glyphs, control characters, units and geometry overrides fail explicitly", async () => {
   const design = await readDesign(designPath);
   await assert.rejects(render({ title: "Demo", steps: [{ command: "demo wide", output: "W".repeat(120) }] }, design, fonts), /step 1 \(demo wide\).*maximum 830px/);

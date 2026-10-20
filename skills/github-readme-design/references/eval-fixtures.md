@@ -369,6 +369,9 @@ Context and files:
   stderr, nonzero exit and a timeout. Include a directory or non-executable
   file supplied as the executable, nested destination and fixture symlinks,
   and SIGINT/SIGTERM before the first command and during managed filesystem work.
+- Exercise FIFO, directory and symlink expectation/write targets, restrictive
+  directory modes from commands and fixture copies, persistent removal errors,
+  and signed, fractional and exponent CSS variation values.
 
 Expected output:
 
@@ -400,6 +403,11 @@ Acceptance checks:
   Fixture symlinks cannot escape `fixture/`. Errors identify the offending path.
 - SIGINT and SIGTERM remove the sandbox throughout its lifetime, terminate any
   running command process group and return 130 and 143 respectively.
+- Non-regular expectation/write targets fail before opening, naming the path.
+  Cleanup restores directory permissions without following symlinks; any
+  remaining removal failure names its path and exits nonzero.
+- Variation numbers accept CSS signs, decimals and exponents. Malformed values
+  and a `wght` setting fail; weight remains owned by `fontWeight`.
 
 Baseline expectation:
 

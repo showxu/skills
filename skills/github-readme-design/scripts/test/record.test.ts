@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
-import { chmod, copyFile, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from "node:fs/promises";
+import { spawn, spawnSync } from "node:child_process";
+import { chmod, copyFile, lstat, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { test } from "node:test";
@@ -13,10 +13,18 @@ const executable = fileURLToPath(new URL("./fixtures/executable.sh", import.meta
 const cli = new URL("../src/cli.ts", import.meta.url).href;
 const outputRoot = fileURLToPath(new URL("../../../../.build/presentation-toolchain/tests/", import.meta.url));
 
+async function removeTestDirectory(root: string): Promise<void> {
+  await chmod(root, 0o700);
+  for (const entry of await readdir(root, { withFileTypes: true })) {
+    if (entry.isDirectory()) await removeTestDirectory(join(root, entry.name));
+  }
+  await rm(root, { recursive: true, force: true });
+}
+
 async function temporary(t: TestContext): Promise<string> {
   await mkdir(outputRoot, { recursive: true });
   const root = await mkdtemp(join(outputRoot, "record-"));
-  t.after(() => rm(root, { recursive: true, force: true }));
+  t.after(() => removeTestDirectory(root));
   return root;
 }
 
@@ -110,6 +118,89 @@ test("nested fixture links cannot leave fixture, while contained links copy ordi
     expect: [{ file: "~/copied/nested/link", equals: "inside" }],
   });
   assert.equal((await record(file, executable, { tempRoot: root })).steps[0].output, "ready");
+});
+
+for (const operation of ["expect", "write"] as const) {
+  for (const [kind, setup] of [
+    ["FIFO", "mkfifo special"],
+    ["directory", "mkdir special"],
+    ["symlink", "printf ready > ordinary; ln -s ordinary special"],
+  ]) {
+    test(`${operation} rejects a ${kind} target before opening it`, async t => {
+      const root = await temporary(t);
+      const file = await script(root, {
+        steps: [{ run: setup }, ...(operation === "write" ? [{ write: "~/project/special", content: "ready" }] : [])],
+        ...(operation === "expect" ? { expect: [{ file: "~/project/special", equals: "ready" }] } : {}),
+      });
+      const result = spawnSync(process.execPath, [fileURLToPath(cli), "terminal", "record",
+        "--script", file, "--executable", executable, "--out", join(root, "recording.json")], {
+        env: { ...process.env, TMPDIR: root }, encoding: "utf8", timeout: 3_000, killSignal: "SIGKILL",
+      });
+      assert.equal(result.error, undefined, `recorder blocked on ${kind}: ${result.error}`);
+      assert.equal(result.status, 1, result.stderr);
+      assert.match(result.stderr, /special.*(?:regular file|ordinary file|symlink)/);
+      assert.equal((await readdir(root)).some(name => name.startsWith("presentation-home-")), false);
+    });
+  }
+}
+
+for (const source of ["step", "fixture"] as const) {
+  for (const fail of [false, true]) {
+    test(`cleanup removes non-writable directories from a ${source} after ${fail ? "failure" : "success"}`, async t => {
+      const root = await temporary(t);
+      const outside = join(root, "outside");
+      await mkdir(outside);
+      await writeFile(join(outside, "keep.txt"), "keep");
+      await chmod(outside, 0o500);
+      await mkdir(join(root, "fixture/locked/nested"), { recursive: true });
+      await writeFile(join(root, "fixture/locked/nested/payload"), "payload");
+      await chmod(join(root, "fixture/locked/nested"), 0o500);
+      await chmod(join(root, "fixture/locked"), 0o500);
+      const file = await script(root, {
+        env: { OUTSIDE: outside },
+        ...(source === "fixture" ? { copy: [{ from: "fixture", to: "copied" }] } : {}),
+        steps: [
+          { run: source === "step"
+            ? 'mkdir -p locked/nested; printf payload > locked/nested/payload; ln -s "$OUTSIDE" locked/outside; chmod 500 locked/nested locked "$HOME"'
+            : 'ln -s "$OUTSIDE" copied/locked-link', cwd: "~", show: false },
+          { run: fail ? "exit 7" : "printf ready" },
+        ],
+      });
+      if (fail) await assert.rejects(record(file, executable, { tempRoot: root }), /exit 7/);
+      else assert.equal((await record(file, executable, { tempRoot: root })).steps[0].output, "ready");
+      assert.equal((await readdir(root)).some(name => name.startsWith("presentation-home-")), false);
+      assert.equal((await lstat(outside)).mode & 0o777, 0o500);
+      assert.equal(await readFile(join(outside, "keep.txt"), "utf8"), "keep");
+    });
+  }
+}
+
+test("cleanup reports the offending path and exits nonzero if removal still fails", async t => {
+  const root = await temporary(t);
+  const file = await script(root);
+  const runner = join(root, "removal-failure.mjs");
+  await writeFile(runner, `
+    import fs from "node:fs/promises";
+    import { syncBuiltinESMExports } from "node:module";
+    const original = fs.rm;
+    fs.rm = async (path, ...args) => {
+      if (String(path).includes("presentation-home-")) {
+        throw Object.assign(new Error("removal denied"), {code: "EACCES", path: path + "/stuck"});
+      }
+      return original(path, ...args);
+    };
+    syncBuiltinESMExports();
+    const { main } = await import(${JSON.stringify(cli)});
+    process.exitCode = await main(process.argv.slice(2));
+  `);
+  const result = spawnSync(process.execPath, [runner, "terminal", "record", "--script", file,
+    "--executable", executable, "--out", join(root, "recording.json")], {
+    env: { ...process.env, TMPDIR: root }, encoding: "utf8",
+  });
+  assert.equal(result.status, 1, result.stderr);
+  assert.match(result.stderr, /presentation-home-[^\n]+\/stuck.*removal denied/);
+  assert.equal((await readdir(root)).filter(name => name.startsWith("presentation-home-")).length, 1);
+  await assert.rejects(readFile(join(root, "recording.json")), { code: "ENOENT" });
 });
 
 // The child pauses at a completed filesystem operation until the parent releases

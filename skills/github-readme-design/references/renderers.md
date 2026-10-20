@@ -186,6 +186,9 @@ Copies require a fresh destination and create each descendant exclusively.
 Managed copies and writes refuse existing destination symlinks at any depth,
 including `~/bin/<executable>`, even when a link points inside home. Errors
 name the offending path.
+Expectation targets and existing managed-write targets must be regular files
+as reported by `lstat`; FIFOs, directories and symlinks fail before opening.
+Managed writes may create a new file.
 
 ### Recorder environment and recording
 
@@ -218,6 +221,10 @@ creation, fixture copying, managed writes, commands, expectation reads and
 removal. A signal terminates any running command process group, waits for
 pending filesystem work and removes the sandbox before exiting with status
 130 (SIGINT) or 143 (SIGTERM).
+Cleanup restores owner permissions on sandbox directories so restricted
+directory modes do not prevent removal. It does not follow symlinks when
+restoring permissions. If cleanup still fails, the diagnostic names the
+offending path and the command exits nonzero.
 
 Normalization replaces both the created and canonical home paths with `~`,
 longest first, and removes exactly one trailing LF from each output. It makes
@@ -255,9 +262,13 @@ falling back to name ID 1. A variable face must have a `wght` axis covering
 face matches only when `fontVariation` is absent and OS/2 `usWeightClass`
 equals `fontWeight`. Exactly one face must match; otherwise the diagnostic
 lists the candidates. `fontVariation` follows CSS settings syntax, such as
-`"'MONO' 1"`; `wght` belongs only in `fontWeight`. The selected variation's
-cmap maps each character to one glyph; kerning, ligatures and contextual
-alternates are not applied. Advance widths come from those glyphs.
+`"'MONO' 1"`; `wght` belongs only in `fontWeight`. Axis values use the
+[CSS number grammar](https://drafts.csswg.org/css-values-4/#numbers): optional
+signs, integer or decimal forms, and optional exponents (`1e0`, `+1`, `.5`).
+A decimal point requires following digits.
+The selected variation's cmap maps each character to one glyph; kerning,
+ligatures and contextual alternates are not applied. Advance widths come
+from those glyphs.
 
 Tabs expand to the next multiple of eight cells, counting the `$ ` prompt
 for commands. Other controls fail. A missing glyph names the character,

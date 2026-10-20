@@ -15,7 +15,7 @@ export function variations(value: string | undefined, token: string): Record<str
   if (value === undefined) return {};
   const result: Record<string, number> = {};
   for (const setting of value.split(",")) {
-    const match = /^\s*(['"])([\x20-\x7e]{4})\1\s+([+-]?(?:\d+(?:\.\d*)?|\.\d+))\s*$/.exec(setting);
+    const match = /^\s*(['"])([\x20-\x7e]{4})\1\s+([+-]?(?:\d+|\d*\.\d+)(?:[eE][+-]?\d+)?)\s*$/.exec(setting);
     if (!match || !Number.isFinite(Number(match[3]))) throw new Error(`${token}: expected CSS font-variation-settings ('TAG' number)`);
     const tag = match[2];
     if (tag === "wght") throw new Error(`${token}: wght must come only from fontWeight`);
