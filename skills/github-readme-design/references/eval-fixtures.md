@@ -350,3 +350,76 @@ Evidence sources:
 Owner notes:
 
 - Neutral fixture inputs; execution evidence stays in ignored output.
+
+## scripted-terminal
+
+Target behavior: Reproducible terminal recording, outlined rendering and CI drift checks.
+
+Input prompt: "Build our CLI, regenerate its light and dark README demo from
+the supplied script and organization standard, then verify the committed assets."
+
+Context and files:
+
+- `scripts/test/fixtures/`: fixed recording, Google-format DESIGN front matter,
+  licensed variable font, and a tiny executable/session fixture. The session
+  exercises hidden setup, file writes, copies, empty output and assertions.
+- Exercise an edited output line, added/removed steps, an SVG-only difference,
+  a broken DESIGN reference, contrast warning, ambiguous fonts, an unsupported
+  glyph, width overflow, a non-px dimension, a fixed environment override,
+  stderr, nonzero exit and a timeout. Include a directory or non-executable
+  file supplied as the executable, nested destination and fixture symlinks,
+  and SIGINT/SIGTERM before the first command and during managed filesystem work.
+- Exercise FIFO, directory and symlink expectation/write targets, restrictive
+  directory modes from commands and fixture copies, persistent removal errors,
+  and signed, fractional and exponent CSS variation values.
+
+Expected output:
+
+- Record the real built executable in the documented fixed environment; show
+  only visible steps. Render both appearances from resolved DESIGN components,
+  merging each dark component over its base, and outline the selected font
+  variation without shaping. Return byte-check results and the visual-review
+  scope, with complete regenerated artifacts when drift occurs.
+
+Forbidden behavior:
+
+- Fabricate successful output, rewrite varying data beyond home-path/trailing-LF
+  normalization, invent missing terminal styling, install into an installed
+  skill or globally, overwrite committed assets during check, or claim a local
+  golden render proves GitHub visual acceptance.
+
+Acceptance checks:
+
+- `npm test` passes type checking and Node tests; both golden SVGs match bytes.
+  Missing glyphs and overflow identify the step; lint diagnostics identify the
+  file, token and rule. Environment overrides and unknown keys fail.
+- A clean `terminal check` exits zero; an edited output line exits one naming
+  its command, with a unified diff and a complete artifact directory. SVG-only
+  drift names the file and DESIGN/renderer change. Usage errors exit two.
+- Failure, assertion and timeout paths remove the sandbox. The fixture's
+  `equals` assertion includes its exact final newline.
+- Invalid executable paths fail before sandbox creation. Copies require fresh
+  destinations; managed writes refuse destination symlinks at every depth.
+  Fixture symlinks cannot escape `fixture/`. Errors identify the offending path.
+- SIGINT and SIGTERM remove the sandbox throughout its lifetime, terminate any
+  running command process group and return 130 and 143 respectively.
+- Non-regular expectation/write targets fail before opening, naming the path.
+  Cleanup restores directory permissions without following symlinks; any
+  remaining removal failure names its path and exits nonzero.
+- Variation numbers accept CSS signs, decimals and exponents. Malformed values
+  and a `wght` setting fail; weight remains owned by `fontWeight`.
+
+Baseline expectation:
+
+- A recording that CI never executes can remain plausible after product
+  behavior changes; live SVG text can vary with the viewer's installed fonts.
+
+Evidence sources:
+
+- Script, recording, golden SVG bytes, command output, CI matrix results and
+  the accepted light/dark visual review.
+
+Owner notes:
+
+- Fixture styling and font bytes belong to this test case. Actual consumers
+  supply their own pinned DESIGN and licensed fonts.

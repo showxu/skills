@@ -1,0 +1,25 @@
+title: Inspect a workspace
+executable: demo
+env:
+  EXAMPLE: fixture
+files:
+  seed/message.txt: |
+    Seed file ready.
+copy:
+  - from: fixture
+    to: copied
+steps:
+  - run: printf 'hidden setup\n'; mkdir -p prepared
+    show: false
+  - write: ~/project/result.txt
+    content: |
+      Written file ready.
+  - run: demo inspect
+  - run: demo empty
+  - run: demo environment
+expect:
+  - file: ~/copied/note.txt
+    contains: Copied
+  - file: ~/project/result.txt
+    equals: |
+      Written file ready.

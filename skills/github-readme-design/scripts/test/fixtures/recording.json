@@ -1,0 +1,17 @@
+{
+  "title": "Inspect a workspace",
+  "steps": [
+    {
+      "command": "demo inspect",
+      "output": "Workspace: ~/project\nSeed file ready.\nCopied fixture ready.\nWritten file ready."
+    },
+    {
+      "command": "demo empty",
+      "output": ""
+    },
+    {
+      "command": "demo environment",
+      "output": "C dumb 1 fixture"
+    }
+  ]
+}
