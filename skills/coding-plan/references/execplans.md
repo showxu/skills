@@ -89,6 +89,15 @@ proceeds. Include and maintain these sections:
 - `Outcomes & Retrospective`: what was achieved, what remains, and what should
   be learned at major milestones or completion.
 
+When the work changes anything that is released (a published package,
+tagged repository or shared revision that others pin), also include
+`Release Points`, decided before execution starts: which repositories release,
+in dependency order, and when. The default is one release when the whole
+change is complete; milestones are named here or not at all. Intermediate
+steps never release, and cross-repository references during the work are full
+SHAs without version comments. Changing the release points after approval is a
+`Decision Log` entry made with the owner.
+
 Session todos are still useful for moment-to-moment tracking, but in ExecPlan
 mode durable state belongs in the plan file itself. Before handoff or stopping,
 reconcile session todos into `Task State` and `Progress`.
@@ -236,6 +245,12 @@ types, and modules precisely.
 
 List exact commands with working directories and expected outputs. Update as
 work proceeds.
+
+## Release Points
+
+Name each repository that releases, in dependency order, and when: once at
+completion unless milestones are named here. Omit this section when nothing
+released changes.
 
 ## Validation and Acceptance
 

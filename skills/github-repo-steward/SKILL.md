@@ -94,7 +94,8 @@ owner-decided 1.0.0 and compatible evolution with planned majors after 1.0
 when no repository or organization policy is declared. Fill the template's tag
 name from the repository's published format; new repositories default to `vX.Y.Z`.
 Under any policy, keep one version source and a CHANGELOG with Unreleased;
-new release tags are signed,
+release once per completed change, never per intermediate PR, as the
+template's "When to release" states; new release tags are signed,
 annotated and immutable, and their remote peeled commit is verified after
 publication. Preserve published legacy tags and history. A tagged mistake ships as a new patch, or the larger version
 required by compatibility.
