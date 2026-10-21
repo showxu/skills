@@ -18,6 +18,9 @@ identify `project.dynamic`, the backend and its source (for example VCS tags),
 and how wheel/sdist metadata and runtime versions are derived. Do not add a
 second version declaration for a dynamic build.>
 
+<When VERSIONING names this repository's version source and mirrors, link it
+in the table instead of listing them; otherwise record them here.>
+
 | Shipped component | Version meaning | Version source | Mirrors and derived fields | Update and read-only check |
 | --- | --- | --- | --- | --- |
 | <actual component> | <version format, such as a product version with a build number> | <existing file, backend or tag> | <actual metadata/runtime fields> | <existing entry points, manual step, or not established> |

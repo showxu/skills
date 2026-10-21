@@ -12,12 +12,10 @@ restate those rules.
 ## Components and Version Sources
 
 The repository ships one `showxu-skills` plugin for Claude Code and Codex.
-The version source and mirrors are listed in
-[VERSIONING](../../VERSIONING.md#version-source).
 
 | Shipped component | Version meaning | Version source | Mirrors and derived fields | Update and read-only check |
 | --- | --- | --- | --- | --- |
-| `showxu-skills` plugin | Plugin release version | [`VERSION`](../../VERSION) | `version` in [.claude-plugin/plugin.json](../../.claude-plugin/plugin.json) and [.codex-plugin/plugin.json](../../.codex-plugin/plugin.json); `metadata.version` in [.claude-plugin/marketplace.json](../../.claude-plugin/marketplace.json) | Manual update; `python3 -B scripts/check_repository.py` and `claude plugin validate .` |
+| `showxu-skills` plugin | Plugin release version | [VERSIONING](../../VERSIONING.md#version-source) | [VERSIONING](../../VERSIONING.md#version-source) | Manual update; `python3 -B scripts/check_repository.py` and `claude plugin validate .` |
 
 ## Compatibility Surface
 
