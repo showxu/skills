@@ -46,7 +46,7 @@ manifest. Run changed skills' declared checks as
 ## Candidate, Acceptance and Publication
 
 Publication follows [VERSIONING's release procedure](../../VERSIONING.md#release-procedure),
-with tag `vX.Y.Z` and message `skills X.Y.Z`. The accepted artifact is the
+including its tag name and message. The accepted artifact is the
 repository tree at the accepted merge commit. Publication requires the
 maintainer's repository write access and configured signing identity;
 [CONTRIBUTING](../../CONTRIBUTING.md) records the review and merge requirements.

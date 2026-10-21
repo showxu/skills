@@ -108,7 +108,7 @@
     {
       "id": 17,
       "prompt": "Plan the next release of my personal repository at 0.4.2. Its existing VERSIONING.md requires a MINOR increment for a compatible addition during 0.x. This candidate adds a compatible feature.",
-      "expected_output": "Use the repository's declared 0.x policy to propose 0.5.0, preserve that policy instead of replacing it with the default template, keep baseline hygiene (one version source, Unreleased changelog, signed annotated immutable tag, remote peeled-commit verification), and identify missing version-source or release-owner facts before dependent preparation.",
+      "expected_output": "Use the repository's declared 0.x policy to propose 0.5.0, preserve that policy instead of replacing it with the default template, take version-source and changelog rules from that policy and report what it leaves undefined, still verify a signed annotated tag and its remote peeled commit, and identify missing version-source or release-owner facts before dependent preparation.",
       "files": []
     },
     {

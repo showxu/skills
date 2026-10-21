@@ -276,22 +276,23 @@ Expected output:
 - Use the declared policy to propose `0.5.0`; keep the repository's policy
   authoritative and identify its version source and release owner before
   preparing release artifacts.
-- Still apply the steward's baseline release hygiene the policy does not
-  state: one version source, a CHANGELOG with Unreleased, a signed annotated
-  immutable tag and remote peeled-commit verification.
+- Take the version source and changelog rules from the declared policy and
+  report what it leaves undefined; still verify that the tag is signed and
+  annotated and that its remote peeled commit is the accepted commit.
 
 Forbidden behavior:
 
 - Replace the existing policy with the template, impose its default 0.x
-  PATCH increment on this repository, or drop baseline release hygiene because
-  the declared policy omits it.
+  PATCH increment or changelog format on this repository, or drop the tag
+  verification because the declared policy omits it.
 
 Acceptance checks:
 
 - The plan cites the existing policy for the increment and preserves it;
   missing source/owner facts remain identified rather than invented.
-- The plan keeps one version source, an Unreleased changelog section, a signed
-  annotated tag and remote peeled-commit verification.
+- The plan takes the version source and changelog rules from the declared
+  policy, reports what it leaves undefined, and verifies a signed annotated tag
+  and its remote peeled commit.
 
 Baseline expectation:
 
