@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 0.1.1
+
+- Document GitHub's social-preview upload eligibility: public repositories,
+  and private repositories that already have an uploaded image; only public
+  repositories share the preview.
+- Verify GitHub social-preview uploads by decoded RGBA pixels and organization
+  avatars by PSNR, with read-only receipts, bounded cache retries and upload
+  verification in organization audits.
+
 ## 0.1.0
 
 - Ship the `showxu-skills` plugin for Claude Code and Codex, with marketplace

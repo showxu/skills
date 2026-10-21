@@ -105,6 +105,15 @@ the repository steward after source merges; organization avatar or pin changes
 use the owner's signed-in browser within authorization. Never touch session
 credentials, cookies or tokens.
 
+During organization audits and after uploads, run the repository steward's
+[upload verifier](../../github-repo-steward/references/upload.md#independent-receipt)
+in `avatar` mode for each organization and `social-preview` mode for each public
+member. Supply the accepted image and its source revision, using the account
+avatar's source when it differs from the umbrella mark. Keep JSON receipts in
+private task evidence and aggregate pass, mismatch and unknown results with the
+organization audit. The verifier owns pixel/PSNR comparisons; this skill does
+not duplicate them. Unreadable evidence remains unknown.
+
 Accept only when both generated profiles match their inputs, inventory coverage
 is complete, links work, actual pin order matches the decision, and consumer
 reports identify the accepted design/source revisions. An uploaded filename

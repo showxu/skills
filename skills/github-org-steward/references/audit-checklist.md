@@ -14,6 +14,7 @@ severity and disposition. Do not claim completion for inaccessible areas.
 | Shared rollout | Consumer proof at proposed full pin, current required contexts, template/member PRs and capacity-bound wave receipts for each runner class and aggregate | Organization steward coordinating repository steward |
 | Build-cache adoption | Predeclared material-saving threshold, controlled repeated cold/miss/warm comparisons, net cost and correctness evidence, accepted decision | Organization steward and ecosystem build owner |
 | Family identity | DESIGN, generator revision, accepted exports/consumer bindings and icon owners | Design owner plus repository steward for delivery |
+| Uploaded images | Run the repository steward's `verify_upload.py avatar` for each organization and `social-preview` for each public member against its accepted image/source revision; retain the JSON receipts and unknown scope | Organization steward aggregating repository-steward verification |
 | Profile/catalog | Job groups, complete generated membership, outcome copy, umbrella identity, account description and working navigation | Organization steward |
 | Member profile | `.github-private` exists and is private for organizations with maintainers; generated from the pinned public catalog with complete matching membership, working live links and no hand-recorded status; policy links back to `.github` | Organization steward |
 | Pins | Curated set and actual order support the visitor promise | Organization steward; owner browser |
