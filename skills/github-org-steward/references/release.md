@@ -16,10 +16,8 @@ ecosystem release owner from the organization's declared inputs. Preserve
 published tag formats; new repositories default to `vX.Y.Z`. Append organization
 sections for family release order, the members' release table, the family's
 documented interfaces and dependency rules. Family publication details belong
-with those release requirements. Derive version levels from the common template;
-its 0.x rules, owner-decided 1.0.0 and 1.0+ compatibility promise apply to the
-organization too. Keep the common policy there rather than restating it in
-this skill.
+with those release requirements. Version levels come from the common template; keep that
+policy there rather than restating it in this skill.
 
 ## Plan by dependency
 
