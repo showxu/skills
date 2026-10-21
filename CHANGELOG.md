@@ -17,6 +17,9 @@
   mechanics in `docs/reference/release.md`.
 - `skill-creator` places a collection's version source and mirrors in its
   VERSIONING.
+- The `VERSIONING` template's release timing no longer describes how other
+  repositories reference a release; workflow integration guides and release
+  references own that.
 
 ## 0.1.1
 

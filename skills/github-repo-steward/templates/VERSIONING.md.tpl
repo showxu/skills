@@ -17,10 +17,6 @@ requests or repositories releases once, when all of it has landed, or at
 milestones its owner names before the work starts. Its intermediate steps,
 review fixes, documentation fixes and pin updates do not release on their own.
 
-While a change is in progress, other repositories reference its commits by full
-SHA without a version comment. Once it is released, consumers pin the tagged
-commit with a `# vX.Y.Z` comment, which lets Dependabot propose later releases.
-
 ## Choosing the next version
 
 ### 0.x (initial development)
