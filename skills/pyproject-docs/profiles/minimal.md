@@ -18,7 +18,7 @@ Apply the [community-file inheritance decision](README.md) to `if local` rows.
 | `CONTRIBUTING.md` | `../templates/CONTRIBUTING.md.tpl` | if local |
 | `docs/README.md` | `../templates/docs.README.md.tpl` | yes |
 | `docs/architecture/README.md` | `../templates/docs.architecture.README.md.tpl` | yes |
-| `docs/architecture/versioning-and-release.md` | `../templates/docs.architecture.versioning-and-release.md.tpl` | yes |
+| `docs/reference/release.md` | `../templates/docs.reference.release.md.tpl` | yes |
 
 ## Not Forced In This Profile
 

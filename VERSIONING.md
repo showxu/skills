@@ -17,10 +17,6 @@ requests or repositories releases once, when all of it has landed, or at
 milestones its owner names before the work starts. Its intermediate steps,
 review fixes, documentation fixes and pin updates do not release on their own.
 
-While a change is in progress, other repositories reference its commits by full
-SHA without a version comment. Once it is released, consumers pin the tagged
-commit with a `# vX.Y.Z` comment, which lets Dependabot propose later releases.
-
 ## Choosing the next version
 
 ### 0.x (initial development)
@@ -57,12 +53,13 @@ release, which may start at `0.1.0`.
 
 ## Version source
 
-The version source is `metadata.version` in the [Claude marketplace manifest](.claude-plugin/marketplace.json).
+The version source is the [`VERSION`](VERSION) file.
 
 Files that mirror it:
 
 - [.claude-plugin/plugin.json](.claude-plugin/plugin.json): `version`
 - [.codex-plugin/plugin.json](.codex-plugin/plugin.json): `version`
+- [.claude-plugin/marketplace.json](.claude-plugin/marketplace.json): `metadata.version`
 
 Update the source and its mirrors together in the release change.
 
@@ -98,5 +95,5 @@ python3 -B scripts/check_repository.py
 claude plugin validate .
 ```
 
-Ecosystem builds, packages, stores and consumer installation checks belong to
-the [plugin distribution workflow](docs/skill-authoring.md#plugin-distribution).
+Ecosystem builds, packages, stores and consumer installation checks belong to the
+[release reference](docs/reference/release.md).

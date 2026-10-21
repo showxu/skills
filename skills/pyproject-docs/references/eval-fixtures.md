@@ -316,9 +316,9 @@ agent guide for this project."
 Context and files:
 
 - `AGENTS.md` has the canonical contract but no `## Code Review Rules`.
-- `docs/architecture/versioning-and-release.md` defines the version bump and
-  the change record; `pyproject.toml` declares console scripts and
-  `requires-python`.
+- `VERSIONING.md` defines the version bump and the change record;
+  `docs/reference/release.md` records the compatibility surface;
+  `pyproject.toml` declares console scripts and `requires-python`.
 - The project's check command already runs a formatter, a linter, and a type
   checker.
 
@@ -327,8 +327,8 @@ Expected output:
 - `AGENTS.md` gains `## Code Review Rules` with `###` groups for compatibility
   and versioning, claims, public documentation, and tests, each naming the
   behavior, the reason, and the safe path.
-- The versioning rule routes to `versioning-and-release.md` instead of
-  copying its bump rules.
+- The versioning rule routes to VERSIONING and the
+  release reference instead of copying its bump rules.
 - Formatting, lint, and type errors are left to the check command.
 - No `CLAUDE.md` or `REVIEW.md` is created.
 
@@ -360,7 +360,7 @@ release automation.
 | --- | --- |
 | Python static project.version | Preserve the actual single version authority; do not add an App build number or another declaration. |
 | Python project.dynamic version from a VCS-aware backend | Name the backend and VCS authority, wheel/sdist and runtime derivation; do not invent project.version. |
-| Existing release policy at another repository path | Complete it, adjust the profile target and all routes, and retain one normative entry. |
+| Existing release facts and mechanics reference at another repository path | Complete it, adjust the profile target and all routes, keep one release reference and leave VERSIONING separate. |
 | New project with no release scripts | Explicitly state that automation is not established; no invented commands or claims of candidate validation. |
 | New toolchain or changed check definitions | Previous evidence is invalid for the affected stage and its dependents; retain failure records. |
 | Unchanged source and exact accepted package | Reuse only trusted matching evidence; preserve the accepted bytes during publication. |

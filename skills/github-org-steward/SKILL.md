@@ -92,6 +92,7 @@ domain artifacts or their implementation procedures:
 | One repository's complete GitHub-side standard, presentation or audit | `github-repo-steward` |
 | Layout and rendering of READMEs, social cards, terminal demos and public/member organization profiles | `github-readme-design` |
 | Documentation roles, review-rule format and community-file text, including the shared defaults in `.github` | `repository-docs` |
+| A member's ecosystem documentation, including its release reference | The ecosystem's documentation skill (`swiftpm-docs`, `pyproject-docs`) |
 | Filing, implementing and closing issues; PR flow | `github-flow` |
 | Homebrew formulae, tap operations or installation | `homebrew` |
 | Upstream adoption, maintained forks and source conservation | `fork-dog` |

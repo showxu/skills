@@ -276,22 +276,23 @@ Expected output:
 - Use the declared policy to propose `0.5.0`; keep the repository's policy
   authoritative and identify its version source and release owner before
   preparing release artifacts.
-- Still apply the steward's baseline release hygiene the policy does not
-  state: one version source, a CHANGELOG with Unreleased, a signed annotated
-  immutable tag and remote peeled-commit verification.
+- Take the version source and changelog rules from the declared policy and
+  report what it leaves undefined; still verify that the tag is signed and
+  annotated and that its remote peeled commit is the accepted commit.
 
 Forbidden behavior:
 
 - Replace the existing policy with the template, impose its default 0.x
-  PATCH increment on this repository, or drop baseline release hygiene because
-  the declared policy omits it.
+  PATCH increment or changelog format on this repository, or drop the tag
+  verification because the declared policy omits it.
 
 Acceptance checks:
 
 - The plan cites the existing policy for the increment and preserves it;
   missing source/owner facts remain identified rather than invented.
-- The plan keeps one version source, an Unreleased changelog section, a signed
-  annotated tag and remote peeled-commit verification.
+- The plan takes the version source and changelog rules from the declared
+  policy, reports what it leaves undefined, and verifies a signed annotated tag
+  and its remote peeled commit.
 
 Baseline expectation:
 
@@ -890,6 +891,55 @@ Baseline expectation:
 Evidence sources:
 
 - Generated artifacts, renderer/check output and executor response.
+
+Owner notes:
+
+- Neutral fixture inputs; execution evidence stays in ignored output.
+
+## duplicate-version-owner
+
+Target behavior: Report any other document that restates version rules, such as
+an architecture versioning page, as a duplicate owner and route its facts to
+the release reference.
+
+Input prompt: "Audit our Swift package's release documentation against the standard."
+
+Context and files:
+
+- Root `VERSIONING.md` from the template.
+- `Documentation/Architecture/VersioningAndRelease.md` restates the 0.x bump
+  rules and records the version source and compatibility surface.
+- `Documentation/Reference/Release.md` holds the release commands.
+
+Expected output:
+
+- A finding that names `VersioningAndRelease.md` as a duplicate owner of
+  version rules; its facts route to `Documentation/Reference/Release.md`
+  through `swiftpm-docs`.
+- VERSIONING's release owner links the release reference; no rule text is
+  copied into the release reference.
+
+Forbidden behavior:
+
+- Keeping both documents as rule owners, copying bump rules into the release
+  reference, or editing files during an audit-only request.
+
+Acceptance checks:
+
+- A finding that names `VersioningAndRelease.md` as a duplicate owner of
+  version rules; its facts route to `Documentation/Reference/Release.md`
+  through `swiftpm-docs`.
+- VERSIONING's release owner links the release reference; no rule text is
+  copied into the release reference.
+
+Baseline expectation:
+
+- Keeping both documents as rule owners, copying bump rules into the release
+  reference, or editing files during an audit-only request.
+
+Evidence sources:
+
+- Executor output, accepted revisions, captured observations and command traces.
 
 Owner notes:
 

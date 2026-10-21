@@ -23,7 +23,7 @@ Apply the [community-file inheritance decision](README.md) to `if local` rows.
 | `.github/CODEOWNERS` | `../templates/CODEOWNERS.tpl` | yes |
 | `docs/README.md` | `../templates/docs.README.md.tpl` | yes |
 | `docs/architecture/README.md` | `../templates/docs.architecture.README.md.tpl` | yes |
-| `docs/architecture/versioning-and-release.md` | `../templates/docs.architecture.versioning-and-release.md.tpl` | yes |
+| `docs/reference/release.md` | `../templates/docs.reference.release.md.tpl` | yes |
 | `docs/proposals/README.md` | `../templates/docs.proposals.README.md.tpl` | yes |
 | `docs/decisions/README.md` | `../templates/docs.decisions.README.md.tpl` | yes |
 | `docs/migrations/README.md` | `../templates/docs.migrations.README.md.tpl` | yes |

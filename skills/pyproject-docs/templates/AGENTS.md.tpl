@@ -47,7 +47,9 @@ truth.
 ## Task Route
 
 - Before changing versions, dependencies, packaging or release workflows, read
-  `docs/architecture/versioning-and-release.md` and use its existing project check entry points.
+  `VERSIONING.md`, or the organization VERSIONING the project adopts, for
+  version rules and `docs/reference/release.md` for this repository's release facts and check
+  entry points.
 
 - For public behavior, update implementation, tests, docs, and generated
   contracts in the same slice.
@@ -59,10 +61,11 @@ truth.
 
 ### Compatibility and versioning
 
-- Flag a change to public API, console scripts, or observable behavior,
-  including a raised `requires-python`, without the change record and version
-  bump `docs/architecture/versioning-and-release.md` requires. Safe path:
-  record the change under the next version with that bump.
+- Flag a change to the compatibility surface recorded in
+  `docs/reference/release.md`, such as public API, console scripts, observable
+  behavior or a raised `requires-python`, without the changelog entry and
+  version bump VERSIONING requires. Safe path: record the change under the
+  next version with that bump.
 
 ### Claims
 

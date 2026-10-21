@@ -23,6 +23,12 @@ they do not change the authority of the facts placed there. Open work stays
 in the repository's issue tracker, and task state stays with its declared
 owner.
 
+Version rules live in the repository's `VERSIONING.md`, or the organization
+VERSIONING it adopts, owned by `github-repo-steward`.
+Release facts and mechanics beyond its release procedure go in
+`docs/reference/release.md`. Other documents link them and do not restate
+version rules.
+
 An ecosystem documentation adapter owns its ecosystem's paths and naming.
 For repositories without one, treat other documentation trees as input to
 normalization into `docs/`, preserving unique content and updating links.

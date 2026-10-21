@@ -1,30 +1,38 @@
-# Versioning and Release
+# Release
 
 Release status: <implemented, partly manual, or not established; cite evidence>.
 
-This document owns the current version and release rules for <repo-name>.
-Operational command details belong in <existing release reference, or not
-established>. If an existing document already owns these rules, complete that
-document and route readers to it instead of maintaining two normative copies.
+Version rules for <repo-name>, covering tags, release timing, choosing the
+next version and the changelog, are in <[VERSIONING](../../VERSIONING.md), or
+the organization VERSIONING the project adopts>. This document records the
+repository's release facts and mechanics and does not restate those rules.
 
-## Components and Version Authority
+<If an existing document already owns these facts, complete that document and
+route readers to it instead of maintaining two copies.>
 
-Inspect `pyproject.toml` and the configured build backend. For a static version,
+## Components and Version Sources
+
+<Inspect `pyproject.toml` and the configured build backend. For a static version,
 identify `[project].version` or its existing owner. For a dynamic version,
 identify `project.dynamic`, the backend and its source (for example VCS tags),
 and how wheel/sdist metadata and runtime versions are derived. Do not add a
-second version declaration for a dynamic build.
+second version declaration for a dynamic build.>
 
-| Shipped component | Version meaning | Authoritative source | Derived fields | Update and read-only check |
+<When VERSIONING names this repository's version source and mirrors, link it
+in the table instead of listing them; otherwise record them here.>
+
+| Shipped component | Version meaning | Version source | Mirrors and derived fields | Update and read-only check |
 | --- | --- | --- | --- | --- |
-| <actual component> | <accepted scheme; build/candidate meaning if used> | <existing file, backend or tag> | <actual metadata/runtime fields> | <existing entry points, manual step, or not established> |
+| <actual component> | <version format, such as a product version with a build number> | <existing file, backend or tag> | <actual metadata/runtime fields> | <existing entry points, manual step, or not established> |
 
-<Specify accepted compatible-fix, compatible-feature and incompatible-change
-rules, including 0.x behavior when applicable. Compatibility is established by
-review and tests, not inferred from comparing version numbers. Record the
-component, change type and rationale when advancing its version. Documentation,
-CI or cleanup alone do not require a product release unless shipped behavior
-changes.>
+## Compatibility Surface
+
+<List what consumers depend on: public API, console scripts and their options,
+output and exit codes, configuration and file formats and locations,
+serialized values, and the supported Python and platform floors. VERSIONING
+decides how a change to this surface affects the next version. Compatibility
+is established by review and tests, not inferred from comparing version
+numbers.>
 
 ## Dependencies and Verified Combinations
 
@@ -47,14 +55,13 @@ commands or implemented automation.>
 
 ## Candidate, Acceptance and Publication
 
-<Describe the actual candidate and release sequence, source trust boundary,
-signing/publishing permissions and the exact artifact accepted. State which
-rules are adopted and which automation is implemented. Where candidates exist,
-failed candidates revise candidate/build identity rather than consuming a new
-formal patch version. Published tags and artifact bytes remain immutable.
-Promote the same accepted artifact; rebuilding changes its identity and requires
-the affected acceptance again. Publish changed components in dependency order
-after their candidate combination has passed.>
+<Describe the actual candidate and release sequence that carries out
+VERSIONING's release procedure: source trust boundary, signing/publishing
+permissions and the exact artifact accepted. State which automation is
+implemented. Published artifact bytes remain immutable. Promote the same
+accepted artifact; rebuilding changes its identity and requires the affected
+acceptance again. Publish changed components in dependency order after their
+candidate combination has passed.>
 
 ## Evidence Reuse and Invalidation
 

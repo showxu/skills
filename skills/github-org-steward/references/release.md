@@ -1,8 +1,10 @@
 # Coordinated publication
 
 One repository's versions, tags, changelog, release mechanics and immutable
-assets belong to its repository steward and ecosystem release owner. The
-organization owns shared version policy and the order/evidence across members.
+assets belong to its repository steward and ecosystem release owner. Each
+member records its release facts and mechanics in its release reference, as
+`github-repo-steward` describes. The organization owns shared version policy
+and the order/evidence across members.
 Do not duplicate per-component release commands here.
 
 ## Shared version policy
@@ -14,10 +16,8 @@ ecosystem release owner from the organization's declared inputs. Preserve
 published tag formats; new repositories default to `vX.Y.Z`. Append organization
 sections for family release order, the members' release table, the family's
 documented interfaces and dependency rules. Family publication details belong
-with those release requirements. Derive version levels from the common template;
-its 0.x rules, owner-decided 1.0.0 and 1.0+ compatibility promise apply to the
-organization too. Keep the common policy there rather than restating it in
-this skill.
+with those release requirements. Version levels come from the common template; keep that
+policy there rather than restating it in this skill.
 
 ## Plan by dependency
 
@@ -33,13 +33,12 @@ skill. Shared workflow changes advance through a representative consumer first,
 then reviewed pin updates in the template and other members. Neither a template
 change nor a new shared revision proves adoption by existing repositories.
 
-A change coordinated across members releases once, when all of it is merged
-and verified, or at milestones named in its plan before the work starts; its
-member steps never release individually. While it is in progress, members pin
-the in-progress shared commits by full SHA without version comments. At the
-release, run representative consumers at the exact candidates, tag in
-dependency order with the owner's confirmation, then move every caller to the
-released pins with their `# vX.Y.Z` comments in one pass.
+A change coordinated across members follows the shared VERSIONING's release
+timing. While it is in progress, members pin the in-progress shared commits by
+full SHA without version comments. At the release, run representative consumers
+at the exact candidates, tag in dependency order with the owner's confirmation,
+then move every caller to the released pins with their `# vX.Y.Z` comments in
+one pass.
 
 ## Size rollout waves to available runners
 

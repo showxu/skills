@@ -8,8 +8,8 @@ example; inherited files are omitted from an export.
 
 ## Source Templates Used
 
-- `templates/docs.architecture.versioning-and-release.md.tpl` ->
-  `docs/architecture/versioning-and-release.md`
+- `templates/docs.reference.release.md.tpl` ->
+  `docs/reference/release.md`
 - `templates/AGENTS.md.tpl` -> `AGENTS.md`
 - `templates/README.md.tpl` -> `README.md`
 - `templates/CONTRIBUTING.md.tpl` -> `CONTRIBUTING.md`
@@ -29,13 +29,15 @@ example; inherited files are omitted from an export.
     README.md
     architecture/
       README.md
-      versioning-and-release.md
+    reference/
+      release.md
 ```
 
 ## Intentional Omissions
 
 This profile does not require `docs/proposals/`, `docs/decisions/`,
-`docs/migrations/`, `docs/archive/`, `docs/reference/`, or `docs/api/`.
+`docs/migrations/`, `docs/archive/` or `docs/api/`. From `docs/reference/`
+it requires only `release.md`.
 
 It also does not emit `.github/README.md`; normal repositories default to the
 root `README.md` for GitHub's surfaced repository landing page.

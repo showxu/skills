@@ -18,6 +18,7 @@ provenance only.
 - `design-system-format.md`: design-system format notes.
 - `skill-authoring.md`: repository-wide trigger contract and manual-entry rules
   for skills.
+- `reference/release.md`: release facts and mechanics, checks and entry points.
 - `repo-architecture/`: repository placement, migration, validation, and
   historical scaffold templates.
 - [Repository maintenance](../MAINTENANCE.md): publication, required checks,

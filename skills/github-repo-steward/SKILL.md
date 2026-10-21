@@ -88,20 +88,25 @@ filed issue. Route filing and working issues to that skill.
 
 ## Version and release hygiene
 
-Use the applicable version policy. The [Version policy default](references/standard.md#settings)
-and [VERSIONING template](templates/VERSIONING.md.tpl) supply the 0.x rules,
-owner-decided 1.0.0 and compatible evolution with planned majors after 1.0
-when no repository or organization policy is declared. Fill the template's tag
-name from the repository's published format; new repositories default to `vX.Y.Z`.
-Under any policy, keep one version source and a CHANGELOG with Unreleased;
-release once per completed change, never per intermediate PR, as the
-template's "When to release" states; new release tags are signed,
-annotated and immutable, and their remote peeled commit is verified after
-publication. Preserve published legacy tags and history. A tagged mistake ships as a new patch, or the larger version
-required by compatibility.
-Retry interrupted publication against the same accepted tag without replacing
-existing assets. Release builds, platform matrices, packages, stores and consumer
-installation procedures belong to the ecosystem's release skill.
+Use the applicable VERSIONING: the repository's, its organization's or, when
+neither is declared, one written from the
+[VERSIONING template](templates/VERSIONING.md.tpl). It owns the version
+source, changelog, release timing, version choice and corrections. Fill the
+template's tag name from the repository's published format; new repositories
+default to `vX.Y.Z`. Verify that new release tags are signed and annotated and
+that each remote tag's peeled commit is the accepted commit after publication.
+Preserve published legacy tags and history. Retry interrupted publication
+against the same accepted tag without replacing existing assets. Release
+builds, platform matrices, packages, stores and consumer installation
+procedures belong to the ecosystem's release skill.
+
+Version rules live only in VERSIONING. A repository's release facts and
+mechanics live in its release reference, which the ecosystem's documentation
+skill creates: `Documentation/Reference/Release.md` for SwiftPM packages, or
+`docs/reference/release.md`. VERSIONING's release owner names that reference,
+and its release details keep only the repository checks. Report any other
+document that restates version rules, such as an architecture versioning page,
+as a duplicate owner and route its facts to the release reference.
 
 ## Boundaries and routing
 

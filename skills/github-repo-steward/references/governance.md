@@ -56,17 +56,14 @@ merged PR or other tree evidence; never discard unproven local work.
 
 ## Release identity
 
-Follow the repository/organization versioning policy, including its rules for
-0.x. Do not impose a new minor/patch interpretation from another project.
-Signed annotated tags bind release identity to one commit under every policy.
-Where neither declares a policy, use the [Version policy default](standard.md#settings)
-and [VERSIONING template](../templates/VERSIONING.md.tpl) for 0.x version
-increments, owner-decided 1.0.0 and compatible evolution with planned majors
-after 1.0. Preserve the repository's published tag-name format; new repositories
-default to `vX.Y.Z`. Protect the declared release-tag pattern against update and deletion.
-An untagged candidate can be
-corrected at its intended version. Existing lightweight or unsigned tags are
-reported, not moved.
+Follow the applicable VERSIONING: the repository's, its organization's or,
+where neither is declared, one written from the
+[VERSIONING template](../templates/VERSIONING.md.tpl). Do not impose another
+project's version interpretation. Signed annotated tags bind release identity
+to one commit under every policy. Preserve the repository's published
+tag-name format; new repositories default to `vX.Y.Z`. Protect the declared
+release-tag pattern against update and deletion. Existing lightweight or
+unsigned tags are reported, not moved.
 
 Release evidence must identify the exact accepted source, configuration and
 checker. Keep private build paths out of attachments. Verify downloaded bytes,
