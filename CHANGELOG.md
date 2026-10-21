@@ -2,64 +2,6 @@
 
 ## Unreleased
 
-## 0.2.0
-
-- Add source-derived Google DESIGN.md front matter to the eight iOS and
-  Liquid Glass templates. Place GitHub presentation design sources under
-  `.github/design/`, record consumed icon copies in per-icon provenance, and
-  regenerate Icon Composer documents in ignored scratch. Standardize `docs/`
-  for repositories without an ecosystem documentation adapter. Defer release
-  timing to the governing delivery workflow and put version changes in the
-  change's final PR.
-- Release once per completed change in the steward's version policy: a change
-  spanning several pull requests or repositories releases when all of it has
-  landed, and its in-progress commits are pinned by full SHA without version
-  comments; release pins carry `# vX.Y.Z`. ExecPlans for work that changes
-  anything released name their release points before execution.
-- Render deterministic social-preview PNGs and public/member organization
-  profiles in the TypeScript presentation toolchain and Action, with shared
-  catalog validation, DESIGN tokens, WebAssembly still-image decoding and byte
-  checks. Require explicit social font variations and reject decoder warnings
-  or recovered raster errors. Replace the Python renderers and recipes; member
-  rendering takes an explicit standard commit.
-- Describe the organization standard's reusable presentation and profile
-  workflows: presentation assets follow each caller's catalog `kind`, the
-  social preview icon resolves from the caller or the pinned standard, and
-  member dashboards call the profile workflow from a job named `check`.
-- Observe member-profile catalog pins from reusable workflow callers in the
-  organization steward through parsed YAML workflows, independently of the
-  renderer implementation, with caller files and SHAs reported for conflicts.
-- Provide the organization family DESIGN template in Google's DESIGN.md format,
-  carrying every terminal, social preview and profile token the toolchain
-  reads.
-
-Upgrading from 0.1.x, following the
-[renderer reference](skills/github-readme-design/references/renderers.md):
-
-- Replace vendored copies of `render_profile.py`, `render_social.py` and
-  `presentation.py` and their recipe files with the Action's `profile` and
-  `social-preview` assets, or the `src/cli.ts` commands, pinned by full commit
-  SHA.
-- Move profile icon sizes and social preview geometry from recipes into DESIGN
-  front matter: the `profile-*` and `social-preview-*` spacing and components,
-  and `fontSize`, `lineHeight` and `fontVariation` on each `social-preview-*`
-  typography token, as in the organization family template. Social previews
-  read the variable font; static instances are no longer needed for them.
-- Add `organization.about` and each repository's `kind`, `title` and `about`
-  to the catalog.
-- Remove `catalog` from member profile input and pass the standard commit as
-  `--catalog-revision`; the reusable profile workflow supplies
-  `job.workflow_sha`.
-- Commit each card as `.github/assets/social-preview/social-preview.png`, and
-  remove card SVGs and layout receipts.
-
-## 0.1.1
-
-- Use MINOR for breaking changes and PATCH otherwise during 0.x; let the owner
-  begin the compatibility promise at 1.0.0, then evolve interfaces compatibly
-  with roughly yearly planned majors, MINOR features and PATCH fixes in the
-  steward's version policy.
-
 ## 0.1.0
 
 - Ship the `showxu-skills` plugin for Claude Code and Codex, with marketplace
@@ -68,10 +10,27 @@ Upgrading from 0.1.x, following the
   experience, Web app implementation and testing, go-to-market and App Store
   work, software engineering and GitHub stewardship, and skill authoring and
   evaluation.
-- Include the [scripted terminal presentation toolchain](skills/github-readme-design/references/renderers.md#terminal)
-  and [GitHub Action](skills/github-readme-design/scripts/action.yml) for
-  recording sessions, rendering light/dark SVGs from DESIGN, and checking
-  recording and image bytes in CI.
+- Include the [TypeScript presentation toolchain](skills/github-readme-design/references/renderers.md)
+  and [GitHub Action](skills/github-readme-design/scripts/action.yml): scripted
+  terminal sessions rendered as light/dark SVGs, social-preview PNGs and
+  public/member organization profiles, all from DESIGN tokens through the
+  official DESIGN.md parser, with byte checks in CI.
+- Describe the organization standard's reusable presentation and profile
+  workflows: presentation assets follow each caller's catalog `kind`, logos
+  match their recorded icon provenance, and member dashboards call the profile
+  workflow from a job named `check`.
 - Include presentation layout references for
   [developer products and organization profiles](skills/github-readme-design/references/design.md)
-  and [apps](skills/github-readme-design/references/design-apps.md).
+  and [apps](skills/github-readme-design/references/design-apps.md): GitHub
+  presentation design sources in `.github/design/`, assets in
+  `.github/assets/`, and consumed icon copies recorded in per-icon provenance.
+- Provide DESIGN.md templates in Google's format, including the organization
+  family template with every terminal, social preview and profile token.
+- Observe member-profile catalog pins from reusable workflow callers in the
+  organization steward.
+- Define the steward's version policy: during 0.x, breaking changes bump MINOR
+  and everything else PATCH; the owner begins the compatibility promise at
+  1.0.0; a change releases once when it is complete, its in-progress commits
+  are pinned by full SHA, and release pins carry `# vX.Y.Z`.
+- Standardize `docs/` for repositories without an ecosystem documentation
+  adapter, and name release points in ExecPlans that change anything released.
