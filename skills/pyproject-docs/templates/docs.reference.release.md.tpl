@@ -6,8 +6,9 @@ Version rules for <repo-name>, covering tags, release timing, choosing the
 next version and the changelog, are in <[VERSIONING](../../VERSIONING.md), or
 the organization VERSIONING the project adopts>. This document records the
 repository's release facts and mechanics and does not restate those rules.
-If an existing document already owns these facts, complete that document and
-route readers to it instead of maintaining two copies.
+
+<If an existing document already owns these facts, complete that document and
+route readers to it instead of maintaining two copies.>
 
 ## Components and Version Sources
 
