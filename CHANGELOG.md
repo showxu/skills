@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 0.1.2
+
+- Keep version rules only in `VERSIONING.md` and a repository's release facts
+  and mechanics in its release reference. `pyproject-docs` writes
+  `docs/reference/release.md`, with a compatibility surface section, in place
+  of `docs/architecture/versioning-and-release.md`; its agent guide routes,
+  review rule, indexes and export checks follow it. To upgrade a project, move
+  the old document's facts into the release reference and update inbound
+  links; its rules are VERSIONING's.
+- `github-repo-steward` reports documents that restate version rules as
+  duplicate owners, `github-org-steward` routes member documentation to the
+  ecosystem documentation skills, and `repository-docs` places release
+  mechanics in `docs/reference/release.md`.
+
 ## 0.1.1
 
 - Document GitHub's social-preview upload eligibility: public repositories,
