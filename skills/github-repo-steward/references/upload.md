@@ -44,7 +44,16 @@ authentication headers, tokens, browser profiles or session databases.
 
 ## Independent receipt
 
-Query the exact repository with GraphQL through the existing GitHub CLI login:
+After each upload, run `scripts/verify_upload.py` against the accepted local
+image and keep its JSON receipt in the task's private evidence. Install the
+steward's pinned `scripts/requirements.txt` in an ignored virtual environment.
+
+```sh
+python3 <skill>/scripts/verify_upload.py social-preview --repository <owner/repository> --image <accepted.png> --source-commit <merged-sha> --json <private-evidence/preview.json>
+```
+
+The script queries the exact repository with GraphQL through the existing
+GitHub CLI login:
 
 ```graphql
 query($owner: String!, $name: String!) {
@@ -54,16 +63,38 @@ query($owner: String!, $name: String!) {
 }
 ```
 
-Check the returned repository and custom-image flag, fetch that served image
-URL, and record time, source revision, local/served SHA-256, byte lengths,
+It checks the returned repository identity case-insensitively and requires the
+custom-image flag, fetches the served image without credentials, and records
+time, source revision, GraphQL ID, local/served SHA-256, byte lengths,
 dimensions and decoded RGBA pixel comparison. Both images must be 1280×640.
-Use Pillow to decode and compare dimensions and pixel bytes. Byte equality and
-pixel equality are separate observations; if GitHub re-encodes an image,
-record it explicitly and inspect the served result instead of claiming a byte
-match. A stale cached image is pending: fetch the current GraphQL URL and retry
-boundedly before asking the owner to inspect the save.
+Byte equality and pixel equality are separate observations: identical pixels
+with different bytes pass with `re-encoded` in the receipt. A pixel mismatch
+triggers up to three retries, five seconds apart, each with a fresh GraphQL
+URL, before failing. Inspect a persistent mismatch with the owner.
+
+The organization avatar check uses the same helper:
+
+```sh
+python3 <skill>/scripts/verify_upload.py avatar --organization <login> --image <accepted-avatar.png> --source-commit <merged-sha> --json <private-evidence/avatar.json>
+```
+
+It queries `organization { login avatarUrl(size: <local width>) }`. Since GitHub
+can resize and re-encode avatars, the helper resizes the local image to the
+served dimensions with bicubic resampling and compares both images composited
+over white and over black. Both PSNR values must be at least 30 dB. The receipt
+records both image sizes and digests and the two PSNR values; an exact match is
+represented as `"infinity"` to keep the receipt valid JSON. `graphql_id` is null
+for this query, which returns the organization login instead of an ID.
+
+Both modes print a one-line summary: exit 0 is pass, 1 is mismatch, and 2 is
+unknown evidence, including unavailable CLI login, API/network failure or an
+undecodable image. `--source-commit` and `--json` are optional; supply both for
+publication evidence. A receipt records the supplied source commit; the caller
+is responsible for obtaining the image from that accepted revision.
 
 HTTP 200, a settings screenshot or an uploaded filename alone does not prove
-correct bytes. Private repository visibility can limit a public check; report
-that scope and use the authorized view without exposing private image URLs.
+correct bytes. Served image URLs are omitted from all helper output. Private
+repository visibility can limit unauthenticated image access; an unreadable
+served image remains unknown with that scope stated. Use the authorized view
+for follow-up without exposing private image URLs.
 Keep receipts in the task's private evidence, out of public READMEs.
