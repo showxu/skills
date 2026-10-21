@@ -99,5 +99,5 @@ python3 -B scripts/check_repository.py
 claude plugin validate .
 ```
 
-Ecosystem builds, packages, stores and consumer installation checks belong to
-the [plugin distribution workflow](docs/skill-authoring.md#plugin-distribution).
+Ecosystem builds, packages, stores and consumer installation checks belong to the
+[release reference](docs/reference/release.md).

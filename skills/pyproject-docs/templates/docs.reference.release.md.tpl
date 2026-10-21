@@ -12,11 +12,11 @@ route readers to it instead of maintaining two copies.>
 
 ## Components and Version Sources
 
-Inspect `pyproject.toml` and the configured build backend. For a static version,
+<Inspect `pyproject.toml` and the configured build backend. For a static version,
 identify `[project].version` or its existing owner. For a dynamic version,
 identify `project.dynamic`, the backend and its source (for example VCS tags),
 and how wheel/sdist metadata and runtime versions are derived. Do not add a
-second version declaration for a dynamic build.
+second version declaration for a dynamic build.>
 
 | Shipped component | Version meaning | Version source | Mirrors and derived fields | Update and read-only check |
 | --- | --- | --- | --- | --- |

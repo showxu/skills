@@ -35,11 +35,9 @@ skill. Shared workflow changes advance through a representative consumer first,
 then reviewed pin updates in the template and other members. Neither a template
 change nor a new shared revision proves adoption by existing repositories.
 
-A change coordinated across members releases once, when all of it is merged
-and verified, or at milestones named in its plan before the work starts; its
-member steps never release individually. While it is in progress, members pin
-the in-progress shared commits by full SHA without version comments. At the
-release, run representative consumers at the exact candidates, tag in
+A change coordinated across members follows the shared VERSIONING's release
+timing and in-progress pin rules. At the release, run representative consumers
+at the exact candidates, tag in
 dependency order with the owner's confirmation, then move every caller to the
 released pins with their `# vX.Y.Z` comments in one pass.
 
