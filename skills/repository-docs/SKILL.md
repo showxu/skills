@@ -20,7 +20,9 @@ existing-document audits, and templates that produce repository documents.
   task. Read [README Layering](rules/readme-layering.md) when a README or a
   document index is involved. Read [Code Review Rules](rules/code-review-rules.md)
   when review rules, a reviewer's setup, or a tool entry file such as
-  CLAUDE.md or REVIEW.md is involved.
+  CLAUDE.md or REVIEW.md is involved. For repositories without an ecosystem
+  documentation adapter, read [Documentation Layout](rules/documentation-layout.md)
+  for the `docs/` tree and file naming.
 - For changes to this skill, read
   [Maintenance Architecture](references/architecture.md) and the affected
   cases in [Eval Fixtures](references/eval-fixtures.md).

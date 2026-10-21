@@ -64,10 +64,16 @@ before matching an existing icon's look. For a new entry, start from
    `scripts/app_icons.py DESIGN.md --name NAME --style STYLE --out OUTPUT`.
    Inspect the contact sheet on light and dark backgrounds at 160 px and
    32 px, every native appearance, and the circular maskable crop.
-7. For Liquid Glass, open the `.icon` in Icon Composer to verify editability
-   and materials. Adopt adjustments into the entry, then regenerate.
-8. After acceptance, copy each output directory to its owning asset location
-   and run `--check` against it. Report differences instead of overwriting.
+7. For Liquid Glass, regenerate the `.icon` into ignored scratch and open it
+   in Icon Composer to verify editability and materials. Adopt adjustments
+   into the entry, then regenerate. The document is a review intermediate,
+   not a committed asset.
+8. After acceptance, copy only consumed files to their owning locations and
+   record each in the icon owner's `provenance.json` as described below. For
+   GitHub presentation, avatar and marks belong in `profile/assets/` and
+   repository logos in `.github/assets/logo/`. Check by regenerating into
+   ignored scratch and comparing SHA-256 digests for each recorded output and
+   consumed copy. Report differences instead of overwriting.
 
 Concept choice, style choice, and visual acceptance require the owner's
 judgment; lint, rendering, exports, and drift checks are deterministic
@@ -106,8 +112,11 @@ releases.
   full-bleed 512 px maskable image whose essential content stays inside the
   central safe circle. With `web_dark`, Liquid Glass also includes five
   masked PNGs under `web/dark/`; verify them against native iOS Dark.
-- `--check` reports `same` for every file of every delivered style and
-  detects missing and extra files.
+- Regeneration into ignored scratch reproduces the SHA-256 digest of every
+  consumed file recorded in `provenance.json`; missing files and digest
+  differences are reported. `--check` compares complete scratch output sets,
+  including missing and extra files, rather than a directory of selected
+  consumed copies.
 - The manifest labels each output `native` or `style-rendering`.
 - A fit to a reference icon agrees in the overlay, junction crops, and
   luminance cross-sections of [reference matching](references/reference-matching.md#5-verify).
@@ -115,6 +124,32 @@ releases.
   [rendering](references/rendering.md), and run the
   [behavior fixtures](references/eval-fixtures.md) and package checks before
   presenting the skill as ready.
+
+## Consumed icon provenance
+
+Keep one `provenance.json` per icon with its source layers. GitHub-only sources
+live in `.github/design/icons/<name>/`; product design, including an icon the
+product ships, stays with the product. Record the product's README logo as a
+consumed export too. Commit only the consumed copies; regenerate the `.icon`
+document into ignored scratch when it is needed for review.
+
+```json
+{
+  "icon": "<name>",
+  "skill": "apple-app-icon-design",
+  "skill_commit": "<full showxu/skills SHA used for verification>",
+  "command": "<exact command>",
+  "renderer": "<ictool bundle and short version>",
+  "verified_at": "YYYY-MM-DD",
+  "copies": [
+    {"repository": "<owner/name>", "path": "<repo-relative path>", "output": "<skill output path>", "sha256": "<hex>"}
+  ]
+}
+```
+
+`output` is relative to the generated output directory. Verify both that
+output and the consumed copy against `sha256`. Native regeneration runs with
+Icon Composer on macOS; CI can compare consumed copies to recorded digests.
 
 ## Output
 

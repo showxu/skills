@@ -8,6 +8,9 @@ moved, reused or decreased.
 
 ## When to release
 
+Where a delivery workflow governs the project, it decides when to release;
+otherwise:
+
 Release once a change is complete: everything it needs, including
 documentation, is merged and verified. A change that spans several pull
 requests or repositories releases once, when all of it has landed, or at
@@ -74,10 +77,9 @@ major's removals beforehand.
 ## Release procedure
 
 1. Choose the next version using the rules above.
-2. In the change's final PR, or in a release PR when the change has already
-   merged, set the version source and its mirrors, move the Unreleased entries
-   into the new `## X.Y.Z` section, and leave an empty `## Unreleased` section
-   at the top.
+2. In the change's final PR, set the version source and its mirrors, move the
+   Unreleased entries into the new `## X.Y.Z` section, and leave an empty
+   `## Unreleased` section at the top.
 3. Run the repository checks and complete the ecosystem release preparation
    below. Resolve review findings before accepting the PR.
 4. Squash merge the accepted PR.

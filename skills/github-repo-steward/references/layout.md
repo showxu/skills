@@ -42,7 +42,27 @@ GitHub prescribes no README image directory; its formatting guide uses
 because GitHub already gives `.github/` precedence for GitHub-facing files,
 and it is independent of language-specific documentation conventions.
 
-A standalone repository also keeps `DESIGN.md` and `design/` at its root,
-with selections in its own metadata. Organization members consume their
-organization's DESIGN and catalog selections; the organization owns variants,
-and members supply content.
+A standalone repository keeps `DESIGN.md` at its root, presentation design
+sources in `.github/design/`, assets in `.github/assets/`, and selections in
+its own metadata. Organization members consume their organization's DESIGN
+and catalog selections; the organization owns variants, and members supply
+content.
+
+Presentation source and asset directories stay inside `.github/`, so roots
+keep their ecosystem's directories: Swift `Sources/`, `Tests/`,
+`Documentation/` and `Scripts/`; Homebrew `Formula/`; Python `scripts/`,
+`tests/` and `docs/`. `.github/design/` holds only sources that exist for
+GitHub presentation, with fonts in `fonts/` and icon `layers/` and
+`provenance.json` in `icons/<name>/`. A product's own design, including its
+UI, design system and shipped icon, stays with the product. One root
+`DESIGN.md` covers the repository's identity, including presentation
+components; its README logo is an export recorded in the icon owner's
+`provenance.json`.
+
+Each receipt lists consumed copies by repository and path, skill output path
+and SHA-256, with the skill commit, renderer version, command and verification
+date. Copies live where they are used: organization avatar and marks in
+`profile/assets/`, member logos in `.github/assets/logo/`. The Icon Composer
+`.icon` document is regenerated from DESIGN and layers into ignored scratch
+when needed for review. CI compares consumed copies with the recorded
+digests; native regeneration runs locally with Icon Composer on macOS.

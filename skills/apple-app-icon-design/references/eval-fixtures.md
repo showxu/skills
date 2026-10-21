@@ -485,3 +485,21 @@ Owner notes:
 
 - The recipe is owned by [design](design.md#grid-backdrop); its geometry by
   [rendering](rendering.md#continuous-rectangles).
+
+## AI-16 — Consumed copies and native review
+
+- Prompt: Deliver the accepted icon as an organization avatar and a CLI logo,
+  then check that both still match the design source.
+- Input: Accepted DESIGN and layers, a native output set, and two selected
+  consumed files in different repositories; one copy is subsequently edited.
+- Expected: Only the avatar and logo are copied to `profile/assets/` and
+  `.github/assets/logo/`. One source-owned `provenance.json` records both
+  repositories, paths, output paths, SHA-256 digests, skill commit, renderer
+  version, command and verification date. Regeneration in ignored scratch
+  supplies the `.icon` for review and detects the changed copy by digest.
+- Preserve: Product-owned design and every consumed copy until drift is
+  resolved by its owner.
+- Failure: Commit the `.icon`, copy the complete output directory, create a
+  duplicate `exports/`, or run whole-set `--check` against selected copies.
+- Acceptance: The receipt accounts for every consumed file; the changed copy
+  is named, unchanged copies match, and generated intermediates stay ignored.

@@ -1,3 +1,274 @@
+---
+version: "alpha"
+name: "Apple Maps (iOS)"
+description: "Apple Maps is the canonical reference for what a system-native iOS map should feel like — a soft cream-paper canvas, generous translucent search card, and the precise dance of SF Symbols, native blurs, and just-right typography that defines every first-party Apple app."
+colors:
+  primary: "#0A84FF"
+  maps-blue-pressed: "#0967D2"
+  maps-red: "#FF3B30"
+  map-land: "#F6F1E6"
+  map-water: "#B9D9EB"
+  map-park: "#D6E5C9"
+  map-road: "#FFFFFF"
+  map-road-outline: "#D5CFC0"
+  map-highway: "#FFD966"
+  map-building-2d: "#EFE9DD"
+  map-building-3d: "#E6DFD0"
+  map-label: "#594F3F"
+  food: "#FF9500"
+  coffee: "#A5694C"
+  drinks: "#5AC8FA"
+  shopping: "#FFCC00"
+  parking: "#AF52DE"
+  hotel: "#5856D6"
+  health: "#FF2D55"
+  ev-charge: "#34C759"
+  canvas: "#FFFFFF"
+  surface: "#F2F2F7"
+  surface-pressed: "#E5E5EA"
+  divider: "#C7C7CC"
+  text: "#000000"
+  text-secondary: "rgba(60,60,67,0.6)"
+  text-tertiary: "rgba(60,60,67,0.3)"
+  text-quaternary: "rgba(60,60,67,0.18)"
+  canvas-dark: "#000000"
+  map-land-dark: "#2A2826"
+  map-water-dark: "#1C2638"
+  map-park-dark: "#2C3A2A"
+  surface-dark: "#1C1C1E"
+  surface-raised-dark: "#2C2C2E"
+  divider-dark: "#38383A"
+  text-dark: "#FFFFFF"
+  text-secondary-dark: "rgba(235,235,245,0.6)"
+  maps-blue-dark: "#409CFF"
+typography:
+  place-card-title:
+    fontFamily: "SF Pro Display"
+    fontSize: "28px"
+    fontWeight: 700
+    lineHeight: "1.15em"
+    letterSpacing: "-0.4px"
+  place-card-subtitle:
+    fontFamily: "SF Pro Text"
+    fontSize: "15px"
+    fontWeight: 400
+    lineHeight: "1.3em"
+    letterSpacing: "0px"
+  hero-search-placeholder:
+    fontFamily: "SF Pro Display"
+    fontSize: "17px"
+    fontWeight: 400
+    lineHeight: "1.3em"
+    letterSpacing: "0px"
+  nav-title-inline:
+    fontFamily: "SF Pro Display"
+    fontSize: "17px"
+    fontWeight: 600
+    lineHeight: "1.2em"
+    letterSpacing: "-0.2px"
+  section-header-card:
+    fontFamily: "SF Pro Text"
+    fontSize: "13px"
+    fontWeight: 600
+    lineHeight: "1.2em"
+    letterSpacing: "0.4px"
+  list-row-title:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 400
+    lineHeight: "1.3em"
+    letterSpacing: "0px"
+  list-row-subtitle:
+    fontFamily: "SF Pro Text"
+    fontSize: "13px"
+    fontWeight: 400
+    lineHeight: "1.2em"
+    letterSpacing: "0px"
+  eta-time:
+    fontFamily: "SF Pro Display"
+    fontSize: "22px"
+    fontWeight: 600
+    lineHeight: "1.1em"
+    letterSpacing: "-0.2px"
+  eta-duration:
+    fontFamily: "SF Pro Display"
+    fontSize: "17px"
+    fontWeight: 500
+    lineHeight: "1.2em"
+    letterSpacing: "0px"
+  direction-step-title:
+    fontFamily: "SF Pro Display"
+    fontSize: "22px"
+    fontWeight: 600
+    lineHeight: "1.2em"
+    letterSpacing: "-0.2px"
+  direction-step-distance:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 500
+    lineHeight: "1.3em"
+    letterSpacing: "0px"
+  category-pill-label:
+    fontFamily: "SF Pro Text"
+    fontSize: "14px"
+    fontWeight: 500
+    lineHeight: "1.0em"
+    letterSpacing: "0px"
+  map-label-major-city:
+    fontFamily: "SF Pro Display"
+    fontSize: "14px"
+    fontWeight: 600
+    lineHeight: "1.0em"
+    letterSpacing: "0px"
+  map-label-neighborhood:
+    fontFamily: "SF Pro Text"
+    fontSize: "12px"
+    fontWeight: 500
+    lineHeight: "1.0em"
+    letterSpacing: "0px"
+  map-label-street:
+    fontFamily: "SF Pro Text"
+    fontSize: "10px"
+    fontWeight: 400
+    lineHeight: "1.0em"
+    letterSpacing: "0px"
+  button-label:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 600
+    lineHeight: "1.0em"
+    letterSpacing: "0px"
+  tab-label:
+    fontFamily: "SF Pro Text"
+    fontSize: "10px"
+    fontWeight: 500
+    lineHeight: "1.0em"
+    letterSpacing: "0.1px"
+  caption:
+    fontFamily: "SF Pro Text"
+    fontSize: "12px"
+    fontWeight: 400
+    lineHeight: "1.3em"
+    letterSpacing: "0px"
+  transit-line-label:
+    fontFamily: "SF Pro Text"
+    fontSize: "12px"
+    fontWeight: 700
+    lineHeight: "1.0em"
+    letterSpacing: "0px"
+rounded:
+  radius-0: "0px"
+  radius-8: "8px"
+  radius-10: "10px"
+  radius-12: "12px"
+  radius-14: "14px"
+  radius-22: "22px"
+spacing:
+  base: "4px"
+  space-4: "4px"
+  space-8: "8px"
+  space-12: "12px"
+  space-16: "16px"
+  space-20: "20px"
+  space-24: "24px"
+  space-32: "32px"
+  space-44: "44px"
+  space-56: "56px"
+  space-64: "64px"
+components:
+  search-field:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    typography: "{typography.hero-search-placeholder}"
+    rounded: "{rounded.radius-10}"
+    height: "44px"
+  search-placeholder:
+    textColor: "{colors.text-tertiary}"
+    typography: "{typography.hero-search-placeholder}"
+  search-grabber:
+    backgroundColor: "{colors.text-tertiary}"
+    width: "36px"
+    height: "5px"
+  category-pill:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.text}"
+    typography: "{typography.category-pill-label}"
+    rounded: "{rounded.radius-14}"
+    width: "64px"
+    height: "88px"
+    padding: "16px 8px"
+  category-food-icon:
+    textColor: "{colors.food}"
+    size: "28px"
+  dropped-pin:
+    textColor: "{colors.maps-red}"
+    size: "32px"
+  location-puck:
+    backgroundColor: "{colors.primary}"
+    size: "22px"
+  place-card:
+    backgroundColor: "{colors.canvas}"
+  place-card-dark:
+    backgroundColor: "{colors.surface-dark}"
+  place-title:
+    textColor: "{colors.text}"
+    typography: "{typography.place-card-title}"
+  place-subtitle:
+    textColor: "{colors.text-secondary}"
+    typography: "{typography.place-card-subtitle}"
+  directions-button:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.canvas}"
+    typography: "{typography.button-label}"
+    rounded: "{rounded.radius-22}"
+    height: "44px"
+    padding: "12px 24px"
+  call-button:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.primary}"
+    rounded: "{rounded.radius-22}"
+    padding: "12px 24px"
+    height: "44px"
+    typography: "{typography.button-label}"
+  directions-sticky:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.canvas}"
+    rounded: "{rounded.radius-8}"
+    height: "48px"
+  photo-card:
+    rounded: "{rounded.radius-12}"
+    height: "80px"
+  map:
+    backgroundColor: "{colors.map-land}"
+    textColor: "{colors.map-label}"
+  map-dark:
+    backgroundColor: "{colors.map-land-dark}"
+  directions-button-pressed:
+    backgroundColor: "{colors.maps-blue-pressed}"
+  place-title-dark:
+    textColor: "{colors.text-dark}"
+  place-subtitle-dark:
+    textColor: "{colors.text-secondary-dark}"
+  place-link-dark:
+    textColor: "{colors.maps-blue-dark}"
+  category-coffee-icon:
+    textColor: "{colors.coffee}"
+  category-drinks-icon:
+    textColor: "{colors.drinks}"
+  category-shopping-icon:
+    textColor: "{colors.shopping}"
+  category-parking-icon:
+    textColor: "{colors.parking}"
+  category-hotel-icon:
+    textColor: "{colors.hotel}"
+  category-health-icon:
+    textColor: "{colors.health}"
+  category-ev-charge-icon:
+    textColor: "{colors.ev-charge}"
+  list-row-pressed:
+    backgroundColor: "{colors.surface-pressed}"
+---
+
 # Design System Inspiration of Apple Maps (iOS)
 
 ## 1. Visual Theme & Atmosphere

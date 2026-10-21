@@ -1874,7 +1874,7 @@ sources:
           reviewed_commit: 7f60ee56b9340f8c2671a08c2d8aab4037546a64
           reviewed_at: 2026-05-25
           granularity: path
-          outcome: included_exact_in_design_md_template_skill_for_apple_platform_liquid_glass_reference
+          outcome: included_in_design_md_template_skill_with_source_derived_google_design_md_front_matter_for_apple_platform_liquid_glass_reference
           open_items: 0
       - id: catalog-provenance-context
         label: Catalog provenance context
@@ -1972,7 +1972,7 @@ sources:
           reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
           reviewed_at: 2026-05-25
           granularity: path
-          outcome: included_exact_in_design_md_template_skill_for_apple_platform_reference
+          outcome: included_in_design_md_template_skill_with_source_derived_google_design_md_front_matter_for_apple_platform_reference
           open_items: 0
       - id: apple-ios-maps-design-md-template
         label: Apple Maps iOS DESIGN.md template
@@ -1989,7 +1989,7 @@ sources:
           reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
           reviewed_at: 2026-05-25
           granularity: path
-          outcome: included_exact_in_design_md_template_skill_for_apple_platform_reference
+          outcome: included_in_design_md_template_skill_with_source_derived_google_design_md_front_matter_for_apple_platform_reference
           open_items: 0
       - id: apple-ios-music-design-md-template
         label: Apple Music iOS DESIGN.md template
@@ -2006,7 +2006,7 @@ sources:
           reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
           reviewed_at: 2026-05-25
           granularity: path
-          outcome: included_exact_in_design_md_template_skill_for_apple_platform_reference
+          outcome: included_in_design_md_template_skill_with_source_derived_google_design_md_front_matter_for_apple_platform_reference
           open_items: 0
       - id: apple-ios-wallet-design-md-template
         label: Apple Wallet iOS DESIGN.md template
@@ -2023,7 +2023,7 @@ sources:
           reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
           reviewed_at: 2026-05-25
           granularity: path
-          outcome: included_exact_in_design_md_template_skill_for_apple_platform_reference
+          outcome: included_in_design_md_template_skill_with_source_derived_google_design_md_front_matter_for_apple_platform_reference
           open_items: 0
       - id: apple-ios-fitness-design-md-template
         label: Apple Fitness iOS DESIGN.md template
@@ -2040,7 +2040,7 @@ sources:
           reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
           reviewed_at: 2026-05-25
           granularity: path
-          outcome: included_exact_in_design_md_template_skill_for_apple_platform_reference
+          outcome: included_in_design_md_template_skill_with_source_derived_google_design_md_front_matter_for_apple_platform_reference
           open_items: 0
       - id: apple-ios-notes-design-md-template
         label: Apple Notes iOS DESIGN.md template
@@ -2057,7 +2057,7 @@ sources:
           reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
           reviewed_at: 2026-05-25
           granularity: path
-          outcome: included_exact_in_design_md_template_skill_for_apple_platform_reference
+          outcome: included_in_design_md_template_skill_with_source_derived_google_design_md_front_matter_for_apple_platform_reference
           open_items: 0
       - id: apple-ios-tv-design-md-template
         label: Apple TV iOS DESIGN.md template
@@ -2074,7 +2074,7 @@ sources:
           reviewed_commit: 5d3aeca239caef3ea4080034eb22ab87cc77fa24
           reviewed_at: 2026-05-25
           granularity: path
-          outcome: included_exact_in_design_md_template_skill_for_apple_platform_reference
+          outcome: included_in_design_md_template_skill_with_source_derived_google_design_md_front_matter_for_apple_platform_reference
           open_items: 0
       - id: catalog-provenance-context
         label: Catalog provenance context

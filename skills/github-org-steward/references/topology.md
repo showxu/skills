@@ -39,14 +39,21 @@ organization layout keeps design inputs, catalog selections and generated
 profile outputs with their shared owner:
 
 ```text
-DESIGN.md                      tokens and rationale (Google format)
-design/fonts/                  font files, upstream names, OFL.txt
-design/icons/<name>/           layers/*.svg, <name>.icon/, exports/, provenance.json
-profile/catalog.json           repositories, icon selections, outcome text
-profile/README.md              generated public profile
-profile/assets/                generated avatar and marks
-.github/assets/social-preview/ the organization repository's own preview
+DESIGN.md                              tokens and rationale (Google format)
+profile/catalog.json                   repositories, product kind, icon, outcome text
+profile/README.md                      generated public profile
+profile/assets/                        avatar and marks (consumed icon exports)
+.github/design/fonts/                  font files, upstream names, OFL.txt
+.github/design/icons/<name>/           layers/*.svg, provenance.json
+.github/assets/social-preview/         the organization repository's own preview
 ```
+
+Keep only GitHub presentation sources under `.github/design/`. Each icon's
+`provenance.json` records its consumed copies, output paths, SHA-256 digests,
+skill commit, renderer version and regeneration command. Consumed files live
+with their owners. Icon Composer `.icon` documents are regenerated from DESIGN
+and layers into ignored scratch for review. Product design, including shipped
+product icons, stays with the product; README logos are recorded exports.
 
 Each organization owns one DESIGN with its variants. The catalog owns
 per-repository selections, including icon and outcome text; members consume

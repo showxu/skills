@@ -1,3 +1,195 @@
+---
+version: "alpha"
+name: "Apple TV (iOS)"
+description: "The Apple TV app is the most *restrained* streaming surface Apple ships."
+colors:
+  primary: "#FFFFFF"
+  cta-pressed: "#E5E5EA"
+  cta-label: "#000000"
+  system-blue: "#0A84FF"
+  blue-pressed: "#0060DF"
+  glass: "rgba(120,120,128,0.36)"
+  canvas: "#000000"
+  surface: "#1C1C1E"
+  surface-raised: "#2C2C2E"
+  divider: "#38383A"
+  canvas-light: "#FFFFFF"
+  surface-light: "#F2F2F7"
+  divider-light: "#C6C6C8"
+  text: "#FFFFFF"
+  text-secondary: "#98989F"
+  text-tertiary: "#636366"
+  mls-pink: "#ED1A6F"
+  live-red: "#FF453A"
+  success: "#30D158"
+  rating-gold: "#FFD60A"
+  progress-track: "rgba(255,255,255,0.28)"
+  channel-fill: "rgba(0,0,0,0.4)"
+  nav-fill: "rgba(0,0,0,0.92)"
+typography:
+  large-title:
+    fontFamily: "SF Pro Display"
+    fontSize: "34px"
+    fontWeight: 800
+    lineHeight: "1.05em"
+    letterSpacing: "-0.8px"
+  hero-title:
+    fontFamily: "SF Pro Display"
+    fontSize: "28px"
+    fontWeight: 800
+    lineHeight: "1.05em"
+    letterSpacing: "-0.6px"
+  row-header:
+    fontFamily: "SF Pro Display"
+    fontSize: "22px"
+    fontWeight: 700
+    lineHeight: "1.15em"
+    letterSpacing: "-0.3px"
+  title-3:
+    fontFamily: "SF Pro Display"
+    fontSize: "20px"
+    fontWeight: 600
+    lineHeight: "1.2em"
+    letterSpacing: "-0.2px"
+  body:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 400
+    lineHeight: "1.45em"
+    letterSpacing: "0px"
+  headline:
+    fontFamily: "SF Pro Text"
+    fontSize: "15px"
+    fontWeight: 600
+    lineHeight: "1.3em"
+    letterSpacing: "0px"
+  subhead:
+    fontFamily: "SF Pro Text"
+    fontSize: "13px"
+    fontWeight: 400
+    lineHeight: "1.35em"
+    letterSpacing: "0px"
+  caption:
+    fontFamily: "SF Pro Text"
+    fontSize: "12px"
+    fontWeight: 500
+    lineHeight: "1.2em"
+    letterSpacing: "0px"
+  eyebrow:
+    fontFamily: "SF Pro Text"
+    fontSize: "11px"
+    fontWeight: 700
+    lineHeight: "1.0em"
+    letterSpacing: "1.2px"
+  button:
+    fontFamily: "SF Pro Text"
+    fontSize: "15px"
+    fontWeight: 600
+    lineHeight: "1.0em"
+    letterSpacing: "0px"
+  footnote:
+    fontFamily: "SF Pro Text"
+    fontSize: "13px"
+    fontWeight: 400
+    lineHeight: "1.3em"
+    letterSpacing: "0px"
+  channel-tag:
+    fontFamily: "SF Pro Text"
+    fontSize: "9px"
+    fontWeight: 700
+    lineHeight: "1.0em"
+    letterSpacing: "0.4px"
+rounded:
+  radius-0: "0px"
+  radius-6: "6px"
+  radius-10: "10px"
+  radius-12: "12px"
+  radius-16: "16px"
+  radius-22: "22px"
+  radius-500: "500px"
+spacing:
+  base: "4px"
+  space-4: "4px"
+  space-8: "8px"
+  space-12: "12px"
+  space-16: "16px"
+  space-20: "20px"
+  space-24: "24px"
+  space-32: "32px"
+  space-40: "40px"
+  space-48: "48px"
+  space-64: "64px"
+components:
+  button-primary:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.cta-label}"
+    typography: "{typography.button}"
+    rounded: "{rounded.radius-12}"
+    padding: "13px 30px"
+  button-primary-pressed:
+    backgroundColor: "{colors.cta-pressed}"
+    textColor: "{colors.cta-label}"
+  button-tinted:
+    backgroundColor: "{colors.system-blue}"
+    textColor: "{colors.text}"
+    typography: "{typography.button}"
+    rounded: "{rounded.radius-12}"
+    padding: "13px 26px"
+  button-tinted-pressed:
+    backgroundColor: "{colors.blue-pressed}"
+    textColor: "{colors.text}"
+  button-glass:
+    backgroundColor: "{colors.glass}"
+    textColor: "{colors.text}"
+    typography: "{typography.button}"
+    rounded: "{rounded.radius-12}"
+    padding: "13px 24px"
+  up-next-thumbnail:
+    rounded: "{rounded.radius-10}"
+  up-next-title:
+    textColor: "{colors.text}"
+    typography: "{typography.headline}"
+  up-next-subhead:
+    textColor: "{colors.text-secondary}"
+    typography: "{typography.subhead}"
+  hero-card:
+    rounded: "{rounded.radius-16}"
+  live-badge:
+    backgroundColor: "{colors.live-red}"
+    rounded: "{rounded.radius-6}"
+    padding: "5px 10px"
+  mls-chip:
+    backgroundColor: "{colors.mls-pink}"
+    rounded: "{rounded.radius-10}"
+  progress-track:
+    backgroundColor: "{colors.progress-track}"
+    height: "4px"
+  progress-fill:
+    backgroundColor: "{colors.text}"
+    height: "4px"
+  channel-tag:
+    backgroundColor: "{colors.channel-fill}"
+    typography: "{typography.channel-tag}"
+    rounded: "5px"
+  tab-bar:
+    backgroundColor: "{colors.nav-fill}"
+    height: "64px"
+  tab-active:
+    textColor: "{colors.system-blue}"
+    typography: "{typography.caption}"
+  tab-inactive:
+    textColor: "{colors.text-tertiary}"
+    typography: "{typography.caption}"
+  browse-screen:
+    backgroundColor: "{colors.canvas}"
+  row-pressed:
+    backgroundColor: "{colors.surface-raised}"
+  account-sheet-light:
+    backgroundColor: "{colors.canvas-light}"
+  grouped-row-light:
+    backgroundColor: "{colors.surface-light}"
+---
+
 # Design System Inspiration of Apple TV (iOS)
 
 ## 1. Visual Theme & Atmosphere

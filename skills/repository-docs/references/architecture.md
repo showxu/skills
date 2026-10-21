@@ -19,6 +19,7 @@ without becoming their authority.
 | rules/route-vs-index.md | Shared role and authority classification |
 | rules/readme-layering.md | Shared reader/manual/index layering |
 | rules/code-review-rules.md | Review-rule shape and tool entry files |
+| rules/documentation-layout.md | `docs/` paths for repositories without an ecosystem documentation adapter |
 | scripts/derive_rules.py | Writes and checks the rule copies bundled into adapters |
 | references/eval-fixtures.md | Durable behavioral inputs and acceptance checks |
 | agents/openai.yaml | Manual entry metadata for the same skill contract |

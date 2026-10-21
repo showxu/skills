@@ -1,3 +1,227 @@
+---
+version: "alpha"
+name: "Apple Fitness (iOS)"
+description: "Apple Fitness is the purest expression of \"the data *is* the brand\" in Apple's app catalog."
+colors:
+  move: "#FA114F"
+  exercise: "#92E82A"
+  stand: "#1EE4E1"
+  primary: "#FF375F"
+  accent-pressed: "#D80E45"
+  fitness-plus: "#C969E0"
+  canvas: "#000000"
+  surface: "#1C1C1E"
+  surface-nested: "#2C2C2E"
+  surface-pressed: "#3A3A3C"
+  divider: "#38383A"
+  fill: "rgba(118,118,128,0.24)"
+  canvas-light: "#F2F2F7"
+  surface-light: "#FFFFFF"
+  divider-light: "#C6C6C8"
+  text: "#FFFFFF"
+  text-secondary: "#EBEBF599"
+  text-tertiary: "#EBEBF54D"
+  success: "#30D158"
+  error: "#FF453A"
+  warning: "#FF9F0A"
+  award-gold: "#FFD60A"
+  move-track: "rgba(250,17,79,0.22)"
+  exercise-track: "rgba(146,232,42,0.22)"
+  stand-track: "rgba(30,228,225,0.22)"
+  tinted-fill: "rgba(250,17,79,0.18)"
+  play-fill: "rgba(255,255,255,0.22)"
+typography:
+  large-title:
+    fontFamily: "SF Pro Display"
+    fontSize: "40px"
+    fontWeight: 800
+    lineHeight: "1.1em"
+    letterSpacing: "-1.0px"
+  date:
+    fontFamily: "SF Pro Display"
+    fontSize: "32px"
+    fontWeight: 800
+    lineHeight: "1.1em"
+    letterSpacing: "-0.6px"
+  header:
+    fontFamily: "SF Pro Display"
+    fontSize: "26px"
+    fontWeight: 800
+    lineHeight: "1.15em"
+    letterSpacing: "-0.5px"
+  section:
+    fontFamily: "SF Pro Display"
+    fontSize: "22px"
+    fontWeight: 800
+    lineHeight: "1.2em"
+    letterSpacing: "-0.4px"
+  title-3:
+    fontFamily: "SF Pro Display"
+    fontSize: "20px"
+    fontWeight: 700
+    lineHeight: "1.25em"
+    letterSpacing: "-0.3px"
+  body:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 600
+    lineHeight: "1.4em"
+    letterSpacing: "-0.2px"
+  body-regular:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 400
+    lineHeight: "1.5em"
+    letterSpacing: "-0.2px"
+  ring-value:
+    fontFamily: "SF Pro Display"
+    fontSize: "19px"
+    fontWeight: 800
+    lineHeight: "1.1em"
+    letterSpacing: "0px"
+  tile-value:
+    fontFamily: "SF Pro Display"
+    fontSize: "22px"
+    fontWeight: 800
+    lineHeight: "1.1em"
+    letterSpacing: "0px"
+  callout-card-title:
+    fontFamily: "SF Pro Text"
+    fontSize: "15px"
+    fontWeight: 600
+    lineHeight: "1.3em"
+    letterSpacing: "-0.2px"
+  footnote:
+    fontFamily: "SF Pro Text"
+    fontSize: "13px"
+    fontWeight: 400
+    lineHeight: "1.35em"
+    letterSpacing: "0px"
+  ring-label-eyebrow:
+    fontFamily: "SF Pro Text"
+    fontSize: "12px"
+    fontWeight: 700
+    lineHeight: "1.2em"
+    letterSpacing: "0.4px"
+  button:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 600
+    lineHeight: "1.0em"
+    letterSpacing: "-0.2px"
+  tab-label:
+    fontFamily: "SF Pro Text"
+    fontSize: "10px"
+    fontWeight: 500
+    lineHeight: "1.0em"
+    letterSpacing: "0px"
+  badge:
+    fontFamily: "SF Pro Text"
+    fontSize: "10px"
+    fontWeight: 700
+    lineHeight: "1.0em"
+    letterSpacing: "0.5px"
+rounded:
+  radius-0: "0px"
+  radius-8: "8px"
+  radius-12: "12px"
+  radius-14: "14px"
+  radius-18: "18px"
+  radius-22: "22px"
+  radius-500: "500px"
+spacing:
+  base: "4px"
+  space-4: "4px"
+  space-8: "8px"
+  space-10: "10px"
+  space-12: "12px"
+  space-16: "16px"
+  space-20: "20px"
+  space-22: "22px"
+  space-28: "28px"
+  space-32: "32px"
+  space-44: "44px"
+components:
+  button-primary:
+    backgroundColor: "{colors.move}"
+    textColor: "{colors.text}"
+    typography: "{typography.button}"
+    rounded: "{rounded.radius-14}"
+    padding: "15px 30px"
+  button-primary-pressed:
+    backgroundColor: "{colors.accent-pressed}"
+    textColor: "{colors.text}"
+  button-primary-disabled:
+    backgroundColor: "{colors.fill}"
+    textColor: "{colors.text-tertiary}"
+  button-tinted:
+    backgroundColor: "{colors.tinted-fill}"
+    textColor: "{colors.primary}"
+    rounded: "{rounded.radius-12}"
+  button-filled:
+    backgroundColor: "{colors.fill}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.radius-12}"
+  button-plain:
+    textColor: "{colors.primary}"
+    typography: "{typography.button}"
+  metric-tile:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    typography: "{typography.tile-value}"
+    rounded: "{rounded.radius-14}"
+    padding: "14px"
+  fitness-card:
+    width: "168px"
+    rounded: "16px"
+  fitness-play:
+    backgroundColor: "{colors.play-fill}"
+    textColor: "{colors.text}"
+    size: "34px"
+  chip:
+    backgroundColor: "{colors.fill}"
+    rounded: "{rounded.radius-500}"
+  chip-selected:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.radius-500}"
+  tab-bar:
+    height: "49px"
+  tab-active:
+    textColor: "{colors.primary}"
+    typography: "{typography.tab-label}"
+  tab-inactive:
+    textColor: "{colors.text-tertiary}"
+    typography: "{typography.tab-label}"
+  search-bar:
+    backgroundColor: "{colors.fill}"
+    textColor: "{colors.text-tertiary}"
+    rounded: "10px"
+    height: "36px"
+  ring-label-move:
+    textColor: "{colors.primary}"
+    typography: "{typography.ring-label-eyebrow}"
+  ring-label-exercise:
+    textColor: "{colors.exercise}"
+    typography: "{typography.ring-label-eyebrow}"
+  ring-label-stand:
+    textColor: "{colors.stand}"
+    typography: "{typography.ring-label-eyebrow}"
+  metric-label:
+    textColor: "{colors.text-secondary}"
+  summary-screen:
+    backgroundColor: "{colors.canvas}"
+  grouped-card-light:
+    backgroundColor: "{colors.surface-light}"
+  segment-selected:
+    backgroundColor: "{colors.surface-pressed}"
+    textColor: "{colors.text}"
+  trend-improving:
+    textColor: "{colors.success}"
+  trend-declining:
+    textColor: "{colors.error}"
+---
+
 # Design System Inspiration of Apple Fitness (iOS)
 
 ## 1. Visual Theme & Atmosphere

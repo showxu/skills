@@ -366,8 +366,11 @@ Expected output:
 
 - Use `.github/assets/` in both repositories, with kind directories and
   appearance filenames from the asset contract. Keep the standalone DESIGN
-  and `design/` at root, and the member's shared design authority in its
-  organization. Hand asset production to the README-design owner.
+  at root, presentation sources under `.github/design/`, and the member's
+  shared design authority in its organization. Preserve ecosystem root
+  directories and product-owned design; record the product's README logo as
+  an export in its icon provenance. Hand asset production to the README-design
+  owner.
 
 Forbidden behavior:
 

@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 0.2.0
+
+- Add source-derived Google DESIGN.md front matter to the eight iOS and
+  Liquid Glass templates. Place GitHub presentation design sources under
+  `.github/design/`, record consumed icon copies in per-icon provenance, and
+  regenerate Icon Composer documents in ignored scratch. Standardize `docs/`
+  for repositories without an ecosystem documentation adapter. Defer release
+  timing to the governing delivery workflow and put version changes in the
+  change's final PR.
 - Release once per completed change in the steward's version policy: a change
   spanning several pull requests or repositories releases when all of it has
   landed, and its in-progress commits are pinned by full SHA without version

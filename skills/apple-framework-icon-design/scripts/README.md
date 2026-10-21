@@ -20,7 +20,7 @@ The generators use only the Python standard library. `--png`, previews, and
 python3 scripts/design_icons.py DESIGN.md --tints
 python3 scripts/design_icons.py DESIGN.md --out /tmp/icons --name swift-example --png
 python3 scripts/design_icons.py DESIGN.md --sheet /tmp/sheet.svg && rsvg-convert -w 1600 /tmp/sheet.svg -o /tmp/sheet.png
-python3 scripts/design_icons.py DESIGN.md --check swift-example=Documentation/Assets/Logo.svg
+python3 scripts/design_icons.py DESIGN.md --check swift-example=.github/assets/logo/logo.svg
 python3 scripts/design_icons.py DESIGN.md --lint
 python3 scripts/stack_logo.py --spec '{"hue": 205, "glyph": "braces", "glyph_rotation": -45}' --out /tmp/try.svg
 python3 scripts/stack_logo.py --spec '{"style": "volumetric", "hue": 196, "glyph": "chevrons", "texture": "grid"}' --out /tmp/tile.svg
@@ -28,7 +28,11 @@ python3 scripts/design_icons.py --fidelity /tmp/reference-icons
 ```
 
 Output is deterministic: the same entry always produces the same bytes, which
-is what `--check` relies on.
+is what `--check` relies on. The SVG check names
+`.github/assets/logo/logo.svg`; regenerate with `--png` into ignored scratch
+and compare generated and consumed `.github/assets/logo/logo.svg` and
+`.github/assets/logo/logo.png` SHA-256 digests with the icon owner's
+`provenance.json`. Copy only consumed files, not the output directory.
 
 Fidelity references must be 256 px square, non-interlaced RGB or RGBA PNGs
 with 8- or 16-bit channels. A report needs at least one measurable reference

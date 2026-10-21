@@ -1,3 +1,246 @@
+---
+version: "alpha"
+name: "Apple Music (iOS)"
+description: "Apple Music's iOS app is the flagship showcase of Apple's own design language — a first-party experience that leans heavily into SF Pro, SF Symbols, system materials (blurs and vibrancy), and haptics."
+colors:
+  primary: "#FA2D48"
+  music-coral: "#FC3C44"
+  red-pressed: "#D4213B"
+  canvas: "#FFFFFF"
+  canvas-dark: "#000000"
+  surface: "#F2F2F7"
+  surface-pressed: "#E5E5EA"
+  surface-dark: "#1C1C1E"
+  surface-raised-dark: "#2C2C2E"
+  surface-elevated-dark: "#3A3A3C"
+  divider: "#C6C6C8"
+  divider-dark: "#38383A"
+  text: "#000000"
+  text-dark: "#FFFFFF"
+  text-secondary: "rgba(60,60,67,0.6)"
+  text-tertiary: "rgba(60,60,67,0.3)"
+  text-quaternary: "rgba(60,60,67,0.18)"
+  text-secondary-dark: "rgba(235,235,245,0.6)"
+  text-tertiary-dark: "rgba(235,235,245,0.3)"
+  atmos-gold: "#D4A857"
+  lossless-silver: "#8E8E93"
+  system-blue: "#007AFF"
+  system-green: "#34C759"
+  error: "#FF3B30"
+  scrubber-track: "rgba(0,0,0,0.1)"
+  scrubber-track-dark: "rgba(255,255,255,0.2)"
+typography:
+  large-title:
+    fontFamily: "SF Pro Display"
+    fontSize: "34px"
+    fontWeight: 700
+    lineHeight: "1.1em"
+    letterSpacing: "0.37px"
+  title-1:
+    fontFamily: "SF Pro Display"
+    fontSize: "28px"
+    fontWeight: 700
+    lineHeight: "1.15em"
+    letterSpacing: "0.36px"
+  listen-now-hero:
+    fontFamily: "SF Pro Display"
+    fontSize: "24px"
+    fontWeight: 700
+    lineHeight: "1.2em"
+    letterSpacing: "-0.2px"
+  title-2:
+    fontFamily: "SF Pro Display"
+    fontSize: "22px"
+    fontWeight: 700
+    lineHeight: "1.2em"
+    letterSpacing: "-0.26px"
+  title-3:
+    fontFamily: "SF Pro Display"
+    fontSize: "20px"
+    fontWeight: 600
+    lineHeight: "1.2em"
+    letterSpacing: "-0.15px"
+  now-playing-title:
+    fontFamily: "SF Pro Display"
+    fontSize: "18px"
+    fontWeight: 600
+    lineHeight: "1.25em"
+    letterSpacing: "-0.1px"
+  headline:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 600
+    lineHeight: "1.25em"
+    letterSpacing: "-0.43px"
+  body:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 400
+    lineHeight: "1.45em"
+    letterSpacing: "-0.43px"
+  callout:
+    fontFamily: "SF Pro Text"
+    fontSize: "16px"
+    fontWeight: 400
+    lineHeight: "1.25em"
+    letterSpacing: "-0.32px"
+  subheadline:
+    fontFamily: "SF Pro Text"
+    fontSize: "15px"
+    fontWeight: 400
+    lineHeight: "1.3em"
+    letterSpacing: "-0.24px"
+  footnote:
+    fontFamily: "SF Pro Text"
+    fontSize: "13px"
+    fontWeight: 400
+    lineHeight: "1.3em"
+    letterSpacing: "-0.08px"
+  caption-1:
+    fontFamily: "SF Pro Text"
+    fontSize: "12px"
+    fontWeight: 400
+    lineHeight: "1.3em"
+    letterSpacing: "0px"
+  caption-2:
+    fontFamily: "SF Pro Text"
+    fontSize: "11px"
+    fontWeight: 400
+    lineHeight: "1.2em"
+    letterSpacing: "0.07px"
+  button:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 600
+    lineHeight: "1.0em"
+    letterSpacing: "-0.43px"
+  tab-label:
+    fontFamily: "SF Pro Text"
+    fontSize: "10px"
+    fontWeight: 500
+    lineHeight: "1.0em"
+    letterSpacing: "-0.24px"
+  lyrics-current:
+    fontFamily: "SF Pro Display"
+    fontSize: "28px"
+    fontWeight: 700
+    lineHeight: "1.2em"
+    letterSpacing: "-0.3px"
+  lyrics-other:
+    fontFamily: "SF Pro Display"
+    fontSize: "22px"
+    fontWeight: 600
+    lineHeight: "1.3em"
+    letterSpacing: "-0.2px"
+rounded:
+  radius-0: "0px"
+  radius-4: "4px"
+  radius-8: "8px"
+  radius-10: "10px"
+  radius-12: "12px"
+  radius-16: "16px"
+  radius-500: "500px"
+spacing:
+  base: "4px"
+  space-4: "4px"
+  space-8: "8px"
+  space-12: "12px"
+  space-16: "16px"
+  space-20: "20px"
+  space-24: "24px"
+  space-32: "32px"
+  space-44: "44px"
+  space-56: "56px"
+  space-72: "72px"
+components:
+  play-button:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.text-dark}"
+    size: "64px"
+  play-button-inline:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.text-dark}"
+    size: "44px"
+  button-primary:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.text-dark}"
+    typography: "{typography.button}"
+    rounded: "{rounded.radius-8}"
+    padding: "10px 24px"
+  button-secondary:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.radius-8}"
+    padding: "10px 16px"
+  button-secondary-dark:
+    backgroundColor: "{colors.surface-raised-dark}"
+    textColor: "{colors.text-dark}"
+    rounded: "{rounded.radius-8}"
+    padding: "10px 16px"
+  scrubber-track:
+    backgroundColor: "{colors.scrubber-track}"
+    height: "4px"
+  scrubber-track-dark:
+    backgroundColor: "{colors.scrubber-track-dark}"
+    height: "4px"
+  scrubber-fill:
+    backgroundColor: "{colors.primary}"
+    height: "4px"
+  scrubber-thumb:
+    backgroundColor: "{colors.text-dark}"
+    size: "16px"
+  album-tile:
+    rounded: "{rounded.radius-12}"
+    width: "160px"
+  hero-card:
+    rounded: "{rounded.radius-16}"
+  track-row:
+    textColor: "{colors.text}"
+    height: "56px"
+  track-artist:
+    textColor: "{colors.text-secondary}"
+    typography: "{typography.subheadline}"
+  track-artist-dark:
+    textColor: "{colors.text-secondary-dark}"
+    typography: "{typography.subheadline}"
+  search-field:
+    backgroundColor: "{colors.surface-pressed}"
+    rounded: "{rounded.radius-10}"
+    height: "36px"
+  search-field-dark:
+    backgroundColor: "{colors.surface-dark}"
+    rounded: "{rounded.radius-10}"
+    height: "36px"
+  atmos-badge:
+    backgroundColor: "{colors.atmos-gold}"
+    textColor: "{colors.text-dark}"
+    rounded: "{rounded.radius-500}"
+    padding: "4px 8px"
+  button-primary-pressed:
+    backgroundColor: "{colors.red-pressed}"
+  library-screen:
+    backgroundColor: "{colors.canvas}"
+  library-screen-dark:
+    backgroundColor: "{colors.canvas-dark}"
+  context-menu-dark:
+    backgroundColor: "{colors.surface-elevated-dark}"
+  album-detail-metadata:
+    textColor: "{colors.text-tertiary}"
+    typography: "{typography.footnote}"
+  album-detail-metadata-dark:
+    textColor: "{colors.text-tertiary-dark}"
+    typography: "{typography.footnote}"
+  lossless-badge:
+    backgroundColor: "{colors.lossless-silver}"
+    textColor: "{colors.text-dark}"
+    rounded: "{rounded.radius-500}"
+    padding: "4px 8px"
+  about-link:
+    textColor: "{colors.system-blue}"
+  download-complete:
+    textColor: "{colors.system-green}"
+---
+
 # Design System Inspiration of Apple Music (iOS)
 
 ## 1. Visual Theme & Atmosphere

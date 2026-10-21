@@ -20,12 +20,15 @@ establish automatic selection or the visual quality of any one icon.
   upright rule for a readable glyph.
 - Failure: Editing generated SVGs by hand, reusing another member's hue, adding text to the icon, or changing global constants.
 - Acceptance: The new hue sits in the widest gap; `--check` reports `same`
-  for the eight existing logos.
+  for the eight existing logos. Accepted files use
+  `.github/assets/logo/logo.svg` and `logo.png`; each copy is recorded in
+  `provenance.json` with its output path and digest. Regeneration into ignored
+  scratch verifies both consumed files without copying the output directory.
 
 ## SI-02 — Drift after a hand edit
 
 - Prompt: Check whether the checked-in logos still match the design file.
-- Context: One repository's `Logo.svg` was recolored by hand; its entry is
+- Context: One repository's `.github/assets/logo/logo.svg` was recolored by hand; its entry is
   unchanged.
 - Expected artifact: A drift report naming that repository and file, with
   the others `same`.
@@ -66,7 +69,7 @@ establish automatic selection or the visual quality of any one icon.
 ## SI-05 — Boundary: social preview request
 
 - Prompt: Make a social preview card for the repository using its icon.
-- Context: The repository already has a `Logo.svg`.
+- Context: The repository already has a `.github/assets/logo/logo.svg`.
 - Expected artifact: A statement that card composition is outside this
   skill, plus the icon's glow tint from `--tints` if useful to the caller.
 - Must preserve: The logo file unchanged.
