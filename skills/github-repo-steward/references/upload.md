@@ -7,6 +7,10 @@ upload-token endpoint. Check the current
 when the UI changes. Prepare 1280×640 accepted PNGs within its current upload
 limits. The accepted file must come from the merged source revision.
 
+GitHub permits uploads to public repositories and to private repositories that
+already have an uploaded preview image. Sharing the preview is supported only
+for public repositories.
+
 ## Owner's browser
 
 Use the owner's already signed-in browser and a task tab. Confirm the account,
