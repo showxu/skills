@@ -454,7 +454,7 @@ Once the plan is written, read it back to confirm:
 - verification and closeout are concrete enough for execution
 - ExecPlan mode, when used, includes maintained `Task State`, `Progress`,
   `Surprises & Discoveries`, `Decision Log`, and `Outcomes & Retrospective`
-  sections
+  sections, plus `Release Points` when the work changes anything released
 - ExecPlan `Status`, `Stop Reason`, and `Current Next Action` make it clear
   whether the next agent may continue, must stop for human input, is blocked, or
   is looking at a completed plan that must not be reopened without explicit

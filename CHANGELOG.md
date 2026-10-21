@@ -2,8 +2,11 @@
 
 ## Unreleased
 
-## 0.2.0
-
+- Release once per completed change in the steward's version policy: a change
+  spanning several pull requests or repositories releases when all of it has
+  landed, and its in-progress commits are pinned by full SHA without version
+  comments; release pins carry `# vX.Y.Z`. ExecPlans for work that changes
+  anything released name their release points before execution.
 - Render deterministic social-preview PNGs and public/member organization
   profiles in the TypeScript presentation toolchain and Action, with shared
   catalog validation, DESIGN tokens, WebAssembly still-image decoding and byte

@@ -321,8 +321,9 @@ the package's CI matrix compares both against committed goldens.
 
 The composite Action lives at
 `showxu/skills/skills/github-readme-design/scripts@<full-40-character-sha> # vX.Y.Z`.
-Pins are full commit SHAs with SemVer comments; version labels below are
-placeholders to resolve to reviewed releases, not mutable references.
+Pins are full commit SHAs. A release pin adds its SemVer comment; version
+labels below are placeholders to resolve to reviewed releases, not mutable
+references. A commit of a change still in progress is pinned by SHA alone.
 
 | Input | Meaning |
 | --- | --- |
@@ -442,13 +443,13 @@ jobs:
       mode: member
 ```
 
-The referenced repositories publish signed SemVer tags after reviewed merges,
-choosing each version by their own `VERSIONING.md`; consumers pin the
-corresponding commit and keep `# vX.Y.Z` comments for Dependabot. A changed
+The referenced repositories release as their own `VERSIONING.md` states,
+once a change is complete rather than after each merge. Consumers pin a
+release's commit with its `# vX.Y.Z` comment for Dependabot, and an
+in-progress commit by SHA alone. Before a release or a pin update, a changed
 shared workflow or toolchain advances through representative consumers at the
-exact candidate commit before tags and pin updates, covering every changed
-path: a change to the tool path needs a tool's run, which downloads its
-executable and checks its terminal
+exact candidate commit, covering every changed path: a change to the tool path
+needs a tool's run, which downloads its executable and checks its terminal
 ([organization release](../../github-org-steward/references/release.md)).
 
 ### Local regeneration
@@ -569,8 +570,8 @@ node <toolchain>/src/cli.ts profile check --design <DESIGN.md> --catalog <catalo
 
 The organization reusable `profile.yml` checks out the catalog and DESIGN at
 `job.workflow_sha` and supplies that same SHA as `catalog-revision` in member
-mode. Consumers pin the workflow by full SHA with a version comment. This one
-pin selects the inputs and the transitive toolchain version. Local invocations
+mode. Consumers pin the workflow by full SHA, with the version comment of a
+release. This one pin selects the inputs and the transitive toolchain version. Local invocations
 must supply that same standard revision explicitly. Public mode omits both
 member input and catalog revision.
 

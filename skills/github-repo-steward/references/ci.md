@@ -49,7 +49,9 @@ PR code in a privileged `pull_request_target` workflow. Pass untrusted event
 text through environment or structured arguments rather than interpolating it
 into shell source.
 
-Pin third-party actions and reusable workflows to full reviewed commits.
+Pin third-party actions and reusable workflows to full reviewed commits. A
+pin to a release carries its `# vX.Y.Z` comment; a pin to an unreleased
+commit of a change still in progress carries none.
 Reusable callers derive input values from the consuming repository. A shared
 change needs syntax validation and a real consumer run at the proposed pin.
 Update callers through PRs after that evidence; a template only affects new

@@ -6,6 +6,18 @@ Versions use SemVer 2.0.0. Release tags are signed and annotated, named
 `vX.Y.Z`, with the message `skills X.Y.Z`. A tagged version is never
 moved, reused or decreased.
 
+## When to release
+
+Release once a change is complete: everything it needs, including
+documentation, is merged and verified. A change that spans several pull
+requests or repositories releases once, when all of it has landed, or at
+milestones its owner names before the work starts. Its intermediate steps,
+review fixes, documentation fixes and pin updates do not release on their own.
+
+While a change is in progress, other repositories reference its commits by full
+SHA without a version comment. Once it is released, consumers pin the tagged
+commit with a `# vX.Y.Z` comment, which lets Dependabot propose later releases.
+
 ## Choosing the next version
 
 ### 0.x (initial development)
@@ -49,7 +61,7 @@ Files that mirror it:
 - [.claude-plugin/plugin.json](.claude-plugin/plugin.json): `version`
 - [.codex-plugin/plugin.json](.codex-plugin/plugin.json): `version`
 
-Update the source and its mirrors together in the release PR.
+Update the source and its mirrors together in the release change.
 
 ## Changelog
 
@@ -62,12 +74,13 @@ major's removals beforehand.
 ## Release procedure
 
 1. Choose the next version using the rules above.
-2. Prepare a release PR that sets the version source and its mirrors, moves
-   the Unreleased entries into the new `## X.Y.Z` section, and leaves an empty
-   `## Unreleased` section at the top.
+2. In the change's final PR, or in a release PR when the change has already
+   merged, set the version source and its mirrors, move the Unreleased entries
+   into the new `## X.Y.Z` section, and leave an empty `## Unreleased` section
+   at the top.
 3. Run the repository checks and complete the ecosystem release preparation
    below. Resolve review findings before accepting the PR.
-4. Squash merge the accepted release PR.
+4. Squash merge the accepted PR.
 5. Create the signed annotated tag with the name and message above on the
    accepted merge commit.
 6. Publish the tag and verify that the remote tag's peeled commit equals the
