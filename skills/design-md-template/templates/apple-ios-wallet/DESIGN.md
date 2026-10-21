@@ -1,3 +1,192 @@
+---
+version: "alpha"
+name: "Apple Wallet (iOS)"
+description: "Apple Wallet is a vault rendered as a stage."
+colors:
+  canvas: "#000000"
+  surface: "#1C1C1E"
+  surface-pressed: "#2C2C2E"
+  glass: "rgba(255,255,255,0.12)"
+  divider: "#262629"
+  titanium-highlight: "#E8E8EB"
+  titanium-midtone: "#A8A8AD"
+  titanium-shadow: "#3D3D3F"
+  chip-gold: "#C7AC73"
+  daily-cash: "#FF3B30"
+  text: "#FFFFFF"
+  text-secondary: "#A0A0A5"
+  text-tertiary: "#636368"
+  primary: "#0A84FF"
+  success: "#30D158"
+  warning: "#FF9F0A"
+  error: "#FF453A"
+typography:
+  wallet-title:
+    fontFamily: "SF Pro Display"
+    fontSize: "34px"
+    fontWeight: 700
+    lineHeight: "1.1em"
+    letterSpacing: "0.36px"
+  detail-sheet-title:
+    fontFamily: "SF Pro Display"
+    fontSize: "28px"
+    fontWeight: 700
+    lineHeight: "1.15em"
+    letterSpacing: "0.35px"
+  section-header:
+    fontFamily: "SF Pro Text"
+    fontSize: "13px"
+    fontWeight: 600
+    lineHeight: "1.2em"
+    letterSpacing: "-0.08px"
+  card-face-issuer-name:
+    fontFamily: "SF Pro Display"
+    fontSize: "17px"
+    fontWeight: 600
+    lineHeight: "1.1em"
+    letterSpacing: "0px"
+  card-face-last4:
+    fontFamily: "SF Mono"
+    fontSize: "17px"
+    fontWeight: 500
+    lineHeight: "1.0em"
+    letterSpacing: "0.5px"
+  card-face-holder-name:
+    fontFamily: "SF Pro Text"
+    fontSize: "13px"
+    fontWeight: 500
+    lineHeight: "1.0em"
+    letterSpacing: "0.3px"
+  card-balance-hero:
+    fontFamily: "SF Pro Display"
+    fontSize: "40px"
+    fontWeight: 700
+    lineHeight: "1.0em"
+    letterSpacing: "0.4px"
+  body:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 400
+    lineHeight: "1.3em"
+    letterSpacing: "-0.4px"
+  footnote:
+    fontFamily: "SF Pro Text"
+    fontSize: "13px"
+    fontWeight: 400
+    lineHeight: "1.3em"
+    letterSpacing: "-0.08px"
+  caption:
+    fontFamily: "SF Pro Text"
+    fontSize: "11px"
+    fontWeight: 400
+    lineHeight: "1.2em"
+    letterSpacing: "0.07px"
+  transaction-amount:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 500
+    lineHeight: "1.0em"
+    letterSpacing: "0px"
+  daily-cash-amount:
+    fontFamily: "SF Pro Display"
+    fontSize: "22px"
+    fontWeight: 700
+    lineHeight: "1.0em"
+    letterSpacing: "0px"
+  action-button:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 600
+    lineHeight: "1.0em"
+    letterSpacing: "-0.4px"
+  system-tab-label:
+    fontFamily: "SF Pro Text"
+    fontSize: "10px"
+    fontWeight: 500
+    lineHeight: "1.0em"
+    letterSpacing: "0px"
+rounded:
+  radius-10: "10px"
+  radius-14: "14px"
+  radius-8: "8px"
+spacing:
+  base: "4px"
+  space-4: "4px"
+  space-8: "8px"
+  space-12: "12px"
+  space-16: "16px"
+  space-20: "20px"
+  space-24: "24px"
+  space-32: "32px"
+  space-40: "40px"
+  space-48: "48px"
+  space-56: "56px"
+  space-64: "64px"
+components:
+  card-frame:
+    rounded: "{rounded.radius-10}"
+  card-credit-debit:
+    rounded: "{rounded.radius-10}"
+    height: "220px"
+  card-boarding-pass:
+    rounded: "{rounded.radius-10}"
+    height: "280px"
+  card-loyalty:
+    rounded: "{rounded.radius-10}"
+    height: "200px"
+  card-stack:
+    backgroundColor: "{colors.canvas}"
+  apple-card-chip:
+    backgroundColor: "{colors.chip-gold}"
+    width: "26px"
+    height: "20px"
+  daily-cash-chip:
+    backgroundColor: "{colors.daily-cash}"
+    textColor: "{colors.text}"
+    size: "28px"
+  grouped-list-row:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    typography: "{typography.body}"
+    padding: "16px"
+  grouped-list-value:
+    textColor: "{colors.text-secondary}"
+    typography: "{typography.body}"
+  grouped-list-disclosure:
+    textColor: "{colors.text-tertiary}"
+    size: "13px"
+  transaction-row:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    typography: "{typography.body}"
+    height: "60px"
+  toolbar-button:
+    backgroundColor: "{colors.glass}"
+    textColor: "{colors.text}"
+    size: "44px"
+  add-card-button:
+    backgroundColor: "{colors.glass}"
+    textColor: "{colors.text}"
+    size: "32px"
+  apple-pay-button:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.radius-8}"
+    height: "50px"
+  pay-now-button:
+    backgroundColor: "{colors.text}"
+    textColor: "{colors.canvas}"
+    rounded: "{rounded.radius-14}"
+    height: "54px"
+  system-link:
+    textColor: "{colors.primary}"
+    typography: "{typography.body}"
+  row-pressed:
+    backgroundColor: "{colors.surface-pressed}"
+  payment-success:
+    textColor: "{colors.success}"
+---
+
 # Design System Inspiration of Apple Wallet (iOS)
 
 ## 1. Visual Theme & Atmosphere

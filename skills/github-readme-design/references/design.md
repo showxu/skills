@@ -73,7 +73,13 @@ kebab-case names and `-light`/`-dark` appearance suffixes:
 
 Use the supplied product kind and icon selection with the applicable DESIGN.
 Organization variants belong in its DESIGN and per-repository selections in
-its catalog; a standalone repository uses its own metadata.
+its catalog; a standalone repository uses its own metadata. Keep `DESIGN.md`
+at the root and GitHub presentation sources under `.github/design/`: fonts
+in `fonts/`, icon layers and `provenance.json` in `icons/<name>/`. Product
+design stays with the product; its README logo is a recorded export. See the
+[repository layout](../../github-repo-steward/references/layout.md) for the
+source boundary and the [organization layout](../../github-org-steward/references/topology.md)
+for shared ownership.
 
 ### Asset principle
 
@@ -82,13 +88,18 @@ can reproduce and compares the result. Assets that require native local tools,
 such as Liquid Glass exports from Icon Composer on macOS, and screenshots CI
 cannot capture are committed with a provenance receipt. Commit consumed
 README images, profile output and the social-preview PNG; retain
-`recording.json` for readable review diffs.
+`recording.json` for readable review diffs. Icon copies live only where they
+are consumed: organization avatar and marks in `profile/assets/`, member
+logos in `.github/assets/logo/`. The icon owner's `provenance.json` records
+each repository, path, skill output path and SHA-256, plus the skill commit,
+renderer version, command and verification date. `.icon` documents are
+regenerated into ignored scratch for Icon Composer review.
 
 | Kind | Script | Capture | CI |
 | --- | --- | --- | --- |
 | terminal | `script.yml` | run commands in a sandbox → `recording.json` | regenerate, byte compare |
 | social-preview | DESIGN + catalog | none | regenerate, byte compare |
-| logo | DESIGN icon entry | native export, receipt | compare to exports at the pinned standard |
+| logo | DESIGN icon entry | native export, receipt | compare consumed copies to provenance digests at the pinned standard |
 | screenshots | `script.yml` naming UI-test scenes | UI test capture, `capture.json` | regenerate with tolerance where CI can run it, else verify receipt |
 
 ### Screenshots

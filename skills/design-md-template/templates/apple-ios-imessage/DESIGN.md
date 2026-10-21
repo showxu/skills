@@ -1,3 +1,230 @@
+---
+version: "alpha"
+name: "iMessage (iOS)"
+description: "iMessage is the canonical iOS conversation surface — and arguably the most-imitated chat UI on the planet."
+colors:
+  primary: "#007AFF"
+  blue-pressed: "#0062CC"
+  sms-green: "#34C759"
+  sms-green-pressed: "#248A3D"
+  canvas: "#FFFFFF"
+  canvas-dark: "#000000"
+  incoming: "#E9E9EB"
+  incoming-dark: "#26262A"
+  surface: "#F2F2F7"
+  surface-dark: "#1C1C1E"
+  surface-raised-dark: "#2C2C2E"
+  input-border: "#C6C6C8"
+  divider: "#3C3C434A"
+  divider-dark: "#38383A"
+  text: "#000000"
+  text-dark: "#FFFFFF"
+  text-secondary: "#3C3C4399"
+  text-secondary-dark: "#EBEBF599"
+  text-tertiary: "#3C3C434D"
+  text-tertiary-dark: "#EBEBF54D"
+  error: "#FF3B30"
+  error-dark: "#FF453A"
+  send-disabled: "#8E8E93"
+  tinted-fill: "rgba(0,122,255,0.16)"
+typography:
+  large-title:
+    fontFamily: "SF Pro Display"
+    fontSize: "34px"
+    fontWeight: 700
+    lineHeight: "1.2em"
+    letterSpacing: "0.4px"
+  title-1:
+    fontFamily: "SF Pro Display"
+    fontSize: "28px"
+    fontWeight: 700
+    lineHeight: "1.2em"
+    letterSpacing: "0.36px"
+  title-3:
+    fontFamily: "SF Pro Display"
+    fontSize: "20px"
+    fontWeight: 600
+    lineHeight: "1.25em"
+    letterSpacing: "0.38px"
+  headline:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 600
+    lineHeight: "1.3em"
+    letterSpacing: "-0.4px"
+  body-bubble:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 400
+    lineHeight: "1.3em"
+    letterSpacing: "-0.4px"
+  message-compact:
+    fontFamily: "SF Pro Text"
+    fontSize: "15px"
+    fontWeight: 400
+    lineHeight: "1.3em"
+    letterSpacing: "-0.2px"
+  callout:
+    fontFamily: "SF Pro Text"
+    fontSize: "16px"
+    fontWeight: 400
+    lineHeight: "1.3em"
+    letterSpacing: "-0.3px"
+  subhead:
+    fontFamily: "SF Pro Text"
+    fontSize: "15px"
+    fontWeight: 400
+    lineHeight: "1.35em"
+    letterSpacing: "-0.2px"
+  footnote:
+    fontFamily: "SF Pro Text"
+    fontSize: "13px"
+    fontWeight: 600
+    lineHeight: "1.35em"
+    letterSpacing: "-0.08px"
+  caption-1:
+    fontFamily: "SF Pro Text"
+    fontSize: "12px"
+    fontWeight: 400
+    lineHeight: "1.35em"
+    letterSpacing: "0px"
+  caption-2:
+    fontFamily: "SF Pro Text"
+    fontSize: "11px"
+    fontWeight: 600
+    lineHeight: "1.35em"
+    letterSpacing: "0.06px"
+  tab-toolbar:
+    fontFamily: "SF Pro Text"
+    fontSize: "11px"
+    fontWeight: 500
+    lineHeight: "1.0em"
+    letterSpacing: "0.07px"
+rounded:
+  radius-0: "0px"
+  radius-6: "6px"
+  radius-10: "10px"
+  radius-14: "14px"
+  radius-19: "19px"
+  radius-22: "22px"
+  radius-500: "500px"
+spacing:
+  base: "4px"
+  space-2: "2px"
+  space-4: "4px"
+  space-8: "8px"
+  space-12: "12px"
+  space-14: "14px"
+  space-16: "16px"
+  space-20: "20px"
+  space-24: "24px"
+  space-32: "32px"
+  space-44: "44px"
+components:
+  send-button:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.text-dark}"
+    size: "30px"
+  send-button-sms:
+    backgroundColor: "{colors.sms-green}"
+    textColor: "{colors.text-dark}"
+    size: "30px"
+  send-button-disabled:
+    backgroundColor: "{colors.send-disabled}"
+    textColor: "{colors.text-dark}"
+    size: "30px"
+  button-primary:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.text-dark}"
+    typography: "{typography.headline}"
+    rounded: "{rounded.radius-14}"
+    padding: "13px 26px"
+  button-primary-pressed:
+    backgroundColor: "{colors.blue-pressed}"
+    textColor: "{colors.text-dark}"
+  button-tinted:
+    backgroundColor: "{colors.tinted-fill}"
+    textColor: "{colors.primary}"
+    rounded: "{rounded.radius-14}"
+  attachment-button:
+    backgroundColor: "{colors.incoming}"
+    textColor: "{colors.send-disabled}"
+    size: "30px"
+  attachment-button-dark:
+    backgroundColor: "{colors.surface-raised-dark}"
+    size: "30px"
+  bubble-outgoing:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.text-dark}"
+    typography: "{typography.body-bubble}"
+    rounded: "{rounded.radius-19}"
+    padding: "8px 14px"
+  bubble-sms:
+    backgroundColor: "{colors.sms-green}"
+    textColor: "{colors.text-dark}"
+    typography: "{typography.body-bubble}"
+    rounded: "{rounded.radius-19}"
+    padding: "8px 14px"
+  bubble-incoming:
+    backgroundColor: "{colors.incoming}"
+    textColor: "{colors.text}"
+    typography: "{typography.body-bubble}"
+    rounded: "{rounded.radius-19}"
+  bubble-incoming-dark:
+    backgroundColor: "{colors.incoming-dark}"
+    textColor: "{colors.text-dark}"
+    typography: "{typography.body-bubble}"
+    rounded: "{rounded.radius-19}"
+  tapback-strip:
+    backgroundColor: "{colors.canvas}"
+    rounded: "24px"
+  tapback-strip-dark:
+    backgroundColor: "{colors.surface-raised-dark}"
+    rounded: "24px"
+  typing-dot:
+    backgroundColor: "{colors.text-tertiary}"
+    size: "7px"
+  typing-dot-dark:
+    backgroundColor: "{colors.text-tertiary-dark}"
+    size: "7px"
+  delivery-receipt:
+    textColor: "{colors.text-secondary}"
+    typography: "{typography.footnote}"
+  delivery-receipt-dark:
+    textColor: "{colors.text-secondary-dark}"
+    typography: "{typography.footnote}"
+  chat-nav:
+    height: "44px"
+  compose-field:
+    textColor: "{colors.text-tertiary}"
+    height: "36px"
+    rounded: "18px"
+  compose-field-dark:
+    textColor: "{colors.text-tertiary-dark}"
+  search-bar:
+    backgroundColor: "{colors.incoming}"
+    textColor: "{colors.text-tertiary}"
+    rounded: "{rounded.radius-10}"
+    height: "36px"
+  search-bar-dark:
+    backgroundColor: "{colors.surface-dark}"
+    textColor: "{colors.text-tertiary-dark}"
+    rounded: "{rounded.radius-10}"
+    height: "36px"
+  conversation-list:
+    backgroundColor: "{colors.surface}"
+  thread:
+    backgroundColor: "{colors.canvas}"
+  thread-dark:
+    backgroundColor: "{colors.canvas-dark}"
+  failed-message:
+    textColor: "{colors.error}"
+  failed-message-dark:
+    textColor: "{colors.error-dark}"
+  sms-control-pressed:
+    backgroundColor: "{colors.sms-green-pressed}"
+---
+
 # Design System Inspiration of iMessage (iOS)
 
 ## 1. Visual Theme & Atmosphere

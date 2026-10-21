@@ -1,3 +1,223 @@
+---
+version: "alpha"
+name: "Apple Notes (iOS)"
+description: "Apple Notes is Apple's most quietly opinionated app — a 16-year exercise in restraint."
+colors:
+  primary: "#F09A38"
+  orange-pressed: "#D87E1F"
+  orange-tint: "#FFF1DD"
+  folder-yellow: "#F5D773"
+  canvas: "#FFFBED"
+  surface: "#FAF6E3"
+  surface-pressed: "#F2EDD6"
+  divider: "#EDEAD8"
+  canvas-dark: "#1A1A1A"
+  surface-dark: "#262626"
+  surface-pressed-dark: "#333333"
+  divider-dark: "#2A2A2A"
+  text: "#1C1C1E"
+  text-secondary: "#8E8E93"
+  text-tertiary: "#C7C7CC"
+  text-dark: "#F2F2F2"
+  text-tertiary-dark: "#48484A"
+  white: "#FFFFFF"
+  success: "#34C759"
+  warning: "#FFCC00"
+  error: "#FF3B30"
+  info: "#0A84FF"
+  highlight-yellow: "#FFEB78"
+  highlight-green: "#B3E47B"
+  highlight-blue: "#A0D8FF"
+  highlight-pink: "#FFB3DB"
+  highlight-purple: "#D4B3FF"
+  folder-highlight: "#FAE8A0"
+typography:
+  large-nav-title:
+    fontFamily: "SF Pro Display"
+    fontSize: "34px"
+    fontWeight: 800
+    lineHeight: "1.1em"
+    letterSpacing: "-0.4px"
+  folder-section-title:
+    fontFamily: "SF Pro Text"
+    fontSize: "22px"
+    fontWeight: 700
+    lineHeight: "1.2em"
+    letterSpacing: "-0.3px"
+  note-title-in-list:
+    fontFamily: "SF Pro Text"
+    fontSize: "16px"
+    fontWeight: 600
+    lineHeight: "1.3em"
+    letterSpacing: "-0.1px"
+  note-preview:
+    fontFamily: "SF Pro Text"
+    fontSize: "14px"
+    fontWeight: 400
+    lineHeight: "1.35em"
+    letterSpacing: "0px"
+  note-date:
+    fontFamily: "SF Pro Text"
+    fontSize: "12px"
+    fontWeight: 400
+    lineHeight: "1.3em"
+    letterSpacing: "0px"
+  folder-row-name:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 400
+    lineHeight: "1.3em"
+    letterSpacing: "0px"
+  note-body-title:
+    fontFamily: "SF Pro Text"
+    fontSize: "20px"
+    fontWeight: 600
+    lineHeight: "1.3em"
+    letterSpacing: "-0.2px"
+  note-body-heading:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 600
+    lineHeight: "1.4em"
+    letterSpacing: "0px"
+  note-body:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 400
+    lineHeight: "1.5em"
+    letterSpacing: "0px"
+  note-body-mono:
+    fontFamily: "SF Mono"
+    fontSize: "15px"
+    fontWeight: 400
+    lineHeight: "1.5em"
+    letterSpacing: "0px"
+  tag-chip:
+    fontFamily: "SF Pro Text"
+    fontSize: "14px"
+    fontWeight: 500
+    lineHeight: "1.0em"
+    letterSpacing: "0px"
+  toolbar-label:
+    fontFamily: "SF Pro Text"
+    fontSize: "11px"
+    fontWeight: 500
+    lineHeight: "1.0em"
+    letterSpacing: "0.1px"
+  button-primary:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 600
+    lineHeight: "1.0em"
+    letterSpacing: "0px"
+  search-placeholder:
+    fontFamily: "SF Pro Text"
+    fontSize: "17px"
+    fontWeight: 400
+    lineHeight: "1.0em"
+    letterSpacing: "0px"
+rounded:
+  radius-0: "0px"
+  radius-4: "4px"
+  radius-10: "10px"
+  radius-12: "12px"
+  radius-16: "16px"
+spacing:
+  base: "4px"
+  space-4: "4px"
+  space-8: "8px"
+  space-12: "12px"
+  space-16: "16px"
+  space-20: "20px"
+  space-24: "24px"
+  space-32: "32px"
+  space-40: "40px"
+  space-48: "48px"
+  space-56: "56px"
+  space-64: "64px"
+components:
+  button-primary:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.white}"
+    typography: "{typography.button-primary}"
+    rounded: "{rounded.radius-12}"
+    padding: "12px 24px"
+  button-primary-pressed:
+    backgroundColor: "{colors.orange-pressed}"
+    textColor: "{colors.white}"
+  new-note-fab:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.white}"
+    size: "56px"
+  inline-action:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    size: "36px"
+  inline-action-pressed:
+    backgroundColor: "{colors.surface-pressed}"
+    textColor: "{colors.text}"
+  note-row:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.text}"
+    typography: "{typography.note-title-in-list}"
+    rounded: "{rounded.radius-0}"
+    height: "84px"
+  note-row-dark:
+    backgroundColor: "{colors.canvas-dark}"
+    textColor: "{colors.text-dark}"
+  note-preview:
+    textColor: "{colors.text-secondary}"
+    typography: "{typography.note-preview}"
+  folder-row:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.text}"
+    typography: "{typography.folder-row-name}"
+    height: "44px"
+  folder-glyph:
+    backgroundColor: "{colors.folder-yellow}"
+    size: "24px"
+  search-bar:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text-secondary}"
+    typography: "{typography.search-placeholder}"
+    rounded: "{rounded.radius-10}"
+    height: "36px"
+  tag-chip:
+    backgroundColor: "{colors.orange-tint}"
+    textColor: "{colors.primary}"
+    typography: "{typography.tag-chip}"
+    rounded: "{rounded.radius-16}"
+    height: "32px"
+    padding: "6px 12px"
+  tag-chip-selected:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.white}"
+  note-editor:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.text}"
+    typography: "{typography.note-body}"
+    rounded: "{rounded.radius-0}"
+    padding: "16px 20px"
+  note-selection:
+    backgroundColor: "{colors.highlight-yellow}"
+  search-bar-dark:
+    backgroundColor: "{colors.surface-dark}"
+  row-pressed-dark:
+    backgroundColor: "{colors.surface-pressed-dark}"
+  checklist-completed:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.white}"
+    size: "24px"
+  highlight-green:
+    backgroundColor: "{colors.highlight-green}"
+  highlight-blue:
+    backgroundColor: "{colors.highlight-blue}"
+  highlight-pink:
+    backgroundColor: "{colors.highlight-pink}"
+  highlight-purple:
+    backgroundColor: "{colors.highlight-purple}"
+---
+
 # Design System Inspiration of Apple Notes (iOS)
 
 ## 1. Visual Theme & Atmosphere

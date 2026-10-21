@@ -17,7 +17,7 @@ checked-in logos still match their source.
 - A new repository or product needs an icon that matches an existing family.
 - A family needs hues, glyphs, or ramps assigned or rebalanced.
 - An icon entry in `DESIGN.md` changed and logos must be regenerated.
-- Checked-in `Logo.svg` files must be verified against `DESIGN.md`.
+- Checked-in `.github/assets/logo/logo.svg` files must be verified against `DESIGN.md`.
 - A family has no `DESIGN.md` yet and needs its first Iconography section.
 
 ## When Not To Use
@@ -34,8 +34,8 @@ checked-in logos still match their source.
 
 - The owner's `DESIGN.md`: organization `.github` repository or project root.
   Read its frontmatter tokens and the `## Iconography` JSON block.
-- Existing icons and where each repository keeps them, usually
-  `Documentation/Assets/Logo.svg` and `Logo.png` or `Docs/Assets/`.
+- Existing repository logos at `.github/assets/logo/logo.svg` and
+  `.github/assets/logo/logo.png`, and the icon owner's `provenance.json`.
 - The new member's purpose, to choose a glyph that says what it does.
 - Hues already in use (`design_icons.py DESIGN.md --tints`).
 
@@ -58,9 +58,21 @@ checked-in logos still match their source.
    `design_icons.py DESIGN.md --sheet /tmp/sheet.svg`. Compare against the
    failure patterns in `references/geometry-and-color.md`.
 6. Iterate on the entry, not on the SVG. Never hand-edit generated files.
-7. Copy the accepted SVG and 1024 px PNG into the repository's assets.
-8. Run the drift check for every repository in the family:
-   `design_icons.py DESIGN.md --check NAME=PATH ...`.
+7. Copy the accepted SVG and 1024 px PNG to `.github/assets/logo/logo.svg`
+   and `.github/assets/logo/logo.png`. Record each consumed copy in the icon
+   owner's `provenance.json` with `repository` (`owner/name`), repo-relative
+   `path`, skill `output` path (`NAME.svg` or `NAME.png`) and `sha256`.
+   The receipt also records `icon`, `skill` (`apple-framework-icon-design`),
+   `skill_commit` (full showxu/skills SHA used for verification), `command`
+   (exact command), `renderer` (framework generator), `verified_at`
+   (`YYYY-MM-DD`), and the `copies` array. GitHub presentation sources belong
+   in `.github/design/icons/<name>/`; product design stays with the product.
+   Consumed exports live only at their owners.
+8. Run the SVG drift check for every repository in the family:
+   `design_icons.py DESIGN.md --check NAME=.github/assets/logo/logo.svg`.
+   Regenerate with `--png` into ignored scratch and compare both generated
+   files and `.github/assets/logo/logo.svg` and `logo.png` with the SHA-256
+   digests in `provenance.json`. Report differences before overwriting.
 9. After changing geometry constants, ramps, or slab lighting in the
    generator, run `design_icons.py --fidelity REFDIR` against the owner's
    reference icons and compare with the figures in
@@ -100,7 +112,9 @@ checked-in logos still match their source.
 
 ## Validation Rules
 
-- `--check` reports `same` for every family member.
+- `--check` reports `same` for every family member's `.github/assets/logo/logo.svg`;
+  regenerated SVG/PNG files and both consumed logo paths match their recorded
+  provenance digests.
 - `--lint` reports `clean`, or each finding is an owner decision recorded in
   the report.
 - The contact sheet shows each icon clearly on white and on `#0d1117` at

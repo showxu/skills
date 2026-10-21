@@ -29,7 +29,13 @@ Liquid Glass output holds `NAME.icon`, `renditions/` with 18 native exports,
 `web/`, a contact sheet, and `manifest.json`. Other styles hold `NAME.svg`,
 `web/`, a contact sheet, and `manifest.json`. The manifest records the style,
 `native` or `style-rendering`, the renderer version, and the design
-generation or geometry.
+generation or geometry. This complete output stays in ignored scratch. Copy
+only the files each target consumes and record them in the icon owner's
+`provenance.json` using the [provenance contract](../SKILL.md#consumed-icon-provenance).
+Regenerate into ignored scratch and compare those output and copy digests for
+delivery checks; `--check` compares complete generated sets, not selected
+files in a consumer's assets directory. Regenerate the `.icon` for Icon
+Composer review rather than committing it.
 
 In `web/`, `favicon.svg`, `favicon-16.png`, and `favicon-32.png` are page
 icons; `icon-192.png` and `icon-512.png` serve a web manifest's `any`

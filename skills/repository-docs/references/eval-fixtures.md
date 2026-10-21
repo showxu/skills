@@ -217,29 +217,34 @@ Target behavior: Audit workspace documentation and community-file text with
 independent repository ownership.
 
 Input prompt: "Audit documentation and community-file text for the root and the
-named app, plugin, library, skill collection, tool tap, and website repositories."
+named app, plugin, library, skill collection, tool tap, website and organization
+`.github` repositories."
 
 Context and files:
 
 - Workspace instructions declare root read-first docs and independent child
   Git boundaries. Targets use different documentation casing and paths.
-- The skill collection, tool tap, and website have no ecosystem documentation
-  adapter. Community-file inheritance inputs are inherited, local, mixed with
-  local files identified, or absent.
+- The skill collection, tool tap, website and organization `.github`
+  repository have no ecosystem documentation adapter. Community-file inheritance
+  inputs are inherited, local, mixed with local files identified, or absent.
 - Unnamed dependency checkouts, caches, agent state, and scratch also exist.
 
 Expected output: Read declared contracts, inspect only named owners, preserve
-local conventions and community-file inheritance decisions, and rank confirmed
-findings without counting ranges twice.
+ecosystem adapters' paths and community-file inheritance decisions, and rank
+confirmed findings without counting ranges twice. For targets without an
+adapter, report normalization to `docs/` with architecture, proposals,
+decisions, migrations, archive and reference roles, optional published API
+reference, and lowercase kebab-case file names. Preserve conventional README
+and GitHub file names.
 
 Forbidden behavior: Recursively scan all workspace contents; impose one
 language's document tree; move child repositories; propose local copies of
 inherited community files.
 
 Acceptance checks: Every named target is accounted for; excluded areas are not
-enumerated; destinations follow each target's existing document convention and
-the supplied community-file inheritance decision. An absent decision produces
-no community-health files and a report that the decision is needed.
+enumerated; destinations follow the ecosystem adapter or the non-adapter
+`docs/` rule and the supplied community-file inheritance decision. An absent
+decision produces no community-health files and a report that the decision is needed.
 
 Baseline expectation: A project-specific normalizer may impose its own paths.
 

@@ -67,3 +67,40 @@ Evidence sources:
 Owner notes:
 
 - Neutral fixture inputs; execution evidence stays in ignored output.
+
+## source-derived-front-matter
+
+Target behavior: Include an upstream template with machine-readable design
+values while preserving its source design.
+
+Input prompt: "Add Google DESIGN.md front matter to these reviewed iOS and
+Liquid Glass templates, preserving their bodies and source provenance."
+
+Context and files:
+
+- Integrated upstream segments identify each local template and reviewed
+  source commit. The template bodies state palettes, type metrics, spacing,
+  radii and some components; other values remain qualitative or variable.
+
+Expected output:
+
+- Derive supported front-matter values from each template's own text. Map
+  native points to the same number of px, including letter spacing. Keep
+  unsupported shapes and qualitative behavior in the unchanged body.
+- Record added front matter in each segment's outcome without changing its
+  source paths or reviewed commit. Define components only from stated values.
+
+Forbidden behavior:
+
+- Invent values or components, alter source colors to silence contrast
+  warnings, rewrite the body, or claim a new upstream review revision.
+
+Acceptance checks:
+
+- Every template has zero lint errors. Report any source-preserving contrast
+  or orphaned-token warnings by template and reason. Body bytes, source paths
+  and reviewed commits are unchanged.
+
+Evidence sources:
+
+- Source/body comparison, front-matter review, provenance diff and lint output.

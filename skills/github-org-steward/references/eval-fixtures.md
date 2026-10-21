@@ -116,9 +116,12 @@ Expected output:
   `profile/README.md` in their respective repositories, defaults live in public
   `.github`, licenses cannot be defaults, and starter workflows pair
   `workflow-templates/<name>.yml` with `<name>.properties.json`.
-- Show the shared layout with root DESIGN, `design/fonts/`,
-  `design/icons/<name>/`, catalog and generated profile/assets. Keep
-  per-repository selections in the catalog and policy in public `.github`.
+- Show the shared layout with root DESIGN, `.github/design/fonts/`,
+  `.github/design/icons/<name>/layers/` and `provenance.json`, catalog and
+  consumed `profile/assets/`. Keep per-repository selections in the catalog
+  and policy in public `.github`. Regenerate `.icon` documents in ignored
+  scratch and record consumed-copy digests instead of committing duplicate
+  exports or Icon Composer documents.
 
 Forbidden behavior:
 

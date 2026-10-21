@@ -476,10 +476,10 @@ node "$toolchain_dir/src/cli.ts" terminal record \
   --out .github/assets/terminal/recording.json
 node "$toolchain_dir/src/cli.ts" terminal render \
   --recording .github/assets/terminal/recording.json --design .build/standard/DESIGN.md \
-  --fonts .build/standard/design/fonts --out-dir .github/assets/terminal
+  --fonts .build/standard/.github/design/fonts --out-dir .github/assets/terminal
 node "$toolchain_dir/src/cli.ts" terminal check \
   --assets .github/assets/terminal --design .build/standard/DESIGN.md \
-  --fonts .build/standard/design/fonts --executable .build/release/demo \
+  --fonts .build/standard/.github/design/fonts --executable .build/release/demo \
   --artifact-dir .build/presentation-artifact
 ```
 

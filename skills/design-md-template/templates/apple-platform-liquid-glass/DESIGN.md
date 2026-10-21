@@ -1,3 +1,98 @@
+---
+version: "alpha"
+name: "Apple — Glass / Soft-Futurism Reference"
+description: "Reference DESIGN.md for premium consumer software with translucent surfaces. SF Pro everywhere, system tints sparingly, vibrancy materials over solid fills."
+colors:
+  bg: "#ffffff"
+  bg-elevated: "#ffffff"
+  surface-grouped: "#f2f2f7"
+  separator: "rgba(60,60,67,0.18)"
+  text: "#1d1d1f"
+  text-secondary: "rgba(60,60,67,0.78)"
+  text-tertiary: "rgba(60,60,67,0.55)"
+  bg-dark: "#000000"
+  bg-elevated-dark: "#1c1c1e"
+  surface-grouped-dark: "#2c2c2e"
+  separator-dark: "rgba(84,84,88,0.65)"
+  primary: "#007aff"
+  system-green: "#34c759"
+  system-red: "#ff3b30"
+  system-orange: "#ff9500"
+  system-purple: "#af52de"
+  system-pink: "#ff2d55"
+  system-yellow: "#ffcc00"
+  material-thin: "rgba(255,255,255,0.6)"
+  material-regular: "rgba(255,255,255,0.78)"
+  material-thick: "rgba(255,255,255,0.92)"
+typography:
+  body-touch:
+    fontFamily: "SF Pro Text, system-ui"
+    fontSize: "17px"
+  body-desktop:
+    fontFamily: "SF Pro Text, system-ui"
+    fontSize: "13px"
+  large-title:
+    fontFamily: "SF Pro Display, system-ui"
+    fontSize: "34px"
+    fontWeight: 600
+  nav-title:
+    fontFamily: "SF Pro Text, system-ui"
+    fontSize: "17px"
+    fontWeight: 600
+  button:
+    fontWeight: 600
+  code:
+    fontFamily: "SF Mono, Menlo"
+rounded:
+  radius-10: "10px"
+  radius-12: "12px"
+  radius-14: "14px"
+  radius-16: "16px"
+spacing:
+  base: "8px"
+  space-4: "4px"
+  space-8: "8px"
+  space-12: "12px"
+  space-16: "16px"
+  space-20: "20px"
+  space-24: "24px"
+  space-32: "32px"
+  space-44: "44px"
+  space-56: "56px"
+  space-80: "80px"
+components:
+  button-primary:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.bg}"
+    typography: "{typography.button}"
+    rounded: "{rounded.radius-12}"
+    padding: "10px 20px"
+  button-bordered:
+    textColor: "{colors.primary}"
+    backgroundColor: "transparent"
+  button-plain:
+    textColor: "{colors.primary}"
+  card:
+    backgroundColor: "{colors.bg-elevated}"
+    rounded: "{rounded.radius-14}"
+  card-dark:
+    backgroundColor: "{colors.bg-elevated-dark}"
+    rounded: "{rounded.radius-14}"
+  grouped-list:
+    backgroundColor: "{colors.surface-grouped}"
+  grouped-list-dark:
+    backgroundColor: "{colors.surface-grouped-dark}"
+  sheet:
+    backgroundColor: "{colors.material-regular}"
+  input:
+    backgroundColor: "{colors.surface-grouped}"
+    rounded: "{rounded.radius-10}"
+    padding: "11px 14px"
+  nav-bar:
+    backgroundColor: "{colors.material-thin}"
+    typography: "{typography.nav-title}"
+---
+
 # Apple — Glass / Soft-Futurism Reference
 
 Reference DESIGN.md for premium consumer software with translucent surfaces. SF Pro everywhere, system tints sparingly, vibrancy materials over solid fills.
