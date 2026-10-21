@@ -1,6 +1,6 @@
 # Documentation
 
-- [Versioning and Release](architecture/versioning-and-release.md): current version and release rules.
+- [Release](reference/release.md): release facts and mechanics; version rules are in VERSIONING.
 
 This directory is the repository documentation index.
 

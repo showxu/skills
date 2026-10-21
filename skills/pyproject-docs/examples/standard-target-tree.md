@@ -35,7 +35,6 @@ community files from the target tree.
     README.md
     architecture/
       README.md
-      versioning-and-release.md
       package-layout.md
       generated-artifacts.md
     proposals/
@@ -48,6 +47,7 @@ community files from the target tree.
       README.md
     reference/
       README.md
+      release.md
     api/
       README.md
   .github/

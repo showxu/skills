@@ -316,9 +316,9 @@ agent guide for this project."
 Context and files:
 
 - `AGENTS.md` has the canonical contract but no `## Code Review Rules`.
-- `docs/architecture/versioning-and-release.md` defines the version bump and
-  the change record; `pyproject.toml` declares console scripts and
-  `requires-python`.
+- `VERSIONING.md` defines the version bump and the change record;
+  `docs/reference/release.md` records the compatibility surface;
+  `pyproject.toml` declares console scripts and `requires-python`.
 - The project's check command already runs a formatter, a linter, and a type
   checker.
 
@@ -327,8 +327,8 @@ Expected output:
 - `AGENTS.md` gains `## Code Review Rules` with `###` groups for compatibility
   and versioning, claims, public documentation, and tests, each naming the
   behavior, the reason, and the safe path.
-- The versioning rule routes to `versioning-and-release.md` instead of
-  copying its bump rules.
+- The versioning rule routes to VERSIONING and the
+  release reference instead of copying its bump rules.
 - Formatting, lint, and type errors are left to the check command.
 - No `CLAUDE.md` or `REVIEW.md` is created.
 

@@ -103,6 +103,14 @@ Retry interrupted publication against the same accepted tag without replacing
 existing assets. Release builds, platform matrices, packages, stores and consumer
 installation procedures belong to the ecosystem's release skill.
 
+Version rules live only in VERSIONING. A repository's release facts and
+mechanics live in its release reference, which the ecosystem's documentation
+skill creates: `Documentation/Reference/Release.md` for SwiftPM packages, or
+`docs/reference/release.md`. VERSIONING's release owner names that reference,
+and its release details keep only the repository checks. Report any other
+document that restates version rules, such as an architecture versioning page,
+as a duplicate owner and route its facts to the release reference.
+
 ## Boundaries and routing
 
 This skill owns repository settings, conformance, README information and

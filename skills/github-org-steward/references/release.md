@@ -1,8 +1,10 @@
 # Coordinated publication
 
 One repository's versions, tags, changelog, release mechanics and immutable
-assets belong to its repository steward and ecosystem release owner. The
-organization owns shared version policy and the order/evidence across members.
+assets belong to its repository steward and ecosystem release owner. Each
+member records its release facts and mechanics in its release reference, as
+`github-repo-steward` describes. The organization owns shared version policy
+and the order/evidence across members.
 Do not duplicate per-component release commands here.
 
 ## Shared version policy

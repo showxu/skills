@@ -894,3 +894,52 @@ Evidence sources:
 Owner notes:
 
 - Neutral fixture inputs; execution evidence stays in ignored output.
+
+## duplicate-version-owner
+
+Target behavior: Report any other document that restates version rules, such as
+an architecture versioning page, as a duplicate owner and route its facts to
+the release reference.
+
+Input prompt: "Audit our Swift package's release documentation against the standard."
+
+Context and files:
+
+- Root `VERSIONING.md` from the template.
+- `Documentation/Architecture/VersioningAndRelease.md` restates the 0.x bump
+  rules and records the version source and compatibility surface.
+- `Documentation/Reference/Release.md` holds the release commands.
+
+Expected output:
+
+- A finding that names `VersioningAndRelease.md` as a duplicate owner of
+  version rules; its facts route to `Documentation/Reference/Release.md`
+  through `swiftpm-docs`.
+- VERSIONING's release owner links the release reference; no rule text is
+  copied into the release reference.
+
+Forbidden behavior:
+
+- Keeping both documents as rule owners, copying bump rules into the release
+  reference, or editing files during an audit-only request.
+
+Acceptance checks:
+
+- A finding that names `VersioningAndRelease.md` as a duplicate owner of
+  version rules; its facts route to `Documentation/Reference/Release.md`
+  through `swiftpm-docs`.
+- VERSIONING's release owner links the release reference; no rule text is
+  copied into the release reference.
+
+Baseline expectation:
+
+- Keeping both documents as rule owners, copying bump rules into the release
+  reference, or editing files during an audit-only request.
+
+Evidence sources:
+
+- Executor output, accepted revisions, captured observations and command traces.
+
+Owner notes:
+
+- Neutral fixture inputs; execution evidence stays in ignored output.
