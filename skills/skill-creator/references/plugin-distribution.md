@@ -78,8 +78,9 @@ group. The collection's own taxonomy or authoring docs own that choice.
 - Give each host a README install section with the exact marketplace and plugin
   names, a local-testing command, and the "plugin or direct install, not both"
   note. Keep direct-install instructions in their own section.
-- Record which files publish what, and the version rule, in the collection's
-  authoring docs. Repository facts stay there, not in this reference.
+- Record which files publish what in the collection's authoring docs, and its
+  version source and mirrors in its VERSIONING. Repository facts stay there,
+  not in this reference.
 
 ## Verify Before Presenting
 

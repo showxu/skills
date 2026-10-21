@@ -88,19 +88,21 @@ def collection_findings(root):
         result = validator.validate_skill(path, package_mode=True)
         findings.extend(f"{name}: {value}" for value in result["errors"])
         warnings.extend(f"{name}: {value}" for value in result["warnings"])
+    version = (root / "VERSION").read_text().strip()
     claude = json.loads((root / ".claude-plugin/marketplace.json").read_text())
     claude_plugin = json.loads((root / ".claude-plugin/plugin.json").read_text())
     codex = json.loads((root / ".codex-plugin/plugin.json").read_text())
     marketplace = json.loads((root / ".agents/plugins/marketplace.json").read_text())
-    if not (codex["version"] == claude_plugin["version"] == claude["metadata"]["version"]):
-        findings.append("Claude plugin, Codex plugin and Claude marketplace versions differ")
+    if not (version == codex["version"] == claude_plugin["version"]
+            == claude["metadata"]["version"]):
+        findings.append("VERSION, Claude plugin, Codex plugin and Claude marketplace versions differ")
     identity_fields = ("name", "version", "description", "author", "homepage",
                        "repository", "license", "keywords")
     identity = {key: codex[key] for key in identity_fields if key in codex}
     if claude_plugin != identity:
         findings.append("Claude plugin must mirror the supported Codex identity fields")
-    if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", codex["version"]):
-        findings.append("Plugin version must have three numeric components")
+    if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version):
+        findings.append("VERSION must have three numeric components")
     if codex["skills"] != "./skills/":
         findings.append("Codex plugin must expose the local skills directory")
     if (len(marketplace["plugins"]) != 1

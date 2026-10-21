@@ -236,8 +236,7 @@ The repository publishes skills through these manifests:
 - `.codex-plugin/plugin.json`: the root `showxu-skills` Codex plugin, which
   exposes `./skills/`.
 
-The Claude and Codex plugin manifest versions equal Claude marketplace
-`metadata.version`. The Claude plugin manifest owns its installation version.
+Version source and mirrors: [VERSIONING](../VERSIONING.md#version-source).
 
 Codex CLI 0.139.0 requires a local source to name a nonempty normal subdirectory
 under its marketplace root. A Git URL source supports a plugin at the repository

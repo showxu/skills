@@ -9,7 +9,8 @@ trigger hardening, and multi-skill review, use `skills/skill-creator/`.
 - `SKILL.md` frontmatter has `name` and `description`
 - frontmatter `name` matches directory name
 - the Claude marketplace publishes one root plugin with the same identity as Codex
-- Claude and Codex plugin versions equal Claude marketplace `metadata.version`
+- the version source and its mirrors agree, as
+  [VERSIONING](../../VERSIONING.md#version-source) lists them
 - published skills have manual entry metadata when the repo expects it
 - README, AGENTS, and docs do not point to stale paths
 

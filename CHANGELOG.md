@@ -15,6 +15,8 @@
   duplicate owners, `github-org-steward` routes member documentation to the
   ecosystem documentation skills, and `repository-docs` places release
   mechanics in `docs/reference/release.md`.
+- `skill-creator` places a collection's version source and mirrors in its
+  VERSIONING.
 
 ## 0.1.1
 

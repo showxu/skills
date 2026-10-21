@@ -57,12 +57,13 @@ release, which may start at `0.1.0`.
 
 ## Version source
 
-The version source is `metadata.version` in the [Claude marketplace manifest](.claude-plugin/marketplace.json).
+The version source is the [`VERSION`](VERSION) file.
 
 Files that mirror it:
 
 - [.claude-plugin/plugin.json](.claude-plugin/plugin.json): `version`
 - [.codex-plugin/plugin.json](.codex-plugin/plugin.json): `version`
+- [.claude-plugin/marketplace.json](.claude-plugin/marketplace.json): `metadata.version`
 
 Update the source and its mirrors together in the release change.
 
