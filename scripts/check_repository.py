@@ -14,6 +14,9 @@ PRIVATE_PARTS = {".agent", ".codex", ".workspace", ".build", "__pycache__"}
 PRIVATE_PATH = re.compile(rb"/(?:Users|home)/[A-Za-z0-9][A-Za-z0-9_.@-]*/")
 TOKEN = re.compile(rb"(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,})")
 PRIVATE_KEY = re.compile(rb"^-----BEGIN (?:[A-Z]+ )?PRIVATE KEY-----\r?$", re.M)
+PLUGIN_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
+PLUGIN_NAME = re.compile(r"(?!.*(?:--|\.\.))[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?")
+PLUGIN_STRINGS = ("version", "description", "homepage", "repository", "license")
 
 
 def git(root, *args, data=None):
@@ -76,6 +79,36 @@ def publication_findings(root, revision):
     return findings
 
 
+def plugin_manifest_findings(plugin):
+    """Check a root plugin.json against the Agent Plugins 1.0.0 manifest schema."""
+    if not isinstance(plugin, dict):
+        return ["Root plugin must be a JSON object"]
+    findings = []
+    name = plugin.get("name")
+    author = plugin.get("author", {})
+    keywords = plugin.get("keywords", [])
+    extensions = plugin.get("extensions", {})
+    if plugin.get("$schema") != PLUGIN_SCHEMA:
+        findings.append("Root plugin must name the Agent Plugins 1.0.0 schema")
+    if not (isinstance(name, str) and len(name) <= 64 and PLUGIN_NAME.fullmatch(name)):
+        findings.append("Root plugin name is not a valid Agent Plugins name")
+    if set(plugin) - {"$schema", "name", "author", "keywords", "extensions", *PLUGIN_STRINGS}:
+        findings.append("Root plugin has fields outside the Agent Plugins schema")
+    if any(key in plugin and not isinstance(plugin[key], str) for key in PLUGIN_STRINGS):
+        findings.append("Root plugin version, description, homepage, repository and license must be strings")
+    if not (isinstance(author, dict) and set(author) <= {"name", "email", "url"}
+            and all(isinstance(value, str) for value in author.values())):
+        findings.append("Root plugin author must hold only name, email and url strings")
+    if not (isinstance(keywords, list) and all(isinstance(value, str) for value in keywords)):
+        findings.append("Root plugin keywords must be a list of strings")
+    if not (isinstance(extensions, dict)
+            and all(isinstance(value, dict) for value in extensions.values())):
+        findings.append("Root plugin extensions must map each namespace to an object")
+    elif not isinstance(extensions.get("com.openai", {}).get("interface"), dict):
+        findings.append("Root plugin must carry the Codex interface in extensions.com.openai")
+    return findings
+
+
 def collection_findings(root):
     spec = importlib.util.spec_from_file_location(
         "skill_package_validator", root / "skills/skill-creator/scripts/validate_skill_package.py")
@@ -91,29 +124,28 @@ def collection_findings(root):
     version = (root / "VERSION").read_text().strip()
     claude = json.loads((root / ".claude-plugin/marketplace.json").read_text())
     claude_plugin = json.loads((root / ".claude-plugin/plugin.json").read_text())
-    codex = json.loads((root / ".codex-plugin/plugin.json").read_text())
+    plugin = json.loads((root / "plugin.json").read_text())
     marketplace = json.loads((root / ".agents/plugins/marketplace.json").read_text())
-    if not (version == codex["version"] == claude_plugin["version"]
+    if not (version == plugin["version"] == claude_plugin["version"]
             == claude["metadata"]["version"]):
-        findings.append("VERSION, Claude plugin, Codex plugin and Claude marketplace versions differ")
+        findings.append("VERSION, root plugin, Claude plugin and Claude marketplace versions differ")
     identity_fields = ("name", "version", "description", "author", "homepage",
                        "repository", "license", "keywords")
-    identity = {key: codex[key] for key in identity_fields if key in codex}
+    identity = {key: plugin[key] for key in identity_fields if key in plugin}
     if claude_plugin != identity:
-        findings.append("Claude plugin must mirror the supported Codex identity fields")
+        findings.append("Claude plugin must mirror the root plugin's identity fields")
     if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version):
         findings.append("VERSION must have three numeric components")
-    if codex["skills"] != "./skills/":
-        findings.append("Codex plugin must expose the local skills directory")
+    findings.extend(plugin_manifest_findings(plugin))
     if (len(marketplace["plugins"]) != 1
-            or marketplace["plugins"][0]["name"] != codex["name"]
+            or marketplace["plugins"][0]["name"] != plugin["name"]
             or marketplace["plugins"][0]["source"] != {
                 "source": "url", "url": "https://github.com/showxu/skills.git", "ref": "master"}):
         findings.append("Codex marketplace does not identify this repository's main plugin")
-    if (claude["name"] != codex["name"]
+    if (claude["name"] != plugin["name"]
             or claude["plugins"] != [{
-                "name": codex["name"], "source": "./",
-                "description": codex["description"]}]):
+                "name": plugin["name"], "source": "./",
+                "description": plugin["description"]}]):
         findings.append("Claude marketplace must publish the single root collection plugin")
     print(f"Checked {len(skills)} skill packages and both marketplaces")
     for warning in warnings:

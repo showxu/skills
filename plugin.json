@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "showxu-skills",
+  "version": "0.1.2",
+  "description": "Skills for product, design, Web development, go-to-market, software engineering, and skill authoring.",
+  "author": {
+    "name": "showxu"
+  },
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "showxu Skills",
+        "shortDescription": "Product, design, engineering, and skill workflows",
+        "developerName": "showxu",
+        "category": "Developer Tools"
+      }
+    }
+  }
+}
