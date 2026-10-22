@@ -226,23 +226,24 @@ Use these questions when reviewing a skill:
 
 The repository publishes skills through these manifests:
 
-- `.claude-plugin/plugin.json`: the root `showxu-skills` Claude plugin.
-  Claude discovers its skills from `skills/`.
+- `plugin.json`: the root `showxu-skills` plugin in the portable Agent Plugins
+  format, with its Codex interface under `extensions.com.openai`. Codex
+  discovers its skills from `skills/`.
+- `.claude-plugin/plugin.json`: the root `showxu-skills` Claude plugin, with the
+  same identity fields as `plugin.json`. Claude discovers its skills from
+  `skills/`.
 - `.claude-plugin/marketplace.json`: the `showxu-skills` marketplace with one
   `showxu-skills` entry containing its name, description, and `source: "./"`.
 - `.agents/plugins/marketplace.json`: the `showxu-skills` Codex marketplace.
   Its single plugin uses the `showxu/skills` Git repository at `master` as its
   source root.
-- `.codex-plugin/plugin.json`: the root `showxu-skills` Codex plugin, which
-  exposes `./skills/`.
 
 Version source and mirrors: [VERSIONING](../VERSIONING.md#version-source).
 
-Codex CLI 0.139.0 requires a local source to name a nonempty normal subdirectory
-under its marketplace root. A Git URL source supports a plugin at the repository
-root. For a working-tree installation check, copy the prospective published
-files into `release/` under a temporary marketplace and point its local source
-at `./release`. This fixture checks the plugin content; Git source installation
+The Codex marketplace installs the plugin from a published Git revision. For a
+working-tree installation check, copy the prospective published files into
+`release/` under a temporary marketplace and point its local source at
+`./release`. This fixture checks the plugin content; Git source installation
 and marketplace refresh require a separately published revision.
 
 Run package validation per skill and `claude plugin validate .`. For isolated

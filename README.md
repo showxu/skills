@@ -8,7 +8,7 @@ requirements, workflow, and supporting resources.
 ## Codex
 
 The `showxu-skills` marketplace publishes one `showxu-skills` plugin containing
-the repository's `skills/` directory.
+the repository's `skills/` directory. It needs Codex CLI 0.147.0 or later.
 
 ```bash
 codex plugin marketplace add showxu/skills --ref master

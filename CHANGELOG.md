@@ -10,6 +10,12 @@
 - Skills track work done in place in the task plan and file issues only for
   work handed to another owner or recorded publicly (`github-flow`,
   `github-org-steward`, `coding-plan`, `repository-docs`, `pyproject-docs`).
+- The `showxu-skills` plugin manifest for Codex is the portable Agent Plugins
+  `plugin.json` at the repository root, with the Codex interface under
+  `extensions.com.openai`; `.codex-plugin/plugin.json` is removed. Codex needs
+  CLI 0.147.0 or later to install the plugin. `skill-creator` publishes Codex
+  plugins with the root manifest and checks the Codex inventory in the
+  installed cache.
 
 ## 0.1.2
 

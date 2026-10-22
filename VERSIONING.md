@@ -57,8 +57,8 @@ The version source is the [`VERSION`](VERSION) file.
 
 Files that mirror it:
 
+- [plugin.json](plugin.json): `version`
 - [.claude-plugin/plugin.json](.claude-plugin/plugin.json): `version`
-- [.codex-plugin/plugin.json](.codex-plugin/plugin.json): `version`
 - [.claude-plugin/marketplace.json](.claude-plugin/marketplace.json): `metadata.version`
 
 Update the source and its mirrors together in the release change.

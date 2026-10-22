@@ -14,6 +14,7 @@ PRIVATE_PARTS = {".agent", ".codex", ".workspace", ".build", "__pycache__"}
 PRIVATE_PATH = re.compile(rb"/(?:Users|home)/[A-Za-z0-9][A-Za-z0-9_.@-]*/")
 TOKEN = re.compile(rb"(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,})")
 PRIVATE_KEY = re.compile(rb"^-----BEGIN (?:[A-Z]+ )?PRIVATE KEY-----\r?$", re.M)
+PLUGIN_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
 
 
 def git(root, *args, data=None):
@@ -91,29 +92,32 @@ def collection_findings(root):
     version = (root / "VERSION").read_text().strip()
     claude = json.loads((root / ".claude-plugin/marketplace.json").read_text())
     claude_plugin = json.loads((root / ".claude-plugin/plugin.json").read_text())
-    codex = json.loads((root / ".codex-plugin/plugin.json").read_text())
+    plugin = json.loads((root / "plugin.json").read_text())
     marketplace = json.loads((root / ".agents/plugins/marketplace.json").read_text())
-    if not (version == codex["version"] == claude_plugin["version"]
+    if not (version == plugin["version"] == claude_plugin["version"]
             == claude["metadata"]["version"]):
-        findings.append("VERSION, Claude plugin, Codex plugin and Claude marketplace versions differ")
+        findings.append("VERSION, root plugin, Claude plugin and Claude marketplace versions differ")
     identity_fields = ("name", "version", "description", "author", "homepage",
                        "repository", "license", "keywords")
-    identity = {key: codex[key] for key in identity_fields if key in codex}
+    identity = {key: plugin[key] for key in identity_fields if key in plugin}
     if claude_plugin != identity:
-        findings.append("Claude plugin must mirror the supported Codex identity fields")
+        findings.append("Claude plugin must mirror the root plugin's identity fields")
     if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version):
         findings.append("VERSION must have three numeric components")
-    if codex["skills"] != "./skills/":
-        findings.append("Codex plugin must expose the local skills directory")
+    if (plugin.get("$schema") != PLUGIN_SCHEMA
+            or set(plugin) - {"$schema", "extensions", *identity_fields}):
+        findings.append("Root plugin must use only Agent Plugins 1.0.0 manifest fields")
+    if not isinstance(plugin.get("extensions", {}).get("com.openai", {}).get("interface"), dict):
+        findings.append("Root plugin must carry the Codex interface in extensions.com.openai")
     if (len(marketplace["plugins"]) != 1
-            or marketplace["plugins"][0]["name"] != codex["name"]
+            or marketplace["plugins"][0]["name"] != plugin["name"]
             or marketplace["plugins"][0]["source"] != {
                 "source": "url", "url": "https://github.com/showxu/skills.git", "ref": "master"}):
         findings.append("Codex marketplace does not identify this repository's main plugin")
-    if (claude["name"] != codex["name"]
+    if (claude["name"] != plugin["name"]
             or claude["plugins"] != [{
-                "name": codex["name"], "source": "./",
-                "description": codex["description"]}]):
+                "name": plugin["name"], "source": "./",
+                "description": plugin["description"]}]):
         findings.append("Claude marketplace must publish the single root collection plugin")
     print(f"Checked {len(skills)} skill packages and both marketplaces")
     for warning in warnings:

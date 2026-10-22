@@ -573,8 +573,9 @@ Context and files:
 
 Expected output:
 
-- Adds `.agents/plugins/marketplace.json` and one `.codex-plugin/plugin.json`
-  rooted at the repository with `"skills": "./skills/"`.
+- Adds `.agents/plugins/marketplace.json` and one root `plugin.json` in the
+  Agent Plugins format, with the Codex interface under `extensions.com.openai`
+  and skills discovered from `skills/`.
 - Uses the same release version as the Claude marketplace, and leaves Claude
   entry versions unpinned unless every release bumps them.
 - Adds a Codex install section next to the existing install routes, with the
