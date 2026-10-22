@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -52,6 +53,34 @@ class PublicationTests(unittest.TestCase):
             self.assertIn("文档.md: workstation path", findings)
             self.assertIn("private/config: tracked despite publication exclusion", findings)
 
+
+class PluginManifestTests(unittest.TestCase):
+    def setUp(self):
+        self.plugin = json.loads((Path(__file__).resolve().parents[2] / "plugin.json").read_text())
+
+    def test_published_manifest_matches_the_schema(self):
+        self.assertEqual(repository.plugin_manifest_findings(self.plugin), [])
+
+    def test_schema_violations_are_reported(self):
+        cases = {
+            "schema": (lambda m: m.update({"$schema": "https://example.com/plugin.json"}),
+                       "1.0.0 schema"),
+            "name": (lambda m: m.update(name="Show--Skills"), "valid Agent Plugins name"),
+            "skills field": (lambda m: m.update(skills="./skills/"), "outside the Agent Plugins"),
+            "top-level interface": (lambda m: m.update(interface={}), "outside the Agent Plugins"),
+            "version type": (lambda m: m.update(version=1), "must be strings"),
+            "author field": (lambda m: m["author"].update(handle="showxu"), "author"),
+            "keywords type": (lambda m: m.update(keywords="skills"), "keywords"),
+            "namespace type": (lambda m: m["extensions"].update({"org.example": []}),
+                               "each namespace"),
+            "missing interface": (lambda m: m["extensions"]["com.openai"].pop("interface"),
+                                  "Codex interface"),
+        }
+        for name, (change, message) in cases.items():
+            with self.subTest(case=name):
+                plugin = json.loads(json.dumps(self.plugin))
+                change(plugin)
+                self.assertIn(message, "\n".join(repository.plugin_manifest_findings(plugin)))
 
 if __name__ == "__main__":
     unittest.main()
