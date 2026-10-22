@@ -128,8 +128,9 @@ repository:
 - Current Truth: `docs/architecture/*`
 - Proposal: `docs/proposals/*`
 - History: `docs/decisions/*`, `docs/migrations/*`, `docs/archive/*`
-- Open Work: the repository's GitHub issues; documents link to them instead of
-  listing work
+- Open Work: the owner's task plan while in progress; the repository's GitHub
+  issues for work handed off or recorded publicly. Documents link to issues
+  instead of listing work
 - Governance: `.github/*` and root policy files
 - Reference: `docs/reference/*`
 - Python API Reference: `docs/api/*` when generated or intentionally authored

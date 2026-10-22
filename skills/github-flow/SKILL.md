@@ -1,6 +1,6 @@
 ---
 name: github-flow
-description: "GitHub flow: file a well-formed issue in its owning repository when work is discovered for later, or land any change through a merged, test-backed GitHub pull request, with or without an issue, then clean up and optionally tag a release. Also apply the flow to local repositories without a remote or explicitly local work before any push. Use for fixing or implementing a GitHub issue, opening or merging a pull request, repository commit and signing conventions, branch naming including issue-linked branches, test-first fixes, pull request hygiene, diagnosing failing CI check runs, post-merge branch and worktree cleanup, and issue-driven release tags. Do not use for release readiness audits without a change to land, store or package-manager publishing, or repositories hosted on other platforms such as GitLab."
+description: "GitHub flow: file a well-formed issue in its owning repository when work is handed to another owner or needs a public record, or land any change through a merged, test-backed GitHub pull request, with or without an issue, then clean up and optionally tag a release. Also apply the flow to local repositories without a remote or explicitly local work before any push. Use for fixing or implementing a GitHub issue, opening or merging a pull request, repository commit and signing conventions, branch naming including issue-linked branches, test-first fixes, pull request hygiene, diagnosing failing CI check runs, post-merge branch and worktree cleanup, and issue-driven release tags. Do not use for release readiness audits without a change to land, store or package-manager publishing, or repositories hosted on other platforms such as GitLab."
 ---
 
 # GitHub Flow
@@ -21,8 +21,8 @@ See [primary sources](references/sources.md) for the specifications and document
 
 ## When To Use
 
-- Work is discovered for later and needs a well-formed issue in its owning
-  repository.
+- Work is handed to another owner, or a user-facing problem needs a public
+  record, and needs a well-formed issue in its owning repository.
 - The user asks to fix, implement, or close a GitHub issue.
 - Any change needs to land through a GitHub pull request, with or without an
   issue, including opening or merging a pull request.
@@ -54,6 +54,10 @@ See [primary sources](references/sources.md) for the specifications and document
 - Current check runs on the pull request head.
 
 ## Filing an issue
+
+File an issue only when the work leaves its current owner or a user-facing
+problem needs a public record. Work its owner does in place needs no issue:
+track it in the task's plan and describe it in its pull request.
 
 1. Choose the repository whose code, documentation or settings would change.
    Organization-wide work goes to the tracker designated for shared standards.

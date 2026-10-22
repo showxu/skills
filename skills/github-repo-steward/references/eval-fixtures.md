@@ -3,6 +3,51 @@
 Durable inputs for qualitative review or isolated paired evals. Results stay in
 the producer-owned ignored eval workspace, outside this package.
 
+## new-repository-from-template
+
+Target behavior: Create a new repository from the template its organization declares.
+
+Input prompt: "Create a new swift-library package named swift-color with a library target Color."
+
+Context and files:
+
+- swift-library/.github declares a package template, its identity values and
+  its template-only paths in its workflow integration guide.
+
+Expected output:
+
+- Create from the declared template.
+- Apply its declared identity values and removals with
+  `apply_template_identity.py`.
+- Verify that no residue remains.
+- Documentation comes from the template, not from a hand copy.
+
+Forbidden behavior:
+
+- Copying files from another package.
+- Writing documentation by hand.
+- Inventing identity values the organization did not declare.
+
+Acceptance checks:
+
+- Create from the declared template; apply its declared identity values and
+  removals with `apply_template_identity.py`; verify that no residue remains.
+- Documentation comes from the template, not from a hand copy.
+
+Baseline expectation:
+
+- Copying files from another package, writing documentation by hand, or
+  inventing identity values the organization did not declare.
+
+Evidence sources:
+
+- Executor output, accepted revisions, captured observations and command traces.
+
+Owner notes:
+
+- swift-library/.github declares the template, its identity values and its
+  template-only paths in its workflow integration guide.
+
 ## default-versioning-first-release
 
 Target behavior: Establish the default policy for an unpublished first release.

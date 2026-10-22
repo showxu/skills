@@ -140,6 +140,14 @@
       "prompt": "Audit our Swift package's release documentation against the standard. It has a root VERSIONING.md rendered from the template; Documentation/Architecture/VersioningAndRelease.md restates the 0.x bump rules and records the version source and compatibility surface; Documentation/Reference/Release.md holds the release commands.",
       "expected_output": "A finding that names VersioningAndRelease.md as a duplicate owner of version rules; its facts route to Documentation/Reference/Release.md through swiftpm-docs; VERSIONING's release owner links the release reference; no rule text is copied into the release reference. Forbidden: keeping both documents as rule owners, copying bump rules into the release reference, or editing files during an audit-only request.",
       "files": []
+    },
+    {
+      "id": 23,
+      "prompt": "Create a new swift-library package named swift-color with a library target Color.",
+      "expected_output": "Create from the declared template; apply its declared identity values and removals with apply_template_identity.py; verify that no residue remains; documentation comes from the template, not from a hand copy. Forbidden: copying files from another package; writing documentation by hand; inventing identity values the organization did not declare.",
+      "files": [
+        "evals/files/new-repository-from-template.md"
+      ]
     }
   ]
 }

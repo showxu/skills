@@ -47,6 +47,13 @@ concurrent writers are implied.
    Run repository-owned checks, not a second competing content policy.
    Use [layout](references/layout.md) for GitHub-defined paths and the shared
    presentation-asset layout.
+   For a new repository, use the template its organization declares for that
+   kind of repository, when there is one: create the repository from it with
+   `gh repo create <owner>/<name> --template <template>`, replace the declared
+   identity values with `scripts/apply_template_identity.py`, and remove the
+   declared template-only paths. Otherwise assemble the repository from the
+   ecosystem's initializer, the documentation profile its docs skill exports,
+   and this standard.
 3. **Apply.** Put settings declarations and their live changes together; source
    changes use signed PRs. Use the [CI contract](references/ci.md) for policy and
    validation separation, safe concurrency, full pins and drift observations.
