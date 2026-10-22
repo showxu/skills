@@ -11,7 +11,7 @@ community files from the target tree.
 - Proposal: `docs/proposals/*`
 - Truth: `docs/architecture/*`
 - History: `docs/decisions/*`, `docs/migrations/*`, `docs/archive/*`
-- Open Work: GitHub issues; documents link to them
+- Open Work: task plans; GitHub issues for handed-off work, linked from documents
 - Governance: `.github/*` and root governance files
 - Reference: `docs/reference/*`
 - API Reference: `docs/api/*` when intentionally published

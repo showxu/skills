@@ -112,25 +112,22 @@ contract into this skill.
 
 ## Open work
 
-Unresolved organization work is tracked as issues, never as hand-maintained
-lists:
+Work the orchestrator does in place is tracked in its plan, and its changes
+land as pull requests that describe them; it needs no issue. Open an issue only
+when work leaves the orchestrator or deserves a public record:
 
-- Work in one repository: an issue in that repository, filed through
-  `github-flow`.
-- Organization-wide work (shared standards, shared workflows, settings,
-  rulesets, Apps, profile, pins, family identity): an issue in the organization's
-  `.github` repository.
-- Sensitive governance gaps, such as a security setting or App permission
-  problem: the organization's private `.github-private` repository when one exists.
-  Vulnerabilities go through the affected repository's private vulnerability
-  reporting.
-- A rollout across repositories: one tracking issue in `.github` with the
-  decision, waves and member checklist. Member changes land as pull requests
-  that reference it; a member issue exists only for a member-specific decision.
-  Close the tracking issue after acceptance.
+- Work handed to one repository's owner: an issue in that repository, filed
+  through `github-flow`.
+- Organization-wide work handed to the organization's owners (shared
+  standards, shared workflows, settings, rulesets, Apps, profile, pins, family
+  identity): an issue in the organization's `.github` repository.
+- Sensitive governance gaps handed to the organization's owners, such as a
+  security setting or App permission problem: the organization's private
+  `.github-private` repository when one exists. Vulnerabilities go through the
+  affected repository's private vulnerability reporting.
 
-Audit reports link the issues they produce instead of carrying open items;
-organization views query live issues.
+Audit reports list each finding with its owner; a finding handed to another
+owner links its issue.
 
 ## Participation and safety
 

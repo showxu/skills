@@ -200,11 +200,11 @@ Expected output:
 Forbidden behavior:
 
 - Assume changing the template updates existing members, auto-repin everything without PRs or impose a global release train.
-- Keep unresolved rollout work in hand-maintained lists or file issues without authorization.
+- File a tracking issue or member issues for rollout work the orchestrator does itself, or keep rollout state outside its plan.
 
 Acceptance checks:
 
-- One tracking issue in `.github` records the decision, waves, member checklist, standard revision, consumer run and current member acceptance. Member PRs reference it; member issues exist only for member-specific decisions. Close the tracking issue after acceptance.
+- The rollout plan records the decision, waves, member checklist, standard revision, consumer run and current member acceptance. Member PRs describe their changes; an issue exists only for work handed to a member's owner.
 
 Baseline expectation:
 

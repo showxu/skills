@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- `github-repo-steward` creates a new repository from the template its
+  organization declares and replaces the declared identity values with
+  `scripts/apply_template_identity.py`; without a template it assembles the
+  repository from the ecosystem initializer, the docs skill export and the
+  standard.
+- Skills track work done in place in the task plan and file issues only for
+  work handed to another owner or recorded publicly (`github-flow`,
+  `github-org-steward`, `coding-plan`, `repository-docs`, `pyproject-docs`).
+
 ## 0.1.2
 
 - Keep version rules only in `VERSIONING.md` and a repository's release facts

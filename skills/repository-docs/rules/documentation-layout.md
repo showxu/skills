@@ -19,9 +19,10 @@ Use lowercase kebab-case file names, such as
 `docs/reference/workflow-integration.md`. Keep conventional names such as
 `README.md`, `AGENTS.md` and GitHub-defined files in their established form.
 These directories separate current truth, proposals, history and reference;
-they do not change the authority of the facts placed there. Open work stays
-in the repository's issue tracker, and task state stays with its declared
-owner.
+they do not change the authority of the facts placed there. Open work stays out
+of these documents: its owner's task plan holds it while that owner does it,
+and the repository's issue tracker holds work handed to another owner or
+recorded publicly. Task state stays with its declared owner.
 
 Version rules live in the repository's `VERSIONING.md`, or the organization
 VERSIONING it adopts, owned by `github-repo-steward`.
