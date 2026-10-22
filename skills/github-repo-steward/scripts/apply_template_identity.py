@@ -100,6 +100,18 @@ def plan(root, tracked, mappings, removals):
         changes.append(FileChange(source, target, original, updated,
                                   stat.S_IMODE(path.lstat().st_mode), path.is_symlink()))
 
+    destinations = {}
+    for change in changes:
+        for destination in (change.target, *change.target.parents):
+            if destination == Path("."):
+                continue
+            folded = str(destination).casefold()
+            previous = destinations.get(folded)
+            if previous is not None and previous != destination:
+                raise ValueError(f"{previous} and {destination}: identity maps produce "
+                                 "a case-insensitive path collision")
+            destinations[folded] = destination
+
     for target in targets:
         if any(parent in targets for parent in target.parents):
             raise ValueError(f"{target}: identity maps put a file inside another file")

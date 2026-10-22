@@ -165,6 +165,40 @@ class TemplateIdentityTests(unittest.TestCase):
         self.assertEqual(original.read_bytes(), b"old")
         self.assertEqual(destination.read_bytes(), b"local")
 
+    def test_case_insensitive_collisions_fail_before_any_changes(self):
+        root = self.root
+        cases = (
+            ("files", "old-one.txt", "old-two.txt", "Name", "name"),
+            ("full-paths", "old-one/item.txt", "old-two/item.txt", "Name", "name"),
+            ("directories", "old-one/first.txt", "old-two/second.txt", "Name", "name"),
+            ("file-directory", "old-one", "old-two/item.txt", "Name", "name"),
+            ("unicode", "old-one.txt", "old-two.txt", "Straße", "STRASSE"),
+        )
+        for case, first, second, new_first, new_second in cases:
+            with self.subTest(case=case):
+                self.root = root / case
+                self.tracked = []
+                self.file(first, b"old-one old-two\n", mode=0o755)
+                self.file(second, b"old-two\n")
+                self.file("Templates/logo.txt", b"template-only\n")
+                before = {path.relative_to(self.root): (
+                    path.read_bytes() if path.is_file() else None,
+                    stat.S_IMODE(path.stat().st_mode),
+                ) for path in self.root.rglob("*")}
+                status, stdout, stderr = self.run_identity(
+                    "--map", f"old-one={new_first}", "--map", f"old-two={new_second}",
+                    "--remove", "Templates")
+                self.assertEqual(status, 1)
+                self.assertIn(new_first, stderr)
+                self.assertIn(new_second, stderr)
+                self.assertIn("case-insensitive path collision", stderr)
+                self.assertEqual(stdout, "")
+                after = {path.relative_to(self.root): (
+                    path.read_bytes() if path.is_file() else None,
+                    stat.S_IMODE(path.stat().st_mode),
+                ) for path in self.root.rglob("*")}
+                self.assertEqual(after, before)
+
     def test_git_worktree_is_required(self):
         error = subprocess.CalledProcessError(128, ["git"], stderr=b"not a git repository")
         stderr = StringIO()
