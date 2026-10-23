@@ -10,7 +10,7 @@
     },
     "settings": {
       "label": "Settings check",
-      "url": "https://github.com/example-team/.github/blob/trunk/checks/settings.py"
+      "url": "https://github.com/example-team/.github/blob/trunk/docs/settings.md"
     },
     "design": {
       "label": "Design",

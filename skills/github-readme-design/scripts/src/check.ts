@@ -36,12 +36,14 @@ export function quote(value: string): string {
 
 export const CLI_PATH = fileURLToPath(new URL("./cli.ts", import.meta.url));
 
-export function regeneration(options: { assets: string; design: string; fonts: string; executable: string }): string {
+export function regeneration(options: CheckOptions): string {
   const { assets, design, fonts, executable } = options;
   const recording = join(assets, "recording.json");
   return [
     `node ${quote(CLI_PATH)} terminal record --script ${quote(join(assets, "script.yml"))} --executable ${quote(executable)} --out ${quote(recording)}`,
-    `node ${quote(CLI_PATH)} terminal render --recording ${quote(recording)} --design ${quote(design)} --fonts ${quote(fonts)} --out-dir ${quote(assets)}`,
+    ...(options.recordingOnly ? [] : [
+      `node ${quote(CLI_PATH)} terminal render --recording ${quote(recording)} --design ${quote(design!)} --fonts ${quote(fonts!)} --out-dir ${quote(assets)}`,
+    ]),
   ].join("\n");
 }
 
@@ -55,13 +57,14 @@ async function optionalRead(file: string): Promise<Buffer | undefined> {
 
 export interface CheckOptions {
   assets: string;
-  design: string;
-  fonts: string;
+  design?: string;
+  fonts?: string;
   executable: string;
   artifactDir?: string;
+  recordingOnly?: boolean;
 }
 
-async function copyArtifact(source: string, generated: string, target: string): Promise<void> {
+async function separateArtifact(source: string, target: string): Promise<void> {
   const canonical = async (path: string): Promise<string> => {
     try { return await realpath(path); }
     catch (error) {
@@ -76,6 +79,10 @@ async function copyArtifact(source: string, generated: string, target: string): 
   const realSource = await canonical(resolve(source));
   const realTarget = await canonical(resolve(target));
   if (contains(realSource, realTarget) || contains(realTarget, realSource)) throw new Error(`${target}: artifact directory must be separate from assets ${source}`);
+}
+
+async function copyArtifact(source: string, generated: string, target: string): Promise<void> {
+  await separateArtifact(source, target);
   await mkdir(target, { recursive: true });
   const names = ["script.yml", "fixture", "recording.json", "terminal-light.svg", "terminal-dark.svg"];
   for (const name of await readdir(target)) {
@@ -89,13 +96,18 @@ async function copyArtifact(source: string, generated: string, target: string): 
 }
 
 export async function check(options: CheckOptions, log: (line: string) => void = console.log): Promise<boolean> {
+  if (!options.recordingOnly && (!options.design || !options.fonts)) {
+    throw new Error("Terminal rendering requires design and fonts");
+  }
   const temporary = await mkdtemp(join(tmpdir(), "presentation-check-"));
   try {
     const recording = await record(join(options.assets, "script.yml"), options.executable);
     const json = recordingJSON(recording);
-    const svg = await render(recording, await readDesign(options.design), options.fonts);
     const outputs: Record<string, string> = { "recording.json": json };
-    for (const theme of THEMES) outputs[`terminal-${theme}.svg`] = svg[theme];
+    if (!options.recordingOnly) {
+      const svg = await render(recording, await readDesign(options.design!), options.fonts!);
+      for (const theme of THEMES) outputs[`terminal-${theme}.svg`] = svg[theme];
+    }
     let different = false;
     let recordingChanged = false;
     for (const [name, bytes] of Object.entries(outputs)) {
@@ -118,11 +130,18 @@ export async function check(options: CheckOptions, log: (line: string) => void =
     }
     if (different) {
       if (options.artifactDir) {
-        await copyArtifact(options.assets, temporary, options.artifactDir);
-        log(`Regenerated asset directory: ${options.artifactDir}`);
+        if (options.recordingOnly) {
+          await separateArtifact(options.assets, options.artifactDir);
+          await checkFile({ file: join(options.assets, "recording.json"), bytes: Buffer.from(json),
+            regenerate: regeneration(options), artifactDir: options.artifactDir }, () => {});
+          log(`Regenerated recording: ${join(options.artifactDir, "recording.json")}`);
+        } else {
+          await copyArtifact(options.assets, temporary, options.artifactDir);
+          log(`Regenerated asset directory: ${options.artifactDir}`);
+        }
       }
       log(`Regenerate from the current directory:\n${regeneration(options)}`);
-    } else log(`${options.assets}: recording.json and both terminal SVGs match`);
+    } else log(`${options.assets}: ${options.recordingOnly ? "recording.json matches" : "recording.json and both terminal SVGs match"}`);
     return !different;
   } finally {
     await rm(temporary, { recursive: true, force: true });

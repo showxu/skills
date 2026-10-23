@@ -40,6 +40,28 @@ test("Action passes social and profile inputs literally and enforces member mode
   }
   const output = "custom output/social.png";
   assert.equal(run({ ...inputs, asset: "social-preview", command: "render", output }).args.at(-1), output);
+  assert.notEqual(action.inputs.design.required, true);
+  const terminal = { asset: "terminal", assets: "terminal assets", executable: "built cli" };
+  const recording = run({ ...terminal, "recording-only": "true" });
+  assert.equal(recording.status, 0, recording.stderr);
+  assert.deepEqual(recording.args, ["action path/src/cli.ts", "terminal", "check",
+    "--assets", terminal.assets, "--executable", terminal.executable, "--recording-only"]);
+  const full = run({ ...terminal, design: inputs.design, fonts: inputs.fonts });
+  assert.equal(full.status, 0, full.stderr);
+  assert.deepEqual(full.args, ["action path/src/cli.ts", "terminal", "check",
+    "--assets", terminal.assets, "--executable", terminal.executable,
+    "--design", inputs.design, "--fonts", inputs.fonts]);
+  for (const values of [
+    { ...terminal, "recording-only": "yes" },
+    { ...terminal, command: "render", "recording-only": "true" },
+    { asset: "profile", "recording-only": "true" },
+    { asset: "social-preview", "recording-only": "true" },
+    { asset: "design", command: "lint", "recording-only": "true" },
+  ]) {
+    const invalid = run(values);
+    assert.equal(invalid.status, 2);
+    assert.deepEqual(invalid.args, []);
+  }
   for (const command of ["render", "check"]) {
     const base = { design: inputs.design, catalog: inputs.catalog, asset: "profile", command };
     const publicResult = run(base);

@@ -1,6 +1,6 @@
 ---
 name: github-readme-design
-description: Lay out and render GitHub repository READMEs and public or member-only organization profiles from a supplied information set and the applicable DESIGN. Use for README first screens and section layout for libraries, CLIs, MCP servers, plugins and apps, open or closed source; badge styling; Quick look form; app download blocks and screenshot plans; public and member-only organization profile layout; deterministic catalog-driven profiles and social previews; and scripted light/dark terminal demos with CI byte checks. Produces README layouts, image exports, terminal scripts and recordings, catalog-driven social/profile exports and review evidence. Does not decide what a README states or source its values, change repository settings, upload previews, assign documentation roles, design icons, or build personal profile READMEs.
+description: Lay out and render GitHub repository READMEs and public or member-only organization profiles from a supplied information set and the applicable DESIGN. Use for README first screens and section layout for libraries, CLIs, MCP servers, plugins and apps, open or closed source; badge styling; Quick look form; app download blocks and screenshot plans; public and member-only organization profile layout; deterministic catalog-driven profiles and social previews; and locally rendered light/dark terminal demos with CI recording checks. Produces README layouts, image exports, terminal scripts and recordings, catalog-driven social/profile exports and review evidence. Does not decide what a README states or source its values, change repository settings, upload previews, assign documentation roles, design icons, or build personal profile READMEs.
 ---
 
 # GitHub README Design
@@ -22,7 +22,7 @@ it takes and how it looks, and renders the images that carry it.
   to the DESIGN owner. For manual README layout, where DESIGN is silent,
   choose project defaults and record them for that owner.
 - **Profile inputs:** the public catalog; for a member dashboard, the catalog
-  and DESIGN from the pinned standard workflow commit, that explicit revision
+  and DESIGN from the accepted `.github` commit, that explicit revision
   and member operational input. Missing or extra members fail.
 - **Existing surface:** the current README, assets, recordings and
   any repository-owned renderer.
@@ -48,9 +48,10 @@ requirement, command or claim the information set does not contain.
    for member dashboards. Plan app screenshots from the released build, in
    light and dark.
 4. **Review.** Inspect the exact exports in light and dark and in the reported
-   browser. Run `terminal check` to re-record and compare the recording and both
+   browser. Locally run `terminal check` to re-record and compare the recording and both
    SVGs; run `social-preview check` and `profile check` for those outputs. Use
-   the documented Action pin chain in CI.
+   the ecosystem validation workflow's `demo` switch in CI to re-record and
+   compare only `recording.json` against the freshly built CLI.
 5. **Hand back.** Return the README layout, exports, terminal scripts and
    recordings, catalog/member input paths, the pinned standard revision and
    review evidence.
@@ -72,7 +73,7 @@ repository settings and preview uploads belong to the caller.
 ## Validation and output
 
 - Every value on the page equals the information set; layouts invent nothing.
-- Terminal recordings and exports pass `terminal check`; social/profile
+- Local terminal recordings and exports pass `terminal check`; social/profile
   exports pass `social-preview check` and `profile check`. Review the exact
   consumed PNG and generated profile markup.
 - Images are reviewed in light and dark; unbreakable overflow fails instead of

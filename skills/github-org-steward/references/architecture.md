@@ -13,14 +13,14 @@ No compatibility alias or duplicate per-repository procedure belongs here.
 | File | Responsibility |
 | --- | --- |
 | SKILL.md | Organization-only trigger, authority, serial coordination, routing and output |
-| topology.md | Repository roles and cross-repository placement |
-| governance.md | Shared declarations, organization settings and authorized Apps |
-| brand.md / website.md | Family source, public/member generated profiles, pins and site integration |
+| topology.md | Data/document `.github`, executable `github-workflows`, member and template roles; promotion and pinning |
+| governance.md | Rules versus checkers, enforced standard revision, organization settings and authorized Apps |
+| brand.md / website.md | Family source, locally rendered and committed public/member profiles, pins and site integration |
 | release.md | Organization VERSIONING extensions, capacity-bound rollout waves, measured development-cache gate, publication dependencies and downstream acceptance |
 | operations.md / audit-checklist.md | Local preservation, authorized handoffs and organization acceptance |
 | scripts/scan_org.py | Organization enumeration, delegation to repository observations, license grouping and local snapshot/compare |
-| scripts/profile_observations.py | Public inventory and pinned member-catalog checks, private visibility, default-branch/workflow/release facts and icon resolution; checks only the observed fields; full schema validation belongs to the TypeScript renderer |
-| scripts/requirements.txt | Pinned PyYAML dependency for workflow caller observations |
+| scripts/profile_observations.py | Public inventory, member-catalog observations, private visibility, default-branch/workflow/release facts and icon resolution; full schema validation belongs to the TypeScript renderer |
+| scripts/requirements.txt | Pinned PyYAML dependency for workflow observations |
 | templates/MAINTENANCE.md.tpl | Organization-level declarations, with member settings delegated to their owner |
 | [Repository steward VERSIONING template](../../github-repo-steward/templates/VERSIONING.md.tpl) | Common policy for the organization's VERSIONING; release.md owns its organization-only sections |
 | tests / references/eval-fixtures.md / evals/evals.json | Scanner regressions and behavioral inputs; dated results stay ignored |
@@ -29,13 +29,20 @@ The scanner loads `github-repo-steward/scripts/scan_repository.py` from a siblin
 skill installation or explicit `--repo-steward`. Missing dependency is an
 actionable failure. It does not embed or fork that implementation. Profile observations read only
 the catalog fields they observe and fail when a required field is missing. The
-TypeScript presentation toolchain owns full schema validation. Member checks
-resolve the standard commit from a dashboard workflow calling
-`<org>/.github/.github/workflows/profile.yml@<sha>`. PyYAML parses every `.yml`
-and `.yaml` workflow; only `jobs.<id>.uses` values identify callers. One distinct
-SHA supplies the pin. Conflicts report REVIEW with the caller files and SHAs;
-absent callers leave the pin unknown. Missing PyYAML reports REVIEW naming
-this skill's `scripts/requirements.txt` to install.
+TypeScript presentation toolchain owns full schema validation. Member revision
+observations require an unambiguous record of the `.github` commit used for
+rendering. The renderer accepts `--catalog-revision` but retains it only through
+resolved relative URLs; absolute input URLs can produce the same bytes at a
+different revision. Those links alone do not establish provenance. When no
+independent revision record exists, stop and report the options: record the
+revision with the generated output, or accept an explicit revision as audit
+input. The renderer owns any output contract; do not add a member-schema field.
+
+The family's `github-workflows` owns reusable workflows and scripts/checkers,
+self-tests with fixture packages and independent versions. Its organization
+check runs from thin callers in `.github` CI for membership, About completeness
+and declared/live settings, recording the enforced `.github` revision. Shared
+changes pass fixtures and one representative member before rollout.
 GitHub operations use the existing CLI login; no credentials are bundled.
 Install the repository steward's pinned Python requirements in an ignored
 environment for per-repository parsed workflow audits. UNKNOWN member evidence

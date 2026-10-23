@@ -32,8 +32,8 @@ status and release values live rather than writing results into labels.
   most twelve lines; keep imports meaningful. An ecosystem README skill
   supplies and builds the snippet when one applies.
 - A CLI: a scripted session at `.github/assets/terminal/script.yml`,
-  re-recorded in CI against the freshly built product and rendered as
-  light/dark SVGs. Use the `<picture>` markup below.
+  rendered locally as light/dark SVGs. CI re-records against the freshly built
+  product and compares only `recording.json` through validation's `demo` switch. Use the `<picture>` markup below.
 - An MCP server: the client configuration as a table of command and arguments
   or a code block, followed by the recorded session when it also ships a CLI.
 - A plugin: the capabilities it adds and the host's install step.
@@ -83,10 +83,11 @@ for shared ownership.
 
 ### Asset principle
 
-Every asset kind follows script → capture → render. CI regenerates what it
-can reproduce and compares the result. Assets that require native local tools,
-such as Liquid Glass exports from Icon Composer on macOS, and screenshots CI
-cannot capture are committed with a provenance receipt. Commit consumed
+Every asset kind follows script → capture → render locally. Check and commit
+outputs with their inputs. Native exports, such as Liquid Glass from Icon
+Composer on macOS, and screenshots keep provenance receipts. The only
+presentation check in member CI is re-recording the demo and comparing its
+`recording.json` against the freshly built CLI. Commit consumed
 README images, profile output and the social-preview PNG; retain
 `recording.json` for readable review diffs. Icon copies live only where they
 are consumed: organization avatar and marks in `profile/assets/`, member
@@ -97,10 +98,11 @@ regenerated into ignored scratch for Icon Composer review.
 
 | Kind | Script | Capture | CI |
 | --- | --- | --- | --- |
-| terminal | `script.yml` | run commands in a sandbox → `recording.json` | regenerate, byte compare |
-| social-preview | DESIGN + catalog | none | regenerate, byte compare |
-| logo | DESIGN icon entry | native export, receipt | compare consumed copies to provenance digests at the pinned standard |
-| screenshots | `script.yml` naming UI-test scenes | UI test capture, `capture.json` | regenerate with tolerance where CI can run it, else verify receipt |
+| terminal | `script.yml` | run commands in a sandbox → `recording.json` | re-record and compare recording only; render/check SVGs locally |
+| social-preview | DESIGN + catalog | none | none; local render/check |
+| profile | DESIGN + catalog, member input when applicable | none | none; local render/check |
+| logo | DESIGN icon entry | native export, receipt | none; compare copies to provenance digests locally |
+| screenshots | `script.yml` naming UI-test scenes | UI test capture, `capture.json` | none; local capture/render/check and receipt |
 
 ### Screenshots
 

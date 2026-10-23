@@ -12,8 +12,8 @@ message. The renderer consumes the resolved components and typography from
 that parser. The official DTCG export remains available for other consumers;
 it is not this renderer's input.
 
-Consumers run the composite Action at a full commit SHA, or use a package copy
-at that commit in their ignored build directory as described under
+Shared automation pins the composite Action at a full commit SHA. Local
+rendering uses a package copy at an accepted toolchain commit in their ignored build directory as described under
 [local regeneration](#local-regeneration). Never install into an installed
 skill directory or the global environment. In this skill's development
 worktree, `npm ci --ignore-scripts && npm test` installs into ignored `scripts/node_modules`
@@ -329,8 +329,9 @@ references. A commit of a change still in progress is pinned by SHA alone.
 | --- | --- |
 | `asset` | Required: `terminal`, `social-preview`, `profile` or `design` |
 | `command` | Default `check`; assets support `check` and `render`, design supports `lint` |
-| `design` | Required path to the applicable DESIGN.md |
-| `fonts` | Organization fonts directory, required for terminal and social-preview |
+| `design` | Required path to the applicable DESIGN.md, except for recording-only checks |
+| `fonts` | Organization fonts directory, required for terminal rendering and social-preview |
+| `recording-only` | Default `false`; `true` compares only terminal recording bytes; allowed only with terminal/check |
 | `assets` | Terminal or social-preview asset directory in the caller |
 | `executable` | Built product, required for terminal |
 | `catalog` | Organization catalog, required for social-preview and profile |
@@ -342,120 +343,60 @@ references. A commit of a change still in progress is pinned by SHA alone.
 | `artifact-dir` | Optional dedicated failure-artifact directory, separate from the checked output |
 
 The Action sets up the Node version from its `.node-version`, installs with
-`npm ci --ignore-scripts --omit=dev`, and runs `src/cli.ts`. `terminal/render` records and
-renders into `assets`; `terminal/check` regenerates in a temporary directory
-and compares recording and SVG bytes without overwriting committed files.
-It reports changed commands pairwise by index, plus added and removed steps,
-and prints a unified recording diff. When the recording matches but an SVG
-differs, it names the file and says DESIGN or the renderer changed. On drift,
-`artifact-dir` receives the complete commit-ready directory: `script.yml`,
-`fixture/` if present, `recording.json` and both SVGs. Copy those files from the
-CI artifact, review and commit them together. Exit codes are 0 for success,
-1 for drift or validation failure and 2 for command usage errors.
-Social-preview drift artifacts contain the regenerated PNG; profile artifacts
-contain the regenerated Markdown file. Public profile mode rejects member input
-and a catalog revision. All Action values reach the shell through environment
-variables and quoted arguments.
+`npm ci --ignore-scripts --omit=dev`, and runs `src/cli.ts`. All Action values
+reach the shell through environment variables and quoted arguments. Render/check modes support local use; member CI uses only
+`terminal/check` with `recording-only: true`.
+
+`terminal check --recording-only --assets <dir> --executable <built-cli>`
+re-records in a temporary sandbox and compares only `recording.json`, without
+requiring DESIGN, fonts or SVGs. It reports changed commands by index, added
+and removed steps, and a unified recording diff. With `--artifact-dir`, drift
+writes only the regenerated `recording.json` into a dedicated directory,
+separate from the checked output. Committed files are never overwritten.
+The flag is valid only for `terminal check` and takes no value; the Action
+input accepts `true` or `false`. Exit codes are 0 for success, 1 for drift or
+validation failure and 2 for usage errors.
+
+Full `terminal check` re-records and renders in temporary directories, comparing
+recording and both SVGs. SVG-only drift names the file and DESIGN/renderer change.
+Its drift artifact contains `script.yml`, optional `fixture/`, `recording.json`
+and both SVGs. `terminal/render` records and renders into `assets`.
+`social-preview check` and `profile check` are local commands; their optional
+drift artifacts contain the regenerated PNG or Markdown. Public profile mode
+rejects member input and a catalog revision. Review local outputs and commit
+them with their inputs.
 
 ### Organization standard and member caller
 
-The pin chain is member → organization reusable workflow → toolchain Action.
-The organization standard owns two reusable workflows. Each validates
-`job.workflow_sha`, checks out the caller and its own standard repository at
-that exact SHA without persisted credentials, and takes DESIGN, fonts and the
-catalog from the pinned standard, never from a branch head.
+Members pin only the family's `<org>/github-workflows` repository, by full SHA
+with a version comment for a release. A commit still in progress has no version
+comment. That repository owns the reusable policy, organization check,
+ecosystem validation/release workflows and every script/checker they execute.
+Each reusable job checks out its own repository at `job.workflow_sha` to run
+those scripts. It records the `.github` revision whose rules it enforces.
 
-`.github/workflows/presentation.yml` accepts `runner` (default
-`ubuntu-24.04`), `executable-artifact`, `executable-path` and `assets`
-(default `.github/assets`). It derives the caller's expected assets from its
-catalog `kind`, following
-[assets by product kind](design.md#assets-by-product-kind):
+The ecosystem release skill owns the job catalog, member configuration format
+and defaults; for Swift packages this is `swiftpm-github-release` in
+`swift-library/skills`. Organizations and repositories may extend them. Use
+that owner's validation workflow path and enable its `demo` switch for a CLI.
+The workflow builds the CLI and invokes this Action with `asset: terminal`,
+`command: check`, `recording-only: true`, the declared asset directory and
+fresh executable. Demo contributes to `validate`; required member contexts are
+only `policy` and `validate`.
 
-| Caller | Checked assets |
-| --- | --- |
-| `tool` | `terminal`, `social-preview` |
-| `library`, `app`, `distribution`, the organization's `.github` | `social-preview` |
-| `website` | none; calling the workflow fails |
-
-A caller owned by another account or missing from the catalog, a missing
-expected asset directory, a `terminal` directory for a kind without terminal,
-and executable inputs missing for a tool or given for any other kind fail.
-The social preview icon is the catalog entry's light-page image (the catalog
-`mark` for `.github`). Its URL must be exactly
-`https://raw.githubusercontent.com/<organization>/<repository>/HEAD/<path>`,
-with no query or fragment and a relative path without `..` segments. A
-`<repository>` equal to the caller resolves to that file in the caller,
-`.github` to that file in the pinned standard; any other host, owner,
-repository or ref, and a missing file, fail with the URL named. For a tool the workflow downloads the built executable
-and restores its execute bit; the runner must match the OS that built the
-product. On failure it uploads `presentation.tar` as the artifact
-`presentation`, laid out like the asset root (`terminal/`, `social-preview/`)
-with modes and hidden files kept; extract it there, review and commit.
-
-`.github/workflows/profile.yml` accepts `mode` (default `public`), `member`
-(default `profile/member.json`) and `output` (default `profile/README.md`) and
-checks the caller's generated profile, as described in
-[organization profiles](#organization-profiles). It rejects an unknown `mode`
-before any checkout, and `member` and `output` must be caller-relative paths
-without `..` segments, so the check cannot read another checkout. On drift it
-uploads the regenerated file as the artifact `profile`. The `.github` repository calls
-both workflows locally; a `.github-private` repository calls `profile.yml` in
-member mode from a job named `check`, so its context is `check / profile`.
-Organization DESIGN CI calls the Action with `asset: design`, `command: lint`
-and `design` so linting and rendering share the parser lockfile.
-
-A tool uploads its build and references only the organization standard:
-
-```yaml
-jobs:
-  build:
-    runs-on: macos-26
-    steps:
-      # Checkout and build the product here.
-      - uses: actions/upload-artifact@<full-40-character-sha> # vX.Y.Z
-        with:
-          name: executable
-          path: .build/release/demo
-  presentation:
-    needs: build
-    uses: example-org/.github/.github/workflows/presentation.yml@<full-40-character-sha> # vX.Y.Z
-    with:
-      runner: macos-26
-      executable-artifact: executable
-      executable-path: demo
-```
-
-A library, app or distribution calls it without executable inputs:
-
-```yaml
-jobs:
-  presentation:
-    uses: example-org/.github/.github/workflows/presentation.yml@<full-40-character-sha> # vX.Y.Z
-```
-
-The member dashboard calls the profile workflow:
-
-```yaml
-jobs:
-  check:
-    uses: example-org/.github/.github/workflows/profile.yml@<full-40-character-sha> # vX.Y.Z
-    with:
-      mode: member
-```
-
-The referenced repositories release as their own `VERSIONING.md` states,
-once a change is complete rather than after each merge. Consumers pin a
-release's commit with its `# vX.Y.Z` comment for Dependabot, and an
-in-progress commit by SHA alone. Before a release or a pin update, a changed
-shared workflow or toolchain advances through representative consumers at the
-exact candidate commit, covering every changed path: a change to the tool path
-needs a tool's run, which downloads its executable and checks its terminal
-([organization release](../../github-org-steward/references/release.md)).
+Profiles, social previews and terminal SVGs are rendered and checked locally,
+then committed. `.github` owns their design/catalog data and thin CI callers;
+its organization check from `github-workflows` verifies membership, About
+completeness and declared/live settings. Presentation/profile reusable
+workflows and separate presentation contexts are outside this contract.
+Shared workflow changes pass fixture packages and one representative member
+at the exact candidate before rollout. Renderer byte goldens test this
+package itself; they do not impose image byte checks on member CI.
 
 ### Local regeneration
 
 From the consumer's task worktree, use its ignored build directory. Set the
-commit to the full reviewed toolchain SHA selected by its pinned standard.
+commit to the full reviewed toolchain SHA selected for local rendering.
 This downloads only the package at that commit, without a checkout or `.git`:
 
 ```sh
@@ -484,7 +425,7 @@ node "$toolchain_dir/src/cli.ts" terminal check \
 ```
 
 Build the real product first and obtain the standard's DESIGN and fonts at
-its pinned workflow revision. The example paths are consumer inputs; use its
+the accepted `.github` revision. The example paths are consumer inputs; use its
 actual ignored build, executable and standard font paths. Reuse the dedicated
 package directory for a pin and replace its contents when changing pins.
 Remove download, dependency and review outputs when no longer needed.
@@ -568,12 +509,16 @@ node <toolchain>/src/cli.ts profile render --design <DESIGN.md> --catalog <catal
 node <toolchain>/src/cli.ts profile check --design <DESIGN.md> --catalog <catalog.json> --member profile/member.json --catalog-revision <full-40-hex-sha> --out profile/README.md --artifact-dir .build/profile-artifact
 ```
 
-The organization reusable `profile.yml` checks out the catalog and DESIGN at
-`job.workflow_sha` and supplies that same SHA as `catalog-revision` in member
-mode. Consumers pin the workflow by full SHA, with the version comment of a
-release. This one pin selects the inputs and the transitive toolchain version. Local invocations
-must supply that same standard revision explicitly. Public mode omits both
-member input and catalog revision.
+Local member rendering supplies the full accepted `.github` revision explicitly
+as `--catalog-revision`, with catalog and DESIGN from that commit. The member
+schema has no revision field, and the renderer does not separately record the
+argument. Resolved catalog-relative URLs contain it, but absolute inputs can
+produce the same URLs at another revision. Do not treat those links as revision
+provenance. If no independent record exists, stop automated revision observation
+and report options to record the revision with the generated output or accept
+an explicit audit input. The owner decides that contract. Public mode omits
+both member input and catalog revision. Commit locally checked profiles with
+their inputs; dashboard CI does not byte-compare them.
 
 The output uses GitHub-supported HTML tables, anchors, headings and images;
 `<picture>` switches declared light/dark images with a fallback. See GitHub's

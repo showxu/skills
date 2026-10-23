@@ -6,7 +6,7 @@
 
 <h2>Maintenance</h2>
 
-<p><a href="https://github.com/example-team/.github/blob/trunk/docs/maintenance.md">Maintenance</a> · <a href="https://github.com/example-team/.github/blob/trunk/docs/releases.md">Release procedure</a> · <a href="https://github.com/example-team/.github/blob/trunk/checks/settings.py">Settings check</a> · <a href="https://github.com/example-team/.github/blob/trunk/DESIGN.md">Design</a></p>
+<p><a href="https://github.com/example-team/.github/blob/trunk/docs/maintenance.md">Maintenance</a> · <a href="https://github.com/example-team/.github/blob/trunk/docs/releases.md">Release procedure</a> · <a href="https://github.com/example-team/.github/blob/trunk/docs/settings.md">Settings check</a> · <a href="https://github.com/example-team/.github/blob/trunk/DESIGN.md">Design</a></p>
 
 <h2>Repositories</h2>
 

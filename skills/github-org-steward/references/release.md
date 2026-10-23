@@ -29,13 +29,17 @@ that actually depend on a changed release.
 
 For every member, invoke `github-repo-steward` with the shared standard and
 release scope. It hands build/package/store mechanics to the ecosystem release
-skill. Shared workflow changes advance through a representative consumer first,
-then reviewed pin updates in the template and other members. Neither a template
+skill. `github-workflows` versions independently. Shared workflow/script changes
+pass syntax checks, self-tests with fixture packages and one representative
+member at the exact candidate before reviewed pin updates in the template and
+other members. Members pin only that repository by full SHA; released pins
+carry a version comment. Jobs check out their own scripts at `job.workflow_sha`
+and record the `.github` rules revision they enforce. Neither a template
 change nor a new shared revision proves adoption by existing repositories.
 
 A change coordinated across members follows the shared VERSIONING's release
 timing. While it is in progress, members pin the in-progress shared commits by
-full SHA without version comments. At the release, run representative consumers
+full SHA without version comments. At the release, run representative members
 at the exact candidates, tag in dependency order with the owner's confirmation,
 then move every caller to the released pins with their `# vX.Y.Z` comments in
 one pass.
@@ -113,7 +117,13 @@ publish through their own release owner.
 ## Acceptance
 
 Bind each member row to accepted input, merged PR, immutable release identity,
-current validation and downloaded artifact/consumer evidence from its owner.
+current validation and downloaded product-artifact checks from its owner.
+Releases attach no evidence assets; acceptance records stay with the task.
+Validation covers format, tests and release build, plus declared platforms,
+docs, demo and repository commands. Consumer verification, dependency-minimum
+and API comparison are outside the shared job catalog. Render/check public
+profiles, member dashboards and presentation images locally and commit them;
+CI checks demo recordings only, inside ecosystem validation.
 Include the capacity snapshot and wave receipts, any cache experiment decision,
 and the repository owner's release cache/concurrency audit.
 Then verify dependent PRs, working public URLs and the organization catalog.

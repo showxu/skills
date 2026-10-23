@@ -66,6 +66,6 @@ release-tag pattern against update and deletion. Existing lightweight or
 unsigned tags are reported, not moved.
 
 Release evidence must identify the exact accepted source, configuration and
-checker. Keep private build paths out of attachments. Verify downloaded bytes,
+checker in the task record. Releases attach no evidence assets. Verify downloaded bytes,
 manifest identity and the documented installation through the ecosystem release
 owner. Never replace release assets to make an old claim appear true.

@@ -19,7 +19,8 @@ Expected output:
 - Place `script.yml`, optional `fixture/`, committed `recording.json` and
   `terminal-light.svg`/`terminal-dark.svg` under `.github/assets/terminal/`.
   Use the documented recorder and renderer, with CI re-recording against the
-  built executable and comparing the recording and both SVGs byte for byte.
+  built executable and comparing only `recording.json` through validation's
+  `demo` switch. Render/check SVGs locally and commit them.
 
 Forbidden behavior:
 
@@ -61,8 +62,8 @@ Expected output:
 - Apply the product-kind matrix: CLI terminal assets, app screenshots,
   library logo/social preview, tap product icon, organization profile assets
   and website organization icon. Use the standard kind directories and names.
-- Describe script → capture → render and the corresponding CI comparison or
-  native-export receipt, with selections owned by the catalog.
+- Describe local script → capture → render/check and demo-only CI recording
+  comparison, with selections owned by the catalog.
 
 Forbidden behavior:
 
@@ -71,9 +72,9 @@ Forbidden behavior:
 
 Acceptance checks:
 
-- Every matrix row is represented; reproducible outputs use regeneration
-  checks, local native outputs keep receipts, and logo comparison targets the
-  exports at the pinned standard.
+- Every matrix row is represented; outputs use local regeneration checks,
+  native outputs keep receipts, and local logo comparison targets the exports
+  at the accepted standard. CI checks only the CLI recording.
 
 Baseline expectation:
 
@@ -97,7 +98,7 @@ Input prompt: "Plan light and dark README screenshots of the app's editor for tw
 Context and files:
 
 - Accepted app information, UI tests, target devices, appearances and locales.
-  Some scenes can run in CI; others require local native capture.
+  The declared devices and locales are available for local native capture.
 
 Expected output:
 
@@ -105,8 +106,7 @@ Expected output:
   device, appearance and locale; record captures in `capture.json`; place
   driving code in the product's UI tests and apply DESIGN's background/frame
   to `<scene>-light.png` and `<scene>-dark.png`.
-- Regenerate with tolerance where CI can capture; verify a provenance receipt
-  otherwise. Store screenshot sets may reuse the captures through their owner.
+- Capture, render and check screenshots locally; keep a provenance receipt. Store screenshot sets may reuse the captures through their owner.
 
 Forbidden behavior:
 
@@ -116,8 +116,7 @@ Forbidden behavior:
 Acceptance checks:
 
 - Each scene has all four selectors, capture metadata and final appearance
-  paths; CI-capable and local-capture scenes have the appropriate evidence
-  contract. App Store screenshot ownership remains distinct.
+  paths and local capture/check evidence. App Store screenshot ownership remains distinct.
 
 Baseline expectation:
 
@@ -126,7 +125,7 @@ Baseline expectation:
 
 Evidence sources:
 
-- Scene plan, file layout, UI-test ownership and capture/CI evidence plan.
+- Scene plan, file layout, UI-test ownership and local capture evidence plan.
 
 Owner notes:
 
@@ -336,7 +335,8 @@ Expected output:
 
 - Use the TypeScript profile command for both layouts with one icon per row,
   the four required DESIGN component sizes, live badges/fallbacks and correct
-  relative-link rebasing. Return byte checks and light/dark review scope.
+  relative-link rebasing. Return local byte checks and light/dark review scope;
+  commit the generated outputs.
 
 Forbidden behavior:
 
@@ -434,3 +434,37 @@ Owner notes:
 
 - Fixture styling and font bytes belong to this test case. Actual consumers
   supply their own pinned DESIGN and licensed fonts.
+
+## recording-only-validation
+
+Target behavior: Keep CI demo validation independent of rendering assets.
+
+Input prompt: "Check the CLI demo in CI after a release build. DESIGN and fonts are unavailable, and the SVGs are stale; the recording is current."
+
+Context and files:
+
+- A built executable, terminal `script.yml` and committed `recording.json` exist. Also exercise a changed command output and missing executable/assets arguments.
+
+Expected output:
+
+- Use `github-workflows` ecosystem validation with `demo` enabled; it invokes `terminal check --recording-only` or the Action with `recording-only: true`. Matching recording passes; drift reports changed steps and the unified diff without modifying committed files.
+
+Forbidden behavior:
+
+- Require DESIGN/fonts/SVGs, compare profiles/social previews/screenshots in CI, add a presentation workflow/context, or skip re-recording the CLI.
+
+Acceptance checks:
+
+- Match exits 0, recording drift exits 1, invalid flag use and missing required arguments exit 2. Optional drift artifacts contain only recording.json. Full local check/render modes still work; profiles and images are locally checked and committed.
+
+Baseline expectation:
+
+- A rendering-dependent check may fail for image drift while missing whether the CLI demo is current.
+
+Evidence sources:
+
+- CLI/Action tests, exit codes, diff output and preserved committed files.
+
+Owner notes:
+
+- Repository names and paths are synthetic case inputs.

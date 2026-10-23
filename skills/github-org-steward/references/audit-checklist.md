@@ -6,7 +6,7 @@ severity and disposition. Do not claim completion for inaccessible areas.
 
 | Area | Organization evidence | Follow-up owner |
 | --- | --- | --- |
-| Shared standards | .github maintenance, versioning, design, community defaults and workflow interfaces agree with declared organization decisions | Organization steward; repository-docs for document roles |
+| Shared standards | `.github` data/documents and `github-workflows` executable interfaces agree with declared decisions; checkers record the rules revision | Organization steward; repository-docs for document roles |
 | Placement | Shared truth has one owner; members contain only delegated extensions; template adoption is distinct from existing members | Organization steward |
 | Organization settings | Actions defaults and actual supported ruleset/plan/visibility scope match declaration | Organization owner and settings checker |
 | Apps | Capability, permissions, events, installation selection and credential locations; no secret values | Organization owner; installation gaps need browser evidence |
@@ -16,7 +16,7 @@ severity and disposition. Do not claim completion for inaccessible areas.
 | Family identity | DESIGN, generator revision, accepted exports/consumer bindings and icon owners | Design owner plus repository steward for delivery |
 | Uploaded images | Run the repository steward's `verify_upload.py avatar` for each organization and `social-preview` for each public member against its accepted image/source revision; retain the JSON receipts and unknown scope | Organization steward aggregating repository-steward verification |
 | Profile/catalog | Job groups, complete generated membership, outcome copy, umbrella identity, account description and working navigation | Organization steward |
-| Member profile | `.github-private` exists and is private for organizations with maintainers; generated from the pinned public catalog with complete matching membership, working live links and no hand-recorded status; policy links back to `.github` | Organization steward |
+| Member profile | `.github-private` exists and is private for organizations with maintainers; rendered/checked locally and committed from the recorded public catalog revision with complete matching membership, working live links and no hand-recorded status; policy links back to `.github` | Organization steward |
 | Pins | Curated set and actual order support the visitor promise | Organization steward; owner browser |
 | Publication | Dependency-ordered accepted releases, release call graph free of cache operations and cancellation, downstream distribution/site PRs and real served artifacts | Repository steward, ecosystem release and distribution owners |
 | Handoffs | Authorization, separate task files, disjoint writes, accepted revisions and one coordinated publisher | Organization steward |

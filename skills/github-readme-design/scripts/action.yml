@@ -8,10 +8,12 @@ inputs:
     description: check or render for assets; lint for design.
     default: check
   design:
-    description: Path to the organization's DESIGN.md.
-    required: true
+    description: Path to the organization's DESIGN.md (required unless recording-only).
   fonts:
-    description: Path to the organization's font directory (terminal and social-preview).
+    description: Path to the organization's font directory (terminal unless recording-only, and social-preview).
+  recording-only:
+    description: Compare only recording.json (terminal check only).
+    default: 'false'
   assets:
     description: Terminal or social-preview asset directory in the caller checkout.
   executable:
@@ -60,15 +62,33 @@ runs:
         PRESENTATION_MEMBER: ${{ inputs.member }}
         PRESENTATION_REVISION: ${{ inputs.catalog-revision }}
         PRESENTATION_OUTPUT: ${{ inputs.output }}
+        PRESENTATION_RECORDING_ONLY: ${{ inputs.recording-only }}
       run: |
         cli="$GITHUB_ACTION_PATH/src/cli.ts"
+        case "$PRESENTATION_RECORDING_ONLY" in
+          true)
+            if [[ "$PRESENTATION_ASSET/$PRESENTATION_COMMAND" != terminal/check ]]; then
+              echo "recording-only is only allowed for terminal check" >&2
+              exit 2
+            fi
+            ;;
+          false) ;;
+          *)
+            echo "recording-only must be true or false" >&2
+            exit 2
+            ;;
+        esac
         case "$PRESENTATION_ASSET/$PRESENTATION_COMMAND" in
           design/lint)
             node "$cli" design lint --design "$PRESENTATION_DESIGN"
             ;;
           terminal/check)
-            args=(--assets "$PRESENTATION_ASSETS" --design "$PRESENTATION_DESIGN"
-                  --fonts "$PRESENTATION_FONTS" --executable "$PRESENTATION_EXECUTABLE")
+            args=(--assets "$PRESENTATION_ASSETS" --executable "$PRESENTATION_EXECUTABLE")
+            if [[ "$PRESENTATION_RECORDING_ONLY" == true ]]; then
+              args+=(--recording-only)
+            else
+              args+=(--design "$PRESENTATION_DESIGN" --fonts "$PRESENTATION_FONTS")
+            fi
             if [[ -n "$PRESENTATION_ARTIFACT" ]]; then
               args+=(--artifact-dir "$PRESENTATION_ARTIFACT")
             fi

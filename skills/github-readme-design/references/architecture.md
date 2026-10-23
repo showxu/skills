@@ -13,7 +13,7 @@ with the caller.
 | renderers.md | Renderer input contracts, DESIGN binding, terminal recording and Action integration |
 | scripts/src/design.ts / fonts.ts | Official DESIGN lint/parse, dark overrides, font selection and glyph outlines |
 | scripts/src/terminal/ | Validated scripted recording in a fixed environment and deterministic light/dark SVG rendering |
-| scripts/src/check.ts / cli.ts | Byte comparison, complete failure artifacts, commands and exit codes |
+| scripts/src/check.ts / cli.ts | Local byte comparison, recording-only CI checks, failure artifacts, commands and exit codes |
 | scripts/action.yml / package.json / package-lock.json / .node-version | Composite Action, locked Node package and runtime |
 | scripts/src/catalog.ts | Shared catalog/member schemas, safe links and revision-based URL resolution |
 | scripts/src/social-preview/ | DESIGN-driven outlined card composition, icon validation and deterministic PNG rasterization |
@@ -25,8 +25,11 @@ errors and warnings stop rendering. Components own colors and geometry;
 typography owns font selection. Renderers have no fallback style. Platform
 constants (canvas dimensions, title legibility floor and README width limit)
 are documented in the renderer reference. The catalog owns repository content;
-member input owns operational facts. The caller's pinned standard workflow
-commit supplies the catalog revision for member relative links.
+member input owns operational facts. The accepted `.github`
+commit supplies the catalog revision for member relative links. Those URLs
+do not independently establish which revision was supplied. Profiles and images are rendered/checked locally
+and committed. The shared ecosystem validation workflow in `github-workflows`
+uses its `demo` switch for recording-only checks against the freshly built CLI.
 
 The font fixture is Google Sans Code v7.001 under its accompanying SIL OFL.
 Fixture DESIGN values and synthetic catalogs/icons are test inputs, not consumer

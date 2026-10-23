@@ -90,7 +90,7 @@
     {
       "id": 14,
       "prompt": "Bring our private .github-private repository into conformance with the organization standard.",
-      "expected_output": "Apply settings, rulesets, signing and CI, including the profile byte check. Review the member dashboard through its renderer, with policy linked to .github.",
+      "expected_output": "Apply settings, rulesets, signing and shared CI callers. Render/check the profile locally and commit it. Review the member dashboard through its renderer, with policy linked to .github.",
       "files": []
     },
     {

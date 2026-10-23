@@ -10,7 +10,7 @@
     {
       "id": 2,
       "prompt": "Our organization hosts independent packages. Roll out the new shared validation convention.",
-      "expected_output": "Update the owning shared interface, validate syntax and a pinned consumer, update the template and existing members through repository-steward PRs, and retain independent release cadence. Track the decision, waves and member checklist in the rollout plan; member PRs describe their changes, and an issue exists only for work handed to a member's owner.",
+      "expected_output": "Update the owning shared interface, validate syntax, fixture packages and one representative member at the candidate pin, update the template and existing members through repository-steward PRs, and retain independent release cadence. Track the decision, waves and member checklist in the rollout plan; member PRs describe their changes, and an issue exists only for work handed to a member's owner.",
       "files": []
     },
     {
@@ -76,13 +76,13 @@
     {
       "id": 13,
       "prompt": "Create the member-only organization dashboard using our existing public catalog and shared maintenance documents.",
-      "expected_output": "Prepare private .github-private/profile/README.md with the shared renderer, catalog at the reusable profile workflow commit, declared maintenance navigation, identical groups/order/membership, icons, live operational rows and organization searches. Apply settings/rulesets/signing/CI and review both profiles in light and dark. Member input owns default_branch; CI badge URLs carry it and the online steward reports mismatches with GitHub.",
+      "expected_output": "Prepare private .github-private/profile/README.md with the shared renderer locally, catalog at the supplied full .github revision, declared maintenance navigation, identical groups/order/membership, icons, live operational rows and organization searches. Apply settings/rulesets/signing/CI and review both profiles in light and dark. Member input owns default_branch; CI badge URLs carry it and the online steward reports mismatches with GitHub.",
       "files": []
     },
     {
       "id": 14,
       "prompt": "Audit our member dashboard. It has a hand-edited table of repositories, CI results and release versions.",
-      "expected_output": "Report drift and the owning catalog/member-input/shared-renderer correction. Require exact catalog membership, live badges or declared fallback links, and a full commit pin on the reusable profile workflow. Preserve audit-only scope.",
+      "expected_output": "Report drift and the owning catalog/member-input/shared-renderer correction. Require exact catalog membership, live badges or declared fallback links, and unambiguous evidence for the standard revision used to render the dashboard; stop revision observation and report provenance options when it is absent. Preserve audit-only scope.",
       "files": []
     },
     {
@@ -93,7 +93,7 @@
     },
     {
       "id": 16,
-      "prompt": "Replace our organization's VERSIONING.md with the steward's current default policy. It currently assigns its own levels to reusable workflow changes, DESIGN regeneration and changes preserving output. The .github repository uses VERSION with no mirrors and published vX.Y.Z tags; MAINTENANCE.md#publication owns its checks and release mechanics. Core must release before CLI. Core uses Git tags X.Y.Z; CLI uses VERSION and tags vX.Y.Z; each member's MAINTENANCE.md#publication owns its release checklist. Our documented interfaces are core's public API, CLI flags and the standard's workflow inputs, outputs, caller contexts and DESIGN token names. CLI dependencies are minor-bounded during core 0.x and stop at the next major from 1.x. Prepare locally without publishing.",
+      "prompt": "Replace our organization's VERSIONING.md with the steward's current default policy. It currently assigns its own levels to reusable workflow changes, DESIGN regeneration and changes preserving output. The .github repository uses VERSION with no mirrors and published vX.Y.Z tags; MAINTENANCE.md#publication owns its checks and release mechanics. Core must release before CLI. Core uses Git tags X.Y.Z; CLI uses VERSION and tags vX.Y.Z; each member's MAINTENANCE.md#publication owns its release checklist. Our documented interfaces are core's public API, CLI flags and github-workflows inputs, outputs and caller contexts, and the standard's DESIGN token names. CLI dependencies are minor-bounded during core 0.x and stop at the next major from 1.x. Prepare locally without publishing.",
       "expected_output": "Replace the organization's separate version-level scheme with the filled repository steward template: 0.x breaks use MINOR and other changes PATCH, 1.0.0 starts the owner's stability promise, and 1.0+ uses compatible additions and deprecation with roughly yearly planned majors. Append declared family release order, member values, documented interfaces and dependency rules. Preserve each version source, tag format, release owner, core-before-CLI order, minor-bounded core 0.x dependencies and next-major bounds from 1.x. Absorbable DESIGN regeneration is a feature (PATCH during 0.x, MINOR after 1.0); do not invent versions or member procedures, or publish.",
       "files": []
     }

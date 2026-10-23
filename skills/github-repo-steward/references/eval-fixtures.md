@@ -919,7 +919,7 @@ Context and files:
 
 Expected output:
 
-- Apply settings, rulesets, signing and CI, including the profile byte check. Review the member dashboard through its renderer, with policy linked to .github.
+- Apply settings, rulesets, signing and shared CI callers. Render/check the profile locally and commit it. Review the member dashboard through its renderer, with policy linked to .github.
 
 Forbidden behavior:
 
@@ -989,3 +989,37 @@ Evidence sources:
 Owner notes:
 
 - Neutral fixture inputs; execution evidence stays in ignored output.
+
+## member-scripts-and-template
+
+Target behavior: Keep repository automation with its owner and templates free of scripts.
+
+Input prompt: "Prepare a Swift member template and a Python member that needs a repository-specific check. A second member needs the same check."
+
+Context and files:
+
+- The family has `.github` documents and `github-workflows`; the template seeds new members. Only local preparation is authorized.
+
+Expected output:
+
+- Keep the template to layout and thin pinned callers. Create lowercase `scripts/` only for repository-specific automation; promote the shared check into `github-workflows` when the second member needs it.
+
+Forbidden behavior:
+
+- Copy the checker into members or the template, use `Scripts/`, put scripts in `.github`, or require a presentation context.
+
+Acceptance checks:
+
+- The template contains no scripts; both members pin `github-workflows` by full SHA with a release version comment. Required contexts are `policy` and `validate`; repository commands extend validation.
+
+Baseline expectation:
+
+- A template or first member may become the accidental owner of duplicated automation.
+
+Evidence sources:
+
+- Proposed file layout, caller pins and ownership explanation.
+
+Owner notes:
+
+- Repository names and paths are synthetic case inputs.
