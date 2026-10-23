@@ -8,6 +8,38 @@ import type { Recording } from "./record.ts";
 export const MAX_WIDTH = 830;
 export const THEMES = ["light", "dark"] as const;
 type Theme = typeof THEMES[number];
+interface ColoredRun { role: string; run: Run }
+interface Row { runs: ColoredRun[]; continuation?: boolean }
+
+function wrap(runs: ColoredRun[], width: number, scale: number, context: string): Row[] {
+  // Accumulated floating-point roundoff must not wrap an exactly fitting glyph.
+  const tolerance = Number.EPSILON * Math.max(1, width) * Math.max(1, runs.reduce((sum, item) => sum + item.run.placements.length, 0));
+  const fits = (advance: number) => advance <= width + tolerance;
+  if (fits(runs.reduce((sum, item) => sum + item.run.advance, 0))) return [{ runs }];
+  const rows: Row[] = [{ runs: [] }];
+  let row = rows[0];
+  let advance = 0;
+  for (const { role, run } of runs) {
+    for (const { glyph } of run.placements) {
+      const glyphAdvance = glyph.advanceWidth * scale;
+      if (!fits(glyphAdvance)) throw new Error(`${context}: glyph ${glyph.id} advance exceeds terminal content width ${width}px`);
+      if (!fits(advance + glyphAdvance)) {
+        row = { runs: [], continuation: true };
+        rows.push(row);
+        advance = 0;
+      }
+      let segment = row.runs.at(-1);
+      if (!segment || segment.role !== role) {
+        segment = { role, run: { placements: [], advance: 0 } };
+        row.runs.push(segment);
+      }
+      segment.run.placements.push({ glyph, x: segment.run.advance });
+      segment.run.advance += glyphAdvance;
+      advance += glyphAdvance;
+    }
+  }
+  return rows;
+}
 
 function xml(value: string): string {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&apos;")
@@ -71,7 +103,7 @@ export async function render(recording: Recording, design: Design, fonts: string
   const face = await resolveFont(fonts, typography);
   const titleText = expandTabs(recording.title);
   const title = face.run(titleText, "recording.json title");
-  const lines: { text: string; context: string; runs: { role: string; run: Run }[] }[] = [];
+  const lines: { text: string; context: string; runs: ColoredRun[] }[] = [];
   for (const [index, step] of recording.steps.entries()) {
     const context = `recording.json step ${index + 1} (${step.command})`;
     if (index) lines.push({ text: "", context, runs: [] });
@@ -87,15 +119,21 @@ export async function render(recording: Recording, design: Design, fonts: string
       }
     }
   }
-  const widest = lines.reduce((previous, line) => {
+  const widestAdvance = lines.reduce((previous, line) => {
     const advance = line.runs.reduce((sum, item) => sum + item.run.advance, 0);
-    return advance > previous.advance ? { advance, text: line.text, context: line.context } : previous;
-  }, { advance: title.advance, text: titleText, context: "recording.json title" });
-  const width = Math.ceil(Math.max(minWidth, widest.advance + 2 * p));
-  if (width > MAX_WIDTH) {
-    throw new Error(`${widest.context}: widest line ${JSON.stringify(widest.text)} requires canvas ${width}px (components.terminal.width=${minWidth}px); maximum ${MAX_WIDTH}px; shorten the script line or title`);
+    return Math.max(previous, advance);
+  }, title.advance);
+  const titleWidth = Math.ceil(Math.max(minWidth, title.advance + 2 * p));
+  if (titleWidth > MAX_WIDTH) {
+    throw new Error(`recording.json title: widest line ${JSON.stringify(titleText)} requires canvas ${titleWidth}px (components.terminal.width=${minWidth}px); maximum ${MAX_WIDTH}px; shorten the title or reduce components.terminal.width`);
   }
-  const height = Math.ceil(bar + 2 * p + lines.length * lineHeight);
+  const width = Math.min(MAX_WIDTH, Math.ceil(Math.max(minWidth, widestAdvance + 2 * p)));
+  const rows = lines.flatMap(line => wrap(line.runs, width - 2 * p, face.scale, line.context));
+  const markerSize = Math.min(6, (p - s) / 2, lineHeight / 3);
+  if (rows.some(row => row.continuation) && Number(number(markerSize / 6)) <= 0) {
+    throw new Error("components.terminal.padding and typography.terminal.lineHeight: must leave room for a visible continuation marker inside the frame");
+  }
+  const height = Math.ceil(bar + 2 * p + rows.length * lineHeight);
   const paths = new Map<number, string>();
   for (const run of [title, ...lines.flatMap(line => line.runs.map(item => item.run))]) {
     for (const { glyph } of run.placements) {
@@ -123,8 +161,14 @@ export async function render(recording: Recording, design: Design, fonts: string
       `<rect x="${number(s)}" y="${number(bar - s)}" width="${number(width - 2 * s)}" height="${number(s)}" fill="${fill("terminal-frame", "backgroundColor")}"/>`,
       drawRun(title, (width - title.advance) / 2, (bar + face.capHeight) / 2, "terminal-title-bar"),
     ];
-    lines.forEach((line, index) => {
+    rows.forEach((line, index) => {
       const baseline = bar + p + index * lineHeight + (lineHeight - (face.ascent + face.descent)) / 2 + face.ascent;
+      if (line.continuation) {
+        const size = markerSize;
+        const centerX = (p + s) / 2;
+        const centerY = baseline - face.capHeight / 2;
+        svg.push(`<path d="M${number(centerX - size / 2)} ${number(centerY - size / 2)}L${number(centerX + size / 2)} ${number(centerY)}L${number(centerX - size / 2)} ${number(centerY + size / 2)}" fill="none" stroke="${fill("terminal")}" stroke-width="${number(size / 6)}" opacity="0.5" aria-hidden="true"/>`);
+      }
       let x = p;
       for (const { run, role } of line.runs) {
         svg.push(drawRun(run, x, baseline, role));

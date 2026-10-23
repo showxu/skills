@@ -288,11 +288,18 @@ no extra separator after the final step.
 With padding `p`, frame size `s`, corner radius `r` and title-bar height `bar`:
 
 - Width is the ceiling of the maximum of `terminal.width`, title advance plus
-  `2p`, and widest line advance plus `2p`. The maximum is **830 px**, the README
+  `2p`, and widest line advance plus `2p`, capped at **830 px**, the README
   column on github.com's repository page: a platform fact, not a DESIGN token.
-  Overflow names the widest line for shortening; the renderer never scales
-  down the text to fit.
-- Height is `ceil(bar + 2p + lineCount × lineHeight)`.
+  The title and minimum width must fit that cap; an over-long title still fails.
+- Command and output lines wrap at the last whole glyph whose advance fits
+  `W−2p`. Whitespace is preserved after tab expansion, without word reflow.
+  Each continuation starts at `x=p` and retains the original glyph color roles.
+  A small vector chevron in the left padding uses terminal text color at half
+  opacity; it needs no font glyph and occupies no text columns. Padding must
+  exceed frame size enough for a visible marker at SVG coordinate precision;
+  line height must also accommodate it. Each glyph must fit the content width.
+  Text is never scaled down. Lines that fit keep their existing SVG bytes.
+- Height is `ceil(bar + 2p + rowCount × lineHeight)`, including continuation rows.
 - Frame and interior are fills, not strokes: the outer rounded rectangle is
   `(0, 0, W, H)` at radius `r`; the interior is `(s, s, W−2s, H−2s)` at radius
   `r−s`. The title-bar fill spans `y=s` to `bar−s` with rounded top corners and
@@ -303,16 +310,18 @@ With padding `p`, frame size `s`, corner radius `r` and title-bar height `bar`:
   scaled to the font size, line `i` has baseline
   `bar + p + i×lineHeight + (lineHeight−(A+D))/2 + A`.
 
-The SVG has `role="img"`, `<title>` and a `<desc>` containing the rendered
-transcript joined by LF and XML-escaped. In `<title>` and `<desc>`, each space
-in a U+0020 run immediately before LF or the end of the text is encoded as
-`&#32;`, preserving the parsed text. Every distinct nonempty glyph path
+The SVG has `role="img"`, `<title>` and a `<desc>` containing the original
+unwrapped transcript (with tabs expanded), joined by LF and XML-escaped.
+Continuation markers are hidden from accessibility APIs. In `<title>` and
+`<desc>`, each space in a U+0020 run immediately before LF or the end of the
+text is encoded as `&#32;`, preserving the parsed text. Every distinct nonempty glyph path
 is defined once, sorted by glyph ID, in font-size pixels with its y axis
 flipped. Runs place glyphs using SVG 2 `<use href>` with x and baseline y;
 there are no live text elements, styles, transforms or external font lookups.
 Element order is title, description, definitions, frame, interior, title bar,
-separator, title run, then body runs in reading order. Numbers have at most
-two decimals with no trailing zeros or negative zero. Hex colors are uppercase;
+separator, title run, then body rows in reading order, each continuation marker
+before its runs. Numbers have at most two decimals with no trailing zeros or
+negative zero. Hex colors are uppercase;
 line endings are LF with one trailing newline. No timestamps or random IDs
 enter the SVG. The same inputs produce the same bytes across macOS and Linux;
 the package's CI matrix compares both against committed goldens.
