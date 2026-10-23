@@ -3,8 +3,6 @@
 import base64
 from http.client import HTTPException
 import json
-from pathlib import Path
-import re
 import posixpath
 import subprocess
 from urllib.error import HTTPError, URLError
@@ -65,44 +63,6 @@ def observed_catalog(catalog):
                 raise ValueError(f"Duplicate observed repository: {name}")
             members[name.lower()] = repo
     return members
-
-
-def profile_revision(owner, branch):
-    try:
-        import yaml
-    except ImportError as error:
-        requirements = Path(__file__).with_name("requirements.txt")
-        raise Unreadable(f"Profile standard pin unknown: PyYAML is missing; install requirements from {requirements}") from error
-    tree = api(f"repos/{owner}/.github-private/git/trees/{quote(branch, safe='')}?recursive=1")
-    if tree.get("truncated") or not isinstance(tree.get("tree"), list):
-        raise Unreadable("Profile standard pin unknown: workflow tree is incomplete")
-    target = f"{owner}/.github/.github/workflows/profile.yml@"
-    revisions = {}
-    for entry in tree["tree"]:
-        path = entry["path"]
-        if entry["type"] != "blob" or not re.fullmatch(r"\.github/workflows/[^/]+\.ya?ml", path):
-            continue
-        try:
-            workflow = yaml.safe_load(content(owner, ".github-private", path, branch))
-        except (yaml.YAMLError, UnicodeError) as error:
-            raise Unreadable(f"Profile standard pin unknown: cannot parse {path}") from error
-        jobs = workflow.get("jobs", {}) if isinstance(workflow, dict) else {}
-        if not isinstance(jobs, dict):
-            raise Unreadable(f"Profile standard pin unknown: invalid jobs in {path}")
-        for job in jobs.values():
-            use = job.get("uses") if isinstance(job, dict) else None
-            if not isinstance(use, str) or not use.lower().startswith(target.lower()):
-                continue
-            revision = use[len(target):]
-            if not re.fullmatch(r"[0-9a-fA-F]{40}", revision):
-                raise ValueError(f"{path}: profile workflow must pin a full commit SHA")
-            revisions.setdefault(revision.lower(), set()).add(path)
-    if not revisions:
-        raise Unreadable("Profile standard pin unknown: no matching workflow caller")
-    if len(revisions) > 1:
-        callers = "; ".join(f"{path}: {revision}" for revision, paths in sorted(revisions.items()) for path in sorted(paths))
-        raise Unreadable(f"Profile standard pin unknown: conflicting workflow caller pins: {callers}")
-    return next(iter(revisions))
 
 
 def catalog_image_url(value, catalog, revision):
@@ -208,33 +168,27 @@ def inspect_profiles(owner, repos, report, member_path="profile/member.json"):
         return
     try:
         member = json.loads(content(owner, ".github-private", member_path, private["defaultBranchRef"]["name"]))
-        revision = profile_revision(owner, private["defaultBranchRef"]["name"])
-        pinned_bytes = content(owner, ".github", "profile/catalog.json", revision)
-        pinned = json.loads(pinned_bytes)
-        pinned_members = observed_catalog(pinned)
         operations = member["repositories"]
         if not isinstance(operations, dict):
             raise ValueError("Member repositories must be an object")
-        expected = {repo["name"] for repo in pinned_members.values()}
+        expected = {repo["name"] for repo in members.values()}
         missing, extra = expected - operations.keys(), operations.keys() - expected
         if missing or extra:
-            raise ValueError(f"Member membership mismatch: missing {sorted(missing)}, extra {sorted(extra)}")
+            report("FAIL", ".github-private",
+                   f"Member dashboard needs regeneration: membership differs from current public catalog; missing {sorted(missing)}, extra {sorted(extra)}")
+        else:
+            report("INFO", ".github-private", f"member dashboard membership matches current public catalog: {len(expected)} repositories")
         for name, facts in operations.items():
             observed_text(facts["default_branch"], f"{name}.default_branch")
             if facts["workflow"] is not None:
                 observed_text(facts["workflow"], f"{name}.workflow")
             observed_text(facts["releases"], f"{name}.releases")
-        if pinned["organization"]["login"].lower() != owner.lower():
-            raise ValueError("Pinned catalog organization differs from scanned organization")
-        membership(set(members), set(pinned_members), report, ".github-private", "pinned/current catalog membership")
-        report("INFO", ".github-private", f"member input covers all {len(pinned_members)} pinned catalog repositories; workflow pin {revision}")
     except Unreadable as error:
         report("REVIEW", ".github-private", str(error))
         return
     except (ValueError, KeyError, TypeError) as error:
-        report("FAIL", ".github-private", f"Invalid member input or workflow pin: {error}")
+        report("FAIL", ".github-private", f"Invalid member input: {error}")
         return
-    inspect_icons(pinned, revision, report)
     for name, facts in operations.items():
         repo = inventory.get(name.lower())
         if repo is None:

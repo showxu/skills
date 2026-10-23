@@ -175,9 +175,10 @@ artifacts; an empty word search is not an ownership proof.
   from the repository steward package. Use `--repo-steward <skill-dir>` when
   the skills are installed separately. Pass `--member-input <path>` when its
   input is not `profile/member.json`. Observe `.github-private` visibility,
-  catalog membership at an unambiguously recorded standard revision, declared
-  default branches against GitHub, workflow files, releases
-  and icons. Absence is optional;
+  member dashboard membership against the current public catalog on `.github`'s
+  default branch, declared default branches against GitHub, workflow files,
+  releases and icons. Report membership drift as a dashboard needing local
+  regeneration. Absence is optional;
   unreadable input is REVIEW. Explain all REVIEW lines and pending runs.
 - Local preservation: `python3 scripts/scan_org.py compare --root <checkouts>
   --baseline <snapshot.json>` reports no unrelated status/index/stash/worktree

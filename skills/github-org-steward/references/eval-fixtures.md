@@ -601,13 +601,10 @@ Input prompt: "Audit our member dashboard. It has a hand-edited table of reposit
 Context and files:
 
 - The public catalog has a new member absent from the dashboard; its copied status and release version are stale. Audit-only scope.
-- The generated README has no separate revision record. A relative icon at
-  revision A becomes an absolute A-pinned icon at B; rendering at B produces
-  the same resource URL. Audit-only scope includes this ambiguous case.
 
 Expected output:
 
-- Report drift and the owning catalog/member-input/shared-renderer correction. Require exact catalog membership, live badges or declared fallback links, and unambiguous evidence for the standard revision used to render the dashboard. Preserve audit-only scope.
+- Compare member input membership with the current public catalog on `.github`'s default branch. Report missing or extra members and the need to regenerate the dashboard locally through the owning member input and shared renderer. Require live badges or declared fallback links. Preserve audit-only scope.
 
 Forbidden behavior:
 
@@ -616,10 +613,8 @@ Forbidden behavior:
 Acceptance checks:
 
 - Findings identify missing membership and hand-recorded state separately, explain generated replacement and retain unreadable evidence as REVIEW.
-- Resource URLs alone do not supply the revision. Missing or ambiguous
-  provenance stops revision observation and reports options to record the
-  revision with the output or accept an explicit audit input. No member-schema
-  field is invented.
+- Missing or extra member entries produce a regeneration finding against the
+  current public catalog; matching membership passes the comparison.
 
 Baseline expectation:
 

@@ -82,7 +82,7 @@
     {
       "id": 14,
       "prompt": "Audit our member dashboard. It has a hand-edited table of repositories, CI results and release versions.",
-      "expected_output": "Report drift and the owning catalog/member-input/shared-renderer correction. Require exact catalog membership, live badges or declared fallback links, and unambiguous evidence for the standard revision used to render the dashboard; stop revision observation and report provenance options when it is absent. Preserve audit-only scope.",
+      "expected_output": "Compare member input membership with the current public catalog on .github's default branch. Report missing or extra members and the need to regenerate the dashboard locally through the owning member input and shared renderer. Require live badges or declared fallback links. Preserve audit-only scope.",
       "files": []
     },
     {

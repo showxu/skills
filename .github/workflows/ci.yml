@@ -71,10 +71,7 @@ jobs:
           .build/repo-audit-venv/bin/python -m pip install --disable-pip-version-check -r skills/github-repo-steward/scripts/requirements.txt
           .build/repo-audit-venv/bin/python -B -m unittest discover -s skills/github-repo-steward/tests -v
       - name: Exercise organization governance
-        run: |
-          python3 -m venv .build/org-audit-venv
-          .build/org-audit-venv/bin/python -m pip install --disable-pip-version-check -r skills/github-org-steward/scripts/requirements.txt
-          .build/org-audit-venv/bin/python -B -m unittest discover -s skills/github-org-steward/tests -v
+        run: python3 -B -m unittest discover -s skills/github-org-steward/tests -v
 
   presentation-toolchain:
     strategy:

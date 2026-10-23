@@ -90,10 +90,9 @@ working links and images, and live badges backed by declared facts. The online
 organization check compares the catalog with all public, non-archived
 repositories except `.github`, verifies each declared `default_branch` against
 GitHub, each workflow on the observed default branch, release presence and icon
-resolution, and verifies catalog membership at the recorded standard revision
-when unambiguous evidence exists. Generated resource URLs alone cannot establish
-that revision. Missing or conflicting provenance remains REVIEW; report options
-to record the revision with the output or accept an explicit audit input.
+resolution. The scanner compares member input membership with the current public
+catalog on `.github`'s default branch and reports missing or extra members as a
+FAIL requiring local dashboard regeneration.
 Unreadable private input is REVIEW, never proof of completeness.
 Organizations with maintainers should have this entry; the scanner observes
 absence without requiring a repository for organizations that have none.
