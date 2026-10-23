@@ -53,6 +53,47 @@ class GlyphTests(unittest.TestCase):
                     self.assertEqual(gradient.attrib["x1"], "-" + bound)
                     self.assertEqual(gradient.attrib["x2"], bound)
 
+    def test_layered_glyph_paints_its_parts_only_on_the_surface_pass(self):
+        glyph = {"layers": [
+            {"circle": [0, 0, .6], "fill": {"colors": ["#ffffff", "#ddddff"], "from": [0, -1], "to": [0, 1]}},
+            {"d": "M-.3 0H.3", "stroke": "#3a3fef", "width": .12, "surface": True},
+            {"d": "M0 0H.5V.5Z", "fill": [0.7, 0.1, 40], "round": .02},
+        ]}
+        shadow = ET.fromstring(glyph_markup(glyph, "black", 1))[0]
+        self.assertEqual(shadow.attrib["transform"], "scale(0.01)")
+        self.assertEqual([e.tag for e in shadow], ["circle", "path"])
+        self.assertEqual({e.attrib["fill"] for e in shadow}, {"black"})
+        top = ET.fromstring(glyph_markup(glyph, "black", 1, surface="i"))[0]
+        gradient = top[0][0]
+        self.assertEqual((gradient.attrib["id"], gradient.attrib["y1"], gradient.attrib["y2"]), ("i-gl0", "-100", "100"))
+        self.assertEqual(top[1].attrib, {"cx": "0", "cy": "0", "r": "60", "fill": "url(#i-gl0)"})
+        self.assertEqual((top[2].attrib["stroke"], top[2].attrib["stroke-width"]), ("#3a3fef", "12"))
+        self.assertEqual((top[3].attrib["fill"], top[3].attrib["stroke-width"]), (oklch(0.7, 0.1, 40), "2"))
+
+    def test_layered_glyph_rejects_unknown_or_mixed_fields(self):
+        for glyph in ({"layers": [{"d": "M0 0", "colour": "red"}]},
+                      {"layers": [{"d": "M0 0", "circle": [0, 0, 1]}]},
+                      {"layers": [{"d": "M0 0"}], "rects": [[0, 0, 1, 1]]}):
+            with self.subTest(glyph=glyph), self.assertRaises(ValueError):
+                glyph_markup(glyph, "white", 1, surface="i")
+
+    def test_layered_glyph_draws_its_surface_in_every_style(self):
+        glyph = {"layers": [{"d": "M0 0H.5V.5Z", "fill": "#123456"}, {"circle": [0, 0, .1], "fill": "#654321", "surface": True}]}
+        for style in ("stacked", "volumetric", "flat"):
+            with self.subTest(style=style):
+                svg = icon_svg(Spec(style=style, custom_glyph=glyph))
+                self.assertEqual(svg.count('fill="#654321"'), 1)
+                self.assertIn('fill="#123456"', svg)
+
+    def test_texture_path_is_stroked_in_face_units(self):
+        for style in ("stacked", "flat"):
+            with self.subTest(style=style):
+                root = ET.fromstring(icon_svg(Spec(style=style, texture={"d": "M0 -.6V.6", "width": .009})))
+                path = next(e for e in root.iter() if e.attrib.get("d") == "M0 -.6V.6")
+                self.assertEqual(path.attrib["stroke-width"], "0.009")
+        with self.assertRaises(ValueError):
+            icon_svg(Spec(texture={"path": "M0 0"}))
+
 
 class PaletteTests(unittest.TestCase):
     def test_separated_dark_face_and_pastel_are_reported(self):

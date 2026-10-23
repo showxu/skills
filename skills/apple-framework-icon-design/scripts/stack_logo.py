@@ -490,10 +490,73 @@ def _scale_path(d: str, scale: float) -> str:
 
 def _glyph_units(g: dict) -> int:
     # WebKit loses small stroke and dash geometry before an enlarging transform.
-    return 100 if (g.get("d") and g.get("style") == "stroke") or g.get("extra") else 1
+    stroked = any("stroke" in layer or "round" in layer for layer in g.get("layers", []))
+    return 100 if (g.get("d") and g.get("style") == "stroke") or g.get("extra") or stroked else 1
 
 
-def glyph_markup(g: dict, color: str, opacity: float, fills: list[str] | None = None, accent: str | None = None) -> str:
+LAYER_FIELDS = {"d", "circle", "fill", "stroke", "width", "round", "surface"}
+
+
+def _layer_paint(paint, uid: str, units: int, defs: list[str]) -> str:
+    """A layer color, or a linear gradient {"colors": [a, b], "from": [x, y], "to": [x, y]} in glyph units."""
+    if not isinstance(paint, dict):
+        return _resolve(paint)
+    if set(paint) - {"colors", "from", "to"} or len(paint.get("colors", [])) != 2:
+        raise ValueError(f"layer gradient takes colors (two), from and to: {paint}")
+    (x1, y1), (x2, y2) = paint.get("from", [-1, -1]), paint.get("to", [1, 1])
+    gid = f"{uid}-gl{len(defs)}"
+    c1, c2 = (_resolve(c) for c in paint["colors"])
+    defs.append(
+        f'<linearGradient id="{gid}" gradientUnits="userSpaceOnUse" x1="{x1 * units:g}" y1="{y1 * units:g}" '
+        f'x2="{x2 * units:g}" y2="{y2 * units:g}"><stop offset="0" stop-color="{c1}"/>'
+        f'<stop offset="1" stop-color="{c2}"/></linearGradient>'
+    )
+    return f"url(#{gid})"
+
+
+def _layers_markup(g: dict, color: str, surface: str | None) -> str:
+    """Layered glyph parts. On the surface pass each part takes its own paint; the shadow, relief and
+    bevel passes draw the parts that are not surface-only in the pass color."""
+    units = _glyph_units(g)
+    path = lambda d: _scale_path(d, units) if units != 1 else d  # noqa: E731
+    length = lambda n: format(n * units, ".15g") if units != 1 else str(n)  # noqa: E731
+    defs, parts = [], []
+    for layer in g["layers"]:
+        unknown = set(layer) - LAYER_FIELDS
+        if unknown or ("d" in layer) == ("circle" in layer):
+            raise ValueError(f"a glyph layer takes d or circle and {sorted(LAYER_FIELDS - {'d', 'circle'})}: {layer}")
+        if layer.get("surface") and surface is None:
+            continue
+        stroked = "stroke" in layer
+        paint = layer.get("stroke" if stroked else "fill") if surface is not None else None
+        paint = color if paint is None else _layer_paint(paint, surface, units, defs)
+        if stroked:
+            look = (f'fill="none" stroke="{paint}" stroke-width="{length(layer.get("width", 0.16))}" '
+                    f'stroke-linecap="round" stroke-linejoin="round"')
+        else:
+            look = f'fill="{paint}"'
+            if layer.get("round"):
+                look += f' stroke="{paint}" stroke-width="{length(layer["round"])}" stroke-linejoin="round"'
+        if "circle" in layer:
+            x, y, r = layer["circle"]
+            parts.append(f'<circle cx="{length(x)}" cy="{length(y)}" r="{length(r)}" {look}/>')
+        else:
+            parts.append(f'<path d="{path(layer["d"])}" {look}/>')
+    inner = (f'<defs>{"".join(defs)}</defs>' if defs else "") + "".join(parts)
+    return f'<g transform="scale({1 / units})">{inner}</g>' if units != 1 else inner
+
+
+def glyph_markup(g: dict, color: str, opacity: float, fills: list[str] | None = None, accent: str | None = None,
+                 surface: str | None = None) -> str:
+    """`surface` is the icon's id on the pass that draws the glyph's visible top; layered glyphs need it
+    for their own paints."""
+    if g.get("layers"):
+        if set(g) - {"layers", "transform"}:
+            raise ValueError("a layered glyph takes layers and transform only")
+        inner = _layers_markup(g, color, surface)
+        if g.get("transform"):
+            inner = f'<g transform="{g["transform"]}">{inner}</g>'
+        return f'<g opacity="{opacity}">{inner}</g>'
     parts = []
     units = _glyph_units(g)
     path = lambda d: _scale_path(d, units) if units != 1 else d
@@ -527,7 +590,12 @@ def glyph_markup(g: dict, color: str, opacity: float, fills: list[str] | None = 
 # Textures in face-local coordinates (square side = 1, centered)
 
 
-def texture_markup(kind: str, color: str, seed: int = 7) -> str:
+def texture_markup(kind: str | dict, color: str, seed: int = 7) -> str:
+    if isinstance(kind, dict):
+        if set(kind) - {"d", "width"} or "d" not in kind:
+            raise ValueError("a texture path takes d and width")
+        return (f'<path d="{kind["d"]}" stroke="{color}" stroke-width="{kind.get("width", 0.006)}" '
+                f'fill="none" stroke-linecap="round" stroke-linejoin="round"/>')
     if kind == "dots":
         cells = [f'<circle cx="{x / 12:.3f}" cy="{y / 12:.3f}" r="0.010"/>' for x in range(-6, 7) for y in range(-6, 7)]
         return f'<g fill="{color}">' + "".join(cells) + "</g>"
@@ -577,7 +645,7 @@ class Spec:
     glyph: str = "none"
     glyph_rotation: float | None = None  # degrees; default per style
     glyph_scale: float = 0.31
-    texture: str = "none"
+    texture: str | dict = "none"  # library name, or {"d", "width"} in face units
     blocks: list[list[float]] = field(default_factory=list)  # 3D blocks: [x, y, height, half-size?]
     band_hues: list[float] = field(default_factory=list)  # optional explicit per-band hues
     face: str = ""               # "graphite" for a dark neutral face, "light" for a white one
@@ -853,14 +921,14 @@ def _slab_group(spec: Spec, pal: Palette, cx: float, cy: float, size: float, uid
                 )
             body.append(
                 f'<g transform="translate(0 {-rp:.2f})"><g transform="{tf}">'
-                f'{glyph_markup(g, color, 1.0, fills, pal.face_front)}</g></g>'
+                f'{glyph_markup(g, color, 1.0, fills, pal.face_front, uid)}</g></g>'
             )
         else:
             body.append(
                 f'<g transform="translate(0 {size * 0.008:.2f})" opacity="0.35"><g transform="{tf}">'
                 f'{glyph_markup(g, pal.glyph_shadow, 1.0, shadow_fills, pal.glyph_shadow)}</g></g>'
             )
-            body.append(f'<g transform="{tf}">{glyph_markup(g, color, 0.95, fills, pal.face_front)}</g>')
+            body.append(f'<g transform="{tf}">{glyph_markup(g, color, 0.95, fills, pal.face_front, uid)}</g>')
 
     # Standing objects: soft contact shadows, then back to front.
     if objects:
@@ -1006,7 +1074,7 @@ def _tile_group(spec: Spec, pal: Palette, cx: float, cy: float, size: float, uid
                     f'<stop offset="0" stop-color="{color}"/><stop offset="1" stop-color="{front_end}"/></linearGradient>'
                 )
                 color = f"url(#{uid}-gf)"
-        body.append(f'<g transform="{tf}">{glyph_markup(g, color, 1.0 if relief else 0.95, fills, bottom)}</g>')
+        body.append(f'<g transform="{tf}">{glyph_markup(g, color, 1.0 if relief else 0.95, fills, bottom, uid)}</g>')
 
     body.append(f'<path d="{outline}" fill="none" stroke="#ffffff" stroke-opacity="0.35" '
                 f'stroke-width="{size * 0.004:.2f}" clip-path="url(#{uid}-clip)"/>')
