@@ -9,10 +9,10 @@ import type { Font } from "fontkit";
 import { open } from "fontkit";
 import { stringify } from "yaml";
 import { changedSteps, check, regeneration } from "../src/check.ts";
-import { parseDesign, readDesign } from "../src/design.ts";
+import { color, parseDesign, px, readDesign } from "../src/design.ts";
 import { matchesFont, number, resolveFont, variations } from "../src/fonts.ts";
 import { environment, normalizeOutput, parseRecording, parseScript, record, recordingJSON } from "../src/terminal/record.ts";
-import { expandTabs, render, THEMES } from "../src/terminal/render.ts";
+import { expandTabs, MAX_WIDTH, render, THEMES } from "../src/terminal/render.ts";
 
 const fixture = fileURLToPath(new URL("./fixtures/", import.meta.url));
 const fonts = join(fixture, "fonts");
@@ -66,6 +66,7 @@ test("golden outlined SVGs are deterministic and share geometry", async () => {
     assert.match(result[theme], /aria-labelledby="title desc"/);
     assert.match(result[theme], /<desc id="desc">\$ demo inspect\nWorkspace: ~\/project/);
     assert.doesNotMatch(result[theme], /<text|<style|transform=|xlink:|\r/);
+    assert.doesNotMatch(result[theme], /aria-hidden="true"/);
     assert.ok(result[theme].endsWith("</svg>\n"));
     const ids = [...result[theme].matchAll(/<path id="g(\d+)"/g)].map(match => Number(match[1]));
     assert.deepEqual(ids, [...new Set(ids)].sort((a, b) => a - b));
@@ -183,9 +184,105 @@ test("fontVariation rejects malformed numbers and keeps weight in fontWeight", (
   }
 });
 
-test("width, missing glyphs, control characters, units and geometry overrides fail explicitly", async () => {
+test("commands and output wrap at whole glyphs, preserving whitespace, colors and transcript", async () => {
   const design = await readDesign(designPath);
-  await assert.rejects(render({ title: "Demo", steps: [{ command: "demo wide", output: "W".repeat(120) }] }, design, fonts), /step 1 \(demo wide\).*maximum 830px/);
+  const typography = design.typography.get("terminal")!;
+  const face = await resolveFont(fonts, typography);
+  const padding = px(design.components.light.get("terminal")!.get("padding"), "padding");
+  const lineHeight = px(typography.lineHeight, "lineHeight");
+  const bar = px(design.components.light.get("terminal-title-bar")!.get("height"), "bar");
+  const cell = face.run("W", "test").advance;
+  const columns = Math.floor((MAX_WIDTH - 2 * padding) / cell);
+  const command = "x".repeat(columns - 3) + "  tail";
+  const output = "W".repeat(columns - 1) + "  " + "z".repeat(columns) + "\tend  ";
+  const recording = { title: "Wrap", steps: [{ command, output }, { command: "done", output: "" }] };
+  const expanded = expandTabs(output);
+  const expected = [
+    { text: "$ " + command.slice(0, columns - 2), row: 0, role: "terminal-command" },
+    { text: command.slice(columns - 2), row: 1, role: "terminal-command" },
+    { text: expanded.slice(0, columns), row: 2, role: "terminal" },
+    { text: expanded.slice(columns, columns * 2), row: 3, role: "terminal" },
+    { text: expanded.slice(columns * 2), row: 4, role: "terminal" },
+    { text: "$ done", row: 6, role: "terminal-command" },
+  ];
+  const result = await render(recording, design, fonts);
+  for (const theme of THEMES) {
+    const svg = result[theme];
+    const fill = (role: string) => color(design.components[theme].get(role)!.get("textColor"), role);
+    assert.match(svg, new RegExp(`width="830" height="${Math.ceil(bar + 2 * padding + 7 * lineHeight)}"`));
+    assert.equal(decodeXMLText(svg.match(/<desc id="desc">([\s\S]*?)<\/desc>/)![1]), `$ ${command}\n${expanded}\n\n$ done`);
+    const actual = [...svg.matchAll(/<g fill="(#[A-F0-9]+)">([\s\S]*?)<\/g>/g)].slice(1).flatMap(group =>
+      [...group[2].matchAll(/<use href="#g(\d+)" x="([^"]+)" y="([^"]+)"\/>/g)].map(use =>
+        ({ id: Number(use[1]), x: use[2], y: use[3], fill: group[1] })));
+    const placements = expected.flatMap(({ text, row, role }) => {
+      const baseline = bar + padding + row * lineHeight + (lineHeight - face.ascent - face.descent) / 2 + face.ascent;
+      return face.run(text, "test").placements.flatMap(({ glyph, x }, index) => face.outline(glyph) ? [{
+        id: glyph.id, x: number(padding + x), y: number(baseline),
+        fill: fill((row === 0 || row === 6) && index < 2 ? "terminal-prompt" : role),
+      }] : []);
+    });
+    assert.deepEqual(actual, placements, theme);
+    const markers = [...svg.matchAll(/<path d="M([\d.]+) ([\d.]+)L([\d.]+) ([\d.]+)L([\d.]+) ([\d.]+)" fill="none" stroke="(#[A-F0-9]+)" stroke-width="([\d.]+)" opacity="0.5" aria-hidden="true"\/>/g)];
+    assert.equal(markers.length, 3);
+    for (const [index, marker] of markers.entries()) {
+      const row = [1, 3, 4][index];
+      const baseline = bar + padding + row * lineHeight + (lineHeight - face.ascent - face.descent) / 2 + face.ascent;
+      assert.equal(marker[4], number(baseline - face.capHeight / 2));
+      assert.equal(marker[7], fill("terminal"));
+      assert.ok(Number(marker[1]) - Number(marker[8]) / 2 > 1);
+      assert.ok(Number(marker[3]) + Number(marker[8]) / 2 < padding);
+    }
+  }
+});
+
+test("exactly fitting lines stay on one row; the next glyph wraps at the left margin", async () => {
+  const base = await readDesign(designPath);
+  const face = await resolveFont(fonts, base.typography.get("terminal")!);
+  const cell = face.run("W", "test").advance;
+  for (const count of [6, 10, 32, 90, 94]) {
+    const padding = (MAX_WIDTH - count * cell) / 2;
+    const design = parseDesign(designText.replace("terminal-padding: 20px", `terminal-padding: ${padding}px`));
+    const fits = await render({ title: "Fit", steps: [{ command: "x", output: "W".repeat(count) }] }, design, fonts);
+    const wraps = await render({ title: "Fit", steps: [{ command: "x", output: "W".repeat(count + 1) }] }, design, fonts);
+    for (const theme of THEMES) {
+      assert.doesNotMatch(fits[theme], /aria-hidden="true"/);
+      assert.equal([...wraps[theme].matchAll(/aria-hidden="true"/g)].length, 1);
+      assert.equal(Number(wraps[theme].match(/height="(\d+)"/)![1]) - Number(fits[theme].match(/height="(\d+)"/)![1]), 21);
+      assert.ok(wraps[theme].includes(`<g fill="${theme === "light" ? "#3F3D5C" : "#C8C7E6"}"><use href="#g${face.run("W", "test").placements[0].glyph.id}" x="${number(padding)}"`));
+    }
+  }
+});
+
+test("wrapping uses variable glyph advances rather than character or word counts", async () => {
+  const design = parseDesign(designText.replaceAll("'MONO' 1", "'MONO' 0"));
+  const face = await resolveFont(fonts, design.typography.get("terminal")!);
+  const text = "Wi iW ".repeat(30);
+  let split = 0;
+  while (face.run(text.slice(0, split + 1), "test").advance <= MAX_WIDTH - 40) split++;
+  assert.notEqual(face.run("W", "test").advance, face.run("i", "test").advance);
+  const result = await render({ title: "Variable", steps: [{ command: "demo", output: text }] }, design, fonts);
+  const groups = [...result.light.matchAll(/<g fill="#3F3D5C">(.*?)<\/g>/g)];
+  assert.equal(groups.length, 2);
+  for (const [index, segment] of [text.slice(0, split), text.slice(split)].entries()) {
+    const expected = face.run(segment, "test").placements.filter(({ glyph }) => face.outline(glyph)).map(({ glyph, x }) => [glyph.id, number(20 + x)]);
+    const actual = [...groups[index][1].matchAll(/<use href="#g(\d+)" x="([^"]+)"/g)].map(match => [Number(match[1]), match[2]]);
+    assert.deepEqual(actual, expected);
+  }
+});
+
+test("wrapping rejects geometry that cannot display a marker or fit one glyph", async () => {
+  for (const padding of [0, 1, 1.01]) {
+    const design = parseDesign(designText.replace("terminal-padding: 20px", `terminal-padding: ${padding}px`));
+    await render({ title: "Fit", steps: [{ command: "demo", output: "short" }] }, design, fonts);
+    await assert.rejects(render({ title: "Wrap", steps: [{ command: "demo", output: "W".repeat(150) }] }, design, fonts), /terminal.padding.*visible continuation marker/);
+  }
+  const narrow = parseDesign(designText.replace("terminal-padding: 20px", "terminal-padding: 411px").replaceAll("'MONO' 1", "'MONO' 0"));
+  await assert.rejects(render({ title: "i", steps: [{ command: "W", output: "" }] }, narrow, fonts), /step 1.*glyph.*content width/);
+});
+
+test("title width, missing glyphs, control characters, units and geometry overrides fail explicitly", async () => {
+  const design = await readDesign(designPath);
+  await assert.rejects(render({ title: "W".repeat(120), steps: [{ command: "demo wide", output: "W".repeat(200) }] }, design, fonts), /recording.json title:.*maximum 830px/);
   await assert.rejects(render({ title: "Demo", steps: [{ command: "demo glyph", output: "\u{10ffff}" }] }, design, fonts), /step 1.*missing glyph.*U\+10FFFF/);
   await assert.rejects(render({ title: "Demo", steps: [{ command: "demo escape", output: "\x1b[31m" }] }, design, fonts), /step 1.*U\+001B/);
   await assert.rejects(render(golden, parseDesign(designText.replace("terminal-padding: 20px", "terminal-padding: 2rem")), fonts), /terminal.padding.*px/);

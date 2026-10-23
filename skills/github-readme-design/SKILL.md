@@ -76,8 +76,9 @@ repository settings and preview uploads belong to the caller.
 - Local terminal recordings and exports pass `terminal check`; social/profile
   exports pass `social-preview check` and `profile check`. Review the exact
   consumed PNG and generated profile markup.
-- Images are reviewed in light and dark; unbreakable overflow fails instead of
-  clipping or shrinking text.
+- Images are reviewed in light and dark. Terminal body lines soft-wrap at
+  whole glyphs with continuation markers; titles must fit. Social-card overflow
+  follows its title/About fitting rules.
 
 Report the layout, exports and their source inputs, DESIGN revision, review evidence,
 defaults chosen where DESIGN was silent, and missing information.

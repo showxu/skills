@@ -376,9 +376,9 @@ Context and files:
   exercises hidden setup, file writes, copies, empty output and assertions.
 - Exercise an edited output line, added/removed steps, an SVG-only difference,
   a broken DESIGN reference, contrast warning, ambiguous fonts, an unsupported
-  glyph, width overflow, a non-px dimension, a fixed environment override,
-  stderr, nonzero exit and a timeout. Include a directory or non-executable
-  file supplied as the executable, nested destination and fixture symlinks,
+  glyph, wide command/output lines, an over-long title, a non-px dimension,
+  a fixed environment override, stderr, nonzero exit and a timeout. Include a
+  directory or non-executable file supplied as the executable, nested destination and fixture symlinks,
   and SIGINT/SIGTERM before the first command and during managed filesystem work.
 - Exercise FIFO, directory and symlink expectation/write targets, restrictive
   directory modes from commands and fixture copies, persistent removal errors,
@@ -402,8 +402,14 @@ Forbidden behavior:
 Acceptance checks:
 
 - `npm test` passes type checking and Node tests; both golden SVGs match bytes.
-  Missing glyphs and overflow identify the step; lint diagnostics identify the
-  file, token and rule. Environment overrides and unknown keys fail.
+  Missing glyphs identify the step; over-long titles fail with title context.
+  Wide commands and output soft-wrap at whole glyphs within an 830 px canvas,
+  preserving whitespace and color roles. Dim vector continuation markers sit
+  in left padding without shifting columns, height includes added rows, and
+  the description retains the unwrapped transcript. Exact fits stay on one row;
+  recordings whose lines fit remain byte-identical.
+  Lint diagnostics identify the file, token and rule. Environment overrides and
+  unknown keys fail.
 - A clean `terminal check` exits zero; an edited output line exits one naming
   its command, with a unified diff and a complete artifact directory. SVG-only
   drift names the file and DESIGN/renderer change. Usage errors exit two.

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Terminal demos soft-wrap wide command and output lines within the 830 px
+  canvas, with dim continuation markers and unwrapped accessible transcripts.
+  Recordings whose lines fit retain identical SVG bytes; titles must still fit.
 - GitHub stewardship separates `.github` rules/data from independently versioned
   `github-workflows` automation, promotes checks shared by two members, and uses
   lowercase repository-owned `scripts/` with script-free templates. Member CI
