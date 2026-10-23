@@ -95,8 +95,8 @@ invocation, not automatic trigger quality.
   a palette, and a layer plan; drafted SVG layers; one entry per concept; a
   `--lint` result; and a `--sheet` comparison for the owner to choose from.
 - Preserve: Brand tokens and the owner's choice of concept.
-- Failure: Picking a concept for the owner, drafting text-heavy or photo-like
-  art, or tracing an existing app's icon.
+- Failure: Picking a concept for the owner, or drafting text-heavy or
+  photo-like art.
 - Acceptance: Every drafted layer passes the SVG contract, lint findings are
   resolved or recorded, and each concept is recognizable at 32 px.
 
