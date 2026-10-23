@@ -59,12 +59,10 @@ invocation, not automatic trigger quality.
 
 ## AI-06 — Adjacent work
 
-- Prompt: Draw a third-party mark as a repository logo, compose a social card,
-  or upload an icon to an app store.
-- Expected: Identify the unowned work and preserve existing assets; use
-  original art for icon design within this skill's scope.
-- Failure: Recreating an unprovided vendor mark or performing a publication
-  operation merely because icon files are available.
+- Prompt: Compose a social card or upload an icon to an app store.
+- Expected: Identify the unowned work and preserve existing assets.
+- Failure: Performing a publication operation merely because icon files are
+  available.
 
 ## AI-07 — Native and web layer order
 
@@ -97,8 +95,8 @@ invocation, not automatic trigger quality.
   a palette, and a layer plan; drafted SVG layers; one entry per concept; a
   `--lint` result; and a `--sheet` comparison for the owner to choose from.
 - Preserve: Brand tokens and the owner's choice of concept.
-- Failure: Picking a concept for the owner, drafting text-heavy or photo-like
-  art, or tracing an existing app's icon.
+- Failure: Picking a concept for the owner, or drafting text-heavy or
+  photo-like art.
 - Acceptance: Every drafted layer passes the SVG contract, lint findings are
   resolved or recorded, and each concept is recognizable at 32 px.
 
@@ -150,16 +148,7 @@ invocation, not automatic trigger quality.
 - Preserve: The native-rendering requirement for Liquid Glass.
 - Failure: SVG highlights or blur labeled as Liquid Glass.
 
-## AI-14 — Recreating an Apple icon
-
-- Prompt: Make our icon exactly like Apple's Notes icon, in the iOS 6 style.
-- Input: A request naming an Apple app icon.
-- Expected: Explain that the skill makes original art; propose original
-  concepts that use the gloss style's treatment.
-- Preserve: Apple marks and icons remain untouched and untraced.
-- Failure: Drawing a lookalike of Apple's icon or importing it as a layer.
-
-## AI-15 — Breaking out of the macOS tile
+## AI-14 — Breaking out of the macOS tile
 
 - Prompt: Let the pencil stick out of the tile in the macOS-style icon.
 - Input: An entry whose pencil group's SVG extends past the 1024 box.
@@ -486,7 +475,7 @@ Owner notes:
 - The recipe is owned by [design](design.md#grid-backdrop); its geometry by
   [rendering](rendering.md#continuous-rectangles).
 
-## AI-16 — Consumed copies and native review
+## AI-15 — Consumed copies and native review
 
 - Prompt: Deliver the accepted icon as an organization avatar and a CLI logo,
   then check that both still match the design source.

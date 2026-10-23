@@ -55,7 +55,7 @@ fit.
 | `glyph_gradient` | none | Two colors across the glyph. |
 | `glyph_fills` | none | Hues for multi-part glyph rectangles. |
 | `fill_lightness` | 0.80 | Lightness of `glyph_fills` parts. |
-| `texture` | `none` | `dots`, `grid`, `lines`, `rings`, or `constellation`. On a tile, `grid` is the grid backdrop. |
+| `texture` | `none` | `dots`, `grid`, `lines`, `rings`, or `constellation`, or a path `{"d": "...", "width": 0.006}` stroked in face units (side 1, centered), such as a family's own design grid. On a tile, `grid` is the grid backdrop. |
 | `texture_opacity` | per style | Texture opacity: 0.14 on the slab, 0.18 on a tile. |
 | `texture_color` | white | Texture color. |
 | `objects` | none | Slab: standing 3D objects. Tile: panels. Both below. |
@@ -109,6 +109,27 @@ corrections in the generator, not in `DESIGN.md` glyph definitions.
 - `dots`: filled circles `[x, y, r]`.
 - `knock`: circles `[x, y, r]` in the accent color, for cut-outs.
 - `transform`: SVG transform applied to the whole glyph.
+
+A layered glyph gives each part its own paint, for marks with several colors:
+
+```json
+"custom_glyph": {
+  "layers": [
+    {"circle": [0, 0, 0.62], "fill": {"colors": ["#FFFFFF", "#DCDDFF"], "from": [0, -0.9], "to": [0, 0.9]}},
+    {"d": "M-0.34 -0.22 L-0.12 0 L-0.34 0.22", "stroke": "#3A3FEF", "width": 0.13, "surface": true}
+  ]
+}
+```
+
+- `layers`: parts in drawing order, each with `d` or `circle` (`[x, y, r]`).
+- `fill` or `stroke`: a color, or a linear gradient with two `colors`
+  between `from` and `to`. A part without one takes the glyph color.
+- `width`: stroke width; `round`: rounds a filled part's corners by stroking
+  it in its own paint at this width.
+- `surface`: drawn only on the glyph's visible top, not in its shadow, relief
+  or bevel, for details inlaid in another part.
+- A layered glyph takes `layers` and `transform` only. Its shadow and relief
+  use the parts' outline, so the glyph keeps one raised shape.
 
 ## Standing Objects
 

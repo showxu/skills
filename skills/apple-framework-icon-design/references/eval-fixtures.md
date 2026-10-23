@@ -38,21 +38,7 @@ establish automatic selection or the visual quality of any one icon.
 - Acceptance: Exit status 1, one `drift` line, and a question asking whether
   to regenerate or adopt the change into the entry.
 
-## SI-03 — Request to imitate a product logo
-
-- Prompt: Make the integration package's icon use the vendor's logo on the
-  face.
-- Context: The package wraps a third-party command-line product.
-- Expected artifact: An entry using a generic glyph that says what the
-  package does, optionally with a palette inspired by the vendor's colors.
-- Must preserve: The rule against including, modifying, or imitating another
-  company's logo.
-- Failure: Tracing the vendor mark, approximating its silhouette, or
-  embedding its image.
-- Acceptance: The glyph is a library or original path, and the report states
-  why the vendor mark was not used.
-
-## SI-04 — Family without a DESIGN.md
+## SI-03 — Family without a DESIGN.md
 
 - Prompt: Give our three repositories matching icons.
 - Context: No `DESIGN.md` exists; repositories are a parser, a CLI, and a
@@ -66,7 +52,7 @@ establish automatic selection or the visual quality of any one icon.
 - Acceptance: `npx @google/design.md lint` reports no errors and
   `design_icons.py --list` prints the three names.
 
-## SI-05 — Boundary: social preview request
+## SI-04 — Boundary: social preview request
 
 - Prompt: Make a social preview card for the repository using its icon.
 - Context: The repository already has a `.github/assets/logo/logo.svg`.
@@ -76,7 +62,7 @@ establish automatic selection or the visual quality of any one icon.
 - Failure: Redrawing the icon inside a card layout or generating card text.
 - Acceptance: No icon or entry changes.
 
-## SI-06 — Tile member in a tile family
+## SI-05 — Tile member in a tile family
 
 - Prompt: Add an icon for the new chart-rendering library; our family uses
   front-facing tiles.
@@ -90,7 +76,7 @@ establish automatic selection or the visual quality of any one icon.
 - Acceptance: `--check` reports `same` for existing logos, and the new entry
   is legible at 40 px on both backgrounds.
 
-## SI-07 — Generator change with fidelity check
+## SI-06 — Generator change with fidelity check
 
 - Prompt: Make the slab corners rounder.
 - Context: The owner has a reference directory of framework icons.
@@ -104,7 +90,7 @@ establish automatic selection or the visual quality of any one icon.
 - Acceptance: The report names the constant, both fidelity runs, and the
   logos that would need regeneration.
 
-## SI-08 — Missing verification inputs
+## SI-07 — Missing verification inputs
 
 - Prompt: Verify this icon family and the generator's fidelity.
 - Context: One checked-in logo is missing. The reference directory is empty,
@@ -117,7 +103,7 @@ establish automatic selection or the visual quality of any one icon.
 - Acceptance: Both checks exit non-zero with actionable diagnostics; neither
   creates or overwrites a logo.
 
-## SI-09 — Family palette reads as two objects
+## SI-08 — Family palette reads as two objects
 
 - Prompt: Our icons look less like Apple's; the top face looks like a
   separate lid.
@@ -133,7 +119,7 @@ establish automatic selection or the visual quality of any one icon.
 - Acceptance: `--lint` exits 1 on the original file and 0 on the revision,
   and the report lists each changed color.
 
-## SI-10 — Rose ramp and shared hues
+## SI-09 — Rose ramp and shared hues
 
 - Prompt: Give two members the same red hue, with a rose ramp on one.
 - Context: A family with distinct member hues and one umbrella icon.

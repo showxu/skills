@@ -171,9 +171,6 @@ Failures seen in practice:
   marks lie along the face axes (`0`).
 - A plus sign laid on the axes reads as an x; draw it diagonally or dashed.
 - One idea per glyph. If it needs a caption to be understood, choose another.
-- Do not imitate another company's or project's logo, even when the member
-  integrates with that product. A generic glyph and a palette reference are
-  acceptable.
 
 ## Review Sizes
 
