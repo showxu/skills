@@ -73,6 +73,7 @@ class GlyphTests(unittest.TestCase):
     def test_layered_glyph_rejects_unknown_or_mixed_fields(self):
         for glyph in ({"layers": [{"d": "M0 0", "colour": "red"}]},
                       {"layers": [{"d": "M0 0", "circle": [0, 0, 1]}]},
+                      {"layers": [{"d": "M0 0", "fill": "red", "stroke": "blue"}]},
                       {"layers": [{"d": "M0 0"}], "rects": [[0, 0, 1, 1]]}):
             with self.subTest(glyph=glyph), self.assertRaises(ValueError):
                 glyph_markup(glyph, "white", 1, surface="i")

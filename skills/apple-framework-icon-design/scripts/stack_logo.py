@@ -523,8 +523,8 @@ def _layers_markup(g: dict, color: str, surface: str | None) -> str:
     defs, parts = [], []
     for layer in g["layers"]:
         unknown = set(layer) - LAYER_FIELDS
-        if unknown or ("d" in layer) == ("circle" in layer):
-            raise ValueError(f"a glyph layer takes d or circle and {sorted(LAYER_FIELDS - {'d', 'circle'})}: {layer}")
+        if unknown or ("d" in layer) == ("circle" in layer) or ("fill" in layer and "stroke" in layer):
+            raise ValueError(f"a glyph layer takes d or circle, fill or stroke, and {sorted(LAYER_FIELDS - {'d', 'circle', 'fill', 'stroke'})}: {layer}")
         if layer.get("surface") and surface is None:
             continue
         stroked = "stroke" in layer
