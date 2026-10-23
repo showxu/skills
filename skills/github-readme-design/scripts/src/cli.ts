@@ -14,6 +14,7 @@ const usage = `Usage:
 node src/cli.ts terminal record --script <script.yml> --executable <path> --out <recording.json>
 node src/cli.ts terminal render --recording <recording.json> --design <DESIGN.md> --fonts <dir> --out-dir <dir>
 node src/cli.ts terminal check --assets <dir> --design <DESIGN.md> --fonts <dir> --executable <path> [--artifact-dir <dir>]
+node src/cli.ts terminal check --recording-only --assets <dir> --executable <path> [--artifact-dir <dir>]
 node src/cli.ts design lint --design <DESIGN.md>
 node src/cli.ts social-preview render --design <DESIGN.md> --fonts <dir> --catalog <catalog.json> --repository <name|.github> --icon <path> --out <social-preview.png>
 node src/cli.ts social-preview check --design <DESIGN.md> --fonts <dir> --catalog <catalog.json> --repository <name|.github> --icon <path> --assets <dir> [--artifact-dir <dir>]
@@ -23,7 +24,7 @@ node src/cli.ts profile check --design <DESIGN.md> --catalog <catalog.json> [--m
 const contracts: Record<string, { required: string[]; optional?: string[] }> = {
   "terminal record": { required: ["script", "executable", "out"] },
   "terminal render": { required: ["recording", "design", "fonts", "out-dir"] },
-  "terminal check": { required: ["assets", "design", "fonts", "executable"], optional: ["artifact-dir"] },
+  "terminal check": { required: ["assets", "executable"], optional: ["design", "fonts", "artifact-dir"] },
   "design lint": { required: ["design"] },
   "social-preview render": { required: ["design", "fonts", "catalog", "repository", "icon", "out"] },
   "social-preview check": { required: ["design", "fonts", "catalog", "repository", "icon", "assets"], optional: ["artifact-dir"] },
@@ -43,11 +44,14 @@ function renderCommand(command: string, values: Record<string, string>): string 
 
 export async function main(args: string[]): Promise<number> {
   let values: Record<string, string>;
+  let recordingOnly = false;
   const command = args.slice(0, 2).join(" ");
   try {
     const contract = contracts[command];
     if (!contract) throw new Error(`Unknown command: ${command}`);
-    const options = Object.fromEntries([...contract.required, ...(contract.optional ?? [])].map(name => [name, { type: "string" as const }]));
+    const options: Record<string, { type: "string" | "boolean" }> = Object.fromEntries(
+      [...contract.required, ...(contract.optional ?? [])].map(name => [name, { type: "string" as const }]));
+    if (command === "terminal check") options["recording-only"] = { type: "boolean" };
     const parsed = parseArgs({ args: args.slice(2), options, strict: true, allowPositionals: false, tokens: true });
     const seen = new Set<string>();
     for (const token of parsed.tokens) {
@@ -55,8 +59,11 @@ export async function main(args: string[]): Promise<number> {
       if (seen.has(token.name)) throw new Error(`Duplicate option --${token.name}`);
       seen.add(token.name);
     }
-    values = parsed.values as Record<string, string>;
-    for (const name of contract.required) {
+    recordingOnly = parsed.values["recording-only"] === true;
+    values = Object.fromEntries(Object.entries(parsed.values).filter(([name]) => name !== "recording-only")) as Record<string, string>;
+    const required = command === "terminal check" && !recordingOnly
+      ? [...contract.required, "design", "fonts"] : contract.required;
+    for (const name of required) {
       if (!values[name]?.trim()) throw new Error(`Missing --${name}`);
     }
     for (const [name, value] of Object.entries(values)) {
@@ -88,7 +95,7 @@ export async function main(args: string[]): Promise<number> {
     } else if (command === "terminal check") {
       return await check({
         assets: values.assets, design: values.design, fonts: values.fonts,
-        executable: values.executable, artifactDir: values["artifact-dir"],
+        executable: values.executable, artifactDir: values["artifact-dir"], recordingOnly,
       }) ? 0 : 1;
     } else {
       const catalog = await readCatalog(values.catalog);
@@ -115,7 +122,7 @@ export async function main(args: string[]): Promise<number> {
     const context = values.script ?? values.recording ?? values.assets ?? values.design;
     console.error(`${context}: ${message(error)}`);
     const rerun = command === "terminal check"
-      ? regeneration({ assets: values.assets, design: values.design, fonts: values.fonts, executable: values.executable })
+      ? regeneration({ assets: values.assets, design: values.design, fonts: values.fonts, executable: values.executable, recordingOnly })
       : command.startsWith("profile ") || command.startsWith("social-preview ")
         ? renderCommand(command, values) : `node ${quote(CLI_PATH)} ${args.map(quote).join(" ")}`;
     console.error(`After correcting the input, run:\n${rerun}`);

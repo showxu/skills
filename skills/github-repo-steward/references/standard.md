@@ -13,8 +13,10 @@ For `.github-private`, apply settings, rulesets, signed work and CI from the
 shared standard, checking actual private-plan enforcement. Its dashboard links
 policy from `.github`. Product README first-screen presentation, social cards
 and inherited community files do not apply. Audit the generated dashboard's
-inputs and byte check through the profile rendering contract; do not add
-product presentation or copied community files to satisfy an inapplicable row.
+inputs and local render/check results through the profile rendering contract;
+commit the generated dashboard. CI uses the shared policy/validation callers;
+do not add product presentation or copied community files to satisfy an
+inapplicable row.
 
 ## Settings
 
@@ -22,7 +24,7 @@ product presentation or copied community files to satisfy an inapplicable row.
 | --- | --- | --- |
 | Default branch | Keep the existing default; a new repository uses the owner's chosen GitHub default | Repository metadata, callers and links agree |
 | Merge | Squash only, PR title, empty body, delete merged branches | `allow_squash_merge=true`, `allow_merge_commit=false`, `allow_rebase_merge=false`, `squash_merge_commit_title=PR_TITLE`, `squash_merge_commit_message=BLANK`, `delete_branch_on_merge=true` |
-| Default branch ruleset | Active, no bypass actors; prevent deletion/force push, require signed commits, PRs, resolved threads and actual policy/validation contexts | Include `~DEFAULT_BRANCH`; read full rule parameters and overlapping legacy protection |
+| Default branch ruleset | Active, no bypass actors; prevent deletion/force push, require signed commits, PRs, resolved threads and `policy` and `validate` contexts | Include `~DEFAULT_BRANCH`; read full rule parameters and overlapping legacy protection |
 | Reviews | Zero extra approvals for a solo owner; team/code-owner requirements follow ownership policy | Review decisions and threads, not only check conclusions |
 | Release tag ruleset | Active; prevent update and deletion of the repository's release pattern (new SemVer projects default to `v*`) | Pattern covers real releases, no bypass |
 | Version policy | When no shared standard applies, write root `VERSIONING.md` from the [template](../templates/VERSIONING.md.tpl), which owns the version rules; the repository's release facts and mechanics live in its release reference | Each tag matches the version source at its commit and has a changelog section |
@@ -51,7 +53,7 @@ and an owning reason, not a local copy of the same policy.
 | LICENSE and third-party notices | Not inherited. Preserve existing license/ownership; choose a new license with explicit owner authority |
 | CODEOWNERS | Not inherited. Define real people/teams and relevant paths; include ownership of the ownership file |
 | Dependabot | Not inherited. Configure actual package ecosystems and actions, normally weekly, through reviewed update PRs |
-| Workflows and settings | Not inherited merely by placing them in `.github`; callers and rulesets must be adopted explicitly |
+| Workflows and settings | Callers pin the family's `github-workflows`; `.github` documents declare settings. Both callers and rulesets need explicit adoption |
 
 For a personal repository without defaults, supply appropriate community files
 in that repository and an explicit private security reporting route. Avoid

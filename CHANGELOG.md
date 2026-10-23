@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- GitHub stewardship separates `.github` rules/data from independently versioned
+  `github-workflows` automation, promotes checks shared by two members, and uses
+  lowercase repository-owned `scripts/` with script-free templates. Member CI
+  requires `policy` and `validate`; shared changes pass fixtures and a
+  representative member before rollout.
+- Profiles, social previews and terminal SVGs render/check locally and commit
+  their outputs. Member dashboards compare membership with the current public
+  catalog and regenerate locally when it drifts.
+- `github-readme-design` supports `terminal check --recording-only` and the
+  Action's `recording-only` input for the ecosystem validation `demo` switch,
+  with recording diffs and no DESIGN, font or SVG requirement.
+
 - `github-repo-steward` creates a new repository from the template its
   organization declares and replaces the declared identity values with
   `scripts/apply_template_identity.py`; without a template it assembles the

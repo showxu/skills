@@ -2,19 +2,31 @@
 
 ## Shared standard
 
-The organization's `.github` declares shared rules once, including a required
-check inventory or equivalent machine-readable mapping and documented
-exceptions. Its settings checker reads the declaration, not a hardcoded second
-copy. Parameters that differ per repository come from those members. Never
-copy a reference checker and merely replace an organization constant.
+The organization's `.github` contains data and documents, including signing and
+PR-title rules, exception lists and the settings declaration. It carries no
+scripts and only thin workflow callers. Required member checks are `policy`
+and `validate`.
+
+The family `github-workflows` owns source-policy checkers, the organization
+check, ecosystem validation/release workflows and their scripts. The organization
+check runs through `.github` CI, compares membership and About completeness,
+and checks declared settings against live state. It reads the declaration and
+records the enforced `.github` revision. Parameters that differ per repository
+come from those members. Never copy a reference checker and merely replace an organization constant.
 
 The organization owner chooses shared default-branch policy, review policy,
 release identity and supported enforcement. `github-repo-steward` applies and
 audits those choices for each member; it owns local signing, branch/tag
 rulesets, merge settings, CI baseline and community inheritance. Shared workflow
-interfaces need syntax and consumer validation before rollout. Require real
-emitted check contexts before making them mandatory; update the organization
-inventory when job names change.
+interfaces need syntax checks, fixture-package tests and one representative
+member run at the exact candidate before rollout. Require real emitted check
+contexts before making them mandatory; update the organization
+declaration when caller configuration changes. The ecosystem release skill
+owns the shared CI job catalog, member format and defaults; organizations and
+repositories may extend them. Validation always runs format, tests and release
+build; platforms, docs and demo are declared options. Render/check profiles and
+images locally and commit outputs. CI checks only the demo recording through
+the validation workflow's `demo` switch.
 
 Organization Actions defaults use least privilege, normally a read token and
 no workflow approval of PRs. Record any chosen exception in the shared

@@ -1,6 +1,6 @@
 ---
 name: github-org-steward
-description: Set up, maintain, coordinate, and audit organization-wide GitHub standards and publication. Use an organization URL, repository inventory or cross-repository change to own the shared .github standard, repository placement, organization settings and scoped Apps, family DESIGN, job-grouped profile/catalog, pins, coordinated releases, acceptance scans and authorized handoffs. Applies each member's GitHub standard through github-repo-steward. Does not own an isolated personal or member repository's settings/presentation, package implementation, icon construction or ecosystem release mechanics.
+description: Set up, maintain, coordinate, and audit organization-wide GitHub standards and publication. Use an organization URL, repository inventory or cross-repository change to own the shared .github standard and github-workflows automation, repository placement, organization settings and scoped Apps, family DESIGN, job-grouped profile/catalog, pins, coordinated releases, acceptance scans and authorized handoffs. Applies each member's GitHub standard through github-repo-steward. Does not own an isolated personal or member repository's settings/presentation, package implementation, icon construction or ecosystem release mechanics.
 ---
 
 # GitHub Org Steward
@@ -25,9 +25,20 @@ never import another organization's names, branches, paths, colors or key setup.
 
 Resolve [topology and GitHub layout](references/topology.md): a product family has
 dependency-ordered publication; a package collection has independently released
-members. Both use `.github` for shared standards, with repository-owned code,
-checks and accepted exceptions. A template seeds new members; it does not update
-existing ones.
+members. Repository roles are:
+
+| Repository | Owns |
+| --- | --- |
+| `.github` | Data and documents: shared rules, settings declaration, catalog, DESIGN, icon sources, fonts, community defaults and generated public profile; only thin workflow callers |
+| `github-workflows` | All reusable workflows and their scripts/checkers, fixture packages and independent versions |
+| `.github-private` | Locally rendered member dashboard and operational input |
+| Member | Product code, repository-specific `scripts/` and pinned shared callers |
+| Template | Initial layout and thin callers, with no scripts |
+
+Rules stay in `.github` documents; checkers in `github-workflows` record which
+`.github` revision they enforce. Promote a check needed by a second member into
+`github-workflows` instead of copying it. A template seeds new members; it does
+not update existing ones.
 
 This is an organization orchestrator with sequential handoffs. Delegation needs
 explicit authorization and disjoint write ownership; a routing table is not
@@ -50,8 +61,9 @@ permission to spawn agents or message other sessions.
 3. **Establish shared truth.** Change the owning `.github` standard first.
    Organization settings/App changes update its MAINTENANCE declaration in the
    same reviewed change, using [governance](references/governance.md). Shared
-   workflow changes require syntax validation and an accepted consumer run at
-   the proposed pin before a broad rollout. Plan capacity-bound waves and the
+   workflow changes live in `github-workflows` and require syntax validation,
+   fixture-package tests and one accepted representative member run at the
+   proposed pin before a broad rollout. Plan capacity-bound waves and the
    measured cache-adoption gate in [coordinated publication](references/release.md)
    before dispatch. Write the organization `.github` root `VERSIONING.md` from
    the repository steward's [template](../github-repo-steward/templates/VERSIONING.md.tpl),
@@ -67,14 +79,17 @@ permission to spawn agents or message other sessions.
 5. **Deliver organization surfaces.** Apply [family and profile](references/brand.md),
    [website integration](references/website.md) and
    [coordinated publication](references/release.md). Keep catalog membership
-   generated from authoritative inventory. Deliver the public profile in
-   `.github` and the maintainer dashboard in private `.github-private` through the shared profile renderer. Review public
-   copy, umbrella identity and pins together; the member profile consumes the
+   generated from authoritative inventory: public, non-archived, non-fork
+   repositories except `.github`. Deliver the public profile in
+   `.github` and the maintainer dashboard in private `.github-private`: render
+   locally with `github-readme-design` and commit inputs and outputs. Review
+   public copy, umbrella identity and pins together; the member profile consumes the
    pinned public catalog and links to shared policy with live operational
    state. Per-repository image production and upload stay with the repository
    steward.
-6. **Accept.** Run the organization's settings check and the cross-repository
-   acceptance scanner below. Reconcile every repository report with its current
+6. **Accept.** Run the organization check from `github-workflows` through
+   `.github` CI for membership, About completeness and declared/live settings,
+   plus the cross-repository acceptance scanner below. Reconcile every repository report with its current
    accepted SHA, live check status and published artifacts. Confirm both profiles,
    matching membership, pin order, scoped App installations and working public URLs.
    Unknowns stay unknown; a prepared branch is not a delivered change.
@@ -99,7 +114,7 @@ domain artifacts or their implementation procedures:
 | Visual identity file shape and templates | `design-md-template` |
 | Personal account profile | `github-profile-readme` |
 | Framework icon family or app icons | `apple-framework-icon-design`, `apple-app-icon-design` |
-| Ecosystem release procedures | That ecosystem's release skill, e.g. `swiftpm-github-release` for Swift packages |
+| Ecosystem release procedures, shared CI job catalog, member configuration format and defaults | That ecosystem's release skill, e.g. `swiftpm-github-release` in `swift-library/skills` for Swift packages; organizations and members may extend them |
 | Facts a member README states: package snippets, install channels, commands and MCP configuration | Their owners, invoked through `github-repo-steward`; e.g. `swiftpm-readme` for Swift package snippets |
 | Website implementation and browser QA | `frontend-design`, `webapp-builder`, `webapp-testing` |
 | Interface/marketing copy | `ux-writing`, `market-messaging` |
@@ -118,9 +133,9 @@ when work leaves the orchestrator or deserves a public record:
 
 - Work handed to one repository's owner: an issue in that repository, filed
   through `github-flow`.
-- Organization-wide work handed to the organization's owners (shared
-  standards, shared workflows, settings, rulesets, Apps, profile, pins, family
-  identity): an issue in the organization's `.github` repository.
+- Organization-wide rules, settings, Apps, profile, pins and family identity
+  handed to the organization's owners: an issue in `.github`. Shared workflow
+  or checker implementation: an issue in `github-workflows`.
 - Sensitive governance gaps handed to the organization's owners, such as a
   security setting or App permission problem: the organization's private
   `.github-private` repository when one exists. Vulnerabilities go through the
@@ -145,8 +160,10 @@ artifacts; an empty word search is not an ownership proof.
 
 ## Validation and output
 
-- Shared standard: its declared checks, plus a pinned consumer run for shared
-  automation changes; GitHub settings declarations match live state.
+- Shared standard: local rendering checks and the organization check from
+  `github-workflows` in `.github` CI. Shared automation passes fixture packages
+  and one representative member at the candidate pin; settings declarations
+  match live state.
 - Coordination: size rollout waves from current total and runner-class
   capacity, measure development build caches against a threshold set before
   the trial, and require cache-free release workflows that preserve running
@@ -159,9 +176,10 @@ artifacts; an empty word search is not an ownership proof.
   from the repository steward package. Use `--repo-steward <skill-dir>` when
   the skills are installed separately. Pass `--member-input <path>` when its
   input is not `profile/member.json`. Observe `.github-private` visibility,
-  catalog membership at the reusable profile workflow pin, declared default
-  branches against GitHub, workflow files,
-  releases and icons. Absence is optional;
+  member dashboard membership against the current public catalog on `.github`'s
+  default branch, declared default branches against GitHub, workflow files,
+  releases and icons. Report membership drift as a dashboard needing local
+  regeneration. Absence is optional;
   unreadable input is REVIEW. Explain all REVIEW lines and pending runs.
 - Local preservation: `python3 scripts/scan_org.py compare --root <checkouts>
   --baseline <snapshot.json>` reports no unrelated status/index/stash/worktree

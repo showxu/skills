@@ -286,6 +286,71 @@ test("changed steps report replacements, additions and removals by index", () =>
   assert.match(changedSteps(golden, { ...golden, steps: [{ command: "new", output: "" }] }).join("\n"), /demo inspect -> new/);
 });
 
+test("recording-only check ignores SVGs and rendering inputs and reports recording drift", async t => {
+  const root = await session(t);
+  const recording = join(root, "recording.json");
+  await copyFile(join(fixture, "recording.json"), recording);
+  await writeFile(join(root, "terminal-light.svg"), "stale SVG\n");
+  const options = { assets: root, executable, recordingOnly: true,
+    design: join(root, "absent.md"), fonts: join(root, "absent-fonts"),
+    artifactDir: join(await temporary(t), "artifact") };
+  const messages: string[] = [];
+  assert.equal(await check(options, line => messages.push(line)), true);
+  assert.match(messages.join("\n"), /recording.json matches/);
+  const changed = recordingJSON({ ...golden, steps: [{ command: "demo inspect", output: "drift" }] });
+  await writeFile(recording, changed);
+  messages.length = 0;
+  assert.equal(await check(options, line => messages.push(line)), false);
+  assert.match(messages.join("\n"), /changed step 1: demo inspect/);
+  assert.match(messages.join("\n"), /added step 2/);
+  assert.match(messages.join("\n"), /--- .*recording.json\n\+\+\+ regenerated/);
+  assert.doesNotMatch(messages.join("\n"), /terminal render|terminal-.*svg/);
+  assert.equal(await readFile(recording, "utf8"), changed);
+  assert.equal(await readFile(join(root, "terminal-light.svg"), "utf8"), "stale SVG\n");
+  assert.deepEqual(await readdir(options.artifactDir), ["recording.json"]);
+  assert.equal(await readFile(join(options.artifactDir, "recording.json"), "utf8"), recordingJSON(golden));
+  const result = spawnSync("/bin/sh", ["-c", regeneration({ assets: root, executable, recordingOnly: true })], { encoding: "utf8" });
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(await check({ assets: root, executable, recordingOnly: true }, () => {}), true);
+});
+
+test("recording-only CLI needs assets and an executable and rejects invalid flag usage", async t => {
+  const root = await session(t);
+  const args = ["terminal", "check", "--assets", root, "--executable", executable];
+  const missing = cli(...args, "--recording-only");
+  assert.equal(missing.status, 1);
+  assert.match(missing.stdout, /missing committed recording/);
+  await copyFile(join(fixture, "recording.json"), join(root, "recording.json"));
+  assert.equal(cli(...args, "--recording-only").status, 0);
+  for (const invalid of [
+    args, [...args, "--design", designPath], [...args, "--fonts", fonts],
+    ["terminal", "check", "--recording-only", "--assets", root],
+    ["terminal", "check", "--recording-only", "--executable", executable],
+    [...args, "--recording-only=false"], [...args, "--recording-only", "false"],
+    [...args, "--recording-only", "--recording-only"],
+    ["terminal", "render", "--recording-only"], ["profile", "check", "--recording-only"],
+  ]) assert.equal(cli(...invalid).status, 2, invalid.join(" "));
+  const failed = cli("terminal", "check", "--recording-only", "--assets", root, "--executable", join(root, "missing"));
+  assert.equal(failed.status, 1);
+  assert.match(failed.stderr, /terminal record/);
+  assert.doesNotMatch(failed.stderr, /terminal render|TypeError/);
+});
+
+test("recording-only artifacts cannot overwrite inputs through overlapping or aliased directories", async t => {
+  const root = await session(t);
+  const input = join(root, "fixture", "data");
+  await mkdir(input);
+  await writeFile(join(input, "recording.json"), "fixture input\n");
+  const output = await temporary(t);
+  const alias = join(output, "alias");
+  await symlink(input, alias);
+  for (const artifactDir of [root, input, join(root, "new"), join(root, ".."), alias]) {
+    await assert.rejects(check({ assets: root, executable, recordingOnly: true, artifactDir }, () => {}),
+      /artifact directory must be separate from assets/);
+  }
+  assert.equal(await readFile(join(input, "recording.json"), "utf8"), "fixture input\n");
+});
+
 test("regeneration commands work outside the package and quote paths", async t => {
   const root = await temporary(t);
   const assets = join(root, "demo's assets");

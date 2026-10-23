@@ -1,5 +1,33 @@
 # CI baseline
 
+Members call reusable workflows from their family's `<org>/github-workflows`
+repository. It owns source policy, the organization check, ecosystem validation
+and release, plus every script/checker those workflows run. Reusable jobs check
+out their own repository at `job.workflow_sha` and execute its scripts; they do
+not embed script source or use workflow generators. The shared repository is
+self-tested with fixture packages and versioned independently.
+
+The organization's `.github` documents own signing, PR-title rules, exceptions
+and settings declarations. Shared checkers record the `.github` revision they
+enforce. Members pin only `github-workflows`; implementation/toolchain pins
+belong inside that shared repository.
+
+Required member checks are only `policy` and `validate`. Validation always
+runs format, tests and a release build; platforms, docs and demo run only where
+declared. The ecosystem release skill owns the shared CI job catalog, member
+configuration format and defaults (for Swift packages,
+`swiftpm-github-release` in `swift-library/skills`). Organizations and members
+may extend them with their own commands. Repository-specific checks live in
+lowercase `scripts/`; a check needed by a second member is promoted into
+`github-workflows`.
+
+Demo validation re-records `recording.json` against the freshly built CLI using
+the ecosystem validation workflow's `demo` switch. Render and check profiles,
+social previews, screenshots and terminal SVGs locally, then commit outputs.
+Demo results feed `validate`; presentation has no separate required context.
+The validation contract excludes consumer verification, dependency-minimum and
+API comparison jobs. Releases attach product artifacts, not evidence assets.
+
 Policy and validation are separate workflows. Title edits must rerun title and
 added-line policy without producing a skipped validation result on the same
 commit. Such a skip can replace a previous failing required result.
@@ -53,7 +81,8 @@ Pin third-party actions and reusable workflows to full reviewed commits. A
 pin to a release carries its `# vX.Y.Z` comment; a pin to an unreleased
 commit of a change still in progress carries none.
 Reusable callers derive input values from the consuming repository. A shared
-change needs syntax validation and a real consumer run at the proposed pin.
+change needs syntax validation, fixture-package tests and one representative
+member run at the proposed pin before rollout.
 Update callers through PRs after that evidence; a template only affects new
 repositories. Keep all related callers consistent with the shared interface.
 
@@ -65,8 +94,9 @@ is advisory or blocking. API failure is unknown, not a clean pin report.
 
 Stable result jobs use `always()` and inspect each dependency result explicitly;
 a failed/cancelled dependency must fail the aggregate. Preserve exact required
-contexts when splitting callers. Observe the resulting names before changing
-rulesets, including reusable names such as `<caller> / <called>`.
+contexts `policy` and `validate` when splitting callers. Observe the resulting
+names before changing rulesets; account for reusable caller/callee naming when
+exposing those two results.
 
 Use read-only default permissions, minimal explicit write jobs and Dependabot
 for actual ecosystems. Ecosystem-specific compilers, SDKs, deployment floors,

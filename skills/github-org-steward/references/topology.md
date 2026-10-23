@@ -11,10 +11,11 @@ Choose the model before placing artifacts:
 
 | Repository role | Owns |
 | --- | --- |
-| `.github` | Shared maintenance/versioning/design standards, supported default community files, reusable workflows, organization checks and public profile |
+| `.github` | Data and documents: MAINTENANCE/VERSIONING rules, settings declaration, catalog, DESIGN, icon sources, fonts, community defaults and generated public profile; only thin callers to `github-workflows` |
+| `github-workflows` | Every reusable workflow and its scripts/checkers: source policy, organization check, ecosystem validation and release; fixture packages and independent versioning |
 | `.github-private` (private) | Member profile, maintenance navigation and live status; shared policy stays in `.github` |
-| Product/package/tool | Its source, interface, requirements, checks, version source, release evidence and meaning |
-| Template | Initial member layout and callers; stamping/first-publication validation owned by its ecosystem |
+| Product/package/tool | Its source, interface, requirements, checks in `scripts/`, version source and meaning |
+| Template | Initial member layout and thin callers, no scripts; stamping/first-publication validation owned by its ecosystem |
 | Website | Public entry, documentation integration, generated catalog and release reconciliation |
 | Tap or distribution integration | Its own domain-owned distribution metadata and checks |
 | Skills | Authored reusable guidance for the organization, without duplicating the source owner's implementation |
@@ -22,15 +23,23 @@ Choose the model before placing artifacts:
 
 Keep shared invariants in `.github` and member-specific facts with their member.
 MAINTENANCE owns declared organization settings and Apps; VERSIONING owns shared
-version policy; DESIGN owns family identity. Documentation roles route to
-`repository-docs`. The layout below is the standard, with GitHub-defined paths
+version policy; DESIGN owns family identity. Signing, PR-title rules, exceptions
+and settings declarations stay in `.github` documents. Their checkers live in
+`github-workflows` and record the enforced `.github` revision. `.github` has no
+scripts or executable workflows beyond thin callers.
+
+A repository owns its specific automation in lowercase `scripts/`, created only
+when needed. Promote a check needed by a second member into `github-workflows`.
+The ecosystem release skill owns the shared job catalog, member configuration
+format and defaults; organization and repository extensions stay with their
+owners. Documentation roles route to `repository-docs`. The layout below is the standard, with GitHub-defined paths
 first.
 
 ## Organization GitHub layout
 
 | Place | Rule | Source |
 | --- | --- | --- |
-| Public `.github` repository | `profile/README.md` is the public organization profile. Supported default community health files and issue/PR templates apply to members without their own; licenses cannot be defaults. `workflow-templates/` holds organization workflow templates, pairing `<name>.yml` with `<name>.properties.json`. | [Organization profile](https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/customizing-your-organizations-profile), [default community health files](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file), [workflow templates](https://docs.github.com/en/actions/how-tos/reuse-automations/create-workflow-templates) |
+| Public `.github` repository | `profile/README.md` is the public organization profile. Supported default community health files and issue/PR templates apply to members without their own; licenses cannot be defaults. `workflow-templates/` pairs thin caller templates `<name>.yml` with `<name>.properties.json`; executable implementations live in `github-workflows`. | [Organization profile](https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/customizing-your-organizations-profile), [default community health files](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file), [workflow templates](https://docs.github.com/en/actions/how-tos/reuse-automations/create-workflow-templates) |
 | Private `.github-private` repository | `profile/README.md` is the member-only profile. Members see it by default and switch with **View as**. Public and member views each pin up to six repositories; only organization owners pin. | [Organization profile](https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/customizing-your-organizations-profile) |
 
 Use the [repository layout](../../github-repo-steward/references/layout.md)
@@ -58,21 +67,29 @@ product icons, stays with the product; README logos are recorded exports.
 Each organization owns one DESIGN with its variants. The catalog owns
 per-repository selections, including icon and outcome text; members consume
 the shared design and supply their content. Keep generated catalog membership
-reconciled with the authoritative inventory. The private repository links to
-shared policy in `.github` rather than maintaining another copy.
+reconciled with the authoritative inventory: public, non-archived, non-fork
+repositories except `.github`. Forks are upstream source lines. The private
+repository links to shared policy in `.github` rather than maintaining another
+copy.
 
 ## Shared defaults and consumers
 
 Default community-file inheritance and repository-local files are applied by
-`github-repo-steward`. Reusable workflows also need explicit pinned callers;
-placing a workflow in `.github` does not install it in every member. Update the
-template and existing repositories separately through reviewed changes.
+`github-repo-steward`. Members pin only `<org>/github-workflows` by full SHA,
+with a `# vX.Y.Z` comment at releases and no version comment for in-progress
+commits. Reusable jobs check out their own repository at `job.workflow_sha`
+and run its scripts; source embedding and workflow generators are not part of
+this contract. Update the template and existing repositories separately through
+reviewed changes. Prove shared changes with fixture packages and one
+representative member at the candidate pin before rollout.
 
 Brand exports have one owning generator and design input. Consumers receive
 only the exports they use, with a reviewed source revision/digest record if
 needed. Do not keep competing local renderers or manually maintained copies.
 The organization inventory owns membership; grouping/order metadata owns
-presentation, and a generator reconciles the two.
+presentation. Local rendering reconciles the two and commits outputs; the
+organization check from `github-workflows` in `.github` CI verifies membership,
+About completeness and settings declarations against live settings.
 
 Fork adoption and legal/provenance review route to `fork-dog`. A shared license
 policy does not relicense upstream code or third-party fixtures. Preserve

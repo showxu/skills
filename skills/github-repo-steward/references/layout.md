@@ -34,8 +34,8 @@ For a member or standalone repository:
 ```
 
 The [asset contract](../../github-readme-design/references/design.md#assets)
-defines which kinds each product uses, optional terminal fixtures, production
-and CI checks. Asset directories are created for the kinds the product needs.
+defines which kinds each product uses, optional terminal fixtures, local
+production/checks and demo recording CI. Create directories for needed kinds.
 
 GitHub prescribes no README image directory; its formatting guide uses
 `/assets/images/...` as an example. `.github/assets/` is the local convention
@@ -50,9 +50,8 @@ content.
 
 Presentation source and asset directories stay inside `.github/`, so roots
 keep their ecosystem's directories: Swift `Sources/`, `Tests/`,
-`Documentation/` and `Scripts/`; Homebrew `Formula/`; Python `scripts/`,
-`tests/` and `docs/`. `.github/design/` holds only sources that exist for
-GitHub presentation, with fonts in `fonts/` and icon `layers/` and
+`Documentation/`; Homebrew `Formula/`; Python `tests/` and `docs/`.
+`.github/design/` holds only sources that exist for GitHub presentation, with fonts in `fonts/` and icon `layers/` and
 `provenance.json` in `icons/<name>/`. A product's own design, including its
 UI, design system and shipped icon, stays with the product. One root
 `DESIGN.md` covers the repository's identity, including presentation
@@ -64,5 +63,13 @@ and SHA-256, with the skill commit, renderer version, command and verification
 date. Copies live where they are used: organization avatar and marks in
 `profile/assets/`, member logos in `.github/assets/logo/`. The Icon Composer
 `.icon` document is regenerated from DESIGN and layers into ignored scratch
-when needed for review. CI compares consumed copies with the recorded
-digests; native regeneration runs locally with Icon Composer on macOS.
+when needed for review. Compare consumed copies with the recorded digests
+locally; native regeneration uses Icon Composer on macOS.
+
+## Scripts
+
+Repository-specific automation belongs in lowercase `scripts/` in every
+ecosystem, created only when needed. The repository owns which scripts exist
+and what they contain. `.github` directories and repository templates carry
+no scripts. A check needed by a second member moves to the family's
+`github-workflows` repository instead of being copied.
