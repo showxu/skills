@@ -88,5 +88,4 @@ tag's version and that `CHANGELOG.md` at that commit has the matching section.
 
 {{release_details}}
 
-Ecosystem builds, packages, stores and consumer installation checks belong to
-{{release_owner}}.
+Ecosystem builds, packages and stores belong to {{release_owner}}.

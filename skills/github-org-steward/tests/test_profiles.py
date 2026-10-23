@@ -33,9 +33,9 @@ class ProfileObservationsTests(unittest.TestCase):
                       self.repo("internal", "private")]
         self.rows = []
 
-    def repo(self, name, visibility="public", archived=False):
+    def repo(self, name, visibility="public", archived=False, fork=False):
         return dict(name=name, visibility=visibility, isArchived=archived,
-                    defaultBranchRef={"name": "development"}, isFork=False)
+                    defaultBranchRef={"name": "development"}, isFork=fork)
 
     def content(self, owner, repository, path, revision):
         if repository == ".github" and path == "profile/catalog.json":
@@ -123,13 +123,18 @@ class ProfileObservationsTests(unittest.TestCase):
                 self.scan()
                 self.assertTrue(any(row[0] == "FAIL" and "visibility" in row[2] for row in self.rows))
 
-    def test_inventory_excludes_archived_and_private_but_not_public_forks(self):
-        self.repos.append(self.repo("fork"))
-        self.repos[-1]["isFork"] = True
+    def test_inventory_excludes_archived_private_and_fork_repositories(self):
+        self.repos.append(self.repo("upstream", fork=True))
         self.scan()
-        failures = [row for row in self.rows if row[0] == "FAIL"]
-        self.assertEqual(len(failures), 1)
-        self.assertIn("missing ['fork']", failures[0][2])
+        self.assertFalse([row for row in self.rows if row[0] in {"FAIL", "REVIEW"}], self.rows)
+        self.assertIn(("INFO", ".github", "public catalog membership: 2 repositories match"), self.rows)
+
+    def test_catalog_rejects_forks_even_when_dashboard_membership_matches(self):
+        self.repos[3]["isFork"] = True
+        self.scan()
+        self.assertEqual([row for row in self.rows if row[0] == "FAIL"], [
+            ("FAIL", ".github", "public catalog membership: missing [], extra ['tool']")])
+        self.assertIn(("INFO", ".github-private", "member dashboard membership matches current public catalog: 2 repositories"), self.rows)
 
     def test_outdated_member_dashboard_needs_regeneration_against_current_catalog(self):
         for missing, extra in ((["new"], []), ([], ["tool"]), (["new"], ["tool"])):

@@ -8,8 +8,8 @@
   requires `policy` and `validate`; shared changes pass fixtures and a
   representative member before rollout.
 - Profiles, social previews and terminal SVGs render/check locally and commit
-  their outputs. Member dashboard revision observations require unambiguous
-  provenance; generated resource URLs alone do not establish it.
+  their outputs. Member dashboards compare membership with the current public
+  catalog and regenerate locally when it drifts.
 - `github-readme-design` supports `terminal check --recording-only` and the
   Action's `recording-only` input for the ecosystem validation `demo` switch,
   with recording diffs and no DESIGN, font or SVG requirement.

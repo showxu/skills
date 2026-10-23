@@ -153,7 +153,8 @@ def inspect_profiles(owner, repos, report, member_path="profile/member.json"):
         report("REVIEW", ".github", "inventory visibility incomplete; cannot verify public membership")
     else:
         expected = {name for name, repo in inventory.items()
-                    if repo["visibility"] == "public" and not repo["isArchived"] and name != ".github"}
+                    if repo["visibility"] == "public" and not repo["isArchived"]
+                    and not repo["isFork"] and name != ".github"}
         membership(expected, set(members), report, ".github", "public catalog membership")
     inspect_icons(catalog, branch, report)
     if "description" in catalog:

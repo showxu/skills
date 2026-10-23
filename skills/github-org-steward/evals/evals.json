@@ -21,8 +21,8 @@
     },
     {
       "id": 4,
-      "prompt": "Add the newly published member to our organization profile and website catalog.",
-      "expected_output": "Reconcile the generated catalog with authoritative public membership, preserve job groups and owning outcome copy, render profile and site from accepted shared identity, and verify links/pins.",
+      "prompt": "Add the newly published member to our organization profile and website catalog. Our inventory also includes public upstream forks, archived repositories and private repositories.",
+      "expected_output": "Reconcile the generated catalog with authoritative membership of public, non-archived, non-fork repositories except .github, preserve job groups and owning outcome copy, render profile and site from accepted shared identity, and verify links/pins.",
       "files": []
     },
     {

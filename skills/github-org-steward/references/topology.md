@@ -67,8 +67,10 @@ product icons, stays with the product; README logos are recorded exports.
 Each organization owns one DESIGN with its variants. The catalog owns
 per-repository selections, including icon and outcome text; members consume
 the shared design and supply their content. Keep generated catalog membership
-reconciled with the authoritative inventory. The private repository links to
-shared policy in `.github` rather than maintaining another copy.
+reconciled with the authoritative inventory: public, non-archived, non-fork
+repositories except `.github`. Forks are upstream source lines. The private
+repository links to shared policy in `.github` rather than maintaining another
+copy.
 
 ## Shared defaults and consumers
 

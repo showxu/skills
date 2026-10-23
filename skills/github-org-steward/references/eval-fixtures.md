@@ -256,15 +256,20 @@ Owner notes:
 
 Target behavior: generated catalog.
 
-Input prompt: "Add the newly published member to our organization profile and website catalog."
+Input prompt: "Add the newly published member to our organization profile and website catalog. Our inventory also includes public upstream forks, archived repositories and private repositories."
 
 Context and files:
 
-- An accepted new member, existing generated profile/catalog and shared DESIGN.
+- An accepted new public, non-archived, non-fork member, existing generated
+  profile/catalog and shared DESIGN; the inventory also contains upstream
+  forks, archived repositories and private repositories.
 
 Expected output:
 
-- Reconcile the generated catalog with authoritative public membership, preserve job groups and owning outcome copy, render profile and site from accepted shared identity, and verify links/pins.
+- Reconcile the generated catalog with authoritative membership of public,
+  non-archived, non-fork repositories except `.github`, preserve job groups and
+  owning outcome copy, render profile and site from accepted shared identity,
+  and verify links/pins.
 
 Forbidden behavior:
 
@@ -272,7 +277,10 @@ Forbidden behavior:
 
 Acceptance checks:
 
-- The generator input and drift/membership check include the new member; source and served outputs are identified.
+- The generator input and drift/membership check include the new member and
+  exclude upstream forks, archived repositories, private repositories and
+  `.github`; source and served outputs are identified. A fork in the catalog
+  fails membership even when the member dashboard contains the same row.
 
 Baseline expectation:
 

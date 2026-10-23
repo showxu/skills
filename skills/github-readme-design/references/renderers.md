@@ -510,15 +510,11 @@ node <toolchain>/src/cli.ts profile check --design <DESIGN.md> --catalog <catalo
 ```
 
 Local member rendering supplies the full accepted `.github` revision explicitly
-as `--catalog-revision`, with catalog and DESIGN from that commit. The member
-schema has no revision field, and the renderer does not separately record the
-argument. Resolved catalog-relative URLs contain it, but absolute inputs can
-produce the same URLs at another revision. Do not treat those links as revision
-provenance. If no independent record exists, stop automated revision observation
-and report options to record the revision with the generated output or accept
-an explicit audit input. The owner decides that contract. Public mode omits
-both member input and catalog revision. Commit locally checked profiles with
-their inputs; dashboard CI does not byte-compare them.
+as `--catalog-revision`, with catalog and DESIGN from that commit. Public mode
+omits both member input and catalog revision. Commit locally checked profiles
+with their inputs; dashboard CI does not byte-compare them. Organization audits
+compare member input membership with the current public catalog on `.github`'s
+default branch and report drift requiring local dashboard regeneration.
 
 The output uses GitHub-supported HTML tables, anchors, headings and images;
 `<picture>` switches declared light/dark images with a fallback. See GitHub's

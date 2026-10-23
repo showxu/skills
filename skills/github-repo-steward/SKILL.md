@@ -104,8 +104,8 @@ default to `vX.Y.Z`. Verify that new release tags are signed and annotated and
 that each remote tag's peeled commit is the accepted commit after publication.
 Preserve published legacy tags and history. Retry interrupted publication
 against the same accepted tag without replacing existing assets. Release
-builds, platform matrices, packages, stores and consumer installation
-procedures belong to the ecosystem's release skill.
+builds, platform matrices, packages and stores belong to the ecosystem's release
+skill.
 
 Version rules live only in VERSIONING. A repository's release facts and
 mechanics live in its release reference, which the ecosystem's documentation

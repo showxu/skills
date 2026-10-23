@@ -79,7 +79,8 @@ permission to spawn agents or message other sessions.
 5. **Deliver organization surfaces.** Apply [family and profile](references/brand.md),
    [website integration](references/website.md) and
    [coordinated publication](references/release.md). Keep catalog membership
-   generated from authoritative inventory. Deliver the public profile in
+   generated from authoritative inventory: public, non-archived, non-fork
+   repositories except `.github`. Deliver the public profile in
    `.github` and the maintainer dashboard in private `.github-private`: render
    locally with `github-readme-design` and commit inputs and outputs. Review
    public copy, umbrella identity and pins together; the member profile consumes the

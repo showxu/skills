@@ -25,11 +25,11 @@ errors and warnings stop rendering. Components own colors and geometry;
 typography owns font selection. Renderers have no fallback style. Platform
 constants (canvas dimensions, title legibility floor and README width limit)
 are documented in the renderer reference. The catalog owns repository content;
-member input owns operational facts. The accepted `.github`
-commit supplies the catalog revision for member relative links. Those URLs
-do not independently establish which revision was supplied. Profiles and images are rendered/checked locally
-and committed. The shared ecosystem validation workflow in `github-workflows`
-uses its `demo` switch for recording-only checks against the freshly built CLI.
+member input owns operational facts. The accepted `.github` commit supplies
+the catalog revision for member relative links. Profiles and images are
+rendered/checked locally and committed. The shared ecosystem validation workflow
+in `github-workflows` uses its `demo` switch for recording-only checks against
+the freshly built CLI.
 
 The font fixture is Google Sans Code v7.001 under its accompanying SIL OFL.
 Fixture DESIGN values and synthetic catalogs/icons are test inputs, not consumer
