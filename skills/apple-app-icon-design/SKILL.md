@@ -1,6 +1,6 @@
 ---
 name: apple-app-icon-design
-description: Design, generate, and review original app icons in the style of each Apple app icon generation - Liquid Glass through Icon Composer, iOS 7-18 flat, macOS 11-15 tiles, and iOS 1-6 gloss - for Apple apps, web apps, or any project that wants an Apple-style icon. Turns a product brief into icon concepts and layered vector artwork, records them in a DESIGN.md Iconography entry, and produces an editable Icon Composer .icon document, native iOS, macOS, and watchOS appearance exports, style renderings, favicons, an apple-touch-icon, PWA and maskable web icons, comparison sheets, lint findings, and drift reports. Use for creating or redesigning app icons, choosing an icon style or generation, tuning glass material groups, matching an existing icon's look by measurement, and checking generated icons against their design source. Do not use for framework-style repository logos, social card composition, SF Symbols export, photographic or raster illustration, recreating Apple's own icons, or publishing app/store assets.
+description: Design, generate, and review original app icons in the style of each Apple app icon generation - Liquid Glass through Icon Composer, iOS 7-18 flat, macOS 11-15 tiles, and iOS 1-6 gloss - for Apple apps, web apps, or any project that wants an Apple-style icon. Turns a product brief into icon concepts and layered vector artwork, records them in a DESIGN.md Iconography entry, and produces an editable Icon Composer .icon document, native iOS, macOS, and watchOS appearance exports, style renderings, favicons, an apple-touch-icon, PWA and maskable web icons, comparison sheets, lint findings, and drift reports. Use for creating or redesigning app icons, choosing an icon style or generation, tuning glass material groups, matching an existing icon's look by measurement, and checking generated icons against their design source. Do not use for framework-style repository logos, social card composition, SF Symbols export, photographic or raster illustration, or publishing app/store assets.
 ---
 
 # Apple App Icon Design
@@ -90,10 +90,8 @@ releases.
 - Earlier generations are style renderings of the same layers. Their
   geometry is measured and recorded in [rendering](references/rendering.md);
   the gloss highlight is a documented approximation.
-- Use original art. Do not trace, recreate, or imitate Apple's icons, Apple
-  hardware, SF Symbols, or another company's logo. Preserve the scope and
-  provenance of explicitly supplied brand assets. Reference matching measures
-  parameters for original art; its captures are never traced, shipped, or
+- Preserve the scope and provenance of explicitly supplied brand assets.
+  Reference matching measures parameters; its captures are never shipped or
   redistributed.
 - Icon Composer ships with Xcode, and Apple's license terms govern native
   renders. Using them outside an Apple-platform app is the owner's decision;
