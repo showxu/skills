@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.1.3
+
+- Framework icons support layered custom glyphs with per-part colors or linear
+  gradients, surface-only details, and texture paths in face units. Icon glyph
+  policy belongs to the owning project.
 - Terminal demos soft-wrap wide command and output lines within the 830 px
   canvas, with dim continuation markers and unwrapped accessible transcripts.
   Recordings whose lines fit retain identical SVG bytes; titles must still fit.
@@ -9,14 +14,18 @@
   `github-workflows` automation, promotes checks shared by two members, and uses
   lowercase repository-owned `scripts/` with script-free templates. Member CI
   requires `policy` and `validate`; shared changes pass fixtures and a
-  representative member before rollout.
+  representative member before rollout. To upgrade an existing organization,
+  move reusable workflows and checkers into `github-workflows`, repin member
+  callers, move member-specific helpers to `scripts/`, and align required
+  checks with the resulting `policy` and `validate` contexts.
 - Profiles, social previews and terminal SVGs render/check locally and commit
   their outputs. Member dashboards compare membership with the current public
-  catalog and regenerate locally when it drifts.
+  catalog and regenerate locally when it drifts. To upgrade, replace CI
+  presentation rendering with local render/check commands and committed
+  outputs, and use ecosystem validation's `demo` switch for CI recording checks.
 - `github-readme-design` supports `terminal check --recording-only` and the
   Action's `recording-only` input for the ecosystem validation `demo` switch,
   with recording diffs and no DESIGN, font or SVG requirement.
-
 - `github-repo-steward` creates a new repository from the template its
   organization declares and replaces the declared identity values with
   `scripts/apply_template_identity.py`; without a template it assembles the
@@ -30,7 +39,10 @@
   `extensions.com.openai`; `.codex-plugin/plugin.json` is removed. Codex needs
   CLI 0.147.0 or later to install the plugin. `skill-creator` publishes Codex
   plugins with the root manifest and checks the Codex inventory in the
-  installed cache.
+  installed cache. To upgrade, install Codex CLI 0.147.0 or later, run
+  `codex plugin marketplace upgrade showxu-skills` and
+  `codex plugin add showxu-skills@showxu-skills`, verify the installed version,
+  then restart Codex. Update custom manifest readers to use `plugin.json`.
 
 ## 0.1.2
 
