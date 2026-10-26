@@ -1,5 +1,4 @@
 .DS_Store
-.agent/
 .vscode/
 __pycache__/
 *.py[cod]
@@ -9,3 +8,7 @@ node_modules/
 /plans/
 skills/interaction-design/references/research/artifacts/
 skills/sketch-design/references/fixtures/apple-tvos-ui.sketch
+/.agent/*
+!/.agent/instructions/
+!/.agent/agents.json
+!/.agent/agents.resolved
