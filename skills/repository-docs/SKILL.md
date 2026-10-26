@@ -78,7 +78,10 @@ it, and how completion will be checked. Name the issue-template configuration
 6. **Apply authorized changes.** Re-read affected files before editing and
    build on existing changes. A concurrent change pauses only that affected
    edit. Keep the index untouched. Correct owned templates together with their
-   affected outputs when both are in scope.
+   affected outputs when both are in scope. When the repository generates
+   `AGENTS.md` from instruction units, such as with the `agents` CLI and a
+   committed `.agent/agents.json`, change the units under
+   `.agent/instructions/` and regenerate instead of editing `AGENTS.md`.
 7. **Verify and hand off.** Check changed links, actual command entry points,
    fact consistency, meaningful content preservation, template/output
    agreement, and appropriate repository checks. Report remaining gaps and
