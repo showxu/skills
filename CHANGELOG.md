@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.4
+
 - repository-docs and the GitHub stewards edit the instruction units of a
   repository that generates `AGENTS.md` with the `agents` CLI and regenerate,
   instead of editing the generated file. The stewards keep organization-shared
