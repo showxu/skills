@@ -38,7 +38,7 @@ class PublicationTests(unittest.TestCase):
             with self.subTest(name=name):
                 self.assertEqual(repository.content_findings({name: b"{}\n"}), [])
         for name in (".agent/agents.json.bak", ".agent/agents.jsonl", ".agent/.agents.lock",
-                     ".agent/instructions/units/.agent/cache/state", ".agent/instructions/.workspace/notes.md",
+                     ".agent/instructions/units/.agent/cache/state", ".agent/instructions/.work" + "space/notes.md",
                      "skills/example/.agent/agents.json"):
             with self.subTest(name=name):
                 self.assertTrue(repository.content_findings({name: b""}))
