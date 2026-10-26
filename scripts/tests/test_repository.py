@@ -32,6 +32,17 @@ class PublicationTests(unittest.TestCase):
             with self.subTest(name=name):
                 self.assertTrue(repository.content_findings({name: b""}))
 
+    def test_agent_instruction_files_are_publishable_but_other_agent_state_is_not(self):
+        for name in (".agent/agents.json", ".agent/agents.resolved", ".agent/instructions/guide.md",
+                     ".agent/instructions/shared/route.md"):
+            with self.subTest(name=name):
+                self.assertEqual(repository.content_findings({name: b"{}\n"}), [])
+        for name in (".agent/agents.json.bak", ".agent/agents.jsonl", ".agent/.agents.lock",
+                     ".agent/instructions/units/.agent/cache/state", ".agent/instructions/.workspace/notes.md",
+                     "skills/example/.agent/agents.json"):
+            with self.subTest(name=name):
+                self.assertTrue(repository.content_findings({name: b""}))
+
     def test_exact_commit_is_scanned_when_worktree_hides_the_leak(self):
         output = Path(os.environ.get("REPOSITORY_TEST_OUTPUT", ".build/repository-tests"))
         output.mkdir(parents=True, exist_ok=True)

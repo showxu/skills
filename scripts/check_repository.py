@@ -12,7 +12,8 @@ import sys
 
 PRIVATE_PARTS = {".agent", ".codex", ".workspace", ".build", "__pycache__"}
 # Instruction units and their declaration and lock are the only tracked .agent files.
-AGENT_INSTRUCTION_FILES = (".agent/instructions/", ".agent/agents.json", ".agent/agents.resolved")
+AGENT_STATE_FILES = {".agent/agents.json", ".agent/agents.resolved"}
+AGENT_INSTRUCTIONS = ".agent/instructions/"
 PRIVATE_PATH = re.compile(rb"/(?:Users|home)/[A-Za-z0-9][A-Za-z0-9_.@-]*/")
 TOKEN = re.compile(rb"(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,})")
 PRIVATE_KEY = re.compile(rb"^-----BEGIN (?:[A-Z]+ )?PRIVATE KEY-----\r?$", re.M)
@@ -56,8 +57,12 @@ def content_findings(files):
     findings = []
     for name, content in files.items():
         parts = Path(name).parts
-        tracked_instructions = name.startswith(AGENT_INSTRUCTION_FILES)
-        if (PRIVATE_PARTS.intersection(parts) and not tracked_instructions) or parts[0] == "plans":
+        private = PRIVATE_PARTS.intersection(parts) or parts[0] == "plans"
+        if name in AGENT_STATE_FILES:
+            private = False
+        elif name.startswith(AGENT_INSTRUCTIONS):
+            private = PRIVATE_PARTS.intersection(Path(name[len(AGENT_INSTRUCTIONS):]).parts)
+        if private:
             findings.append(f"{name}: private execution file")
         if name.endswith((".pyc", ".pyo", ".plan.md")) or ".DS_Store" in parts:
             findings.append(f"{name}: generated or private artifact")

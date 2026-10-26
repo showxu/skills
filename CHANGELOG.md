@@ -2,11 +2,11 @@
 
 ## Unreleased
 
-- repository-docs edits the instruction units of a repository that generates
-  `AGENTS.md` with the `agents` CLI instead of the generated file. The GitHub
-  stewards keep organization-shared units in `.github`'s
-  `.agent/instructions/shared/` and commit a repository's units, declaration,
-  lock and generated `AGENTS.md` together.
+- repository-docs and the GitHub stewards edit the instruction units of a
+  repository that generates `AGENTS.md` with the `agents` CLI and regenerate,
+  instead of editing the generated file. The stewards keep organization-shared
+  units in `.github`'s `.agent/instructions/shared/` and commit a repository's
+  units, declaration, lock and generated `AGENTS.md` together.
 
 ## 0.1.3
 
