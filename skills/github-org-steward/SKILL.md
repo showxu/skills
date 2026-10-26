@@ -36,7 +36,10 @@ members. Repository roles are:
 | Template | Initial layout and thin callers, with no scripts |
 
 Rules stay in `.github` documents; checkers in `github-workflows` record which
-`.github` revision they enforce. Promote a check needed by a second member into
+`.github` revision they enforce. When the organization shares agent
+instructions through the `agents` CLI, `.github` keeps those units under
+`.agent/instructions/shared/`, stating only rules every member shares, and
+members reference that repository as a source. Promote a check needed by a second member into
 `github-workflows` instead of copying it. A template seeds new members; it does
 not update existing ones.
 

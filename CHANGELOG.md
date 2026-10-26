@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- repository-docs edits the instruction units of a repository that generates
+  `AGENTS.md` with the `agents` CLI instead of the generated file. The GitHub
+  stewards keep organization-shared units in `.github`'s
+  `.agent/instructions/shared/` and commit a repository's units, declaration,
+  lock and generated `AGENTS.md` together.
+
 ## 0.1.3
 
 - Framework icons support layered custom glyphs with per-part colors or linear

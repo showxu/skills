@@ -140,6 +140,10 @@ upload evidence. It does not own the following artifacts or decisions:
 Hand over the repository, applicable standard revision, accepted source, scoped
 change and evidence. Do not implement another owner's policy by copying it here.
 
+When a repository manages its instructions with the `agents` CLI, commit
+`.agent/instructions/`, `.agent/agents.json`, `.agent/agents.resolved` and the
+generated `AGENTS.md` together, and ignore the rest of `.agent/`.
+
 ## Participation and failure handling
 
 Reuse existing authorization. Ask only for missing facts or material choices:
