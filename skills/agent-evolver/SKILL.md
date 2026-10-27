@@ -1,6 +1,6 @@
 ---
 name: agent-evolver
-description: "Re-evaluate agent skills and instruction units for a new model, host or agent-tool version. Use for upgrade audits of a skill collection or of AGENTS.md/CLAUDE.md instruction units, and for applying the findings the user approves. Produces an audit report with measured cost, ranked findings and per-item recommendations, then an ordered cleanup; changes nothing until the user approves. Not for authoring one skill from scratch or installing skills."
+description: "Re-evaluate agent skills and instruction units for a new model, host or agent-tool version, or for newly published official agent guidance. Use for upgrade audits of a skill collection or of AGENTS.md/CLAUDE.md instruction units, for deciding what new official guidance to adopt, and for applying the findings the user approves. Produces an audit report with measured cost, ranked findings and per-item recommendations, then an ordered cleanup; changes nothing until the user approves. Not for authoring one skill from scratch or installing skills."
 ---
 
 # Agent Evolver
@@ -15,7 +15,7 @@ itself.
 
 | Mode | When | Output | Stops at |
 | --- | --- | --- | --- |
-| Upgrade audit | A model, host or agent tool changed, or the user asks | Audit report for one scope | The user's decision on the findings |
+| Upgrade audit | A model, host or agent tool changed, new official agent guidance was published, or the user asks | Audit report for one scope | The user's decision on the findings |
 | Approved cleanup | The user approved findings from an audit | Changes in the owning repository through its delivery flow | The repository's merge decision |
 
 ## Inputs
@@ -27,8 +27,9 @@ itself.
   evaluated for. Read them from the hosts; do not assume them.
 - **Owners:** the repository guide, its authoring contract, its validation
   commands and, for instructions, the tool that renders them.
-- **Evidence access:** local session logs are read only within the scope the
-  user granted. See [Evidence](references/evidence.md).
+- **Evidence access:** usage counts never read message content; reading
+  past session content to build eval cases needs the user's permission. See
+  [Evidence](references/evidence.md).
 
 Ask only for facts that change the scope, the owner or evidence access.
 

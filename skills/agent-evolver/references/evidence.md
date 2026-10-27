@@ -52,32 +52,28 @@ examples and runtime behavior apart. A declaration that compiles is not
 evidence of UI lifecycle, performance, device, permission, network or model
 behavior. Keep old-system branches the project still targets.
 
-## Usage and Experience Evidence
+## Usage Evidence
 
-Local session logs show which items are used and where agents struggle. Read
-them only within the scope the user granted: by default, counts and file
-references, not message content.
+`scripts/usage_counts.py` counts, per skill and host over a stated window,
+uses and maintenance sessions (work inside the collection's own repository)
+separately, without reading message content. Report the window and the
+counting method it prints; judge use from the uses column. Low counts for
+seasonal tasks are not evidence of no value.
 
-- `scripts/usage_counts.py` counts, per skill and host over a stated window,
-  uses and maintenance sessions (work inside the collection's own repository)
-  separately. Report the window and the counting method it prints; judge use
-  from the uses column. Low counts for seasonal tasks are not evidence of no
-  value.
-- When the user grants content access, look in this order: the current
-  request and repository state; project guidance and existing skills; memory
-  and session summaries; raw current sessions only when summaries lack the
-  needed evidence; raw archived sessions only when current ones are
-  insufficient or the user asks for them.
-- Narrow any content search to the scope's repository first, then to explicit
-  terms such as skill names, commands or failure text. Label cross-repository
-  matches as broad evidence.
+## Past Sessions as Eval Sources
 
-Strong evidence: the same failure after independent tasks; agents repeatedly
-rediscovering the same path, boundary or tool sequence; triggers or validation
-rules contradicted by actual work; the same output shape produced repeatedly.
+Past sessions show how an earlier model behaved, so they never settle whether
+the current model still needs an item; the current-model run does. Their use
+is to supply realistic eval cases:
 
-Weak evidence: a one-off bug, a broad topic, a single TODO, a speculative idea,
-or generic capability with no project-specific process or failure.
-
-An experience signal can raise a source question; it does not verify an
-external fact.
+- Read session content only when the user allows it, summaries before raw
+  sessions, narrowed to the scope's repository and to explicit terms such as
+  skill names, commands or failure text.
+- Turn a failure into an eval case when it repeated across independent tasks,
+  when agents repeatedly rediscovered the same path, boundary or tool
+  sequence, or when actual work contradicted a trigger or validation rule.
+  One-off bugs, broad topics and generic capability are not cases.
+- Use real request wording for trigger-eval prompts. Remove personal and
+  confidential content before a case is stored.
+- A past failure that no longer reproduces on the current model is evidence
+  for Simplify or Retire only through the with/without comparison.

@@ -113,3 +113,19 @@ automatic selection, current vendor facts or live host behavior.
 - Failure: Repairing the installation, hand-editing install state, or
   reporting the skill as defective because it was not loaded.
 - Acceptance: Performed versus proposed actions are reported accurately.
+
+## AE-08 — A past failure on a new model
+
+- Prompt: Agents kept skipping the signing check last month, so we added a rule
+  for it. With the new model, can we drop the rule?
+- Context: Summaries of three independent sessions show the skipped check on
+  the earlier model; content access is allowed. The rule lives in one skill.
+- Expected artifact: The failure turned into an eval case with personal
+  content removed, run on the current model with and without the rule, and a
+  recommendation that follows the result.
+- Must preserve: The rule until the comparison supports removing it.
+- Failure: Dropping the rule because the transcripts are old, keeping it only
+  because the transcripts show the failure, or storing raw transcript text in
+  the case.
+- Acceptance: The recommendation cites the current-model runs, not the past
+  sessions.

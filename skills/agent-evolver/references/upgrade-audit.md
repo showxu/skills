@@ -80,7 +80,8 @@ prove conflict. When either side or its source changes, recheck the judgment.
   listing check when it has one. Convert characters to tokens only with a
   stated ratio or a tokenizer.
 - Trigger evals: prompts in the user's own words that do not name the skill,
-  plus prompts that must not trigger it. Run them before and after a change on
+  plus prompts that must not trigger it. Start from each item's fixtures and
+  from past failures turned into cases (see [Evidence](evidence.md)). Run them before and after a change on
   the same host version; report hits, misses and runs per case.
 - Capability comparison: the same cases with and without the item, graded by
   deterministic checks where possible and a written rubric otherwise.
