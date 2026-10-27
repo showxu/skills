@@ -5,16 +5,45 @@
 Owner commits use the owner's declared identity and registered signing key.
 External and bot authors retain their own ownership; an owner gate for locally
 prepared commits must not become an identity restriction on external PRs.
-Configure only the task clone, never global Git config. The helper accepts
-`OWNER_NAME`, `OWNER_EMAIL`, `SIGNING_KEY`, `CONTENT_CHECK`, and `FAST_CHECK`:
+Configure only the task clone, never global Git config.
+`scripts/configure-signing.sh` sets the clone's identity, SSH signing of
+commits and tags, and its allowed-signers list from `OWNER_NAME`,
+`OWNER_EMAIL`, `SIGNING_KEY` and an optional `ALLOWED_SIGNERS`. Run it alone
+where the owner signs but the push gate is not installed.
+`scripts/configure-clone.sh` runs it, then installs the gate from
+`CONTENT_CHECK` and `FAST_CHECK`:
 
 ```sh
+sh scripts/configure-signing.sh <clone>
 sh scripts/configure-clone.sh <task-clone>
-git -C <task-clone> verify-commit HEAD
+git -C <clone> verify-commit HEAD
 ```
 
 `SIGNING_KEY` is the local private-key path; the helper reads only its adjacent
 public key. No key is bundled. The existing signing agent performs signatures.
+
+The applicable standard decides where the allowed-signers list lives. The
+helper uses `ALLOWED_SIGNERS` when set, otherwise the clone's configured
+`gpg.ssh.allowedSignersFile`, otherwise `allowed_signers` in the clone's Git
+directory. Relative paths start at the working tree root, as Git resolves
+them. The helper appends the owner's line when the list lacks it and keeps
+every other line, such as a release signer's. A list that is repository
+content, tracked or not ignored in a working tree, is only read; add a missing
+owner line through that repository's review.
+
+Rerun the helpers on each clone after recloning or reinstalling a machine. Only
+the private key needs to be kept: `ssh-keygen -y -f <key> > <key>.pub`
+restores its public key, and the signing keys registered on GitHub rebuild a
+lost list:
+
+```sh
+gh api --paginate users/<login>/ssh_signing_keys \
+  --jq '.[] | "<email> namespaces=\"git\" \(.key)"' >> <list>
+```
+
+When rotating the signing key, keep the retired public key registered on
+GitHub and in the list, so signatures it made still verify.
+
 `CONTENT_CHECK` is a repository-owned commit scan receiving the candidate as
 shell argument `$1`; `FAST_CHECK` is the clean candidate's fast validation.
 The pre-push hook fails closed if either command is absent. It validates new
