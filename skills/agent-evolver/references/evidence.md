@@ -69,10 +69,12 @@ is to supply realistic eval cases:
 - Read session content only when the user allows it, summaries before raw
   sessions, narrowed to the scope's repository and to explicit terms such as
   skill names, commands or failure text.
-- Turn a failure into an eval case when it repeated across independent tasks,
-  when agents repeatedly rediscovered the same path, boundary or tool
-  sequence, or when actual work contradicted a trigger or validation rule.
-  One-off bugs, broad topics and generic capability are not cases.
+- Turn concrete failures into eval cases, first those that repeated across
+  independent tasks, that made agents rediscover the same path, boundary or
+  tool sequence, or where actual work contradicted a trigger or validation
+  rule. A single concrete boundary or validation failure is also a valid
+  case. Broad topics and generic capability are not cases.
+- A case shows what to test; only the current-model run supports a change.
 - Use real request wording for trigger-eval prompts. Remove personal and
   confidential content before a case is stored.
 - A past failure that no longer reproduces on the current model is evidence
