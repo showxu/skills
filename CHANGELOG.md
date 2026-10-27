@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 0.2.0
+## 0.1.5
 
 - agent-evolver re-evaluates a skill collection, named skills or a set of
   instruction units for a new model, host or agent-tool version, or for newly
@@ -14,12 +14,11 @@
   by regeneration, doctor and readback in fresh sessions.
   `scripts/usage_counts.py` counts skill use per host, apart from maintenance
   of the collection's own repository.
-- Breaking: agent-evolver no longer has the official-knowledge and
-  Codex-experience topics, scheduled evolution batches, external delivery of
-  pull requests and issues, or `scripts/collect_evidence.py`. To upgrade,
-  replace a scheduled job that invoked agent-evolver with an upgrade audit
-  requested after a model, host or agent-tool release, and use
-  `scripts/usage_counts.py` for usage evidence.
+- agent-evolver no longer runs scheduled evolution batches or delivers pull
+  requests and issues itself, and its official-knowledge and Codex-experience
+  topics and `scripts/collect_evidence.py` are replaced by the audit above.
+  Request an upgrade audit after a model, host or agent-tool release instead
+  of scheduling agent-evolver.
 
 ## 0.1.4
 
