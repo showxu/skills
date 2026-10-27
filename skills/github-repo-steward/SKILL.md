@@ -43,7 +43,7 @@ concurrent writers are implied.
    requests end in that report without mutations.
 2. **Prepare.** Make a bounded change list. Preserve valid historical records,
    legal notices and external authorship. For signed owner work, configure only
-   the task clone or worktree using [governance](references/governance.md).
+   the clone's local Git config using [governance](references/governance.md).
    Run repository-owned checks, not a second competing content policy.
    Use [layout](references/layout.md) for GitHub-defined paths and the shared
    presentation-asset layout.

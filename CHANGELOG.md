@@ -8,11 +8,14 @@
   allowed-signers list on its own with `scripts/configure-signing.sh`, without
   the push gate; `scripts/configure-clone.sh` still requires its checks and
   now delegates signing to it. Both use `ALLOWED_SIGNERS` when set, otherwise
-  the clone's configured list, and fall back to `allowed_signers` in the Git
-  directory. They append the owner's line when missing and keep every other
-  signer; a list that is repository content is only read. Governance covers
-  rerunning after a reclone or reinstall, rebuilding the list from the signing
-  keys registered on GitHub, and keeping retired keys after rotation.
+  the clone's configured list, and fall back to `allowed_signers` in the
+  repository's common Git directory, which all worktrees share and which
+  survives removing a worktree. They append the owner's line when no line
+  authorizes the owner's key for Git signing and keep every other signer; a
+  list that is a symbolic link or repository content is only read. Governance
+  treats signing configuration as shared by a clone's worktrees, and covers
+  rerunning after a reclone or reinstall, rebuilding the owner's lines from the
+  signing keys registered on GitHub, and keeping retired keys after rotation.
 
 ## 0.1.5
 
