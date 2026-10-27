@@ -138,6 +138,26 @@ class UsageCountsTests(HelperTestCase):
         })
         self.assertEqual(report["counts"]["alpha"]["codex"], {"uses": 0, "maintenance": 0})
 
+    def test_user_input_and_plan_tools_are_ignored_but_other_mentions_count(self):
+        ignored = []
+        for tool in ("request_user_input", "update_plan"):
+            for custom in (False, True):
+                event = codex_call(custom=custom)
+                event["payload"]["name"] = tool
+                field = "input" if custom else "arguments"
+                event["payload"][field] = json.dumps({"question": "Inspect /collection/alpha/SKILL.md?"})
+                ignored.append(event)
+        self.jsonl(self.codex_home / "sessions" / "ignored.jsonl", ignored)
+        for custom in (False, True):
+            event = codex_call("beta", custom=custom)
+            event["payload"]["name"] = "other_tool"
+            field = "input" if custom else "arguments"
+            event["payload"][field] = json.dumps({"note": "Consider /collection/beta/SKILL.md later."})
+            self.jsonl(self.codex_home / "sessions" / f"mention-{custom}.jsonl", [event])
+        report = json.loads(self.count("--json").stdout)
+        self.assertEqual(report["counts"]["alpha"]["codex"], {"uses": 0, "maintenance": 0})
+        self.assertEqual(report["counts"]["beta"]["codex"], {"uses": 2, "maintenance": 0})
+
     def test_explicit_stores_override_isolated_defaults(self):
         self.jsonl(self.codex_home / "sessions" / "default.jsonl", [codex_call()])
         self.jsonl(self.claude_projects / "project" / "default.jsonl", [claude_call()])
@@ -239,6 +259,27 @@ class UsageCountsTests(HelperTestCase):
         for host in ("codex", "claude-code"):
             self.assertEqual(report["counts"]["alpha"][host], {"uses": 2, "maintenance": 0})
 
+    def test_nested_independent_repositories_and_submodules_count_as_uses(self):
+        nested = self.repository / "nested-project"
+        (nested / ".git").mkdir(parents=True)
+        module = self.repository / "submodules" / "child"
+        module.mkdir(parents=True)
+        metadata = self.repository / ".git" / "modules" / "child"
+        metadata.mkdir(parents=True)
+        target = os.path.relpath(metadata, module)
+        (module / ".git").write_text(f"gitdir: {target}\n", encoding="utf-8")
+        locations = (nested / "src", module / "src", self.repository)
+        for index, cwd in enumerate(locations):
+            self.jsonl(self.codex_home / "sessions" / f"session-{index}.jsonl", [
+                codex_meta(cwd), codex_call(),
+            ])
+        self.jsonl(self.claude_projects / "project" / "session.jsonl", [
+            claude_call(cwd=cwd) for cwd in locations
+        ])
+        report = json.loads(self.count("--json").stdout)
+        for host in ("codex", "claude-code"):
+            self.assertEqual(report["counts"]["alpha"][host], {"uses": 2, "maintenance": 1})
+
     def test_gitfile_can_point_directly_to_the_common_directory(self):
         checkout = self.root / "linked-checkout"
         checkout.mkdir()
@@ -295,8 +336,10 @@ class UsageCountsTests(HelperTestCase):
         method = json.loads(self.count("--json").stdout)["method"]
         self.assertEqual(set(method), {"codex", "claude-code"})
         self.assertIn("session", method["codex"]["count"])
-        self.assertIn("reads, writes or searches", method["codex"]["count"])
+        self.assertIn("tool call's arguments or input mention a path", method["codex"]["count"])
         self.assertIn("/<name>/SKILL.md", method["codex"]["count"])
+        self.assertIn("request_user_input and update_plan are ignored", method["codex"]["count"])
+        self.assertIn("a mention without a read can still count", method["codex"]["count"])
         self.assertIn("relative SKILL.md read", " ".join(method["codex"]["limits"]))
         self.assertIn("first session_meta payload.cwd", method["codex"]["maintenance"])
         self.assertIn("Skill tool call", method["claude-code"]["count"])
@@ -305,6 +348,7 @@ class UsageCountsTests(HelperTestCase):
             self.assertIn("Missing or unusable cwd", " ".join(host["limits"]))
             self.assertIn("common Git directory", host["maintenance"])
             self.assertIn("main checkout", host["maintenance"])
+            self.assertIn("Only without a cwd .git ancestor", host["maintenance"])
             self.assertIn("Deleted worktrees outside the main checkout count as uses", " ".join(host["limits"]))
 
     def test_markdown_shows_uses_and_maintenance_for_both_hosts(self):

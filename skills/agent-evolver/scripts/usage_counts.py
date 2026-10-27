@@ -68,9 +68,10 @@ def count_kind(cwd: object, common_directory: Path | None, main_checkout: Path |
         if not directory.is_absolute():
             return "uses"
         directory = directory.resolve()
+        cwd_common_directory = common_git_directory(directory)
+        if cwd_common_directory is not None:
+            return "maintenance" if cwd_common_directory == common_directory else "uses"
         if main_checkout is not None and (directory == main_checkout or main_checkout in directory.parents):
-            return "maintenance"
-        if common_directory is not None and common_git_directory(directory) == common_directory:
             return "maintenance"
     except (OSError, RuntimeError, ValueError):
         return "uses"
@@ -91,6 +92,8 @@ def strings(value: object) -> Iterator[str]:
 def codex_skills(event: dict, pattern: re.Pattern) -> set[str]:
     payload = event.get("payload")
     if event.get("type") != "response_item" or not isinstance(payload, dict):
+        return set()
+    if payload.get("name") in ("request_user_input", "update_plan"):
         return set()
     field = {"function_call": "arguments", "custom_tool_call": "input"}.get(payload.get("type"))
     if field is None:
@@ -203,10 +206,13 @@ def count_usage(root: Path, codex_home: Path, claude_projects: Path,
                           for kind in ("uses", "maintenance")} for host in HOSTS},
         "method": {
             "codex": {
-                "count": "One session per skill that reads, writes or searches a path ending in /<name>/SKILL.md.",
-                "maintenance": "The first session_meta payload.cwd belongs to the same Git repository as --skills-root: "
-                               "inside the main checkout or any worktree sharing its common Git directory. "
-                               "Without a .git ancestor for --skills-root, use its parent.",
+                "count": "One session per skill when a tool call's arguments or input mention a path ending in "
+                         "/<name>/SKILL.md. request_user_input and update_plan are ignored; "
+                         "a mention without a read can still count.",
+                "maintenance": "The first session_meta payload.cwd is maintenance when its nearest .git ancestor "
+                               "resolves to the same common Git directory as --skills-root. Only without a cwd .git "
+                               "ancestor, use main checkout containment (or --skills-root's parent if it has no "
+                               ".git ancestor).",
                 "limits": ["A relative SKILL.md read from inside the skill directory is missed.",
                            "Missing or unusable cwd, including a relative path, counts as uses.",
                            "Deleted worktrees outside the main checkout count as uses because their .git metadata "
@@ -214,9 +220,9 @@ def count_usage(root: Path, codex_home: Path, claude_projects: Path,
             },
             "claude-code": {
                 "count": "One Skill tool call naming the skill, with or without a plugin prefix.",
-                "maintenance": "The event's own cwd belongs to the same Git repository as --skills-root: "
-                               "inside the main checkout or any worktree sharing its common Git directory. "
-                               "Without a .git ancestor for --skills-root, use its parent.",
+                "maintenance": "The event's own cwd is maintenance when its nearest .git ancestor resolves to the "
+                               "same common Git directory as --skills-root. Only without a cwd .git ancestor, use "
+                               "main checkout containment (or --skills-root's parent if it has no .git ancestor).",
                 "limits": ["Skill use without a recorded Skill tool call is missed.",
                            "Missing or unusable cwd, including a relative path, counts as uses.",
                            "Deleted worktrees outside the main checkout count as uses because their .git metadata "

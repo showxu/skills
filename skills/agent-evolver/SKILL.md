@@ -35,7 +35,8 @@ Ask only for facts that change the scope, the owner or evidence access.
 ## Upgrade Audit
 
 Read-only. Do not edit files, create branches or worktrees, or run checks that
-write outside system temporary directories.
+write outside system temporary directories. Write the report to a file only
+when the user asks for one.
 
 1. Resolve the scope's repository, owners and validation commands. Read the
    repository guide and authoring contract before judging any item.

@@ -22,8 +22,9 @@ python3 scripts/usage_counts.py --skills-root <repository>/skills --since <YYYY-
 ```
 
 - Skill names come from each `<skills-root>/*/SKILL.md` frontmatter `name`.
-- Codex: a session counts once for a skill when a tool call in it reads,
-  writes or searches a path ending in `/<name>/SKILL.md`. Rollouts are read
+- Codex: a session counts once for a skill when a tool call's arguments
+  mention a path ending in `/<name>/SKILL.md`; user-input and plan tools are
+  ignored, and a mention without a read can still count. Rollouts are read
   from `--codex-home` (default `$CODEX_HOME` or `~/.codex`): `sessions/` and
   `archived_sessions/`.
 - Claude Code: each `Skill` tool call naming the skill counts once, with or
@@ -31,8 +32,9 @@ python3 scripts/usage_counts.py --skills-root <repository>/skills --since <YYYY-
   (default `~/.claude/projects`), including subagent transcripts.
 - Work inside the Git repository that contains `--skills-root` counts as
   `maintenance`: its main checkout and every worktree of it, matched through
-  the shared Git directory. Everything else counts as `uses`, including
-  worktrees outside the main checkout that no longer exist.
+  the shared Git directory. A nested repository or submodule is a different
+  repository. Everything else counts as `uses`, including worktrees outside
+  the main checkout that no longer exist.
 - Only events at or after `--since` and before the optional `--until` count.
   Both accept ISO dates or times; dates and times without a timezone use UTC.
 - The output has the window, per-skill `uses` and `maintenance` per host,

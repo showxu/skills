@@ -1,7 +1,7 @@
 interface:
   display_name: "Agent 进化"
-  short_description: "模型或工具升级后重新评估技能和指令，并提示何时需要评估"
+  short_description: "模型或工具升级后重新评估技能和指令，并按批准的结论清理"
   icon_small: "./assets/icon-small.svg"
   icon_large: "./assets/icon-large.png"
   brand_color: "#7C3AED"
-  default_prompt: "Use $agent-evolver to audit a skill collection or instruction units for the current model and host versions, or to list the changes since the last audit."
+  default_prompt: "Use $agent-evolver to audit a skill collection or instruction units for the current model and host versions, then apply the findings I approve."

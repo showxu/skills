@@ -20,8 +20,11 @@ hierarchy and the distilled local rules.
 
 A skill that stores mutable external facts should name its sources in a
 source map (`references/*sources*.md`, `*authority*.md`, `*freshness*.md` or
-an extractor script). `scripts/collect_sources.py` lists the declared sources
-of exact skills; listing a source is not checking it. For vendored skills and
+an extractor script). Each entry names the source (URL, command, schema path
+or probe), its class, the local claim or file that depends on it, the
+verification method and its known failure mode, and a last-checked date only
+when the check actually ran. `scripts/collect_sources.py` lists the declared
+sources of exact skills; listing a source is not checking it. For vendored skills and
 shared instruction sources, an agent tool that tracks upstream sources (for
 example `agents watch status` and `agents watch diff`) shows what changed
 since they were last reviewed. Propose a source map
@@ -60,6 +63,11 @@ references, not message content.
   separately. Report the window and the counting method it prints; judge use
   from the uses column. Low counts for seasonal tasks are not evidence of no
   value.
+- When the user grants content access, look in this order: the current
+  request and repository state; project guidance and existing skills; memory
+  and session summaries; raw current sessions only when summaries lack the
+  needed evidence; raw archived sessions only when current ones are
+  insufficient or the user asks for them.
 - Narrow any content search to the scope's repository first, then to explicit
   terms such as skill names, commands or failure text. Label cross-repository
   matches as broad evidence.

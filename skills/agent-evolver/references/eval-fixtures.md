@@ -64,12 +64,15 @@ automatic selection, current vendor facts or live host behavior.
   `.agent/instructions/` declared in `.agent/agents.json`. The stale path is in
   the `guide` unit. The unit also holds a principle paragraph.
 - Expected artifact: The unit edited; instructions rendered twice with no
-  changes on the second run; the tool's doctor clean; a readback check
-  planned or run on each target host.
+  changes on the second run; the tool's doctor clean; a readback in a fresh
+  session on each target host that lists the headings and quotes the changed
+  rule.
 - Must preserve: The principle paragraph verbatim; other units.
 - Failure: Editing the rendered AGENTS.md, rewriting the principle, or
-  claiming the change is verified from the diff alone.
-- Acceptance: The rendered file matches the unit; the path resolves.
+  claiming the change is verified from the diff or the render alone.
+- Acceptance: The rendered file matches the unit, the path resolves, and each
+  host's readback quotes the corrected path. Where a host cannot be read back,
+  the result says verification is incomplete for that host.
 
 ## AE-05 — Different vendor recommendations
 

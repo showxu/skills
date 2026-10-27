@@ -103,7 +103,6 @@ prove conflict. When either side or its source changes, recheck the judgment.
 7. Cleanup order, validation method and acceptance criteria for each step.
 8. Decisions the user needs to make.
 
-Deliver the report in the conversation. When it must outlive the session,
-save it where the project keeps ignored agent working files and say where.
-The next audit of the same scope starts from the latest report's versions
-and decisions.
+Deliver the report in the conversation. Save it to a file only when the user
+asks, at the location the user approves. The next audit of the same scope
+starts from the latest report's versions and decisions.
