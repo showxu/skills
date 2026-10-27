@@ -1,6 +1,6 @@
 ---
 name: agent-evolver
-description: "Re-evaluate agent skills and instruction units for a new model, host or agent-tool version, or for newly published official agent guidance. Use for upgrade audits of a skill collection or of AGENTS.md/CLAUDE.md instruction units, for deciding what new official guidance to adopt, and for applying the findings the user approves. Produces an audit report with measured cost, ranked findings and per-item recommendations, then an ordered cleanup; changes nothing until the user approves. Not for authoring one skill from scratch or installing skills."
+description: "Re-evaluate agent skills and instruction units for a new model, host or agent-tool version, or for newly published official agent guidance. Use for upgrade audits of a skill collection or of AGENTS.md/CLAUDE.md instruction units, for deciding what new official guidance to adopt, and for applying the findings the user approves. Produces an audit report with measured context cost, ranked findings and per-item recommendations, then an ordered cleanup; changes nothing until the user approves. Not for authoring one skill from scratch or installing skills."
 ---
 
 # Agent Evolver
@@ -20,16 +20,16 @@ itself.
 
 ## Inputs
 
-- **Scope:** one skill collection (a repository's skills root) or one
-  instruction source (its units, declaration and generated targets). Audit one
-  scope at a time; several scopes get separate reports.
+- **Scope:** one skill collection (a repository's skills root), named skills
+  within one, or one instruction source (its units, declaration and generated
+  targets). Audit one scope at a time; several scopes get separate reports.
 - **Versions:** the model, host and agent-tool versions the scope is being
   evaluated for. Read them from the hosts; do not assume them.
 - **Owners:** the repository guide, its authoring contract, its validation
   commands and, for instructions, the tool that renders them.
-- **Evidence access:** usage counts never read message content; reading
-  past session content to build eval cases needs the user's permission. See
-  [Evidence](references/evidence.md).
+- **Evidence access:** usage counts parse session logs for tool calls and
+  print only aggregates; reading past session content to build eval cases
+  needs the user's permission. See [Evidence](references/evidence.md).
 
 Ask only for facts that change the scope, the owner or evidence access.
 

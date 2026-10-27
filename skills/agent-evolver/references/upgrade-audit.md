@@ -16,7 +16,9 @@ versions being evaluated:
 Take these from the host's official documentation and confirm uncertain ones
 with a bounded local probe, such as the host's own context or doctor report.
 Record each fact with its source and date; do not copy a number from an older
-audit without checking it.
+audit without checking it. When a fact cannot be established, such as the
+active model or the rendered listing, record it as unresolved with what was
+tried, and report the measurements that depend on it as conditional on it.
 
 ## Dimensions
 
@@ -90,6 +92,13 @@ prove conflict. When either side or its source changes, recheck the judgment.
   isolated precision. Reproduce listing competition separately with the full
   installed set when that matters.
 - Use skill-creator's eval flow for fixture shape and grading.
+- Before running an eval tool, check where it writes results and caches and
+  whether it publishes them; turn publication off. During a read-only audit,
+  run it only when everything it writes stays in system temporary
+  directories. Otherwise, and for items without fixtures, report zero runs and
+  put the evals in the cleanup plan.
+- Report the cost of an eval plan separately from context cost: runs, model,
+  and expected time or spend.
 
 ## Guidance Audits
 

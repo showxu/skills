@@ -56,9 +56,10 @@ behavior. Keep old-system branches the project still targets.
 
 `scripts/usage_counts.py` counts, per skill and host over a stated window,
 uses and maintenance sessions (work inside the collection's own repository)
-separately, without reading message content. Report the window and the
-counting method it prints; judge use from the uses column. Low counts for
-seasonal tasks are not evidence of no value.
+separately. It parses session logs for tool calls and prints only aggregates,
+never message text. Report the window and the counting method it prints;
+judge use from the uses column. Low counts for seasonal tasks are not
+evidence of no value.
 
 ## Past Sessions as Eval Sources
 
