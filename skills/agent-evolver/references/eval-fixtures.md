@@ -80,12 +80,14 @@ automatic selection, current vendor facts or live host behavior.
   instructions and say what to adopt.
 - Context: The excerpts discuss different host and model conditions. Local
   rules keep source receipts, counterexamples and validation standards.
-- Expected artifact: Per-recommendation decisions with publisher, date,
-  conditions, the local claim affected and any owner decision.
+- Expected artifact: A guidance audit: one row per concrete recommendation
+  with publisher, date, conditions, the affected items with file and line, the
+  proposed change or "no change", and any owner decision. Items no
+  recommendation concerns are not evaluated.
 - Must preserve: Each recommendation's conditions; accepted local invariants.
 - Failure: Blending the advice into one universal rule, treating an excerpt as
-  the verified current page, or removing a production rule on vendor
-  authority.
+  the verified current page, removing a production rule on vendor authority,
+  or running a full audit of every item.
 - Acceptance: Conditions stay distinct; evidence limits are explicit; any
   policy change has a concrete diff for the user to decide.
 

@@ -5,7 +5,7 @@ agent tools change. It has two modes over one method: a read-only upgrade
 audit, and cleanup of the findings the user approves.
 
 - `SKILL.md` owns the trigger, modes, inputs, workflow and result.
-- `references/upgrade-audit.md` owns host facts, the five dimensions, finding
+- `references/upgrade-audit.md` owns host facts, the five dimensions, guidance audits, finding
   classes, recommendations, overlap, measurement and the report.
 - `references/cleanup.md` owns the order, removal accounting, validation and
   delivery of approved changes.

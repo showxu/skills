@@ -65,6 +65,13 @@ when the user asks for one.
 For instruction units, apply [Instructions](references/instructions.md) in
 steps 3–6.
 
+When the trigger is new official guidance rather than a version change, run a
+guidance audit instead of a full one: extract the guidance's concrete
+recommendations with their conditions, map each to the items it actually
+concerns, evaluate only those items, and report a decision per
+recommendation. See [Upgrade audit](references/upgrade-audit.md). Run a full
+audit for model, host or agent-tool changes, or when the user asks.
+
 ## Approved Cleanup
 
 Change only what the user approved, in the owning repository's task worktree,

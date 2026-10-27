@@ -91,6 +91,24 @@ prove conflict. When either side or its source changes, recheck the judgment.
   installed set when that matters.
 - Use skill-creator's eval flow for fixture shape and grading.
 
+## Guidance Audits
+
+New official guidance changes what is recommended, not what the model can
+do, so audit only what it touches:
+
+1. Read the guidance as vendor guidance (see [Evidence](evidence.md)) and list
+   its concrete recommendations, each with its model, host and task
+   conditions. Skip statements with no concrete recommendation.
+2. For each recommendation, find the items in scope it concerns: rules it
+   would change, contradict or make redundant. A recommendation that concerns
+   no item is reported as not applicable.
+3. Evaluate those items on the dimensions the recommendation affects, using
+   the same evidence and eval rules as a full audit.
+4. Report one row per recommendation: the recommendation and its conditions,
+   the affected items with file and line, the proposed change or "no change",
+   and the evidence. Changes to the user's principles, permissions or
+   validation standards are listed as decisions for the user.
+
 ## Report
 
 1. Scope, host and model versions, and the host facts with their sources.
