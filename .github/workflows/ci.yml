@@ -72,6 +72,8 @@ jobs:
           .build/repo-audit-venv/bin/python -B -m unittest discover -s skills/github-repo-steward/tests -v
       - name: Exercise organization governance
         run: python3 -B -m unittest discover -s skills/github-org-steward/tests -v
+      - name: Exercise agent evolution helpers
+        run: python3 -B -m unittest discover -s skills/agent-evolver/tests -v
 
   presentation-toolchain:
     strategy:

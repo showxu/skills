@@ -1,182 +1,105 @@
 ---
 name: agent-evolver
-description: "Evolve agent instructions and skills from official documentation, OpenAI or Anthropic best practices, SDK/CLI evidence, and Codex memory, rollout or session experience. Use for knowledge refreshes, AGENTS.md improvements, repeated agent mistakes, evidence-backed skill candidates, and manual or scheduled evolution audits. Produces per-target evidence decisions, authorized improvements, validation and pending work. Select the relevant evolution topic; installation and link management remain separate."
+description: "Re-evaluate agent skills and instruction units for a new model, host or agent-tool version, or for newly published official agent guidance. Use for upgrade audits of a skill collection or of AGENTS.md/CLAUDE.md instruction units, for deciding what new official guidance to adopt, and for applying the findings the user approves. Produces an audit report with measured context cost, ranked findings and per-item recommendations, then an ordered cleanup; changes nothing until the user approves. Not for authoring one skill from scratch or installing skills."
 ---
 
 # Agent Evolver
 
-Evolve the knowledge and operating guidance an agent actually uses. Preserve
-accurate official knowledge, concrete engineering judgment, counterexamples,
-and accepted project principles. A shorter file or newer timestamp is not an
-independent success criterion.
+Skills and instructions written for one model drift as models, hosts and agent
+tools change. This skill re-evaluates them against the current model and
+current official practice. Improve task performance, information density and
+maintainability; a smaller collection or a lower token count is not a goal by
+itself.
 
-## Ownership and Inputs
+## Modes
 
-This skill owns a bounded evolution batch: target selection, authoritative
-source and experience comparison, protected-rule mapping, update packets,
-authorized instruction repairs, skill-authoring handoffs, and the resulting
-validation/pending state.
-It supports both a manual target/source request and a scheduled profile.
+| Mode | When | Output | Stops at |
+| --- | --- | --- | --- |
+| Upgrade audit | A model, host or agent tool changed, new official agent guidance was published, or the user asks | Audit report for one scope | The user's decision on the findings |
+| Approved cleanup | The user approved findings from an audit | Changes in the owning repository through its delivery flow | The repository's merge decision |
 
-Accept supplied articles or excerpts, official docs and resource endpoints,
-tool help and schemas, SDK/compiler/package evidence, scoped Codex memory,
-rollout summaries or sessions, existing skills and AGENTS.md files, and an
-optional local maintenance profile. Resolve the actual repository, source
-owner, installed identity, version, and relevant rules before
-making a change. Do not infer ownership from an installation directory.
+## Inputs
 
-Select the relevant topics from the request or configured scope, then load only
-their references:
+- **Scope:** one skill collection (a repository's skills root), named skills
+  within one, or one instruction source (its units, declaration and generated
+  targets). Audit one scope at a time; several scopes get separate reports.
+- **Versions:** the model, host and agent-tool versions the scope is being
+  evaluated for. Read them from the hosts; do not assume them.
+- **Owners:** the repository guide, its authoring contract, its validation
+  commands and, for instructions, the tool that renders them.
+- **Evidence access:** usage counts parse session logs for tool calls and
+  print only aggregates; reading past session content to build eval cases
+  needs the user's permission. See [Evidence](references/evidence.md).
 
-| Topic | Evidence and purpose | Required reference |
-| --- | --- | --- |
-| `official-knowledge` | Official docs, supplied practices and tool/platform evidence; verify changed facts and applicable guidance. | [Source verification](references/source-verification.md) |
-| `codex-experience` | Codex memory, rollout summaries and scoped sessions; identify repeated failures, successful practices and evidence-backed skill candidates. | [Codex experience](references/codex-experience.md), then its evidence rules |
+Ask only for facts that change the scope, the owner or evidence access.
 
-A task can use both topics. Keep authoritative facts and observed experience
-distinct; an experience signal can raise a source question without proving the
-source changed. A knowledge refresh does not implicitly request session access.
+## Upgrade Audit
 
-Choose the entry mode from the request:
+Read-only. Do not edit files, create branches or worktrees, or run checks that
+write outside system temporary directories. Write the report to a file only
+when the user asks for one.
 
-- **Evidence audit:** inspect the named evidence and return per-target packets,
-  no-change/watch decisions, or owner questions. It does not edit targets.
-  `source-audit` selects this mode for official-knowledge work.
-- **Evolution batch:** continue the already-authorized inspection, bounded
-  editing, validation, and state update. A profile selects targets and permitted
-  actions; it cannot grant permissions the user or host did not provide.
+1. Resolve the scope's repository, owners and validation commands. Read the
+   repository guide and authoring contract before judging any item.
+2. Establish the host facts for the target versions from official
+   documentation and bounded local probes: how skills and instructions load,
+   listing budgets, description limits, what survives context compaction.
+   Date each fact and name its source.
+3. Inventory every item in scope and measure it: always-visible metadata,
+   loaded body, on-demand references, and the scope's share of each host's
+   listing budget. When a number cannot be measured, state the estimate method.
+4. Gather behavior and usage evidence where available: existing fixtures,
+   trigger evals, local usage counts, upstream changes for vendored material.
+5. Evaluate each item on the five dimensions in
+   [Upgrade audit](references/upgrade-audit.md): capability gain over the
+   current model, trigger quality, context cost, conflicts and duplicated work,
+   and freshness.
+6. Classify each finding as Confirmed Defect, Optimization Candidate or Needs
+   Verification, and recommend Keep, Simplify, Verify or Retire for each item.
+   Do not recommend retirement because the model "should manage now"; require
+   a with/without comparison. Keep domain knowledge, compatibility and safety
+   constraints. When the benefit is unclear, keep the status quo.
+7. Write the report in the format in [Upgrade audit](references/upgrade-audit.md)
+   and stop for the user's decision.
 
-Codex experience audits produce recommendations by default. Their scheduled
-scope, raw-session access, ledger writes and target mutation gates remain in
-the topic reference. A general evolution batch does not approve implementing
-every newly discovered behavior recommendation; a concrete approved change can
-continue through the authoring owner.
+For instruction units, apply [Instructions](references/instructions.md) in
+steps 3–6.
 
-When scope is missing, clarify only facts that change the owner, writable
-targets, or evidence access. A named target/source request or configured
-scheduled scope already supplies that context. Optional account access, broad
-unscoped discovery, costly scans, and live mutations need their own authorization.
+When the trigger is new official guidance rather than a version change, run a
+guidance audit instead of a full one: extract the guidance's concrete
+recommendations with their conditions, map each to the items it actually
+concerns, evaluate only those items, and report a decision per
+recommendation. See [Upgrade audit](references/upgrade-audit.md). Run a full
+audit for model, host or agent-tool changes, or when the user asks.
 
-## Workflow
+## Approved Cleanup
 
-1. Read the target repository entry and instruction hierarchy, then the target
-   skill and its maintenance architecture. For workspace-governed operations,
-   follow that workspace's actual CLI contract.
-2. Load only the selected profile, current target records, and relevant
-   references. Temporary downloads and probes belong in cache; accepted
-   progress and recovery evidence do not. See [State and recovery](references/state-and-recovery.md).
-   For collection-wide upkeep, discover the current skills within the supplied
-   source and installation scope on every run before selecting the batch.
-   Reconcile source identity, real path and declared name with prior records:
-   new targets start pending, changed targets retain their prior validation
-   revisions, and missing targets retain history until their disposition is
-   established. A failed scope scan cannot establish absence. Prior inventory
-   is progress, not a target whitelist; the deep-review cap applies after
-   discovery. Explicitly named target audits can keep their exact selection.
-3. Select the smallest useful batch. Scheduled runs honor the configured cap,
-   prioritize real failures and known changes, and advance the oldest eligible
-   pending verification. Review due existing knowledge even without a new
-   article. Record a retry condition for unavailable sources or environments.
-4. Identify the exact local claim or repeated behavior and apply the selected
-   topic's evidence rules. A fetch, directory listing, source inventory or
-   matching session line is not a completed knowledge or behavior review.
-5. Compare the verified evidence and local contract. Record accept-update,
-   no-change, watch, or needs-owner-decision with evidence and applicability.
-   Several independently repairable targets receive separate packets; a split,
-   rename, new skill, ownership conflict, or collection-boundary change requires
-   an explicit architecture decision.
-6. Preserve the affected principles, source receipts, patch policies, examples,
-   scripts, templates, compatibility paths, and acceptance criteria before
-   editing. Apply the rules in
-   [Instruction and skill changes](references/instruction-and-skill-changes.md).
-7. In evolution mode, finish the authorized repair within the topic's mutation
-   scope. This caller may compose an evidence packet with capability conservation
-   and the existing skill-creation workflow; it does not turn an evidence-only
-   leaf workflow into an editor.
-   Use skill-creator for final skill authoring and its existing per-skill
-   validation/review flow. Instruction repairs remain with the instruction
-   owner. Evidence-audit mode stops at its requested packet.
-8. Validate the changed behavior and record actual results. Reuse valid evidence
-   for unchanged versions; expand or repeat tests only for new changes,
-   failures, or unresolved concerns. Do not replace required human feedback,
-   lower criteria, or invent benchmark results.
-9. Update the selected state records only after triage. Keep source inspection,
-   package revision, compilation, runtime, human feedback, pending decisions,
-   and recovery distinct. Report any installation follow-up to its owner.
+Change only what the user approved, in the owning repository's task worktree,
+through that repository's delivery flow. Follow
+[Cleanup](references/cleanup.md): order the work as correctness, structure,
+descriptions within listing budgets, then body trimming; account for every
+removed block; compare trigger and behavior evals before and after; deliver
+one candidate per repository for the requirement.
 
-## Adjacent Responsibilities
+Use skill-creator for single-skill anatomy, fixtures and eval flow. Edit
+instruction units, not generated instruction files, and regenerate through
+the project's instruction tool.
 
-- Broad external-source intake belongs to any-to-skill. Package-to-skill evidence
-  belongs to its domain distiller; compiler interface output is evidence, not
-  authority to decide skill placement.
-- skill-distiller preserves capabilities when consolidation needs a conservation
-  pass. Use it when relevant, not as a mandatory stage for every small edit.
-- skill-cli owns installed source requirements, materialization, and links.
-  Emit the affected source, skill, scope, agent, mode, and readiness when
-  synchronization is needed. Do not implement a second installer here.
-- Product code, dependency upgrades, publishing, plugin lifecycle changes, and
-  changes to the user's authority or production rules need their own owners
-  and authorization.
+## Boundaries
 
-## External Delivery
-
-Use this section only when the caller authorizes delivery beyond local edits,
-such as pushing task branches, opening pull requests or filing issues. The
-caller's profile names the authorized repositories and actions; this skill
-does not grant them.
-
-Route each candidate before any write:
-
-| Route | Condition | Delivery |
-| --- | --- | --- |
-| Repair | Within the profile's allowed actions, with a clear owner and current evidence, and without changing responsibilities, principles, permissions, acceptance criteria or executable behavior. Typical repairs correct facts, versions, source links, paths, navigation and metadata typos. | Edit in the target repository's own task working copy, as its isolation rules assign. Run its checks and obtain review from an agent that did not author the change. Push only the task branch and open a pull request. Never merge, push a default branch or force-push. |
-| Decision | A profile owner decision, a change to helper, script or example behavior, or any candidate that cannot be shown to be a repair. | File one issue in the owning repository with the evidence, the proposed change and the decision needed. Do not edit the target. For a repository without a remote, list the candidate in the run's pending decisions instead. |
-| No change | No concrete change is proposed yet: the claim is already covered, evidence is unavailable, or the effect cannot yet be established. | Record no-change, watch or a retry condition. |
-
-Route in two steps. Without a concrete proposed change, record no change with a
-watch or retry condition. Once a concrete change is proposed, it is a repair
-only when every repair condition is shown; otherwise it is a decision.
-
-Deliver only to repositories the profile authorizes for delivery and that have
-a remote. For any other repository, including one found during discovery, list
-both repair and decision candidates in the run's pending decisions.
-
-Record every external item in the [delivery ledger](references/state-and-recovery.md#delivery-ledger)
-before and after creating it. Read a target's canonical checkout without
-changing it, and leave unrelated changes untouched. Paths the profile locks are
-report-only: list proposed changes as pending decisions, without branches, pull
-requests or edits.
-
-End the run with one batch listing new pull requests, issues, local candidates,
-review and check results, and pending decisions. Report an unchanged pending
-item again only when its state changes.
-
-## Scheduled Use
-
-The scheduler supplies this skill, topics, a profile or explicit targets, and
-the invocation mode. Cadence, machine paths, enabled directions, batch size, and
-notification preference belong to that invocation/profile, not duplicated
-copies of this workflow.
-
-Use the same source and validation standards as manual work. Finish authorized
-local work, preserve dirty targets, and continue independent targets when one
-is blocked. Do not reopen a completed execution plan or permanent Goal for
-routine runs. Use parallel agents only when explicitly authorized and when
-their read-only evidence slices are independent.
+- Installation and links belong to the installation owner; report needed
+  follow-ups instead of installing.
+- Publishing, releases, dependency upgrades and product code need their own
+  owners and authorization.
+- Changes to the user's principles, permissions or validation standards are
+  the user's decision; show the exact proposed change and its evidence.
+- Preserve unrelated working-tree changes in every repository.
+- A failed or interrupted run reports what completed and what can resume; it
+  never presents a partial result as complete.
 
 ## Result
 
-Return a concise result with:
-
-- targets and source evidence actually inspected;
-- selected topics, observed behavior, confidence and evidence access limits;
-- per-target decision and the claim affected;
-- changed artifacts and validation actually completed;
-- pending knowledge, unavailable environments, or owner decisions;
-- installation follow-ups for the corresponding owner;
-- state and exact recovery evidence, if files changed.
-
-For a quiet scheduled profile, notify only on an actual update, actionable
-failure, or required decision, deduplicated by source/target/decision. An
-unchanged record is not a new notification. Never report all knowledge current
-when only entries or a subset of their references were reviewed.
+Report the scope and versions evaluated, what was inspected and how, findings
+with evidence and confidence, recommendations, blind spots, and the decisions
+the user needs to make. Never report a scope as current when only part of it
+was inspected.
