@@ -1,71 +1,40 @@
-# Evidence Inventory Helpers
+# Helpers
 
-## collect_evidence.py
-
-Run from any project repository to collect a bounded evidence inventory before
-writing a Codex experience audit.
-
-```bash
-python3 /path/to/agent-evolver/scripts/collect_evidence.py \
-  --root /path/to/project \
-  --term important-module-or-script
-```
-
-By default the script scans project guidance, existing local skills, Codex
-memory, and rollout summaries. It does not scan raw session files unless
-`--include-sessions` is passed.
-
-For recurring automations, include automation-local memory as policy and
-backlog context:
-
-```bash
-python3 /path/to/agent-evolver/scripts/collect_evidence.py \
-  --root /path/to/project \
-  --automation-id <automation-id>
-```
-
-Use `--automation-memory /path/to/memory.md` when the automation memory lives
-outside the default `$CODEX_HOME/automations/<id>/memory.md` path.
-
-For recurring raw-session scans, pass an automation-local ledger path:
-
-```bash
-python3 /path/to/agent-evolver/scripts/collect_evidence.py \
-  --root /path/to/project \
-  --include-archived-sessions \
-  --no-update-evidence-ledger \
-  --evidence-ledger "${CODEX_HOME:-$HOME/.codex}/automations/<job>/processed-evidence.json"
-```
-
-The ledger is read-only by default: it skips records already processed for the
-same target repo, source, session id, and content hash, but it does not mark new
-raw sessions processed.
-
-After report triage, write ledger entries only for files with a concrete
-disposition:
-
-```bash
-python3 /path/to/agent-evolver/scripts/collect_evidence.py \
-  --root /path/to/project \
-  --include-archived-sessions \
-  --evidence-ledger "${CODEX_HOME:-$HOME/.codex}/automations/<job>/processed-evidence.json" \
-  --update-evidence-ledger \
-  --ledger-disposition-file /path/to/dispositions.json
-```
-
-Use a uniform `--ledger-disposition no-change` only when every scanned file has
-the same conclusion. For mixed outcomes, use a disposition JSON object keyed by
-the helper output's `ledger_key` values. Do not ledger untriaged candidates.
+Both helpers use only the Python standard library and print JSON with `--json`.
 
 ## collect_sources.py
 
-Inventory declared source references for exact skills in a repository:
+Lists the declared source references of exact skills in a repository:
 
 ```bash
-python3 /path/to/agent-evolver/scripts/collect_sources.py \
-  --root /path/to/repository --skill exact-skill-name --json
+python3 scripts/collect_sources.py --root <repository> --skill <name> --json
 ```
 
-Repeat `--skill` for multiple exact targets. `--term` is fuzzy discovery only.
-The output inventories source locations; source verification remains a separate
-judgment in the official-knowledge topic.
+Repeat `--skill` for several targets. `--term` is fuzzy discovery only. The
+output lists source locations; checking them is the audit's work.
+
+## usage_counts.py
+
+Counts, per skill in a collection, how often each host used it over a window:
+
+```bash
+python3 scripts/usage_counts.py --skills-root <repository>/skills --since <YYYY-MM-DD> --json
+```
+
+- Skill names come from each `<skills-root>/*/SKILL.md` frontmatter `name`.
+- Codex: a session counts once for a skill when a tool call in it reads,
+  writes or searches a path ending in `/<name>/SKILL.md`. Rollouts are read
+  from `--codex-home` (default `$CODEX_HOME` or `~/.codex`): `sessions/` and
+  `archived_sessions/`.
+- Claude Code: each `Skill` tool call naming the skill counts once, with or
+  without a plugin prefix. Transcripts are read from `--claude-projects`
+  (default `~/.claude/projects`), including subagent transcripts.
+- Work inside the Git repository that contains `--skills-root` counts as
+  `maintenance`: its main checkout and every worktree of it, matched through
+  the shared Git directory. Everything else counts as `uses`, including
+  worktrees outside the main checkout that no longer exist.
+- Only events at or after `--since` and before the optional `--until` count.
+  Both accept ISO dates or times; dates and times without a timezone use UTC.
+- The output has the window, per-skill `uses` and `maintenance` per host,
+  totals, the counting method and its limits, the number of files read, and
+  files that could not be parsed. It never prints message content.
