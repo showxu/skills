@@ -127,24 +127,37 @@ class SigningSetupTests(unittest.TestCase):
         self.assertFalse((self.repo / ".git/allowed_signers").exists())
         self.assert_verified_commit()
 
-    def test_owner_line_without_options_or_with_crlf_is_kept(self):
-        for content in (f"{EMAIL} {self.public}\n", f"{EMAIL} {self.public}\r\n"):
-            with self.subTest(content=content):
-                self.shared.write_bytes((content + self.bot).encode())
-                self.git("config", "gpg.ssh.allowedSignersFile", str(self.shared))
+    def test_lines_authorizing_owner_key_for_git_are_kept(self):
+        self.git("config", "gpg.ssh.allowedSignersFile", str(self.shared))
+        for owner in (f"{EMAIL} {self.public}\n", f"{EMAIL} {self.public}\r\n",
+                      f'{EMAIL} NAMESPACES="file,g?t" {self.public}\n',
+                      f'{EMAIL} namespaces="*,!file" {self.public} owner\n'):
+            with self.subTest(owner=owner):
+                content = (owner + self.bot).encode()
+                self.shared.write_bytes(content)
                 self.assert_configured(self.configure())
-                self.assertEqual(self.shared.read_bytes(), (content + self.bot).encode())
-        self.assert_verified_commit()
+                self.assertEqual(self.shared.read_bytes(), content)
+                self.assert_verified_commit()
 
-    def test_lines_that_do_not_authorize_git_signing_are_not_the_owner_line(self):
-        content = (f"{EMAIL} cert-authority {self.public}\n"
-                   f'{EMAIL} namespaces="file" {self.public}\n'
-                   f"{EMAIL} {self.other} replaced {self.public}\n")
-        self.shared.write_text(content)
+    def test_lines_not_authorizing_owner_key_for_git_are_ignored(self):
+        lines = [f"{EMAIL} cert-authority {self.public}\n",
+                 f"{EMAIL} CERT-AUTHORITY {self.public}\n",
+                 f'{EMAIL} Namespaces="file" {self.public}\n',
+                 f'{EMAIL} namespaces="g*,!git" {self.public}\n',
+                 f"{EMAIL} {self.other} replaced {self.public}\n"]
+        self.shared.write_text("".join(lines))
         self.git("config", "gpg.ssh.allowedSignersFile", str(self.shared))
         self.assert_configured(self.configure())
-        self.assertEqual(self.shared.read_text(), content + self.line)
+        self.assertEqual(self.shared.read_text(), "".join(lines) + self.line)
         self.assert_verified_commit()
+        single = self.root / "single"
+        for line in lines:
+            with self.subTest(line=line):
+                single.write_text(line)
+                result = subprocess.run(
+                    ["git", "-c", f"gpg.ssh.allowedSignersFile={single}", "verify-commit", "HEAD"],
+                    cwd=self.repo, env=self.env, text=True, capture_output=True)
+                self.assertNotEqual(result.returncode, 0, result.stderr)
 
     def test_rotated_key_is_appended_after_retired_key(self):
         retired = f'{EMAIL} namespaces="git" {self.other}\n'

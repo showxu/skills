@@ -34,10 +34,31 @@ line="$OWNER_EMAIL namespaces=\"git\" $key"
 
 # A line lists principals, optional options, then the key and a comment. It
 # authorizes the owner when a principal is the email and the key matches,
-# unless its options make the key a certificate authority or omit the git
-# namespace.
+# unless its options make the key a certificate authority or its namespaces
+# pattern list does not admit git. As in OpenSSH, option names ignore case and
+# patterns use *, ? and ! negation.
 has_owner_line() {
   [ -f "$list" ] && awk -v email="$OWNER_EMAIL" -v key="$key" '
+    function glob(p, s,    c) {
+      if (p == "") return s == ""
+      c = substr(p, 1, 1)
+      if (c == "*") return glob(substr(p, 2), s) || (s != "" && glob(p, substr(s, 2)))
+      return s != "" && (c == "?" || c == substr(s, 1, 1)) && glob(substr(p, 2), substr(s, 2))
+    }
+    function admits_git(options,    lower, quoted, patterns, n, i, p, negated, admitted) {
+      lower = tolower(options)
+      if (lower ~ /(^|[ ,])cert-authority([ ,]|$)/) return 0
+      if (!match(lower, /(^|[ ,])namespaces="[^"]*"/)) return 1
+      split(substr(options, RSTART, RLENGTH), quoted, "\"")
+      n = split(quoted[2], patterns, ",")
+      admitted = 0
+      for (i = 1; i <= n; i++) {
+        p = patterns[i]
+        negated = sub(/^!/, "", p)
+        if (glob(p, "git")) { if (negated) return 0; admitted = 1 }
+      }
+      return admitted
+    }
     { sub(/\r$/, "") }
     /^[[:space:]]*(#|$)/ { next }
     {
@@ -45,8 +66,7 @@ has_owner_line() {
       while (k < NF && $k !~ /^(ssh-|ecdsa-|sk-)/) k++
       options = ""
       for (i = 2; i < k; i++) options = options " " $i
-      if ($k " " $(k + 1) != key || options ~ /cert-authority/) next
-      if (options ~ /namespaces=/ && options !~ /namespaces="([^"]*,)?git[,"]/) next
+      if ($k " " $(k + 1) != key || !admits_git(options)) next
       n = split($1, principals, ",")
       for (i = 1; i <= n; i++) if (principals[i] == email) found = 1
     }
@@ -54,7 +74,7 @@ has_owner_line() {
 }
 
 refuse() {
-  echo "$list $1, or set ALLOWED_SIGNERS to another list:" >&2
+  echo "$list $1, or set ALLOWED_SIGNERS if the standard names another list:" >&2
   echo "$line" >&2
   exit 1
 }
