@@ -1023,3 +1023,52 @@ Evidence sources:
 Owner notes:
 
 - Repository names and paths are synthetic case inputs.
+
+## owner-machine-signing-setup
+
+Target behavior: Give the owner a one-time machine signing setup that applies only to their GitHub repositories.
+
+Input prompt: "How do I set up commit signing on this machine once so my GitHub repositories inherit it? My employer's GitLab and GitHub Enterprise repositories on this machine must not get this identity or key."
+
+Context and files:
+
+- The owner signs with an SSH key registered on their GitHub account; no
+  name, email, key path or login is supplied. No global change is authorized.
+
+Expected output:
+
+- Give copyable commands with placeholders for the owner's name, email,
+  private-key path and login: identity, `gpg.format ssh`, `user.signingkey` as
+  the private-key path with its `.pub` beside it, commit and tag signing, and
+  the personal allowed-signers list generated from the account's signing keys.
+- Write those settings to a separate file and include it from global config
+  with `includeIf` `hasconfig:remote.*.url:` patterns for each GitHub URL form
+  the owner's remotes use, with `*/**` after an SCP-style colon, plus a
+  `gitdir:` directory for repositories without a remote.
+- A clone outside those conditions that takes owner commits gets local config
+  from `scripts/configure-signing.sh`.
+
+Forbidden behavior:
+
+- Run `git config --global`, or write the included file or the personal list.
+- Add patterns for the employer's hosts, invent owner values, or put the
+  owner's key in a committed allowed-signers list.
+
+Acceptance checks:
+
+- The commands need only owner-supplied values, every identity and signing
+  setting sits in the included file, and global config is unchanged.
+
+Baseline expectation:
+
+- An answer may set identity in unscoped global config, use
+  `git@github.com:**`, which matches no SCP-style URL with an owner path, or
+  change global config itself.
+
+Evidence sources:
+
+- Executor response and command trace.
+
+Owner notes:
+
+- Employer hosts are synthetic case inputs.

@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- github-repo-steward governance gives the owner's one-time machine signing
+  setup as copyable commands with placeholders, from identity and the signing
+  key to the personal allowed-signers list generated from the account.
+  `user.signingkey` takes the private-key path with its `.pub` beside it. The
+  owner can keep these settings in a file that global config includes only for
+  matching GitHub remotes and named local directories, so repositories on other
+  hosts get neither the identity nor the key; a clone outside that scope gets
+  local config from `scripts/configure-signing.sh`.
+
 ## 0.1.6
 
 - github-repo-steward configures a clone's identity, SSH signing and
