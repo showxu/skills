@@ -13,9 +13,12 @@
   survives removing a worktree. They append the owner's line when no line
   authorizes the owner's key for Git signing and keep every other signer; a
   list that is a symbolic link or repository content is only read. Governance
-  treats signing configuration as shared by a clone's worktrees, and covers
-  rerunning after a reclone or reinstall, rebuilding the owner's lines from the
-  signing keys registered on GitHub, and keeping retired keys after rotation.
+  defaults to the owner's global signing, set once per machine and inherited by
+  clones, and keeps local setup for clones without it, shared by their
+  worktrees. The owner's keys registered on GitHub are the source of truth: a
+  personal list holds only those keys and is regenerated from them after a
+  reinstall or rotation, and a repository commits a list only for signers no
+  account publishes, such as release automation.
 
 ## 0.1.5
 
