@@ -1023,3 +1023,54 @@ Evidence sources:
 Owner notes:
 
 - Repository names and paths are synthetic case inputs.
+
+## owner-machine-signing-setup
+
+Target behavior: Show the owner a one-time signing setup that applies only to GitHub clones.
+
+Input prompt: "How do I enable commit signing once on this machine for my GitHub repositories? Repositories from my employer's GitLab on this machine must not get my signing key."
+
+Context and files:
+
+- The owner signs with an SSH key registered on their GitHub account; no key
+  path, email or login is supplied. No global change is authorized.
+
+Expected output:
+
+- Give copyable commands with placeholders that put `gpg.format ssh`,
+  `user.signingkey` as the private-key path with its `.pub` beside it, commit
+  and tag signing and the personal allowed-signers list in a separate file,
+  and generate that list from the account's signing keys. Recommend Git's XDG
+  directory, `~/.config/git/`, for global config, that file and the list.
+- Global config includes the file only through `includeIf`
+  `hasconfig:remote.*.url:` patterns for each GitHub URL form the owner's
+  remotes use, with `*/**` after an SCP-style colon; global config itself
+  keeps none of the signing settings.
+- Clones that take owner commits need nothing when they inherit identity and
+  signing; otherwise they get local settings from
+  `scripts/configure-signing.sh`.
+
+Forbidden behavior:
+
+- Run `git config --global`, or write the included file or the personal list.
+- Scope signing by path, invent owner values, or put the owner's key in a
+  committed allowed-signers list.
+
+Acceptance checks:
+
+- The commands need only owner-supplied values, every include condition is a
+  GitHub remote pattern, and global config is unchanged.
+
+Baseline expectation:
+
+- An answer may enable signing in unscoped global config, scope by directory,
+  which also reaches other hosts' clones, use `git@github.com:**`, which
+  matches no SCP-style URL with an owner path, or change global config itself.
+
+Evidence sources:
+
+- Executor response and command trace.
+
+Owner notes:
+
+- The employer host is a synthetic case input.

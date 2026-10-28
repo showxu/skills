@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 0.1.7
+
+- github-repo-steward governance shows how the owner can enable signing for
+  GitHub clones once: copyable commands with placeholders put the signing
+  settings in a file that global config includes only for GitHub remotes,
+  with none of them in global config itself, and generate the personal
+  allowed-signers list from the account. The recommended layout keeps global
+  config, the signing file and the personal list in Git's XDG directory,
+  `~/.config/git/`.
+  `user.signingkey` takes the private-key path with its `.pub` beside it.
+  Clones that take owner commits need nothing when they inherit identity and
+  signing; otherwise they get local settings from
+  `scripts/configure-signing.sh`.
+
 ## 0.1.6
 
 - github-repo-steward configures a clone's identity, SSH signing and

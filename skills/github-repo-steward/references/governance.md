@@ -7,14 +7,51 @@ External and bot authors retain their own ownership; an owner gate for locally
 prepared commits must not become an identity restriction on external PRs.
 
 The owner's signing keys registered on GitHub are the source of truth for the
-owner, and GitHub verifies other authors' commits. By default the owner
-configures each machine once in global Git config: identity, the signing key,
-signing of commits and tags, and a personal allowed-signers list, the file that
-global `gpg.ssh.allowedSignersFile` names, holding only the owner's keys,
-retired ones included. Clones inherit it. The owner maintains global config and
-regenerates the personal list; never change global config. Report a machine
-without global signing, or a personal list without the owner's current key, to
-the owner and configure the clone locally.
+owner, and GitHub verifies other authors' commits. The personal allowed-signers
+list, the file that the inherited `gpg.ssh.allowedSignersFile` names, holds
+only the owner's keys, retired ones included. The owner maintains global Git
+config, including any file it includes, and regenerates the personal list;
+never change them. A clone that takes owner commits needs nothing when it
+inherits the owner's identity and signing; otherwise
+`scripts/configure-signing.sh` writes the settings it does not inherit. Report
+a clone with a GitHub remote that inherits no signing, or a personal list
+without the owner's current key, to the owner.
+`git -C <clone> config --show-origin --get user.signingkey` shows what a clone
+inherits; a `--global` lookup ignores included files.
+
+The owner can enable signing for GitHub clones once. The recommended layout
+keeps Git's files in its XDG directory and the keys in `~/.ssh/`; other paths
+work the same way:
+
+- `~/.config/git/config`: global config. `git config --global` writes it once
+  no `~/.gitconfig` exists, so move an existing `~/.gitconfig` there.
+- `~/.config/git/github`: the signing settings, which global config includes
+  only for GitHub remotes; global config itself holds none of them.
+- `~/.config/git/allowed_signers`: the personal list.
+
+```sh
+mkdir -p ~/.config/git
+git config --file ~/.config/git/github gpg.format ssh
+git config --file ~/.config/git/github user.signingkey <private-key-path>
+git config --file ~/.config/git/github commit.gpgsign true
+git config --file ~/.config/git/github tag.gpgsign true
+git config --file ~/.config/git/github gpg.ssh.allowedSignersFile ~/.config/git/allowed_signers
+git config --global 'includeIf.hasconfig:remote.*.url:git@github.com:*/**.path' ~/.config/git/github
+git config --global 'includeIf.hasconfig:remote.*.url:https://github.com/**.path' ~/.config/git/github
+gh api --paginate users/<login>/ssh_signing_keys \
+  --jq '.[] | "<owner-email> namespaces=\"git\" \(.key)"' > ~/.config/git/allowed_signers.new &&
+  test -s ~/.config/git/allowed_signers.new &&
+  mv ~/.config/git/allowed_signers.new ~/.config/git/allowed_signers
+```
+
+`user.signingkey` takes the private-key path; keep its public key beside it as
+`<private-key-path>.pub`, which the helpers read. The last command writes
+every SSH signing key the account `<login>` registers into the personal list,
+replacing the list only after a complete fetch. Add an include for every URL
+form the owner's remotes use, such as `ssh://git@github.com/**`; any matching
+remote counts, an `upstream` included. Git's `**` spans directories only as a
+whole path component, so an SCP-style URL needs `*/**` after its colon.
+`hasconfig` needs Git 2.36 or later.
 
 A committed allowed-signers list holds only signers no account publishes, such
 as release automation. A repository keeps it under `.github/`, or uses the
@@ -63,14 +100,8 @@ A fresh clone has no local signing settings and inherits global signing where
 the machine has it; otherwise run the helper on it. A task clone runs
 `scripts/configure-clone.sh` either way. When the owner reinstalls a machine or
 rotates the signing key, the owner keeps every retired key registered on GitHub
-and regenerates the personal list from the account, replacing it only after a
-complete fetch:
-
-```sh
-gh api --paginate users/<login>/ssh_signing_keys \
-  --jq '.[] | "<email> namespaces=\"git\" \(.key)"' > <personal-list>.new &&
-  test -s <personal-list>.new && mv <personal-list>.new <personal-list>
-```
+and regenerates the personal list from the account with the `gh api` command
+above.
 
 After a rotation, rerun the helper with the new `SIGNING_KEY` on clones whose
 local config sets the signing key or the allowed-signers list. Keep the private
