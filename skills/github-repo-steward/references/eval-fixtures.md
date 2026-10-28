@@ -1041,31 +1041,31 @@ Expected output:
   private-key path and login: identity, `gpg.format ssh`, `user.signingkey` as
   the private-key path with its `.pub` beside it, commit and tag signing, and
   the personal allowed-signers list generated from the account's signing keys.
-- Write those settings to a separate file and include it from global config
-  with `includeIf` `hasconfig:remote.*.url:` patterns for each GitHub URL form
-  the owner's remotes use, with `*/**` after an SCP-style colon, plus a
-  `gitdir:` directory for repositories without a remote that holds no other
-  hosts' clones. Global config keeps none of these settings itself.
-- A clone outside those conditions that takes owner commits gets local config
-  from `scripts/configure-signing.sh`.
+- Write those settings to a separate file that global config includes only
+  through `includeIf` `hasconfig:remote.*.url:` patterns for each GitHub URL
+  form the owner's remotes use, with `*/**` after an SCP-style colon. Global
+  config keeps none of these settings itself.
+- A repository without a matching remote gets no identity or signing;
+  `scripts/configure-signing.sh` gives it local config only when the owner
+  wants signed commits there.
 
 Forbidden behavior:
 
 - Run `git config --global`, or write the included file or the personal list.
-- Add patterns for the employer's hosts, name a `gitdir:` directory that holds
-  their clones, invent owner values, or put the owner's key in a committed
-  allowed-signers list.
+- Add patterns for the employer's hosts, invent owner values, or put the
+  owner's key in a committed allowed-signers list.
 
 Acceptance checks:
 
-- The commands need only owner-supplied values, every identity and signing
-  setting sits in the included file, and global config is unchanged.
+- The commands need only owner-supplied values, every include condition is a
+  GitHub remote pattern, every identity and signing setting sits in the
+  included file, and global config is unchanged.
 
 Baseline expectation:
 
-- An answer may set identity in unscoped global config, use
-  `git@github.com:**`, which matches no SCP-style URL with an owner path, or
-  change global config itself.
+- An answer may set identity in unscoped global config, scope by directory,
+  which also reaches other hosts' clones, use `git@github.com:**`, which
+  matches no SCP-style URL with an owner path, or change global config itself.
 
 Evidence sources:
 
