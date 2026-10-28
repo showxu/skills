@@ -16,10 +16,9 @@ Required member checks are only `policy` and `validate`. Validation always
 runs format, tests and a release build; platforms, docs and demo run only where
 declared. The ecosystem release skill owns the shared CI job catalog, member
 configuration format and defaults (for Swift packages,
-`swiftpm-github-release` in `swift-library/skills`). Organizations and members
-may extend them with their own commands. Repository-specific checks live in
-lowercase `scripts/`; a check needed by a second member is promoted into
-`github-workflows`.
+`swiftpm-github-release`). Organizations and members may extend them with
+their own commands. Repository-specific checks live in lowercase `scripts/`; a
+check needed by a second member is promoted into `github-workflows`.
 
 Demo validation re-records `recording.json` against the freshly built CLI using
 the ecosystem validation workflow's `demo` switch. Render and check profiles,

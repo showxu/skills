@@ -7,11 +7,11 @@ the producer-owned ignored eval workspace, outside this package.
 
 Target behavior: Create a new repository from the template its organization declares.
 
-Input prompt: "Create a new swift-library package named swift-color with a library target Color."
+Input prompt: "Create a new example-org package named swift-color with a library target Color."
 
 Context and files:
 
-- swift-library/.github declares a package template, its identity values and
+- example-org/.github declares a package template, its identity values and
   its template-only paths in its workflow integration guide.
 
 Expected output:
@@ -45,7 +45,7 @@ Evidence sources:
 
 Owner notes:
 
-- swift-library/.github declares the template, its identity values and its
+- example-org/.github declares the template, its identity values and its
   template-only paths in its workflow integration guide.
 
 ## default-versioning-first-release
