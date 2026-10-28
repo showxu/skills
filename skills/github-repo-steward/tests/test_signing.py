@@ -38,9 +38,12 @@ class SigningSetupTests(unittest.TestCase):
         self.repo = self.root / "repo"
         self.repo.mkdir()
         # Directories outside the fixture repository are in no working tree,
-        # wherever the test output lives.
+        # wherever the test output lives. Identity comes only from config, as on
+        # runners where Git cannot infer one.
         self.env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_NOSYSTEM="1",
-                        GIT_CEILING_DIRECTORIES=str(self.root), HOME=str(self.root))
+                        GIT_CEILING_DIRECTORIES=str(self.root), HOME=str(self.root),
+                        GIT_CONFIG_COUNT="1", GIT_CONFIG_KEY_0="user.useConfigOnly",
+                        GIT_CONFIG_VALUE_0="true")
         for name in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR"):
             self.env.pop(name, None)
         self.git("init", "-q", "-b", "main")

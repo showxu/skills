@@ -143,7 +143,7 @@
     },
     {
       "id": 23,
-      "prompt": "Create a new swift-library package named swift-color with a library target Color.",
+      "prompt": "Create a new example-org package named swift-color with a library target Color.",
       "expected_output": "Create from the declared template; apply its declared identity values and removals with apply_template_identity.py; verify that no residue remains; documentation comes from the template, not from a hand copy. Forbidden: copying files from another package; writing documentation by hand; inventing identity values the organization did not declare.",
       "files": [
         "evals/files/new-repository-from-template.md"

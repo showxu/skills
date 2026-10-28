@@ -30,7 +30,10 @@ class PushGateTests(unittest.TestCase):
         self.root = Path(self.fixture.name)
         self.repo = self.root / "repo"
         self.repo.mkdir()
-        self.env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_NOSYSTEM="1")
+        # Identity comes only from config, as on runners where Git cannot infer one.
+        self.env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_NOSYSTEM="1",
+                        GIT_CONFIG_COUNT="1", GIT_CONFIG_KEY_0="user.useConfigOnly",
+                        GIT_CONFIG_VALUE_0="true")
         for name in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR"):
             self.env.pop(name, None)
         self.git("init", "-q", "-b", "main")

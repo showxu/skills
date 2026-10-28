@@ -52,12 +52,12 @@ class TemplateIdentityTests(unittest.TestCase):
 
     def test_content_and_path_replacement_longest_first_preserves_mode_and_bytes(self):
         name = "swift-package-template/scripts/swift-package-template.sh"
-        original = self.file(name, b"#!/bin/sh\r\nswift-library/swift-package-template swift-package-template\r\n",
+        original = self.file(name, b"#!/bin/sh\r\nexample-org/swift-package-template swift-package-template\r\n",
                              mode=0o755)
         untracked = self.file("untracked.txt", b"swift-package-template", tracked=False)
         status, stdout, stderr = self.run_identity(
             "--map", "swift-package-template=swift-color",
-            "--map", "swift-library/swift-package-template=example/swift-color")
+            "--map", "example-org/swift-package-template=example/swift-color")
         target = self.root / "swift-color/scripts/swift-color.sh"
         self.assertEqual(status, 0, stderr)
         self.assertFalse(original.exists())
