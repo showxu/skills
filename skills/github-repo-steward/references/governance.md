@@ -14,13 +14,14 @@ commits and tags, and a personal allowed-signers list, the file that the
 included `gpg.ssh.allowedSignersFile` names, holding only the owner's keys,
 retired ones included. Clones with such a remote inherit it. The owner
 maintains global config, including any file it includes, and regenerates the
-personal list; never change them. Report a clone that inherits no signing, or a
-personal list without the owner's current key, to the owner and configure the
-clone locally. `git -C <clone> config --show-origin --get user.signingkey`
+personal list; never change them. Report a clone with a GitHub remote that
+inherits no signing, or a personal list without the owner's current key, to the
+owner and configure the clone locally.
+`git -C <clone> config --show-origin --get user.signingkey`
 shows what a clone inherits; a `--global` lookup ignores included files.
 
 The owner sets up a machine once. The settings go in `<owner-config>`, which
-global config includes only for repositories whose remotes are on GitHub, so
+global config includes only for repositories with a GitHub remote, so
 repositories on other hosts, such as an employer's GitLab or GitHub Enterprise
 Server, get neither the identity nor the key:
 
@@ -48,10 +49,12 @@ Add an include for every URL form the owner's remotes use, such as
 `ssh://git@github.com/**` or an SSH host alias. Git matches these patterns path
 by path: `**` spans directories only as a whole path component, so an
 SCP-style URL needs `*/**` after its colon. `hasconfig` needs Git 2.36 or
-later, and the included file must not set remote URLs. Global config itself
-keeps none of these settings, so a repository without a matching remote gets
-no identity or signing; `scripts/configure-signing.sh` gives one local config
-when the owner wants signed commits there.
+later, and the included file must not set remote URLs. Any matching remote
+counts, so a clone from another host that also carries a GitHub remote, such
+as an `upstream`, gets the identity and key too. Global config itself keeps
+none of these settings, so a repository without a matching remote gets no
+identity or signing; `scripts/configure-signing.sh` gives such a repository
+local config when the owner wants signed commits there.
 
 A committed allowed-signers list holds only signers no account publishes, such
 as release automation. A repository keeps it under `.github/`, or uses the
