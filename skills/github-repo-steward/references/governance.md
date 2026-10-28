@@ -53,17 +53,18 @@ owner's line when the selected list lacks it and keep every other line. They
 never write an inherited list, and report one that lacks the owner's key. A
 symbolic link or repository content, tracked or not ignored in a working tree,
 is only read; when it lacks the owner's line, the helpers stop before any
-write. Set `ALLOWED_SIGNERS` to a list outside working trees when the clone's
-local list is gone or committed, or to the list an applicable standard names
-for clones. Never name the personal list there; the helpers reuse it when
-inherited.
+write. When the clone's local list is gone or committed, unset its local
+`gpg.ssh.allowedSignersFile` and rerun the helper, which then reuses the
+inherited list or the default one. Set `ALLOWED_SIGNERS` only to a list outside
+working trees that an applicable standard names for clones. Never name the
+personal list there; the helpers reuse it when inherited.
 
 A fresh clone has no local signing settings and inherits global signing where
 the machine has it; otherwise run the helper on it. A task clone runs
 `scripts/configure-clone.sh` either way. When the owner reinstalls a machine or
-rotates the signing
-key, the owner keeps every retired key registered on GitHub and regenerates the
-personal list from the account, replacing it only after a complete fetch:
+rotates the signing key, the owner keeps every retired key registered on GitHub
+and regenerates the personal list from the account, replacing it only after a
+complete fetch:
 
 ```sh
 gh api --paginate users/<login>/ssh_signing_keys \
@@ -73,9 +74,8 @@ gh api --paginate users/<login>/ssh_signing_keys \
 
 After a rotation, rerun the helper with the new `SIGNING_KEY` on clones whose
 local config sets the signing key or the allowed-signers list. Keep the private
-signing key;
-`ssh-keygen -y -f <key> > <key>.pub` restores its public key. A committed list
-keeps its signers' retired keys.
+signing key; `ssh-keygen -y -f <key> > <key>.pub` restores its public key. A
+committed list keeps its signers' retired keys.
 
 `CONTENT_CHECK` is a repository-owned commit scan receiving the candidate as
 shell argument `$1`; `FAST_CHECK` is the clean candidate's fast validation.

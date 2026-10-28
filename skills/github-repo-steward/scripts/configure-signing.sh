@@ -91,7 +91,7 @@ setting=${setting:-$common/allowed_signers}
 list=$(path_of "$setting")
 
 refuse() {
-  echo "$list $1; name a list outside working trees in ALLOWED_SIGNERS for:" >&2
+  echo "$list $1; select a list outside working trees for:" >&2
   echo "$line" >&2
   exit 1
 }
