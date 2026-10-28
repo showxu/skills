@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.7
+
 - github-repo-steward governance shows how the owner can enable signing for
   GitHub clones once: copyable commands with placeholders put the signing
   settings in a file that global config includes only for GitHub remotes,
