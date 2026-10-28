@@ -45,8 +45,8 @@ concurrent writers are implied.
    legal notices and external authorship. For signed owner work, a clone
    inherits the owner's global signing or gets local Git config, and every task
    clone that pushes owner commits gets the owner push gate; follow
-   [governance](references/governance.md), which also gives the owner's
-   one-time machine setup, and never change global config.
+   [governance](references/governance.md), which also shows the owner's
+   one-time signing setup for GitHub clones, and never change global config.
    Run repository-owned checks, not a second competing content policy.
    Use [layout](references/layout.md) for GitHub-defined paths and the shared
    presentation-asset layout.

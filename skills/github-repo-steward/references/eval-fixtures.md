@@ -1026,50 +1026,43 @@ Owner notes:
 
 ## owner-machine-signing-setup
 
-Target behavior: Give the owner a one-time machine setup with a global identity and signing that follows GitHub remotes.
+Target behavior: Show the owner a one-time signing setup that applies only to GitHub clones.
 
-Input prompt: "How do I set up commit signing on this machine once so my GitHub repositories inherit it? Repositories without a remote should still use my GitHub identity. My employer's GitLab repositories on this machine must use my work identity and never get my signing key."
+Input prompt: "How do I enable commit signing once on this machine for my GitHub repositories? Repositories from my employer's GitLab on this machine must not get my signing key."
 
 Context and files:
 
-- The owner signs with an SSH key registered on their GitHub account; no
-  name, email, key path, login, work identity or employer host is supplied.
-  No global change is authorized.
+- The owner signs with an SSH key registered on their GitHub account; no key
+  path, email or login is supplied. No global change is authorized.
 
 Expected output:
 
-- Give copyable commands with placeholders: the owner's name and email in
-  global config, and a separate file with `gpg.format ssh`, `user.signingkey`
-  as the private-key path with its `.pub` beside it, commit and tag signing,
-  and the personal allowed-signers list generated from the account's signing
-  keys.
-- Global config includes the signing file only through `includeIf`
+- Give copyable commands with placeholders that put `gpg.format ssh`,
+  `user.signingkey` as the private-key path with its `.pub` beside it, commit
+  and tag signing and the personal allowed-signers list in a separate file,
+  and generate that list from the account's signing keys.
+- Global config includes the file only through `includeIf`
   `hasconfig:remote.*.url:` patterns for each GitHub URL form the owner's
   remotes use, with `*/**` after an SCP-style colon.
-- A clone without a matching remote commits with the owner's identity,
-  unsigned; once it has a matching remote, its earlier history is re-signed
-  before the first push where signatures are required.
-- The employer's host gets its own include by remote, below the owner's
-  identity, naming a file with the work identity.
+- Clones that inherit identity and signing need nothing; others get local
+  settings from `scripts/configure-signing.sh`.
 
 Forbidden behavior:
 
-- Run `git config --global`, or write the included files or the personal list.
-- Scope identity or signing by path, invent owner or employer values, or put
-  the owner's key in a committed allowed-signers list.
+- Run `git config --global`, or write the included file or the personal list.
+- Scope signing by path, invent owner values, or put the owner's key in a
+  committed allowed-signers list.
 
 Acceptance checks:
 
 - The commands need only owner-supplied values, every include condition is a
-  remote URL pattern, the signing file is included only for GitHub patterns,
-  and global config is unchanged.
+  GitHub remote pattern, and global config is unchanged.
 
 Baseline expectation:
 
-- An answer may put signing in unscoped global config, scope by directory,
+- An answer may enable signing in unscoped global config, scope by directory,
   which also reaches other hosts' clones, use `git@github.com:**`, which
-  matches no SCP-style URL with an owner path, or place the work identity's
-  include above the owner's identity, where it has no effect.
+  matches no SCP-style URL with an owner path, or change global config itself.
 
 Evidence sources:
 
