@@ -1040,7 +1040,8 @@ Expected output:
 - Give copyable commands with placeholders that put `gpg.format ssh`,
   `user.signingkey` as the private-key path with its `.pub` beside it, commit
   and tag signing and the personal allowed-signers list in a separate file,
-  and generate that list from the account's signing keys.
+  and generate that list from the account's signing keys. Recommend Git's XDG
+  directory, `~/.config/git/`, for global config, that file and the list.
 - Global config includes the file only through `includeIf`
   `hasconfig:remote.*.url:` patterns for each GitHub URL form the owner's
   remotes use, with `*/**` after an SCP-style colon; global config itself

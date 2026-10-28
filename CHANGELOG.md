@@ -8,7 +8,9 @@
   GitHub clones once: copyable commands with placeholders put the signing
   settings in a file that global config includes only for GitHub remotes,
   with none of them in global config itself, and generate the personal
-  allowed-signers list from the account.
+  allowed-signers list from the account. The recommended layout keeps global
+  config, the signing file and the personal list in Git's XDG directory,
+  `~/.config/git/`.
   `user.signingkey` takes the private-key path with its `.pub` beside it.
   Clones that take owner commits need nothing when they inherit identity and
   signing; otherwise they get local settings from

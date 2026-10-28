@@ -19,21 +19,29 @@ without the owner's current key, to the owner.
 `git -C <clone> config --show-origin --get user.signingkey` shows what a clone
 inherits; a `--global` lookup ignores included files.
 
-The owner can enable signing for GitHub clones once, for example with the
-signing settings in a file that global config includes only for GitHub
-remotes, and none of them in global config itself:
+The owner can enable signing for GitHub clones once. The recommended layout
+keeps Git's files in its XDG directory and the keys in `~/.ssh/`; other paths
+work the same way:
+
+- `~/.config/git/config`: global config. `git config --global` writes it once
+  no `~/.gitconfig` exists, so move an existing `~/.gitconfig` there.
+- `~/.config/git/github`: the signing settings, which global config includes
+  only for GitHub remotes; global config itself holds none of them.
+- `~/.config/git/allowed_signers`: the personal list.
 
 ```sh
-git config --file <signing-config> gpg.format ssh
-git config --file <signing-config> user.signingkey <private-key-path>
-git config --file <signing-config> commit.gpgsign true
-git config --file <signing-config> tag.gpgsign true
-git config --file <signing-config> gpg.ssh.allowedSignersFile <personal-list>
-git config --global 'includeIf.hasconfig:remote.*.url:git@github.com:*/**.path' <signing-config>
-git config --global 'includeIf.hasconfig:remote.*.url:https://github.com/**.path' <signing-config>
+mkdir -p ~/.config/git
+git config --file ~/.config/git/github gpg.format ssh
+git config --file ~/.config/git/github user.signingkey <private-key-path>
+git config --file ~/.config/git/github commit.gpgsign true
+git config --file ~/.config/git/github tag.gpgsign true
+git config --file ~/.config/git/github gpg.ssh.allowedSignersFile ~/.config/git/allowed_signers
+git config --global 'includeIf.hasconfig:remote.*.url:git@github.com:*/**.path' ~/.config/git/github
+git config --global 'includeIf.hasconfig:remote.*.url:https://github.com/**.path' ~/.config/git/github
 gh api --paginate users/<login>/ssh_signing_keys \
-  --jq '.[] | "<owner-email> namespaces=\"git\" \(.key)"' > <personal-list>.new &&
-  test -s <personal-list>.new && mv <personal-list>.new <personal-list>
+  --jq '.[] | "<owner-email> namespaces=\"git\" \(.key)"' > ~/.config/git/allowed_signers.new &&
+  test -s ~/.config/git/allowed_signers.new &&
+  mv ~/.config/git/allowed_signers.new ~/.config/git/allowed_signers
 ```
 
 `user.signingkey` takes the private-key path; keep its public key beside it as
