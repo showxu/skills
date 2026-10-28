@@ -50,14 +50,17 @@ git config --global 'includeIf.gitdir:<local-only-dir>/.path' <owner-config>
 ```
 
 A repository gets the owner's identity and key once one of its remotes matches
-a pattern, or when its Git directory lies under `<local-only-dir>/`, which
-covers repositories without a remote. Add a pattern for every URL form the
-owner's remotes use, such as `ssh://git@github.com/**` or an SSH host alias.
-Git matches these patterns path by path: `**` spans directories only after a
-`/`, so an SCP-style URL needs `*/**` after its colon. `hasconfig` needs Git
-2.36 or later, and the included file must not set remote URLs. A clone outside
-these conditions that takes owner commits gets local config from
-`scripts/configure-signing.sh`.
+a pattern, or when its Git directory lies under `<local-only-dir>/`, for
+repositories without a remote. That condition ignores remotes, so the directory
+must hold no other hosts' clones. Add a pattern for every URL form the owner's
+remotes use, such as `ssh://git@github.com/**` or an SSH host alias. Git
+matches these patterns path by path: `**` spans directories only as a whole
+path component, so an SCP-style URL needs `*/**` after its colon. `hasconfig`
+needs Git 2.36 or later, and the included file must not set remote URLs.
+Global config itself then keeps none of these settings; a default for other
+hosts, such as another identity, goes above the `includeIf` lines, because the
+value read last wins. A clone outside these conditions that takes owner commits
+gets local config from `scripts/configure-signing.sh`.
 
 A committed allowed-signers list holds only signers no account publishes, such
 as release automation. A repository keeps it under `.github/`, or uses the

@@ -1044,15 +1044,17 @@ Expected output:
 - Write those settings to a separate file and include it from global config
   with `includeIf` `hasconfig:remote.*.url:` patterns for each GitHub URL form
   the owner's remotes use, with `*/**` after an SCP-style colon, plus a
-  `gitdir:` directory for repositories without a remote.
+  `gitdir:` directory for repositories without a remote that holds no other
+  hosts' clones. Global config keeps none of these settings itself.
 - A clone outside those conditions that takes owner commits gets local config
   from `scripts/configure-signing.sh`.
 
 Forbidden behavior:
 
 - Run `git config --global`, or write the included file or the personal list.
-- Add patterns for the employer's hosts, invent owner values, or put the
-  owner's key in a committed allowed-signers list.
+- Add patterns for the employer's hosts, name a `gitdir:` directory that holds
+  their clones, invent owner values, or put the owner's key in a committed
+  allowed-signers list.
 
 Acceptance checks:
 
