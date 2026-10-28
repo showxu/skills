@@ -70,6 +70,12 @@ class SigningSetupTests(unittest.TestCase):
         return subprocess.run(["sh", str(SKILL / "scripts" / script), str(repo or self.repo)],
                               env=environment, text=True, capture_output=True)
 
+    def inherit(self, settings):
+        gitconfig = self.root / "gitconfig"
+        for name, value in settings.items():
+            subprocess.run(["git", "config", "--file", str(gitconfig), name, value], check=True)
+        self.env["GIT_CONFIG_GLOBAL"] = str(gitconfig)
+
     def config(self):
         return (self.repo / ".git/config").read_text()
 
@@ -125,6 +131,33 @@ class SigningSetupTests(unittest.TestCase):
         self.assertEqual(self.shared.read_text(), self.bot + self.line)
         self.assertEqual(self.signers(), str(self.shared))
         self.assertFalse((self.repo / ".git/allowed_signers").exists())
+        self.assert_verified_commit()
+
+    def test_inherited_signing_is_not_pinned_locally(self):
+        personal = f'{EMAIL} namespaces="git" {self.other}\n' + self.line
+        self.shared.write_text(personal)
+        settings = {"user.name": "Fixture Owner", "user.email": EMAIL, "gpg.format": "ssh",
+                    "user.signingkey": str(self.key), "gpg.ssh.allowedSignersFile": str(self.shared),
+                    "commit.gpgsign": "true", "tag.gpgsign": "true"}
+        self.inherit(settings)
+        self.assert_configured(self.configure("configure-clone.sh", CONTENT_CHECK="true",
+                                              FAST_CHECK="true"))
+        for name in settings:
+            self.assertEqual(self.git("config", "--local", "--get", name, check=False), "", name)
+        self.assertEqual(self.shared.read_text(), personal)
+        self.assertFalse((self.repo / ".git/allowed_signers").exists())
+        self.assertTrue((self.repo / ".git/hooks/pre-push").exists())
+        self.assert_verified_commit()
+
+    def test_inherited_list_without_owner_is_only_read(self):
+        self.shared.write_text(self.bot)
+        self.inherit({"gpg.ssh.allowedSignersFile": str(self.shared)})
+        self.assert_configured(self.configure())
+        fallback = self.repo / ".git/allowed_signers"
+        self.assertEqual(self.shared.read_text(), self.bot)
+        self.assertEqual(fallback.read_text(), self.line)
+        self.assertEqual(self.git("config", "--local", "--get", "gpg.ssh.allowedSignersFile"),
+                         str(fallback))
         self.assert_verified_commit()
 
     def test_lines_authorizing_owner_key_for_git_are_kept(self):

@@ -42,9 +42,10 @@ concurrent writers are implied.
    with their peeled targets, and reusable-workflow pin drift. Audit-only
    requests end in that report without mutations.
 2. **Prepare.** Make a bounded change list. Preserve valid historical records,
-   legal notices and external authorship. For signed owner work, use signing the
-   clone inherits from the owner's global Git config, or configure only its local
-   Git config, using [governance](references/governance.md).
+   legal notices and external authorship. For signed owner work, a clone
+   inherits the owner's global signing or gets local Git config, and every task
+   clone that pushes owner commits gets the owner push gate; follow
+   [governance](references/governance.md) and never change global config.
    Run repository-owned checks, not a second competing content policy.
    Use [layout](references/layout.md) for GitHub-defined paths and the shared
    presentation-asset layout.

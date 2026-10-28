@@ -1,17 +1,19 @@
 #!/bin/sh
 # Configure a clone's owner identity, SSH commit and tag signing, and its
 # allowed-signers list in local config, which all of the clone's worktrees share.
+# A setting the clone already inherits with the same value is not written.
 #
 # Set OWNER_NAME, OWNER_EMAIL, SIGNING_KEY and optionally ALLOWED_SIGNERS, then:
 #   configure-signing.sh <repo-dir>
 #
 # SIGNING_KEY is the private SSH key path; its .pub file must sit next to it.
-# The list is ALLOWED_SIGNERS, else the configured gpg.ssh.allowedSignersFile,
-# else allowed_signers in the common Git directory. The setting keeps the value
-# as given; Git resolves ~/ and relative paths, from the working tree root.
-# The owner's line is appended when missing and other lines are kept. A list
-# that is a symbolic link or repository content is only read. Every refusal
-# precedes the first write.
+# The list is ALLOWED_SIGNERS, else the local gpg.ssh.allowedSignersFile, else
+# the inherited one when it already authorizes the owner, else allowed_signers
+# in the common Git directory. The setting keeps the value as given; Git
+# resolves ~/ and relative paths, from the working tree root. The owner's line
+# is appended when missing and other lines are kept. A list that is a symbolic
+# link or repository content is only read. Every refusal precedes the first
+# write.
 set -eu
 
 repo=${1:?usage: configure-signing.sh <repo-dir>}
@@ -20,17 +22,16 @@ repo=${1:?usage: configure-signing.sh <repo-dir>}
 : "${SIGNING_KEY:?set SIGNING_KEY}"
 [ -f "$SIGNING_KEY.pub" ] || { echo "missing $SIGNING_KEY.pub" >&2; exit 1; }
 
-common=$(git -C "$repo" rev-parse --path-format=absolute --git-common-dir)
-setting=${ALLOWED_SIGNERS:-$(git -C "$repo" config --local --get gpg.ssh.allowedSignersFile || :)}
-setting=${setting:-$common/allowed_signers}
-case $setting in
-/*) list=$setting ;;
-"~/"*) list=$HOME/${setting#"~/"} ;;
-*) list=$(git -C "$repo" rev-parse --show-toplevel)/$setting ;;
-esac
-
 key=$(cut -d' ' -f1,2 "$SIGNING_KEY.pub")
 line="$OWNER_EMAIL namespaces=\"git\" $key"
+
+path_of() {
+  case $1 in
+  /*) printf '%s\n' "$1" ;;
+  "~/"*) printf '%s\n' "$HOME/${1#"~/"}" ;;
+  *) printf '%s\n' "$(git -C "$repo" rev-parse --show-toplevel)/$1" ;;
+  esac
+}
 
 # A line lists principals, optional options, then the key and a comment. It
 # authorizes the owner when a principal is the email and the key matches,
@@ -38,7 +39,7 @@ line="$OWNER_EMAIL namespaces=\"git\" $key"
 # pattern list does not admit git. As in OpenSSH, option names ignore case and
 # patterns use *, ? and ! negation.
 has_owner_line() {
-  [ -f "$list" ] && awk -v email="$OWNER_EMAIL" -v key="$key" '
+  [ -f "$1" ] && awk -v email="$OWNER_EMAIL" -v key="$key" '
     function glob(p, s,    c) {
       if (p == "") return s == ""
       c = substr(p, 1, 1)
@@ -70,31 +71,50 @@ has_owner_line() {
       n = split($1, principals, ",")
       for (i = 1; i <= n; i++) if (principals[i] == email) found = 1
     }
-    END { exit !found }' "$list"
+    END { exit !found }' "$1"
 }
 
+common=$(git -C "$repo" rev-parse --path-format=absolute --git-common-dir)
+setting=${ALLOWED_SIGNERS:-$(git -C "$repo" config --local --get gpg.ssh.allowedSignersFile || :)}
+if [ -z "$setting" ]; then
+  inherited=$(git -C "$repo" config --get gpg.ssh.allowedSignersFile || :)
+  if [ -n "$inherited" ] && has_owner_line "$(path_of "$inherited")"; then
+    setting=$inherited
+  fi
+fi
+setting=${setting:-$common/allowed_signers}
+list=$(path_of "$setting")
+
 refuse() {
-  echo "$list $1, or set ALLOWED_SIGNERS if the standard names another list:" >&2
+  echo "$list $1; name a list outside working trees in ALLOWED_SIGNERS for:" >&2
   echo "$line" >&2
   exit 1
 }
 
-if ! has_owner_line; then
-  [ ! -L "$list" ] || refuse "is a symbolic link; add this line to its target"
+if ! has_owner_line "$list"; then
+  [ ! -L "$list" ] || refuse "is a symbolic link, which is not written through"
   dir=$(dirname "$list")
   if [ "$(git -C "$dir" rev-parse --is-inside-work-tree 2>/dev/null)" = true ] &&
     ! git -C "$dir" check-ignore -q -- "$(basename "$list")"; then
-    [ -e "$list" ] || refuse "is missing from a working tree; restore it through its review"
-    refuse "is repository content; add this line through its review"
+    [ -e "$list" ] || refuse "is missing from a working tree"
+    refuse "is repository content, which takes no owner key"
   fi
   if [ -s "$list" ] && [ -n "$(tail -c 1 "$list")" ]; then echo >>"$list"; fi
   printf '%s\n' "$line" >>"$list"
 fi
 
-git -C "$repo" config --replace-all user.name "$OWNER_NAME"
-git -C "$repo" config --replace-all user.email "$OWNER_EMAIL"
-git -C "$repo" config --replace-all gpg.format ssh
-git -C "$repo" config --replace-all user.signingkey "$SIGNING_KEY"
-git -C "$repo" config --replace-all gpg.ssh.allowedSignersFile "$setting"
-git -C "$repo" config --replace-all commit.gpgsign true
-git -C "$repo" config --replace-all tag.gpgsign true
+# A local value is replaced; an inherited one is overridden only when it differs.
+set_config() {
+  if git -C "$repo" config --local --get-all "$1" >/dev/null ||
+    [ "$(git -C "$repo" config --get "$1" || :)" != "$2" ]; then
+    git -C "$repo" config --replace-all "$1" "$2"
+  fi
+}
+
+set_config user.name "$OWNER_NAME"
+set_config user.email "$OWNER_EMAIL"
+set_config gpg.format ssh
+set_config user.signingkey "$SIGNING_KEY"
+set_config gpg.ssh.allowedSignersFile "$setting"
+set_config commit.gpgsign true
+set_config tag.gpgsign true

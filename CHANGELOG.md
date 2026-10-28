@@ -7,18 +7,21 @@
 - github-repo-steward configures a clone's identity, SSH signing and
   allowed-signers list on its own with `scripts/configure-signing.sh`, without
   the push gate; `scripts/configure-clone.sh` still requires its checks and
-  now delegates signing to it. Both use `ALLOWED_SIGNERS` when set, otherwise
-  the clone's configured list, and fall back to `allowed_signers` in the
-  repository's common Git directory, which all worktrees share and which
-  survives removing a worktree. They append the owner's line when no line
-  authorizes the owner's key for Git signing and keep every other signer; a
-  list that is a symbolic link or repository content is only read. Governance
-  defaults to the owner's global signing, set once per machine and inherited by
-  clones, and keeps local setup for clones without it, shared by their
-  worktrees. The owner's keys registered on GitHub are the source of truth: a
-  personal list holds only those keys and is regenerated from them after a
-  reinstall or rotation, and a repository commits a list only for signers no
-  account publishes, such as release automation.
+  now delegates signing to it. Both write only settings the clone does not
+  already inherit, and use `ALLOWED_SIGNERS` when set, otherwise the clone's
+  local list, otherwise an inherited list that already authorizes the owner,
+  otherwise `allowed_signers` in the repository's common Git directory, which
+  all worktrees share and which survives removing a worktree. They append the
+  owner's line when no line authorizes the owner's key for Git signing and keep
+  every other signer; an inherited list, a symbolic link or repository content
+  is only read.
+- github-repo-steward governance defaults to signing configured once per
+  machine in global Git config and inherited by clones. The owner's keys
+  registered on GitHub are the source of truth: the personal list holds only
+  them and is regenerated from the account after a reinstall or rotation, and a
+  committed list holds only signers no account publishes, such as release
+  automation, under a repository's `.github/` or its organization's `.github`
+  repository.
 
 ## 0.1.5
 
