@@ -66,7 +66,8 @@ class SigningSetupTests(unittest.TestCase):
 
     def configure(self, script="configure-signing.sh", repo=None, **inputs):
         environment = dict(self.env, OWNER_NAME="Fixture Owner", OWNER_EMAIL=EMAIL,
-                           SIGNING_KEY=str(self.key), **inputs)
+                           SIGNING_KEY=str(self.key))
+        environment.update(inputs)
         return subprocess.run(["sh", str(SKILL / "scripts" / script), str(repo or self.repo)],
                               env=environment, text=True, capture_output=True)
 
@@ -152,13 +153,39 @@ class SigningSetupTests(unittest.TestCase):
     def test_inherited_list_without_owner_is_only_read(self):
         self.shared.write_text(self.bot)
         self.inherit({"gpg.ssh.allowedSignersFile": str(self.shared)})
-        self.assert_configured(self.configure())
+        result = self.configure()
+        self.assert_configured(result)
+        self.assertIn(f"inherited {self.shared} lacks the owner's key", result.stderr)
         fallback = self.repo / ".git/allowed_signers"
         self.assertEqual(self.shared.read_text(), self.bot)
         self.assertEqual(fallback.read_text(), self.line)
         self.assertEqual(self.git("config", "--local", "--get", "gpg.ssh.allowedSignersFile"),
                          str(fallback))
         self.assert_verified_commit()
+
+    def test_rotation_extends_local_list_under_inherited_key(self):
+        retired_key = Path(self.signing.name) / "release-key"
+        retired = f'{EMAIL} namespaces="git" {self.other}\n'
+        self.shared.write_text(self.bot)
+        self.inherit({"user.name": "Fixture Owner", "user.email": EMAIL, "gpg.format": "ssh",
+                      "user.signingkey": str(retired_key), "commit.gpgsign": "true",
+                      "gpg.ssh.allowedSignersFile": str(self.shared)})
+        self.assert_configured(self.configure(SIGNING_KEY=str(retired_key)))
+        self.inherit({"user.signingkey": str(self.key)})
+        self.assert_configured(self.configure())
+        self.assertEqual((self.repo / ".git/allowed_signers").read_text(), retired + self.line)
+        self.assertEqual(self.git("config", "--local", "--get", "user.signingkey", check=False), "")
+        self.assert_verified_commit()
+
+    def test_relative_list_without_working_tree_is_refused(self):
+        bare = self.root / "bare.git"
+        self.git("init", "-q", "--bare", str(bare))
+        config = (bare / "config").read_text()
+        relative = str(self.shared.relative_to(self.shared.anchor))
+        result = self.configure(repo=bare, ALLOWED_SIGNERS=relative)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(self.shared.exists())
+        self.assertEqual((bare / "config").read_text(), config)
 
     def test_lines_authorizing_owner_key_for_git_are_kept(self):
         self.git("config", "gpg.ssh.allowedSignersFile", str(self.shared))

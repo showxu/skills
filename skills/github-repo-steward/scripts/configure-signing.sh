@@ -29,7 +29,7 @@ path_of() {
   case $1 in
   /*) printf '%s\n' "$1" ;;
   "~/"*) printf '%s\n' "$HOME/${1#"~/"}" ;;
-  *) printf '%s\n' "$(git -C "$repo" rev-parse --show-toplevel)/$1" ;;
+  *) root=$(git -C "$repo" rev-parse --show-toplevel) && printf '%s\n' "$root/$1" ;;
   esac
 }
 
@@ -78,8 +78,13 @@ common=$(git -C "$repo" rev-parse --path-format=absolute --git-common-dir)
 setting=${ALLOWED_SIGNERS:-$(git -C "$repo" config --local --get gpg.ssh.allowedSignersFile || :)}
 if [ -z "$setting" ]; then
   inherited=$(git -C "$repo" config --get gpg.ssh.allowedSignersFile || :)
-  if [ -n "$inherited" ] && has_owner_line "$(path_of "$inherited")"; then
-    setting=$inherited
+  if [ -n "$inherited" ]; then
+    inherited_list=$(path_of "$inherited")
+    if has_owner_line "$inherited_list"; then
+      setting=$inherited
+    else
+      echo "inherited $inherited_list lacks the owner's key; using a local list" >&2
+    fi
   fi
 fi
 setting=${setting:-$common/allowed_signers}

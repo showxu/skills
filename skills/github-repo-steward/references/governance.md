@@ -12,14 +12,16 @@ configures each machine once in global Git config: identity, the signing key,
 signing of commits and tags, and a personal allowed-signers list, the file that
 global `gpg.ssh.allowedSignersFile` names, holding only the owner's keys,
 retired ones included. Clones inherit it. The owner maintains global config and
-the personal list; never change them. Report a machine without them to the
-owner and configure the clone locally.
+regenerates the personal list; never change global config. Report a machine
+without global signing, or a personal list without the owner's current key, to
+the owner and configure the clone locally.
 
 A committed allowed-signers list holds only signers no account publishes, such
 as release automation. A repository keeps it under `.github/`, or uses the
 single list its organization keeps in the organization's `.github` repository.
-Release verification adds the owner's keys from the account. Never add the
-owner's key to a committed list.
+Release verification adds the owner's keys from the account, for example in a
+temporary list combined with the committed one. Never add the owner's key to a
+committed list, and never use a committed list as a clone's list.
 
 The helpers take `OWNER_NAME`, `OWNER_EMAIL`, `SIGNING_KEY` and an optional
 `ALLOWED_SIGNERS`, and write to the clone's local config only settings it does
@@ -48,15 +50,18 @@ authorizes the owner's key, otherwise `allowed_signers` in the common Git
 directory. Git config keeps the value as given, and Git resolves `~/` and
 relative paths, which start at the working tree root. The helpers append the
 owner's line when the selected list lacks it and keep every other line. They
-never write an inherited list. A symbolic link or repository content, tracked
-or not ignored in a working tree, is only read; when it lacks the owner's line,
-the helpers stop before any write. Set `ALLOWED_SIGNERS` to a list outside
-working trees when the clone's local list is gone or committed, or when an
-applicable standard names another list.
+never write an inherited list, and report one that lacks the owner's key. A
+symbolic link or repository content, tracked or not ignored in a working tree,
+is only read; when it lacks the owner's line, the helpers stop before any
+write. Set `ALLOWED_SIGNERS` to a list outside working trees when the clone's
+local list is gone or committed, or to the list an applicable standard names
+for clones. Never name the personal list there; the helpers reuse it when
+inherited.
 
 A fresh clone has no local signing settings and inherits global signing where
-the machine has it; otherwise run the helper on it. A committed list returns
-with the clone. When the owner reinstalls a machine or rotates the signing
+the machine has it; otherwise run the helper on it. A task clone runs
+`scripts/configure-clone.sh` either way. When the owner reinstalls a machine or
+rotates the signing
 key, the owner keeps every retired key registered on GitHub and regenerates the
 personal list from the account, replacing it only after a complete fetch:
 
@@ -67,7 +72,8 @@ gh api --paginate users/<login>/ssh_signing_keys \
 ```
 
 After a rotation, rerun the helper with the new `SIGNING_KEY` on clones whose
-local config sets the signing key. Keep the private signing key;
+local config sets the signing key or the allowed-signers list. Keep the private
+signing key;
 `ssh-keygen -y -f <key> > <key>.pub` restores its public key. A committed list
 keeps its signers' retired keys.
 
