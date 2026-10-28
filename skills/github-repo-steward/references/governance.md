@@ -11,16 +11,17 @@ owner, and GitHub verifies other authors' commits. The personal allowed-signers
 list, the file that the inherited `gpg.ssh.allowedSignersFile` names, holds
 only the owner's keys, retired ones included. The owner maintains global Git
 config, including any file it includes, and regenerates the personal list;
-never change them. A clone that inherits the owner's identity and signing needs
-nothing; otherwise `scripts/configure-signing.sh` writes the settings it does
-not inherit. Report a clone with a GitHub remote that inherits no signing, or a
-personal list without the owner's current key, to the owner.
+never change them. A clone that takes owner commits needs nothing when it
+inherits the owner's identity and signing; otherwise
+`scripts/configure-signing.sh` writes the settings it does not inherit. Report
+a clone with a GitHub remote that inherits no signing, or a personal list
+without the owner's current key, to the owner.
 `git -C <clone> config --show-origin --get user.signingkey` shows what a clone
 inherits; a `--global` lookup ignores included files.
 
 The owner can enable signing for GitHub clones once, for example with the
 signing settings in a file that global config includes only for GitHub
-remotes:
+remotes, and none of them in global config itself:
 
 ```sh
 git config --file <signing-config> gpg.format ssh
@@ -40,9 +41,9 @@ gh api --paginate users/<login>/ssh_signing_keys \
 every SSH signing key the account `<login>` registers into the personal list,
 replacing the list only after a complete fetch. Add an include for every URL
 form the owner's remotes use, such as `ssh://git@github.com/**`; any matching
-remote counts. Git's `**` spans directories only as a whole path component, so
-an SCP-style URL needs `*/**` after its colon. `hasconfig` needs Git 2.36 or
-later.
+remote counts, an `upstream` included. Git's `**` spans directories only as a
+whole path component, so an SCP-style URL needs `*/**` after its colon.
+`hasconfig` needs Git 2.36 or later.
 
 A committed allowed-signers list holds only signers no account publishes, such
 as release automation. A repository keeps it under `.github/`, or uses the

@@ -1043,9 +1043,11 @@ Expected output:
   and generate that list from the account's signing keys.
 - Global config includes the file only through `includeIf`
   `hasconfig:remote.*.url:` patterns for each GitHub URL form the owner's
-  remotes use, with `*/**` after an SCP-style colon.
-- Clones that inherit identity and signing need nothing; others get local
-  settings from `scripts/configure-signing.sh`.
+  remotes use, with `*/**` after an SCP-style colon; global config itself
+  keeps none of the signing settings.
+- Clones that take owner commits need nothing when they inherit identity and
+  signing; otherwise they get local settings from
+  `scripts/configure-signing.sh`.
 
 Forbidden behavior:
 
