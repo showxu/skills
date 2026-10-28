@@ -13,7 +13,8 @@ repositories and organization members through the same contract.
 | information.md | What each product kind states, value owners, copy and demonstration content |
 | upload.md | Owner browser procedure, temporary Apple Events fallback, independent receipt |
 | audit.md | Full semantic audit and bounded mechanical settings projection |
-| scripts/configure-clone.sh / prepush-check.sh | Task-clone signing and repository-owned validation gates |
+| scripts/configure-signing.sh | Clone identity, SSH signing and append-only allowed-signers list selection |
+| scripts/configure-clone.sh / prepush-check.sh | Owner task-clone setup and repository-owned validation gates |
 | scripts/scan_repository.py | Accepted-ancestry signatures/subjects, tag type/signatures, parsed reusable-pin drift, workflow/content observations and license digest; reused by organization aggregation |
 | scripts/requirements.txt | Pinned PyYAML for workflow discovery and Pillow for upload verification |
 | scripts/audit_repo.py | Read-only settings capture and expected/observed comparison |

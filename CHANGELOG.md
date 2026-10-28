@@ -2,6 +2,27 @@
 
 ## Unreleased
 
+## 0.1.6
+
+- github-repo-steward configures a clone's identity, SSH signing and
+  allowed-signers list on its own with `scripts/configure-signing.sh`, without
+  the push gate; `scripts/configure-clone.sh` still requires its checks and
+  now delegates signing to it. Both write only settings the clone does not
+  already inherit, and use `ALLOWED_SIGNERS` when set, otherwise the clone's
+  local list, otherwise an inherited list that already authorizes the owner,
+  otherwise `allowed_signers` in the repository's common Git directory, which
+  all worktrees share and which survives removing a worktree. They append the
+  owner's line when no line authorizes the owner's key for Git signing and keep
+  every other signer; an inherited list, a symbolic link or repository content
+  is only read, and an inherited list without the owner's key is reported.
+- github-repo-steward governance defaults to signing configured once per
+  machine in global Git config and inherited by clones. The owner's keys
+  registered on GitHub are the source of truth: the personal list holds only
+  them and is regenerated from the account after a reinstall or rotation, and a
+  committed list holds only signers no account publishes, such as release
+  automation, under a repository's `.github/` or its organization's `.github`
+  repository.
+
 ## 0.1.5
 
 - agent-evolver re-evaluates a skill collection, named skills or a set of
