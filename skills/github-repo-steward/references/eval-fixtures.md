@@ -1026,46 +1026,50 @@ Owner notes:
 
 ## owner-machine-signing-setup
 
-Target behavior: Give the owner a one-time machine signing setup that applies only to their GitHub repositories.
+Target behavior: Give the owner a one-time machine setup with a global identity and signing that follows GitHub remotes.
 
-Input prompt: "How do I set up commit signing on this machine once so my GitHub repositories inherit it? My employer's GitLab and GitHub Enterprise repositories on this machine must not get this identity or key."
+Input prompt: "How do I set up commit signing on this machine once so my GitHub repositories inherit it? Repositories without a remote should still use my GitHub identity. My employer's GitLab repositories on this machine must use my work identity and never get my signing key."
 
 Context and files:
 
 - The owner signs with an SSH key registered on their GitHub account; no
-  name, email, key path or login is supplied. No global change is authorized.
+  name, email, key path, login, work identity or employer host is supplied.
+  No global change is authorized.
 
 Expected output:
 
-- Give copyable commands with placeholders for the owner's name, email,
-  private-key path and login: identity, `gpg.format ssh`, `user.signingkey` as
-  the private-key path with its `.pub` beside it, commit and tag signing, and
-  the personal allowed-signers list generated from the account's signing keys.
-- Write those settings to a separate file that global config includes only
-  through `includeIf` `hasconfig:remote.*.url:` patterns for each GitHub URL
-  form the owner's remotes use, with `*/**` after an SCP-style colon. Global
-  config keeps none of these settings itself.
-- A repository without a matching remote gets no identity or signing;
-  `scripts/configure-signing.sh` gives it local config only when the owner
-  wants signed commits there.
+- Give copyable commands with placeholders: the owner's name and email in
+  global config, and a separate file with `gpg.format ssh`, `user.signingkey`
+  as the private-key path with its `.pub` beside it, commit and tag signing,
+  and the personal allowed-signers list generated from the account's signing
+  keys.
+- Global config includes the signing file only through `includeIf`
+  `hasconfig:remote.*.url:` patterns for each GitHub URL form the owner's
+  remotes use, with `*/**` after an SCP-style colon.
+- A clone without a matching remote commits with the owner's identity,
+  unsigned; once it has a matching remote, its earlier history is re-signed
+  before the first push where signatures are required.
+- The employer's host gets its own include by remote, below the owner's
+  identity, naming a file with the work identity.
 
 Forbidden behavior:
 
-- Run `git config --global`, or write the included file or the personal list.
-- Add patterns for the employer's hosts, invent owner values, or put the
-  owner's key in a committed allowed-signers list.
+- Run `git config --global`, or write the included files or the personal list.
+- Scope identity or signing by path, invent owner or employer values, or put
+  the owner's key in a committed allowed-signers list.
 
 Acceptance checks:
 
 - The commands need only owner-supplied values, every include condition is a
-  GitHub remote pattern, every identity and signing setting sits in the
-  included file, and global config is unchanged.
+  remote URL pattern, the signing file is included only for GitHub patterns,
+  and global config is unchanged.
 
 Baseline expectation:
 
-- An answer may set identity in unscoped global config, scope by directory,
+- An answer may put signing in unscoped global config, scope by directory,
   which also reaches other hosts' clones, use `git@github.com:**`, which
-  matches no SCP-style URL with an owner path, or change global config itself.
+  matches no SCP-style URL with an owner path, or place the work identity's
+  include above the owner's identity, where it has no effect.
 
 Evidence sources:
 
@@ -1073,4 +1077,4 @@ Evidence sources:
 
 Owner notes:
 
-- Employer hosts are synthetic case inputs.
+- The employer host is a synthetic case input.

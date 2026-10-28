@@ -8,33 +8,31 @@ prepared commits must not become an identity restriction on external PRs.
 
 The owner's signing keys registered on GitHub are the source of truth for the
 owner, and GitHub verifies other authors' commits. By default the owner
-configures each machine once, in a file that global Git config includes for
-repositories with a GitHub remote: identity, the signing key, signing of
-commits and tags, and a personal allowed-signers list, the file that the
-included `gpg.ssh.allowedSignersFile` names, holding only the owner's keys,
-retired ones included. Clones with such a remote inherit it. The owner
-maintains global config, including any file it includes, and regenerates the
-personal list; never change them. Report a clone with a GitHub remote that
-inherits no signing, or a personal list without the owner's current key, to the
-owner and configure the clone locally.
-`git -C <clone> config --show-origin --get user.signingkey`
-shows what a clone inherits; a `--global` lookup ignores included files.
+configures each machine once. Global Git config holds the owner's identity,
+which every clone uses. A file that global config includes for repositories
+with a GitHub remote holds the signing key, signing of commits and tags, and a
+personal allowed-signers list, the file that the included
+`gpg.ssh.allowedSignersFile` names, holding only the owner's keys, retired ones
+included. Clones with such a remote inherit signing. The owner maintains global
+config, including any file it includes, and regenerates the personal list;
+never change them. Report a clone with a GitHub remote that inherits no
+signing, or a personal list without the owner's current key, to the owner and
+configure the clone locally.
+`git -C <clone> config --show-origin --get user.signingkey` shows what a clone
+inherits; a `--global` lookup ignores included files.
 
-The owner sets up a machine once. The settings go in `<owner-config>`, which
-global config includes only for repositories with a GitHub remote, so
-repositories on other hosts, such as an employer's GitLab or GitHub Enterprise
-Server, get neither the identity nor the key:
+The owner sets up a machine once:
 
 ```sh
-git config --file <owner-config> user.name "<owner-name>"
-git config --file <owner-config> user.email <owner-email>
-git config --file <owner-config> gpg.format ssh
-git config --file <owner-config> user.signingkey <private-key-path>
-git config --file <owner-config> commit.gpgsign true
-git config --file <owner-config> tag.gpgsign true
-git config --file <owner-config> gpg.ssh.allowedSignersFile <personal-list>
-git config --global 'includeIf.hasconfig:remote.*.url:git@github.com:*/**.path' <owner-config>
-git config --global 'includeIf.hasconfig:remote.*.url:https://github.com/**.path' <owner-config>
+git config --global user.name "<owner-name>"
+git config --global user.email <owner-email>
+git config --file <signing-config> gpg.format ssh
+git config --file <signing-config> user.signingkey <private-key-path>
+git config --file <signing-config> commit.gpgsign true
+git config --file <signing-config> tag.gpgsign true
+git config --file <signing-config> gpg.ssh.allowedSignersFile <personal-list>
+git config --global 'includeIf.hasconfig:remote.*.url:git@github.com:*/**.path' <signing-config>
+git config --global 'includeIf.hasconfig:remote.*.url:https://github.com/**.path' <signing-config>
 gh api --paginate users/<login>/ssh_signing_keys \
   --jq '.[] | "<owner-email> namespaces=\"git\" \(.key)"' > <personal-list>.new &&
   test -s <personal-list>.new && mv <personal-list>.new <personal-list>
@@ -45,16 +43,33 @@ gh api --paginate users/<login>/ssh_signing_keys \
 every SSH signing key the account `<login>` registers into the personal list,
 replacing the list only after a complete fetch.
 
-Add an include for every URL form the owner's remotes use, such as
-`ssh://git@github.com/**` or an SSH host alias. Git matches these patterns path
-by path: `**` spans directories only as a whole path component, so an
-SCP-style URL needs `*/**` after its colon. `hasconfig` needs Git 2.36 or
-later, and the included file must not set remote URLs. Any matching remote
-counts, so a clone from another host that also carries a GitHub remote, such
-as an `upstream`, gets the identity and key too. Global config itself keeps
-none of these settings, so a repository without a matching remote gets no
-identity or signing; `scripts/configure-signing.sh` gives such a repository
-local config when the owner wants signed commits there.
+Signing follows remotes, never paths. Add an include for every URL form the
+owner's remotes use, such as `ssh://git@github.com/**` or an SSH host alias.
+Git matches these patterns path by path: `**` spans directories only as a whole
+path component, so an SCP-style URL needs `*/**` after its colon. `hasconfig`
+needs Git 2.36 or later, and the included file must not set remote URLs. Any
+matching remote counts, so a clone from another host that also carries a GitHub
+remote, such as an `upstream`, is signed too.
+
+A clone without a matching remote commits with the owner's identity, unsigned.
+Once it has a matching remote, new commits are signed. When its repository
+requires signed commits, re-sign the earlier history before the first push;
+this keeps trees, order and authorship:
+
+```sh
+git -C <clone> rebase --root --rebase-merges --force-rebase
+```
+
+Another host whose repositories need a different identity gets its own
+include, also by remote, naming a file that holds that identity:
+
+```sh
+git config --global 'includeIf.hasconfig:remote.*.url:<host-url-pattern>.path' <host-identity-config>
+```
+
+Git uses the value it reads last, so this include stays below the owner's
+identity in global config; `git config --global` appends a new include at the
+end.
 
 A committed allowed-signers list holds only signers no account publishes, such
 as release automation. A repository keeps it under `.github/`, or uses the
